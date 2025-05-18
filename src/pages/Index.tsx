@@ -1,12 +1,14 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import { useState } from "react";
+import MathPractice from "../components/MathPractice";
+import { Card } from "@/components/ui/card";
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
+      <Card className="w-full max-w-md p-6 shadow-lg">
+        <MathPractice />
+      </Card>
     </div>
   );
 };
