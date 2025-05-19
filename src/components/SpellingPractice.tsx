@@ -345,14 +345,18 @@ const SpellingPractice = () => {
   const checkAnswer = () => {
     if (!currentWord || missingPositions.length === 0) return;
 
-    const correctLetter = correctLetters[currentPosition];
-    const normalizedCorrectLetter = removeDiacritics(correctLetter).toLowerCase();
-    const normalizedUserAnswer = removeDiacritics(userAnswer).toLowerCase();
+    const correctLetter = correctLetters[currentPosition].toLowerCase();
+    const userAnswerNormalized = userAnswer.toLowerCase();
     
-    // Kontrolujeme, zda uživatel zadal správné i/y (bez ohledu na diakritiku)
-    const isCorrect = 
-      (normalizedCorrectLetter === 'i' && (normalizedUserAnswer === 'i')) ||
-      (normalizedCorrectLetter === 'y' && (normalizedUserAnswer === 'y'));
+    // Určení, zda je odpověď správná - kontrolujeme jen základ (i/y)
+    const isCorrect = (
+      (correctLetter === 'i' || correctLetter === 'í') && (userAnswerNormalized === 'i' || userAnswerNormalized === 'í')
+    ) || (
+      (correctLetter === 'y' || correctLetter === 'ý') && (userAnswerNormalized === 'y' || userAnswerNormalized === 'ý')
+    );
+    
+    // Pro debug do konzole
+    console.log(`Správná odpověď: ${correctLetter}, Uživatelova odpověď: ${userAnswerNormalized}, Vyhodnoceno jako: ${isCorrect ? 'Správně' : 'Špatně'}`);
     
     if (isCorrect) {
       toast({
