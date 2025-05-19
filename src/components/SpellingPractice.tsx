@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,60 +7,178 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { removeDiacritics } from "@/lib/utils";
+
+type WordType = "vyjmenované" | "příbuzné" | "odvozené";
+
+type SpellingWord = {
+  word: string;
+  type: WordType;
+  positions?: number[]; // Pozice, kde se má doplnit i/y (pro složitější případy)
+};
 
 type SpellingGroup = {
   name: string;
-  words: string[];
+  words: SpellingWord[];
+  phrases?: string[]; // Slovní spojení a věty
 };
 
 const spellingGroups: SpellingGroup[] = [
   {
     name: "B",
     words: [
-      "být", "bydlit", "obyvatel", "byt", "příbytek", "nábytek", "dobytek", 
-      "obyčej", "bystrý", "bylina", "kobyla", "býk", "Přibyslav"
+      { word: "být", type: "vyjmenované" },
+      { word: "bydlit", type: "vyjmenované" },
+      { word: "obyvatel", type: "vyjmenované" },
+      { word: "byt", type: "vyjmenované" },
+      { word: "příbytek", type: "vyjmenované" },
+      { word: "nábytek", type: "vyjmenované" },
+      { word: "dobytek", type: "vyjmenované" },
+      { word: "obyčej", type: "vyjmenované" },
+      { word: "bystrý", type: "vyjmenované" },
+      { word: "bylina", type: "vyjmenované" },
+      { word: "kobyla", type: "vyjmenované" },
+      { word: "býk", type: "vyjmenované" },
+      { word: "Přibyslav", type: "vyjmenované" },
+      // Příbuzná a odvozená slova
+      { word: "neobyčejný", type: "příbuzné" },
+      { word: "bytost", type: "příbuzné" },
+      { word: "bylinný", type: "příbuzné" },
+      { word: "zabydlet", type: "příbuzné" },
+      { word: "býčí", type: "příbuzné" },
+      { word: "bidlo", type: "odvozené" },
+      { word: "nabídka", type: "odvozené" },
+      { word: "bit", type: "odvozené" }
+    ],
+    phrases: [
+      "Býk se pase na býlí",
+      "V bytě je nový nábytek",
+      "Obyvatelé bydlí v malých bytech",
+      "Kobyla běhá po louce"
     ]
   },
   {
     name: "L",
     words: [
-      "slyšet", "mlýn", "blýskat se", "polykat", "plynout", "plýtvat", "vzlykat", 
-      "lysý", "lýtko", "lýko", "pelyněk", "plyš", "plynový", "vzlykat"
+      { word: "slyšet", type: "vyjmenované" },
+      { word: "mlýn", type: "vyjmenované" },
+      { word: "blýskat se", type: "vyjmenované" },
+      { word: "polykat", type: "vyjmenované" },
+      { word: "plynout", type: "vyjmenované" },
+      { word: "plýtvat", type: "vyjmenované" },
+      { word: "vzlykat", type: "vyjmenované" },
+      { word: "lysý", type: "vyjmenované" },
+      { word: "lýtko", type: "vyjmenované" },
+      { word: "lýko", type: "vyjmenované" },
+      { word: "pelyněk", type: "vyjmenované" },
+      { word: "plyš", type: "vyjmenované" },
+      { word: "plynový", type: "vyjmenované" },
+      { word: "vzlykat", type: "vyjmenované" },
+      // Příbuzná a odvozená slova
+      { word: "blýskavý", type: "příbuzné" },
+      { word: "zalykat", type: "příbuzné" },
+      { word: "lýkožrout", type: "příbuzné" },
+      { word: "linka", type: "odvozené" },
+      { word: "list", type: "odvozené" },
+      { word: "lichý", type: "odvozené" }
+    ],
+    phrases: [
+      "Na nebi se blýská",
+      "Mlýn mele mouku",
+      "Slyšel jsem v noci vzlykat"
     ]
   },
   {
     name: "M",
     words: [
-      "my", "mýt", "myslit", "mýlit se", "hmyz", "myš", "hlemýžď", "mýtit", 
-      "zamykat", "smýkat", "dmýchat", "chmýří", "nachomýtnout se", "Litomyšl"
+      { word: "my", type: "vyjmenované" },
+      { word: "mýt", type: "vyjmenované" },
+      { word: "myslit", type: "vyjmenované" },
+      { word: "mýlit se", type: "vyjmenované" },
+      { word: "hmyz", type: "vyjmenované" },
+      { word: "myš", type: "vyjmenované" },
+      { word: "hlemýžď", type: "vyjmenované" },
+      { word: "mýtit", type: "vyjmenované" },
+      { word: "zamykat", type: "vyjmenované" },
+      { word: "smýkat", type: "vyjmenované" },
+      { word: "dmýchat", type: "vyjmenované" },
+      { word: "chmýří", type: "vyjmenované" },
+      { word: "nachomýtnout se", type: "vyjmenované" },
+      { word: "Litomyšl", type: "vyjmenované" }
     ]
   },
   {
     name: "P",
     words: [
-      "pýcha", "pytel", "pysk", "netopýr", "slepýš", "pyl", "kopyto", "klopýtat", 
-      "třpytit se", "zpytovat", "pykat", "pýr", "pýřit se", "čepýřit se"
+      { word: "pýcha", type: "vyjmenované" },
+      { word: "pytel", type: "vyjmenované" },
+      { word: "pysk", type: "vyjmenované" },
+      { word: "netopýr", type: "vyjmenované" },
+      { word: "slepýš", type: "vyjmenované" },
+      { word: "pyl", type: "vyjmenované" },
+      { word: "kopyto", type: "vyjmenované" },
+      { word: "klopýtat", type: "vyjmenované" },
+      { word: "třpytit se", type: "vyjmenované" },
+      { word: "zpytovat", type: "vyjmenované" },
+      { word: "pykat", type: "vyjmenované" },
+      { word: "pýr", type: "vyjmenované" },
+      { word: "pýřit se", type: "vyjmenované" },
+      { word: "čepýřit se", type: "vyjmenované" }
     ]
   },
   {
     name: "S",
     words: [
-      "syn", "sytý", "sýr", "syrový", "sychravý", "usychat", "sýkora", "sýček", 
-      "sysel", "syčet", "sypat", "vysypat", "násyp", "zásyp"
+      { word: "syn", type: "vyjmenované" },
+      { word: "sytý", type: "vyjmenované" },
+      { word: "sýr", type: "vyjmenované" },
+      { word: "syrový", type: "vyjmenované" },
+      { word: "sychravý", type: "vyjmenované" },
+      { word: "usychat", type: "vyjmenované" },
+      { word: "sýkora", type: "vyjmenované" },
+      { word: "sýček", type: "vyjmenované" },
+      { word: "sysel", type: "vyjmenované" },
+      { word: "syčet", type: "vyjmenované" },
+      { word: "sypat", type: "vyjmenované" },
+      { word: "vysypat", type: "vyjmenované" },
+      { word: "násyp", type: "vyjmenované" },
+      { word: "zásyp", type: "vyjmenované" }
     ]
   },
   {
     name: "V",
     words: [
-      "vy", "vysoký", "výt", "výskat", "zvykat", "žvýkat", "vydra", "výr", 
-      "vyžle", "povyk", "výheň", "cavyky", "vyza", "Vyšehrad"
+      { word: "vy", type: "vyjmenované" },
+      { word: "vysoký", type: "vyjmenované" },
+      { word: "výt", type: "vyjmenované" },
+      { word: "výskat", type: "vyjmenované" },
+      { word: "zvykat", type: "vyjmenované" },
+      { word: "žvýkat", type: "vyjmenované" },
+      { word: "vydra", type: "vyjmenované" },
+      { word: "výr", type: "vyjmenované" },
+      { word: "vyžle", type: "vyjmenované" },
+      { word: "povyk", type: "vyjmenované" },
+      { word: "výheň", type: "vyjmenované" },
+      { word: "cavyky", type: "vyjmenované" },
+      { word: "vyza", type: "vyjmenované" },
+      { word: "Vyšehrad", type: "vyjmenované" }
     ]
   },
   {
     name: "Z",
     words: [
-      "jazyk", "nazývat", "ozývat se", "vyzývat", "zbytek", "zvedat", "způsob", 
-      "zykat", "zisk", "hezký", "prazdroj", "zkouška"
+      { word: "jazyk", type: "vyjmenované" },
+      { word: "nazývat", type: "vyjmenované" },
+      { word: "ozývat se", type: "vyjmenované" },
+      { word: "vyzývat", type: "vyjmenované" },
+      { word: "zbytek", type: "vyjmenované" },
+      { word: "zvedat", type: "vyjmenované" },
+      { word: "způsob", type: "vyjmenované" },
+      { word: "zykat", type: "vyjmenované" },
+      { word: "zisk", type: "vyjmenované" },
+      { word: "hezký", type: "vyjmenované" },
+      { word: "prazdroj", type: "vyjmenované" },
+      { word: "zkouška", type: "vyjmenované" }
     ]
   }
 ];
@@ -78,6 +195,10 @@ const SpellingPractice = () => {
   const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
   const [gameEnded, setGameEnded] = useState(false);
   const [wordGroup, setWordGroup] = useState("");
+  const [isPhrase, setIsPhrase] = useState(false);
+  const [correctLetters, setCorrectLetters] = useState<string[]>([]);
+  const [missingPositions, setMissingPositions] = useState<number[]>([]);
+  const [currentPosition, setCurrentPosition] = useState(0);
 
   const toggleGroup = (groupName: string) => {
     setSelectedGroups((current) => 
@@ -103,23 +224,87 @@ const SpellingPractice = () => {
     }
   };
 
-  const generateProblem = (): { word: string, displayed: string, group: string } => {
-    // Filter words based on selected groups
+  const generateProblem = () => {
+    // Filtrujeme skupiny podle výběru
     const availableGroups = spellingGroups.filter(group => 
       selectedGroups.includes(group.name)
     );
     
-    // Select random group and random word from that group
+    if (availableGroups.length === 0) return null;
+    
+    // Náhodně vybereme skupinu
     const randomGroup = availableGroups[Math.floor(Math.random() * availableGroups.length)];
-    const randomWord = randomGroup.words[Math.floor(Math.random() * randomGroup.words.length)];
     
-    // Determine if we'll hide 'y' or 'i' in the word
-    const wordWithMissingLetter = randomWord.replace(/[yiYI]/g, '_');
+    // Náhodně rozhodneme, zda použijeme frázi nebo slovo
+    const usePhrase = randomGroup.phrases && randomGroup.phrases.length > 0 && Math.random() > 0.7;
     
-    return { 
-      word: randomWord, 
-      displayed: wordWithMissingLetter,
-      group: randomGroup.name
+    if (usePhrase && randomGroup.phrases) {
+      // Vybereme náhodnou frázi
+      const randomPhrase = randomGroup.phrases[Math.floor(Math.random() * randomGroup.phrases.length)];
+      
+      // Najdeme všechny pozice i/y/í/ý v textu
+      const positions: number[] = [];
+      const letters: string[] = [];
+      
+      for (let i = 0; i < randomPhrase.length; i++) {
+        const char = randomPhrase[i].toLowerCase();
+        if (char === 'i' || char === 'y' || char === 'í' || char === 'ý') {
+          positions.push(i);
+          letters.push(char);
+        }
+      }
+      
+      // Pokud jsou nějaké i/y ve frázi
+      if (positions.length > 0) {
+        // Vytvoříme text s podtržítky místo i/y
+        let displayedPhrase = randomPhrase;
+        positions.forEach((pos) => {
+          displayedPhrase = displayedPhrase.substring(0, pos) + '_' + displayedPhrase.substring(pos + 1);
+        });
+        
+        return {
+          word: randomPhrase,
+          displayed: displayedPhrase,
+          group: randomGroup.name,
+          positions,
+          letters,
+          isPhrase: true
+        };
+      }
+    }
+    
+    // Pokud nepoužijeme frázi nebo žádná není k dispozici, použijeme slovo
+    const words = randomGroup.words;
+    if (words.length === 0) return null;
+    
+    const randomWord = words[Math.floor(Math.random() * words.length)];
+    
+    // Najdeme všechny pozice i/y/í/ý ve slově
+    const positions: number[] = [];
+    const letters: string[] = [];
+    
+    for (let i = 0; i < randomWord.word.length; i++) {
+      const char = randomWord.word[i].toLowerCase();
+      if (char === 'i' || char === 'y' || char === 'í' || char === 'ý') {
+        positions.push(i);
+        letters.push(char);
+      }
+    }
+    
+    // Vytvoříme slovo s podtržítky místo i/y
+    let displayedWord = randomWord.word;
+    positions.forEach((pos) => {
+      displayedWord = displayedWord.substring(0, pos) + '_' + displayedWord.substring(pos + 1);
+    });
+    
+    return {
+      word: randomWord.word,
+      displayed: displayedWord,
+      group: randomGroup.name,
+      type: randomWord.type,
+      positions,
+      letters,
+      isPhrase: false
     };
   };
 
@@ -135,33 +320,69 @@ const SpellingPractice = () => {
 
     setProblemCount((prev) => prev + 1);
     const problem = generateProblem();
+    
+    if (!problem) {
+      toast({
+        title: "Chyba",
+        description: "Nepodařilo se vygenerovat příklad.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setCurrentWord(problem.word);
     setDisplayedWord(problem.displayed);
     setWordGroup(problem.group);
+    setIsPhrase(problem.isPhrase || false);
+    setMissingPositions(problem.positions || []);
+    setCorrectLetters(problem.letters || []);
+    setCurrentPosition(0);
     setShowProblem(true);
     setUserAnswer("");
     setGameEnded(false);
   };
 
   const checkAnswer = () => {
-    if (!currentWord) return;
+    if (!currentWord || missingPositions.length === 0) return;
 
-    // Convert both strings to lowercase for comparison
-    if (userAnswer.toLowerCase() === currentWord.toLowerCase()) {
+    const correctLetter = correctLetters[currentPosition];
+    const normalizedCorrectLetter = removeDiacritics(correctLetter).toLowerCase();
+    const normalizedUserAnswer = removeDiacritics(userAnswer).toLowerCase();
+    
+    // Kontrolujeme, zda uživatel zadal správné i/y (bez ohledu na diakritiku)
+    const isCorrect = 
+      (normalizedCorrectLetter === 'i' && (normalizedUserAnswer === 'i')) ||
+      (normalizedCorrectLetter === 'y' && (normalizedUserAnswer === 'y'));
+    
+    if (isCorrect) {
       toast({
         title: "Správně!",
         variant: "default",
       });
-      setCorrectAnswers((prev) => prev + 1);
+      
+      // Přejdeme na další pozici, pokud existuje
+      if (currentPosition < missingPositions.length - 1) {
+        setCurrentPosition(currentPosition + 1);
+        setUserAnswer("");
+      } else {
+        setCorrectAnswers((prev) => prev + 1);
+        startNewGame(); // Začneme novou hru
+      }
     } else {
       toast({
         title: "Špatně!",
-        description: `Správná odpověď byla: ${currentWord}`,
+        description: `Správná odpověď byla: ${correctLetter}`,
         variant: "destructive",
       });
+      
+      // Přejdeme na další pozici i po špatné odpovědi
+      if (currentPosition < missingPositions.length - 1) {
+        setCurrentPosition(currentPosition + 1);
+        setUserAnswer("");
+      } else {
+        startNewGame(); // Začneme novou hru
+      }
     }
-    
-    startNewGame();
   };
 
   const endGame = () => {
@@ -180,6 +401,20 @@ const SpellingPractice = () => {
     if (e.key === "Enter") {
       checkAnswer();
     }
+  };
+
+  // Pomocná funkce pro zobrazení slova s aktuální mezerou
+  const renderWordWithCurrentGap = () => {
+    if (!displayedWord || missingPositions.length === 0) return displayedWord;
+    
+    // Vytvoříme podtržítka pro všechny mezery, které nejsou aktuální
+    let result = currentWord;
+    for (let i = 0; i < missingPositions.length; i++) {
+      const position = missingPositions[i];
+      const replacement = i === currentPosition ? "___" : correctLetters[i];
+      result = result.substring(0, position) + replacement + result.substring(position + 1);
+    }
+    return result;
   };
 
   return (
@@ -255,28 +490,35 @@ const SpellingPractice = () => {
           <div className="py-4">
             {displayedWord && (
               <div className="space-y-4">
-                <p className="text-center font-medium">Vyjmenované slovo po {wordGroup}</p>
-                <p className="text-2xl font-bold text-center mb-4">
-                  {displayedWord}
+                <p className="text-center font-medium">
+                  {isPhrase ? "Věta/spojení" : `Vyjmenované slovo po ${wordGroup}`}
+                </p>
+                <p className="text-2xl font-bold text-center mb-4 whitespace-pre-wrap">
+                  {renderWordWithCurrentGap()}
+                </p>
+                <p className="text-center text-gray-600">
+                  Doplňte pouze písmeno i/y na zvýrazněné místo
                 </p>
               </div>
             )}
-            <Input
-              value={userAnswer}
-              onChange={(e) => setUserAnswer(e.target.value)}
-              onKeyDown={handleKeyPress}
-              placeholder="Napište celé slovo správně"
-              className="text-lg"
-              autoFocus
-            />
+            <div className="flex justify-center items-center gap-4">
+              <Button 
+                onClick={() => { setUserAnswer("i"); setTimeout(checkAnswer, 100); }}
+                className="text-2xl px-6 py-4 bg-blue-500 hover:bg-blue-600"
+                size="lg"
+              >
+                i
+              </Button>
+              <Button 
+                onClick={() => { setUserAnswer("y"); setTimeout(checkAnswer, 100); }}
+                className="text-2xl px-6 py-4 bg-green-500 hover:bg-green-600"
+                size="lg"
+              >
+                y
+              </Button>
+            </div>
           </div>
           <DialogFooter className="flex flex-col sm:flex-row gap-2">
-            <Button 
-              onClick={checkAnswer}
-              className="w-full sm:w-auto bg-orange-500 hover:bg-orange-600"
-            >
-              Odpovědět
-            </Button>
             <Button 
               onClick={endGame}
               className="w-full sm:w-auto bg-red-500 hover:bg-red-600"
