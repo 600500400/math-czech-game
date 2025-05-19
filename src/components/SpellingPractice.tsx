@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -415,8 +416,13 @@ const SpellingPractice = () => {
     let result = currentWord;
     for (let i = 0; i < missingPositions.length; i++) {
       const position = missingPositions[i];
-      const replacement = i === currentPosition ? "___" : correctLetters[i];
-      result = result.substring(0, position) + replacement + result.substring(position + 1);
+      if (i === currentPosition) {
+        // Pro aktuální pozici vložíme zvýrazněné podtržítko (ne písmeno)
+        result = result.substring(0, position) + "_" + result.substring(position + 1);
+      } else {
+        // Pro ostatní pozice vložíme původní písmeno
+        result = result.substring(0, position) + correctLetters[i] + result.substring(position + 1);
+      }
     }
     return result;
   };
