@@ -16,3 +16,15 @@ export interface SpellingGameState {
   lastAnswerCorrect: boolean | null;
   showAnimation: boolean;
 }
+
+export interface SpellingWord {
+  word: string;
+  type: string;
+  positions?: number[];
+}
+
+export interface SpellingGroup {
+  name: string;
+  words: SpellingWord[];
+  phrases?: string[];
+}

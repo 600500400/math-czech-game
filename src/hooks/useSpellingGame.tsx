@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { spellingGroups } from "../data/spellingData";
 import { useAuth } from "./useAuth";

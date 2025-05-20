@@ -1,17 +1,4 @@
-
-export type WordType = "vyjmenované" | "příbuzné" | "odvozené";
-
-export type SpellingWord = {
-  word: string;
-  type: WordType;
-  positions?: number[]; // Pozice, kde se má doplnit i/y (pro složitější případy)
-};
-
-export type SpellingGroup = {
-  name: string;
-  words: SpellingWord[];
-  phrases?: string[]; // Slovní spojení a věty
-};
+import { SpellingWord, SpellingGroup } from "@/types/spellingTypes";
 
 export const spellingGroups: SpellingGroup[] = [
   {

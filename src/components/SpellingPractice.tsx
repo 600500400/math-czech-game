@@ -1,4 +1,3 @@
-
 import { GroupSelectionDialog } from "./spelling/GroupSelectionDialog";
 import { WordProblemDialog } from "./spelling/WordProblemDialog";
 import { StatisticsDialog } from "./spelling/StatisticsDialog";
