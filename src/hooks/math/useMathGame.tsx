@@ -1,9 +1,10 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useProblemGenerator } from './useProblemGenerator';
 import { useDifficultySettings } from './useDifficultySettings';
 import { useGameState } from './useGameState';
-import { Problem, Operation } from '@/types/mathTypes';
+import { useAnswerHandler } from './useAnswerHandler';
+import { useGameFinisher } from './useGameFinisher';
 import { useAuth } from '@/hooks/useAuth';
 import { useStatistics } from '@/hooks/useStatistics';
 
@@ -61,15 +62,44 @@ export function useMathGame() {
     allowedOperations 
   });
 
-  // Počítáme statistiky
+  // Calculate statistics
   const totalAnswers = correctAnswers + wrongAnswers;
   const correctPercentage = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 0;
-
-  // Předdeklarace funkcí
-  const checkAnswer = useCallback(() => { /* bude definováno později */ }, []);
-  const endGame = useCallback(() => { /* bude definováno později */ }, []);
   
-  // Akce hry
+  // Initialize game finisher hook
+  const { endGame } = useGameFinisher({
+    setShowProblem,
+    setGameEnded,
+    setShowStatsDialog,
+    userId,
+    correctAnswers,
+    wrongAnswers,
+    allowedOperations,
+    maxValue,
+    maxMultiplyValue,
+    maxDivideValue,
+    saveMathStatistics
+  });
+
+  // Initialize answer handler hook (must be after endGame is defined)
+  const { checkAnswer, handleKeyPress } = useAnswerHandler({
+    currentProblem,
+    userAnswer,
+    correctAnswers,
+    wrongAnswers,
+    problemCount,
+    generateProblem,
+    setCorrectAnswers,
+    setWrongAnswers,
+    setLastAnswerCorrect,
+    setShowAnimation,
+    setShowConfetti,
+    setUserAnswer,
+    setCurrentProblem,
+    endGame
+  });
+  
+  // Game actions
   const startNewGame = useCallback(() => {
     if(!difficultySet) {
       setShowDifficultyDialog(true);
@@ -96,95 +126,6 @@ export function useMathGame() {
     setWrongAnswers
   ]);
 
-  // Implementace checkAnswer
-  const actualCheckAnswer = useCallback(() => {
-    if (!currentProblem) return;
-    
-    const parsedAnswer = parseFloat(userAnswer);
-    const isCorrect = !isNaN(parsedAnswer) && parsedAnswer === currentProblem.result;
-    
-    if (isCorrect) {
-      setCorrectAnswers(prev => prev + 1);
-      setLastAnswerCorrect(true);
-    } else {
-      setWrongAnswers(prev => prev + 1);
-      setLastAnswerCorrect(false);
-    }
-    
-    // Zobrazíme animaci
-    setShowAnimation(true);
-    if (isCorrect) setShowConfetti(true);
-    
-    // Časovač pro skrytí animace
-    setTimeout(() => {
-      setShowAnimation(false);
-      setShowConfetti(false);
-    }, 2000);
-    
-    // Posuneme se na další příklad nebo ukončíme hru
-    setTimeout(() => {
-      if (correctAnswers + wrongAnswers + 1 >= problemCount) {
-        endGame();
-      } else {
-        setCurrentProblem(generateProblem());
-        setUserAnswer("");
-      }
-    }, 1000);
-  }, [
-    correctAnswers, 
-    currentProblem, 
-    endGame, 
-    generateProblem, 
-    problemCount, 
-    setCorrectAnswers, 
-    setCurrentProblem, 
-    setLastAnswerCorrect, 
-    setShowAnimation, 
-    setShowConfetti, 
-    setUserAnswer, 
-    setWrongAnswers, 
-    userAnswer, 
-    wrongAnswers
-  ]);
-
-  // Implementace endGame
-  const actualEndGame = useCallback(() => {
-    setShowProblem(false);
-    setGameEnded(true);
-    setShowStatsDialog(true);
-    
-    // Pokud je uživatel přihlášený, uložíme statistiky
-    if (userId && (correctAnswers > 0 || wrongAnswers > 0)) {
-      const operations = allowedOperations.join(',');
-      saveMathStatistics.mutate({
-        correctAnswers,
-        wrongAnswers,
-        operation: operations,
-        difficultyLevel: {
-          maxValue,
-          maxMultiplyValue,
-          maxDivideValue
-        }
-      });
-    }
-  }, [
-    allowedOperations,
-    correctAnswers,
-    maxDivideValue,
-    maxMultiplyValue,
-    maxValue,
-    saveMathStatistics,
-    setGameEnded,
-    setShowProblem,
-    setShowStatsDialog,
-    userId,
-    wrongAnswers
-  ]);
-
-  // Přiřazení implementací do předdeklarovaných funkcí
-  Object.assign(checkAnswer, actualCheckAnswer);
-  Object.assign(endGame, actualEndGame);
-
   const resetGame = useCallback(() => {
     setCorrectAnswers(0);
     setWrongAnswers(0);
@@ -208,12 +149,6 @@ export function useMathGame() {
     setUserAnswer,
     setWrongAnswers
   ]);
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      checkAnswer();
-    }
-  };
 
   // Vrátíme vše co potřebujeme
   return {
