@@ -1,0 +1,41 @@
+
+import { useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
+
+export function useGroupSelection() {
+  const { toast } = useToast();
+  const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
+  const [showGroupDialog, setShowGroupDialog] = useState(false);
+
+  const toggleGroup = (groupName: string) => {
+    setSelectedGroups((current) => 
+      current.includes(groupName)
+        ? current.filter(name => name !== groupName)
+        : [...current, groupName]
+    );
+  };
+
+  const setGroups = () => {
+    if (selectedGroups.length > 0) {
+      setShowGroupDialog(false);
+      toast({
+        title: "Skupiny nastaveny",
+        description: `Vybrané skupiny: ${selectedGroups.join(", ")}`,
+      });
+    } else {
+      toast({
+        title: "Chyba",
+        description: "Vyberte alespoň jednu skupinu vyjmenovaných slov.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  return {
+    selectedGroups,
+    showGroupDialog,
+    setShowGroupDialog,
+    toggleGroup,
+    setGroups
+  };
+}
