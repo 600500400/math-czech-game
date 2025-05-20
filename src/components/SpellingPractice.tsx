@@ -6,17 +6,21 @@ import { useToast } from "@/components/ui/use-toast";
 import { generateSpellingProblem, checkSpellingAnswer } from "@/utils/spellingUtils";
 import { GroupSelectionDialog } from "./spelling/GroupSelectionDialog";
 import { WordProblemDialog } from "./spelling/WordProblemDialog";
+import { StatisticsDialog } from "./spelling/StatisticsDialog";
+import { FunGraphics } from "./spelling/FunGraphics";
 import { spellingGroups } from "@/data/spellingData";
 
 const SpellingPractice = () => {
   const { toast } = useToast();
   const [correctAnswers, setCorrectAnswers] = useState(0);
+  const [wrongAnswers, setWrongAnswers] = useState(0);
   const [problemCount, setProblemCount] = useState(0);
   const [currentWord, setCurrentWord] = useState("");
   const [displayedWord, setDisplayedWord] = useState("");
   const [userAnswer, setUserAnswer] = useState("");
   const [showProblem, setShowProblem] = useState(false);
   const [showGroupDialog, setShowGroupDialog] = useState(false);
+  const [showStatsDialog, setShowStatsDialog] = useState(false);
   const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
   const [gameEnded, setGameEnded] = useState(false);
   const [wordGroup, setWordGroup] = useState("");
@@ -24,6 +28,8 @@ const SpellingPractice = () => {
   const [correctLetters, setCorrectLetters] = useState<string[]>([]);
   const [missingPositions, setMissingPositions] = useState<number[]>([]);
   const [currentPosition, setCurrentPosition] = useState(0);
+  const [lastAnswerCorrect, setLastAnswerCorrect] = useState<boolean | null>(null);
+  const [showAnimation, setShowAnimation] = useState(false);
 
   const toggleGroup = (groupName: string) => {
     setSelectedGroups((current) => 
@@ -81,6 +87,7 @@ const SpellingPractice = () => {
     setShowProblem(true);
     setUserAnswer("");
     setGameEnded(false);
+    setShowAnimation(false);
   };
 
   const handleAnswer = (answer: string) => {
@@ -95,6 +102,10 @@ const SpellingPractice = () => {
     // Pro debug do konzole
     console.log(`Správná odpověď: ${correctLetter}, Uživatelova odpověď: ${answer}, Vyhodnoceno jako: ${isCorrect ? 'Správně' : 'Špatně'}`);
     
+    // Nastavíme výsledek a spustíme animaci
+    setLastAnswerCorrect(isCorrect);
+    setShowAnimation(true);
+    
     if (isCorrect) {
       toast({
         title: "Správně!",
@@ -107,7 +118,11 @@ const SpellingPractice = () => {
         setUserAnswer("");
       } else {
         setCorrectAnswers((prev) => prev + 1);
-        startNewGame(); // Začneme novou hru
+        
+        // Timeout před dalším slovem, aby byla vidět animace
+        setTimeout(() => {
+          startNewGame(); // Začneme novou hru
+        }, 1500);
       }
     } else {
       toast({
@@ -116,14 +131,24 @@ const SpellingPractice = () => {
         variant: "destructive",
       });
       
+      setWrongAnswers((prev) => prev + 1);
+      
       // Přejdeme na další pozici i po špatné odpovědi
       if (currentPosition < missingPositions.length - 1) {
         setCurrentPosition(currentPosition + 1);
         setUserAnswer("");
       } else {
-        startNewGame(); // Začneme novou hru
+        // Timeout před dalším slovem, aby byla vidět animace
+        setTimeout(() => {
+          startNewGame(); // Začneme novou hru
+        }, 1500);
       }
     }
+    
+    // Schováme animaci po 1,5 sekundách
+    setTimeout(() => {
+      setShowAnimation(false);
+    }, 1500);
   };
 
   const endGame = () => {
@@ -133,9 +158,6 @@ const SpellingPractice = () => {
       title: "Hra ukončena",
       description: `Počet správných odpovědí: ${correctAnswers}`,
     });
-    // Reset game state
-    setProblemCount(0);
-    setCorrectAnswers(0);
   };
   
   const handleAnswerI = () => {
@@ -146,6 +168,8 @@ const SpellingPractice = () => {
     handleAnswer("y");
   };
 
+  const totalAnswers = correctAnswers + wrongAnswers;
+
   return (
     <div className="space-y-4">
       <h1 className="text-3xl font-bold text-center text-orange-500">Procvičování vyjmenovaných slov</h1>
@@ -154,12 +178,20 @@ const SpellingPractice = () => {
         <p className="text-blue-500 font-medium">
           Počet slov: <Badge variant="outline">{problemCount}</Badge>
         </p>
-        {gameEnded && (
+        <div className="flex gap-2 items-center">
           <p className="text-green-500 font-medium">
-            Správné odpovědi: <Badge variant="outline">{correctAnswers}</Badge>
+            Správně: <Badge variant="outline">{correctAnswers}</Badge>
           </p>
-        )}
+          {wrongAnswers > 0 && (
+            <p className="text-red-500 font-medium">
+              Špatně: <Badge variant="outline">{wrongAnswers}</Badge>
+            </p>
+          )}
+        </div>
       </div>
+      
+      {/* Fun Graphics Component */}
+      <FunGraphics isCorrect={lastAnswerCorrect} showAnimation={showAnimation} />
 
       <div className="space-y-2">
         <Button 
@@ -176,6 +208,15 @@ const SpellingPractice = () => {
         >
           Spustit hru
         </Button>
+        
+        {(correctAnswers > 0 || wrongAnswers > 0) && (
+          <Button 
+            onClick={() => setShowStatsDialog(true)} 
+            className="w-full bg-blue-500 hover:bg-blue-600"
+          >
+            Zobrazit statistiky
+          </Button>
+        )}
       </div>
 
       {/* Group Selection Dialog */}
@@ -202,6 +243,15 @@ const SpellingPractice = () => {
         onAnswerI={handleAnswerI}
         onAnswerY={handleAnswerY}
         onEndGame={endGame}
+      />
+      
+      {/* Statistics Dialog */}
+      <StatisticsDialog 
+        open={showStatsDialog}
+        onOpenChange={setShowStatsDialog}
+        correctAnswers={correctAnswers}
+        wrongAnswers={wrongAnswers}
+        totalAnswers={totalAnswers}
       />
     </div>
   );

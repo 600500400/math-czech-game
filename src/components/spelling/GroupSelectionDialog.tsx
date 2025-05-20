@@ -26,19 +26,33 @@ export const GroupSelectionDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Výběr skupin vyjmenovaných slov</DialogTitle>
+          <DialogTitle className="text-xl text-center text-orange-500">Výběr skupin vyjmenovaných slov</DialogTitle>
         </DialogHeader>
         <div className="py-4">
-          <p className="mb-2">Vyberte skupiny vyjmenovaných slov:</p>
-          <div className="space-y-2">
+          <p className="mb-4 text-center">Vyber si, která vyjmenovaná slova chceš procvičovat:</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {spellingGroups.map(group => (
-              <div key={group.name} className="flex items-center space-x-2">
+              <div 
+                key={group.name} 
+                className={`flex items-center space-x-2 p-3 border-2 rounded-lg transition-all duration-200 ${
+                  selectedGroups.includes(group.name) 
+                    ? 'border-orange-500 bg-orange-50' 
+                    : 'border-gray-200 hover:border-orange-300'
+                }`}
+                onClick={() => toggleGroup(group.name)}
+              >
                 <Checkbox 
                   id={`group-${group.name}`} 
                   checked={selectedGroups.includes(group.name)}
                   onCheckedChange={() => toggleGroup(group.name)}
+                  className="data-[state=checked]:bg-orange-500 data-[state=checked]:border-orange-500"
                 />
-                <Label htmlFor={`group-${group.name}`}>Vyjmenovaná slova po {group.name}</Label>
+                <Label 
+                  htmlFor={`group-${group.name}`}
+                  className="cursor-pointer font-medium text-lg flex-1"
+                >
+                  Vyjmenovaná slova po {group.name}
+                </Label>
               </div>
             ))}
           </div>
@@ -46,7 +60,7 @@ export const GroupSelectionDialog = ({
         <DialogFooter>
           <Button 
             onClick={setGroups}
-            className="bg-orange-500 hover:bg-orange-600"
+            className="bg-orange-500 hover:bg-orange-600 w-full text-lg py-6"
           >
             Potvrdit výběr
           </Button>
