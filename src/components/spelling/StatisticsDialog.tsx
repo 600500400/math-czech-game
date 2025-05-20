@@ -14,6 +14,12 @@ interface StatisticsDialogProps {
   totalAnswers: number;
 }
 
+interface ChartDataItem {
+  name: string;
+  value: number;
+  color: string;
+}
+
 export const StatisticsDialog = ({
   open,
   onOpenChange,
@@ -22,7 +28,7 @@ export const StatisticsDialog = ({
   totalAnswers,
 }: StatisticsDialogProps) => {
   // Připravíme data pro graf
-  const chartData = [
+  const chartData: ChartDataItem[] = [
     { name: "Správně", value: correctAnswers, color: "#4ade80" },
     { name: "Špatně", value: wrongAnswers, color: "#f87171" },
   ];
@@ -80,7 +86,7 @@ export const StatisticsDialog = ({
                 <BarChart data={chartData}>
                   <XAxis dataKey="name" />
                   <YAxis />
-                  <Bar dataKey="value" fill={(entry) => entry.color} />
+                  <Bar dataKey="value" fill={(entry: ChartDataItem) => entry.color || "#4ade80"} />
                   <ChartTooltip content={<ChartTooltipContent />} />
                 </BarChart>
               </ChartContainer>
