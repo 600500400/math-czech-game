@@ -60,7 +60,7 @@ export const ConfettiExplosion: React.FC<ConfettiProps> = ({
   if (!showConfetti) return null;
   
   return (
-    <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden" aria-hidden="true">
+    <div className="fixed inset-0 pointer-events-none z-[9999] overflow-hidden" aria-hidden="true">
       {particles}
     </div>
   );

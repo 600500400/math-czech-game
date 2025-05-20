@@ -67,7 +67,7 @@ export const FunGraphics = ({ isCorrect, showAnimation }: FunGraphicsProps) => {
   };
   
   return (
-    <div className="fixed inset-0 pointer-events-none z-[999] flex items-center justify-center">
+    <div className="fixed inset-0 pointer-events-none z-[9999] flex items-center justify-center">
       <div className="flex flex-col items-center transition-opacity duration-500 opacity-100 space-y-2">
         {imageSrc && (
           <div className={`${isCorrect ? 'animate-bounce' : 'animate-pulse'}`}>

@@ -42,13 +42,11 @@ const MathPractice = () => {
 
   return (
     <div className="space-y-4 relative">
-      {/* Confetti effect */}
-      <ConfettiExplosion trigger={showConfetti} particleCount={30} />
-      
-      {/* Fun Graphics Component - moved outside dialogs for visibility */}
+      {/* Fun Graphics & Confetti Components - moved above dialogs for visibility */}
       {showAnimation && (
         <FunGraphics isCorrect={lastAnswerCorrect} showAnimation={showAnimation} />
       )}
+      <ConfettiExplosion trigger={showConfetti} particleCount={30} />
       
       <h1 className="text-3xl font-bold text-center text-orange-500">Procvičování matematiky</h1>
       
