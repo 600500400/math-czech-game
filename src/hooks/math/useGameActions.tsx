@@ -18,6 +18,8 @@ export function useGameActions({
   setShowConfetti,
   setShowProblem: setShowProb,
   generateProblem,
+  correctAnswers,
+  setDifficultySet,
 }) {
   const { toast } = useToast();
 
