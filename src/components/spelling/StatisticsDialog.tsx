@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from "recharts";
+import { BarChart, Bar, XAxis, YAxis } from "recharts";
 
 interface StatisticsDialogProps {
   open: boolean;
@@ -27,7 +27,7 @@ export const StatisticsDialog = ({
   wrongAnswers,
   totalAnswers,
 }: StatisticsDialogProps) => {
-  // Připravíme data pro graf
+  // Prepare data for the chart
   const chartData: ChartDataItem[] = [
     { name: "Správně", value: correctAnswers, color: "#4ade80" },
     { name: "Špatně", value: wrongAnswers, color: "#f87171" },
@@ -88,8 +88,8 @@ export const StatisticsDialog = ({
                   <YAxis />
                   <Bar 
                     dataKey="value" 
-                    fill="#4ade80" 
-                    stroke="#4ade80"
+                    fill={(entry: any) => entry.color || "#4ade80"}
+                    stroke={(entry: any) => entry.color || "#4ade80"}
                   />
                   <ChartTooltip content={<ChartTooltipContent />} />
                 </BarChart>

@@ -10,22 +10,27 @@ export const FunGraphics = ({ isCorrect, showAnimation }: FunGraphicsProps) => {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   
   useEffect(() => {
-    // Resetujeme obrázek, pokud není animace aktivní
+    // Reset image if animation is not active
     if (!showAnimation) {
       setImageSrc(null);
       return;
     }
     
-    // Vybereme náhodný obrázek podle výsledku
+    // Choose a random image based on the result
     if (isCorrect === true) {
       const correctImages = [
         "/images/happy-kid.png",
-        "/images/stars.png"
+        "/images/stars.png",
+        "/images/correct-answer.png",
+        "/images/thumbs-up.png",
+        "/images/celebration.png"
       ];
       setImageSrc(correctImages[Math.floor(Math.random() * correctImages.length)]);
     } else if (isCorrect === false) {
       const wrongImages = [
-        "/images/try-again.png"
+        "/images/try-again.png",
+        "/images/incorrect-answer.png",
+        "/images/thinking-face.png"
       ];
       setImageSrc(wrongImages[Math.floor(Math.random() * wrongImages.length)]);
     }

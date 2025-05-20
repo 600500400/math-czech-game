@@ -6,6 +6,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { useToast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { FunGraphics } from "./spelling/FunGraphics";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { BarChart, Bar, XAxis, YAxis } from "recharts";
 
 type Operation = "+" | "-" | "*" | "/";
 type Problem = {
@@ -15,18 +20,31 @@ type Problem = {
   result: number;
 };
 
+interface ChartDataItem {
+  name: string;
+  value: number;
+  color: string;
+}
+
 const MathPractice = () => {
   const { toast } = useToast();
   const [correctAnswers, setCorrectAnswers] = useState(0);
+  const [wrongAnswers, setWrongAnswers] = useState(0);
   const [problemCount, setProblemCount] = useState(0);
   const [currentProblem, setCurrentProblem] = useState<Problem | null>(null);
   const [userAnswer, setUserAnswer] = useState("");
   const [showProblem, setShowProblem] = useState(false);
   const [showDifficultyDialog, setShowDifficultyDialog] = useState(false);
+  const [showStatsDialog, setShowStatsDialog] = useState(false);
   const [maxValue, setMaxValue] = useState(10);
   const [difficultySet, setDifficultySet] = useState(false);
   const [allowedOperations] = useState<Operation[]>(["+", "-", "*", "/"]);
   const [gameEnded, setGameEnded] = useState(false);
+  const [lastAnswerCorrect, setLastAnswerCorrect] = useState<boolean | null>(null);
+  const [showAnimation, setShowAnimation] = useState(false);
+
+  const totalAnswers = correctAnswers + wrongAnswers;
+  const correctPercentage = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 0;
 
   const setDifficulty = () => {
     if (maxValue > 0) {
@@ -90,14 +108,20 @@ const MathPractice = () => {
     setShowProblem(true);
     setUserAnswer("");
     setGameEnded(false);
+    setShowAnimation(false);
   };
 
   const checkAnswer = () => {
     if (!currentProblem) return;
 
     const answer = parseFloat(userAnswer);
+    const isCorrect = answer === currentProblem.result;
     
-    if (answer === currentProblem.result) {
+    // Set the result for animation
+    setLastAnswerCorrect(isCorrect);
+    setShowAnimation(true);
+    
+    if (isCorrect) {
       toast({
         title: "Správně!",
         variant: "default",
@@ -109,9 +133,16 @@ const MathPractice = () => {
         description: `Správná odpověď byla: ${currentProblem.result}`,
         variant: "destructive",
       });
+      setWrongAnswers((prev) => prev + 1);
     }
     
-    startNewGame();
+    // Hide animation after 1.5 seconds
+    setTimeout(() => {
+      setShowAnimation(false);
+      // Generate new problem
+      setCurrentProblem(generateProblem());
+      setUserAnswer("");
+    }, 1500);
   };
 
   const endGame = () => {
@@ -121,9 +152,14 @@ const MathPractice = () => {
       title: "Hra ukončena",
       description: `Počet správných odpovědí: ${correctAnswers}`,
     });
+    // Don't reset the game stats so they can be viewed after the game
+  };
+
+  const resetGame = () => {
     // Reset game state
     setProblemCount(0);
     setCorrectAnswers(0);
+    setWrongAnswers(0);
     setDifficultySet(false);
   };
 
@@ -133,6 +169,12 @@ const MathPractice = () => {
     }
   };
 
+  // Chart data for statistics
+  const chartData: ChartDataItem[] = [
+    { name: "Správně", value: correctAnswers, color: "#4ade80" },
+    { name: "Špatně", value: wrongAnswers, color: "#f87171" },
+  ];
+
   return (
     <div className="space-y-4">
       <h1 className="text-3xl font-bold text-center text-orange-500">Procvičování matematiky</h1>
@@ -141,12 +183,29 @@ const MathPractice = () => {
         <p className="text-blue-500 font-medium">
           Počet příkladů: <Badge variant="outline">{problemCount}</Badge>
         </p>
-        {gameEnded && (
+        <div className="flex gap-2">
           <p className="text-green-500 font-medium">
-            Správné odpovědi: <Badge variant="outline">{correctAnswers}</Badge>
+            Správné: <Badge variant="outline">{correctAnswers}</Badge>
           </p>
-        )}
+          <p className="text-red-500 font-medium">
+            Špatné: <Badge variant="outline">{wrongAnswers}</Badge>
+          </p>
+        </div>
       </div>
+
+      {/* Progress bar for ongoing statistics */}
+      {totalAnswers > 0 && (
+        <div className="space-y-2">
+          <div className="flex justify-between text-sm">
+            <span>Úspěšnost</span>
+            <span className="font-medium">{correctPercentage}%</span>
+          </div>
+          <Progress value={correctPercentage} className="h-3" />
+        </div>
+      )}
+      
+      {/* Fun Graphics Component */}
+      <FunGraphics isCorrect={lastAnswerCorrect} showAnimation={showAnimation} />
 
       <div className="space-y-2">
         <Button 
@@ -163,6 +222,24 @@ const MathPractice = () => {
         >
           Spustit hru
         </Button>
+        
+        {totalAnswers > 0 && (
+          <Button
+            onClick={() => setShowStatsDialog(true)}
+            className="w-full bg-blue-500 hover:bg-blue-600"
+          >
+            Zobrazit statistiku
+          </Button>
+        )}
+
+        {gameEnded && (
+          <Button
+            onClick={resetGame}
+            className="w-full bg-gray-500 hover:bg-gray-600"
+          >
+            Resetovat statistiky
+          </Button>
+        )}
       </div>
 
       {/* Difficulty Dialog */}
@@ -212,6 +289,17 @@ const MathPractice = () => {
               className="text-lg"
               autoFocus
             />
+            
+            {/* In-game statistics */}
+            {totalAnswers > 0 && (
+              <div className="mt-4 space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-green-500">Správně: {correctAnswers}</span>
+                  <span className="text-red-500">Špatně: {wrongAnswers}</span>
+                </div>
+                <Progress value={correctPercentage} className="h-2" />
+              </div>
+            )}
           </div>
           <DialogFooter className="flex flex-col sm:flex-row gap-2">
             <Button 
@@ -225,6 +313,81 @@ const MathPractice = () => {
               className="w-full sm:w-auto bg-red-500 hover:bg-red-600"
             >
               Ukončit hru
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Statistics Dialog */}
+      <Dialog open={showStatsDialog} onOpenChange={setShowStatsDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center text-xl">Statistika matematiky</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-6 py-4">
+            {/* Progress bar */}
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span>Úspěšnost</span>
+                <span className="font-medium">{correctPercentage}%</span>
+              </div>
+              <Progress value={correctPercentage} className="h-3" />
+            </div>
+            
+            {/* Detailed statistics table */}
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Typ</TableHead>
+                  <TableHead className="text-right">Počet</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow>
+                  <TableCell>Správné odpovědi</TableCell>
+                  <TableCell className="text-right font-medium text-green-500">{correctAnswers}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>Špatné odpovědi</TableCell>
+                  <TableCell className="text-right font-medium text-red-500">{wrongAnswers}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>Celkem</TableCell>
+                  <TableCell className="text-right font-medium">{totalAnswers}</TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+            
+            {/* Graph */}
+            {totalAnswers > 0 && (
+              <div className="h-48">
+                <ChartContainer config={{
+                  correct: { color: "#4ade80" },
+                  wrong: { color: "#f87171" }
+                }}>
+                  <BarChart data={chartData}>
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Bar 
+                      dataKey="value" 
+                      fill="#4ade80"
+                      stroke="#4ade80"
+                      name="Hodnota"
+                    />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                  </BarChart>
+                </ChartContainer>
+              </div>
+            )}
+          </div>
+          
+          <DialogFooter>
+            <Button 
+              onClick={() => setShowStatsDialog(false)}
+              className="bg-orange-500 hover:bg-orange-600 w-full"
+            >
+              Zavřít
             </Button>
           </DialogFooter>
         </DialogContent>
