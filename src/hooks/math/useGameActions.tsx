@@ -12,11 +12,9 @@ export function useGameActions({
   currentProblem,
   userAnswer,
   setLastAnswerCorrect,
-  setShowAnimation: setShowAnim,
   setCorrectAnswers,
   setWrongAnswers,
   setShowConfetti,
-  setShowProblem: setShowProb,
   generateProblem,
   correctAnswers,
   setDifficultySet,
@@ -49,7 +47,7 @@ export function useGameActions({
     
     // Set the result for animation
     setLastAnswerCorrect(isCorrect);
-    setShowAnim(true);
+    setShowAnimation(true);
     
     // Trigger confetti for correct answers
     if (isCorrect) {
@@ -72,7 +70,7 @@ export function useGameActions({
     
     // Hide animation after 1.5 seconds
     setTimeout(() => {
-      setShowAnim(false);
+      setShowAnimation(false);
       // Generate new problem
       setCurrentProblem(generateProblem());
       setUserAnswer("");
@@ -80,7 +78,7 @@ export function useGameActions({
   };
 
   const endGame = () => {
-    setShowProb(false);
+    setShowProblem(false);
     setGameEnded(true);
     toast({
       title: "Hra ukončena",

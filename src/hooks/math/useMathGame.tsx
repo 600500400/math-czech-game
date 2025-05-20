@@ -34,7 +34,6 @@ export function useMathGame() {
     setCorrectAnswers: gameState.setCorrectAnswers,
     setWrongAnswers: gameState.setWrongAnswers,
     setShowConfetti: gameState.setShowConfetti,
-    setShowProblem: gameState.setShowProblem,
     generateProblem: problemGenerator.generateProblem,
     correctAnswers: gameState.correctAnswers,
     setDifficultySet: gameState.setDifficultySet,
