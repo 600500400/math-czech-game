@@ -72,7 +72,9 @@ const SpellingPractice = () => {
       {/* Word Problem Dialog */}
       <WordProblemDialog
         open={showProblem}
-        onOpenChange={(open) => setShowProblem(open)}
+        onOpenChange={(open) => {
+          if (!open) endGame();
+        }}
         displayedWord={displayedWord}
         currentWord={currentWord}
         isPhrase={isPhrase}

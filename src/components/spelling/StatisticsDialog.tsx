@@ -86,7 +86,11 @@ export const StatisticsDialog = ({
                 <BarChart data={chartData}>
                   <XAxis dataKey="name" />
                   <YAxis />
-                  <Bar dataKey="value" fill={(entry: ChartDataItem) => entry.color || "#4ade80"} />
+                  <Bar 
+                    dataKey="value" 
+                    fill="#4ade80" 
+                    stroke="#4ade80"
+                  />
                   <ChartTooltip content={<ChartTooltipContent />} />
                 </BarChart>
               </ChartContainer>
