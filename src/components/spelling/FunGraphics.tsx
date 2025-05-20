@@ -69,13 +69,13 @@ export const FunGraphics = ({ isCorrect, showAnimation }: FunGraphicsProps) => {
   
   return (
     <div className="fixed inset-0 pointer-events-none z-[9999] flex items-center justify-center">
-      <div className="flex flex-col items-center transition-opacity duration-500 opacity-100 space-y-2">
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center opacity-100 space-y-4">
         {imageSrc && (
-          <div className={`${isCorrect ? 'animate-bounce' : 'animate-pulse'}`}>
+          <div className={`${isCorrect ? 'animate-bounce' : 'animate-pulse'} bg-white/90 rounded-lg shadow-md p-3`}>
             <img 
               src={imageSrc} 
               alt={isCorrect ? "Super!" : "Zkus to znovu"} 
-              className="h-32 object-contain rounded-lg shadow-md bg-white/90 p-2"
+              className="h-32 object-contain"
               onError={(e) => {
                 // Fallback image if the original doesn't load
                 const target = e.target as HTMLImageElement;
@@ -87,7 +87,7 @@ export const FunGraphics = ({ isCorrect, showAnimation }: FunGraphicsProps) => {
                   if (parent) {
                     target.style.display = "none";
                     const textEl = document.createElement("div");
-                    textEl.className = "text-3xl font-bold bg-white/90 p-4 rounded-lg text-center";
+                    textEl.className = "text-3xl font-bold text-center";
                     textEl.textContent = isCorrect ? "Super!" : "Zkus to znovu";
                     parent.appendChild(textEl);
                   }
@@ -97,26 +97,26 @@ export const FunGraphics = ({ isCorrect, showAnimation }: FunGraphicsProps) => {
           </div>
         )}
         
-        {/* Flying emojis using absolute positioning */}
-        {isCorrect && showAnimation && (
-          <div className="relative h-20 w-full overflow-hidden">
-            <span className="absolute animate-[fade-in_1s,slide-in-right_2s] top-2 left-1/4 text-4xl">🎉</span>
-            <span className="absolute animate-[fade-in_1s,slide-in-right_1.5s] delay-75 bottom-4 left-1/3 text-4xl">⭐</span>
-            <span className="absolute animate-[fade-in_1s,slide-in-right_2.5s] delay-100 top-8 right-1/4 text-4xl">🌟</span>
-            <span className="absolute animate-[fade-in_1s,slide-in-right_1.8s] delay-150 bottom-1 right-1/3 text-4xl">🏆</span>
-          </div>
-        )}
-        
         {/* Icon display */}
         <div className={`flex justify-center transition-all duration-300 ${showIcon ? 'scale-100 opacity-100' : 'scale-0 opacity-0'}`}>
           {renderIcon()}
         </div>
         
-        {/* Text feedback */}
-        {isCorrect !== null && (
-          <p className={`text-2xl font-bold text-center animate-fade-in bg-white/80 px-4 py-2 rounded-full shadow-lg ${isCorrect ? 'text-green-600' : 'text-orange-600'}`}>
+        {/* Text feedback - now in a fixed position */}
+        {isCorrect !== null && !imageSrc && (
+          <p className={`text-2xl font-bold text-center animate-fade-in bg-white/90 px-4 py-2 rounded-full shadow-lg ${isCorrect ? 'text-green-600' : 'text-orange-600'}`}>
             {isCorrect ? 'Výborně!' : 'Ještě to zkus!'}
           </p>
+        )}
+        
+        {/* Flying emojis now contained within the centered div */}
+        {isCorrect && showAnimation && (
+          <div className="absolute w-full h-full overflow-hidden">
+            <span className="absolute animate-[fade-in_1s] top-0 left-1/4 text-4xl">🎉</span>
+            <span className="absolute animate-[fade-in_1s] delay-75 bottom-0 left-1/3 text-4xl">⭐</span>
+            <span className="absolute animate-[fade-in_1s] delay-100 top-8 right-1/4 text-4xl">🌟</span>
+            <span className="absolute animate-[fade-in_1s] delay-150 bottom-1 right-1/3 text-4xl">🏆</span>
+          </div>
         )}
       </div>
     </div>

@@ -57,13 +57,25 @@ const SpellingPractice = () => {
 
   return (
     <div className="space-y-4 relative">
-      {/* Confetti effect when answers are correct */}
-      <ConfettiExplosion trigger={showConfetti} particleCount={30} />
+      {/* Fun Graphics Component - moved outside dialogs for visibility with higher z-index */}
+      <div className="z-[9999]">
+        {showAnimation && (
+          <FunGraphics isCorrect={lastAnswerCorrect} showAnimation={showAnimation} />
+        )}
+      </div>
       
-      {/* Fun Graphics Component - moved outside dialogs for visibility */}
-      {showAnimation && (
-        <FunGraphics isCorrect={lastAnswerCorrect} showAnimation={showAnimation} />
-      )}
+      {/* Confetti effect when answers are correct - with high z-index */}
+      <div className="z-[9999] relative">
+        <ConfettiExplosion 
+          trigger={showConfetti} 
+          particleCount={30}
+          particleSize={10}
+          duration={2000}
+          force={0.8}
+          width={1600}
+          zIndex={9999}
+        />
+      </div>
       
       <GameHeader 
         problemCount={problemCount}

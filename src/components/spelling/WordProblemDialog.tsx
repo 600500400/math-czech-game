@@ -36,7 +36,7 @@ export const WordProblemDialog = ({
   
   return (
     <Dialog open={open} onOpenChange={(open) => !open && onEndGame()}>
-      <DialogContent className="bg-gradient-to-b from-blue-50 to-white border-2 border-blue-200 rounded-xl shadow-xl">
+      <DialogContent className="z-[8000] bg-gradient-to-b from-blue-50 to-white border-2 border-blue-200 rounded-xl shadow-xl">
         <DialogHeader>
           <DialogTitle className="text-center text-xl font-bold text-blue-600 flex items-center justify-center gap-2">
             <Star className="h-5 w-5 text-yellow-400" />
