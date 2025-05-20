@@ -1,7 +1,6 @@
 
 import { useCallback } from 'react';
 import { Operation } from '@/types/mathTypes';
-import { UseMutateFunction } from '@tanstack/react-query';
 
 interface UseGameFinisherProps {
   setShowProblem: (value: React.SetStateAction<boolean>) => void;
@@ -14,7 +13,7 @@ interface UseGameFinisherProps {
   maxValue: number;
   maxMultiplyValue: number;
   maxDivideValue: number;
-  saveMathStatistics: UseMutateFunction<any, Error, any, unknown>;
+  saveMathStatistics: (data: any) => void;
 }
 
 export function useGameFinisher({
@@ -39,7 +38,7 @@ export function useGameFinisher({
     // Pokud je uživatel přihlášený, uložíme statistiky
     if (userId && (correctAnswers > 0 || wrongAnswers > 0)) {
       const operations = allowedOperations.join(',');
-      saveMathStatistics.mutate({
+      saveMathStatistics({
         correctAnswers,
         wrongAnswers,
         operation: operations,

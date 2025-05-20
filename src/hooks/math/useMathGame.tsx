@@ -1,193 +1,126 @@
-
 import { useState, useCallback } from 'react';
-import { useProblemGenerator } from './useProblemGenerator';
-import { useDifficultySettings } from './useDifficultySettings';
-import { useGameState } from './useGameState';
-import { useAnswerHandler } from './useAnswerHandler';
-import { useGameFinisher } from './useGameFinisher';
-import { useAuth } from '@/hooks/useAuth';
-import { useStatistics } from '@/hooks/useStatistics';
+import { Problem, Operation } from '@/types/mathTypes';
+import { useMutation } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
-export function useMathGame() {
-  const { authState } = useAuth();
-  const userId = authState.user?.id || null;
-  const { saveMathStatistics } = useStatistics(userId);
+interface UseMathGameProps {
+  allowedOperations: Operation[];
+  maxValue: number;
+  maxMultiplyValue: number;
+  maxDivideValue: number;
+  problemCount: number;
+  userId: string | null;
+}
 
-  const {
-    maxValue,
-    maxMultiplyValue,
-    maxDivideValue,
-    difficultySet,
-    allowedOperations,
-    setMaxValue,
-    setMaxMultiplyValue,
-    setMaxDivideValue,
-    setDifficultySet,
-    toggleOperation,
-    setDifficulty,
-  } = useDifficultySettings();
+export function useMathGame({
+  allowedOperations,
+  maxValue,
+  maxMultiplyValue,
+  maxDivideValue,
+  problemCount,
+  userId
+}: UseMathGameProps) {
+  const [currentProblem, setCurrentProblem] = useState<Problem | null>(null);
+  const [userAnswer, setUserAnswer] = useState<string>("");
+  const [correctAnswers, setCorrectAnswers] = useState<number>(0);
+  const [wrongAnswers, setWrongAnswers] = useState<number>(0);
+  const [gameEnded, setGameEnded] = useState<boolean>(false);
+  const [showProblem, setShowProblem] = useState<boolean>(true);
+  const [showAnimation, setShowAnimation] = useState<boolean>(false);
+  const [showConfetti, setShowConfetti] = useState<boolean>(false);
+  const [showStatsDialog, setShowStatsDialog] = useState<boolean>(false);
+  const [lastAnswerCorrect, setLastAnswerCorrect] = useState<boolean | null>(null);
 
-  const {
-    correctAnswers,
-    wrongAnswers,
-    problemCount,
-    currentProblem,
-    userAnswer,
-    showProblem,
-    showDifficultyDialog,
-    showStatsDialog,
-    gameEnded,
-    lastAnswerCorrect,
-    showAnimation,
-    showConfetti,
-    
-    setCorrectAnswers,
-    setWrongAnswers,
-    setProblemCount,
-    setCurrentProblem,
-    setUserAnswer,
-    setShowProblem,
-    setShowDifficultyDialog,
-    setShowStatsDialog,
-    setGameEnded,
-    setLastAnswerCorrect,
-    setShowAnimation,
-    setShowConfetti,
-  } = useGameState();
+  // Funkce pro generování matematických příkladů
+  const generateProblem = useCallback(() => {
+    const operation = allowedOperations[Math.floor(Math.random() * allowedOperations.length)];
+    let num1: number, num2: number, result: number;
 
-  const { generateProblem } = useProblemGenerator({ 
-    maxValue, 
-    maxMultiplyValue, 
-    maxDivideValue, 
-    allowedOperations 
-  });
-
-  // Calculate statistics
-  const totalAnswers = correctAnswers + wrongAnswers;
-  const correctPercentage = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 0;
-  
-  // Initialize game finisher hook
-  const { endGame } = useGameFinisher({
-    setShowProblem,
-    setGameEnded,
-    setShowStatsDialog,
-    userId,
-    correctAnswers,
-    wrongAnswers,
-    allowedOperations,
-    maxValue,
-    maxMultiplyValue,
-    maxDivideValue,
-    saveMathStatistics
-  });
-
-  // Initialize answer handler hook (must be after endGame is defined)
-  const { checkAnswer, handleKeyPress } = useAnswerHandler({
-    currentProblem,
-    userAnswer,
-    correctAnswers,
-    wrongAnswers,
-    problemCount,
-    generateProblem,
-    setCorrectAnswers,
-    setWrongAnswers,
-    setLastAnswerCorrect,
-    setShowAnimation,
-    setShowConfetti,
-    setUserAnswer,
-    setCurrentProblem,
-    endGame
-  });
-  
-  // Game actions
-  const startNewGame = useCallback(() => {
-    if(!difficultySet) {
-      setShowDifficultyDialog(true);
-      return;
+    switch (operation) {
+      case 'addition':
+        num1 = Math.floor(Math.random() * maxValue) + 1;
+        num2 = Math.floor(Math.random() * maxValue) + 1;
+        result = num1 + num2;
+        break;
+      case 'subtraction':
+        num1 = Math.floor(Math.random() * maxValue) + 1;
+        num2 = Math.floor(Math.random() * num1) + 1;
+        result = num1 - num2;
+        break;
+      case 'multiplication':
+        num1 = Math.floor(Math.random() * maxMultiplyValue) + 1;
+        num2 = Math.floor(Math.random() * maxMultiplyValue) + 1;
+        result = num1 * num2;
+        break;
+      case 'division':
+        num2 = Math.floor(Math.random() * maxDivideValue) + 1;
+        result = Math.floor(Math.random() * maxDivideValue) + 1;
+        num1 = num2 * result;
+        break;
+      default:
+        num1 = 0;
+        num2 = 0;
+        result = 0;
     }
-    
-    setProblemCount(10); // Default počet problémů
-    setCorrectAnswers(0);
-    setWrongAnswers(0);
-    setUserAnswer("");
-    setGameEnded(false);
-    setCurrentProblem(generateProblem());
-    setShowProblem(true);
-  }, [
-    difficultySet,
-    generateProblem,
-    setCorrectAnswers,
-    setCurrentProblem,
-    setGameEnded,
-    setProblemCount,
-    setShowDifficultyDialog,
-    setShowProblem,
-    setUserAnswer,
-    setWrongAnswers
-  ]);
 
-  const resetGame = useCallback(() => {
-    setCorrectAnswers(0);
-    setWrongAnswers(0);
-    setProblemCount(10);
-    setUserAnswer("");
-    setCurrentProblem(null);
-    setShowProblem(false);
-    setGameEnded(false);
-    setLastAnswerCorrect(null);
-    setShowAnimation(false);
-    setShowConfetti(false);
-  }, [
-    setCorrectAnswers,
-    setCurrentProblem,
-    setGameEnded,
-    setLastAnswerCorrect,
-    setProblemCount,
-    setShowAnimation,
-    setShowConfetti,
-    setShowProblem,
-    setUserAnswer,
-    setWrongAnswers
-  ]);
+    return {
+      num1,
+      num2,
+      operation,
+      result
+    };
+  }, [allowedOperations, maxValue, maxMultiplyValue, maxDivideValue]);
 
-  // Vrátíme vše co potřebujeme
+  // Inicializace mutace pro uložení statistik
+  const mutate = useMutation(
+    async (data: any) => {
+      const { data: response, error } = await supabase
+        .from('math_statistics')
+        .insert([
+          {
+            user_id: userId,
+            correct_answers: data.correctAnswers,
+            wrong_answers: data.wrongAnswers,
+            operation: data.operation,
+            difficulty_level: data.difficultyLevel
+          }
+        ]);
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return response;
+    }
+  );
+
+  // Update saveMathStatistics type to fix the type error
+  const saveMathStatistics = (data: any) => {
+    mutate.mutate(data);
+  };
+
   return {
-    // Stav hry
-    correctAnswers,
-    wrongAnswers,
-    problemCount,
     currentProblem,
     userAnswer,
-    showProblem,
-    showDifficultyDialog,
-    showStatsDialog,
-    maxValue,
-    maxMultiplyValue,
-    maxDivideValue,
-    difficultySet,
+    correctAnswers,
+    wrongAnswers,
     gameEnded,
-    lastAnswerCorrect,
+    showProblem,
     showAnimation,
     showConfetti,
-    totalAnswers,
-    correctPercentage,
-    allowedOperations,
-    
-    // Settery
+    showStatsDialog,
+    lastAnswerCorrect,
+    setCurrentProblem,
     setUserAnswer,
-    setShowDifficultyDialog,
+    setCorrectAnswers,
+    setWrongAnswers,
+    setGameEnded,
+    setShowProblem,
+    setShowAnimation,
+    setShowConfetti,
     setShowStatsDialog,
-    setMaxValue,
-    setMaxMultiplyValue,
-    setMaxDivideValue,
-    setDifficulty,
-    toggleOperation,
-    
-    // Akce
-    startNewGame,
-    checkAnswer,
-    endGame,
-    resetGame,
-    handleKeyPress,
+    setLastAnswerCorrect,
+    generateProblem,
+    saveMathStatistics
   };
 }
