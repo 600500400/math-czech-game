@@ -69,7 +69,8 @@ export const FunGraphics = ({ isCorrect, showAnimation }: FunGraphicsProps) => {
   
   return (
     <div className="fixed inset-0 pointer-events-none z-[9999] flex items-center justify-center">
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center opacity-100 space-y-4">
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+        {/* Image or text feedback */}
         {imageSrc && (
           <div className={`${isCorrect ? 'animate-bounce' : 'animate-pulse'} bg-white/90 rounded-lg shadow-md p-3`}>
             <img 
@@ -77,48 +78,47 @@ export const FunGraphics = ({ isCorrect, showAnimation }: FunGraphicsProps) => {
               alt={isCorrect ? "Super!" : "Zkus to znovu"} 
               className="h-32 object-contain"
               onError={(e) => {
-                // Fallback image if the original doesn't load
                 const target = e.target as HTMLImageElement;
                 console.log(`Image failed to load: ${target.src}`);
-                target.src = isCorrect ? "/images/stars.png" : "/images/try-again.png";
-                // If fallback also fails, show text
-                target.onerror = () => {
-                  const parent = target.parentElement;
-                  if (parent) {
-                    target.style.display = "none";
-                    const textEl = document.createElement("div");
-                    textEl.className = "text-3xl font-bold text-center";
-                    textEl.textContent = isCorrect ? "Super!" : "Zkus to znovu";
-                    parent.appendChild(textEl);
-                  }
-                };
+                target.style.display = "none";
+                
+                // Create text element instead
+                const parent = target.parentElement;
+                if (parent) {
+                  const textEl = document.createElement("div");
+                  textEl.className = "text-3xl font-bold text-center";
+                  textEl.textContent = isCorrect ? "Super!" : "Zkus to znovu";
+                  parent.appendChild(textEl);
+                }
               }}
             />
           </div>
         )}
         
         {/* Icon display */}
-        <div className={`flex justify-center transition-all duration-300 ${showIcon ? 'scale-100 opacity-100' : 'scale-0 opacity-0'}`}>
+        <div className={`flex justify-center mt-4 transition-all duration-300 ${showIcon ? 'scale-100 opacity-100' : 'scale-0 opacity-0'}`}>
           {renderIcon()}
         </div>
         
-        {/* Text feedback - now in a fixed position */}
+        {/* Text feedback when no image is shown */}
         {isCorrect !== null && !imageSrc && (
-          <p className={`text-2xl font-bold text-center animate-fade-in bg-white/90 px-4 py-2 rounded-full shadow-lg ${isCorrect ? 'text-green-600' : 'text-orange-600'}`}>
-            {isCorrect ? 'Výborně!' : 'Ještě to zkus!'}
-          </p>
-        )}
-        
-        {/* Flying emojis now contained within the centered div */}
-        {isCorrect && showAnimation && (
-          <div className="absolute w-full h-full overflow-hidden">
-            <span className="absolute animate-[fade-in_1s] top-0 left-1/4 text-4xl">🎉</span>
-            <span className="absolute animate-[fade-in_1s] delay-75 bottom-0 left-1/3 text-4xl">⭐</span>
-            <span className="absolute animate-[fade-in_1s] delay-100 top-8 right-1/4 text-4xl">🌟</span>
-            <span className="absolute animate-[fade-in_1s] delay-150 bottom-1 right-1/3 text-4xl">🏆</span>
+          <div className="bg-white/90 px-4 py-2 rounded-full shadow-lg">
+            <p className={`text-2xl font-bold text-center animate-fade-in ${isCorrect ? 'text-green-600' : 'text-orange-600'}`}>
+              {isCorrect ? 'Výborně!' : 'Ještě to zkus!'}
+            </p>
           </div>
         )}
       </div>
+      
+      {/* Flying emojis */}
+      {isCorrect && showAnimation && (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <span className="absolute animate-[fade-in_1s] top-0 left-1/4 text-4xl">🎉</span>
+          <span className="absolute animate-[fade-in_1s] delay-75 bottom-0 left-1/3 text-4xl">⭐</span>
+          <span className="absolute animate-[fade-in_1s] delay-100 top-8 right-1/4 text-4xl">🌟</span>
+          <span className="absolute animate-[fade-in_1s] delay-150 bottom-1 right-1/3 text-4xl">🏆</span>
+        </div>
+      )}
     </div>
   );
 };
