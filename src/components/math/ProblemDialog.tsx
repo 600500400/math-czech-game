@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
@@ -47,9 +47,12 @@ const ProblemDialog: React.FC<ProblemDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={(open) => !open && endGame()}>
-      <DialogContent>
+      <DialogContent className="z-[9000]">
         <DialogHeader>
           <DialogTitle>Řeš příklad</DialogTitle>
+          <DialogDescription className="sr-only">
+            Zde můžete řešit matematické příklady
+          </DialogDescription>
         </DialogHeader>
         <div className="py-4">
           {currentProblem && (

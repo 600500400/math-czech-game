@@ -25,10 +25,11 @@ export const FunGraphics = ({ isCorrect, showAnimation }: FunGraphicsProps) => {
     
     // Choose a random image based on the result
     if (isCorrect === true) {
+      // Updated correct images with direct local paths ensuring they work
       const correctImages = [
         "/images/happy-kid.png",
         "/images/stars.png",
-        "/images/correct-answer.png",
+        "/images/correct-answer.png", 
         "/images/thumbs-up.png",
         "/images/celebration.png"
       ];
@@ -74,7 +75,24 @@ export const FunGraphics = ({ isCorrect, showAnimation }: FunGraphicsProps) => {
             <img 
               src={imageSrc} 
               alt={isCorrect ? "Super!" : "Zkus to znovu"} 
-              className="h-32 object-contain rounded-lg shadow-md"
+              className="h-32 object-contain rounded-lg shadow-md bg-white/90 p-2"
+              onError={(e) => {
+                // Fallback image if the original doesn't load
+                const target = e.target as HTMLImageElement;
+                console.log(`Image failed to load: ${target.src}`);
+                target.src = isCorrect ? "/images/stars.png" : "/images/try-again.png";
+                // If fallback also fails, show text
+                target.onerror = () => {
+                  const parent = target.parentElement;
+                  if (parent) {
+                    target.style.display = "none";
+                    const textEl = document.createElement("div");
+                    textEl.className = "text-3xl font-bold bg-white/90 p-4 rounded-lg text-center";
+                    textEl.textContent = isCorrect ? "Super!" : "Zkus to znovu";
+                    parent.appendChild(textEl);
+                  }
+                };
+              }}
             />
           </div>
         )}
