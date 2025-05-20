@@ -15,7 +15,7 @@ export function useMathGame() {
   const [showStatsDialog, setShowStatsDialog] = useState(false);
   const [maxValue, setMaxValue] = useState(10);
   const [difficultySet, setDifficultySet] = useState(false);
-  const [allowedOperations] = useState<Operation[]>(["+", "-", "*", "/"]);
+  const [allowedOperations, setAllowedOperations] = useState<Operation[]>(["+", "-", "*", "/"]);
   const [gameEnded, setGameEnded] = useState(false);
   const [lastAnswerCorrect, setLastAnswerCorrect] = useState<boolean | null>(null);
   const [showAnimation, setShowAnimation] = useState(false);
@@ -24,13 +24,42 @@ export function useMathGame() {
   const totalAnswers = correctAnswers + wrongAnswers;
   const correctPercentage = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 0;
 
+  const toggleOperation = (operation: Operation) => {
+    setAllowedOperations(current => {
+      if (current.includes(operation)) {
+        // Don't allow removing the last operation
+        if (current.length === 1) {
+          toast({
+            title: "Upozornění",
+            description: "Alespoň jedna operace musí být vybrána.",
+            variant: "default",
+          });
+          return current;
+        }
+        return current.filter(op => op !== operation);
+      } else {
+        return [...current, operation];
+      }
+    });
+  };
+
   const setDifficulty = () => {
     if (maxValue > 0) {
       setDifficultySet(true);
       setShowDifficultyDialog(false);
+      
+      const operationDescriptions = {
+        "+": "sčítání",
+        "-": "odčítání",
+        "*": "násobení",
+        "/": "dělení"
+      };
+      
+      const selectedOps = allowedOperations.map(op => operationDescriptions[op]).join(", ");
+      
       toast({
         title: "Obtížnost nastavena",
-        description: `Maximální hodnota pro sčítání a odčítání: ${maxValue}`,
+        description: `Maximální hodnota: ${maxValue}, Operace: ${selectedOps}`,
       });
     } else {
       toast({
@@ -42,7 +71,16 @@ export function useMathGame() {
   };
 
   const generateProblem = (): Problem => {
+    if (allowedOperations.length === 0) {
+      // Default to addition if somehow no operations are selected
+      return generateProblemForOperation("+");
+    }
+    
     const operation = allowedOperations[Math.floor(Math.random() * allowedOperations.length)] as Operation;
+    return generateProblemForOperation(operation);
+  };
+  
+  const generateProblemForOperation = (operation: Operation): Problem => {
     let num1, num2, result;
 
     switch (operation) {
@@ -169,6 +207,7 @@ export function useMathGame() {
     showConfetti,
     totalAnswers,
     correctPercentage,
+    allowedOperations,
 
     // Actions
     setUserAnswer,
@@ -176,6 +215,7 @@ export function useMathGame() {
     setShowStatsDialog,
     setMaxValue,
     setDifficulty,
+    toggleOperation,
     startNewGame,
     checkAnswer,
     endGame,

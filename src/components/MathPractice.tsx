@@ -25,12 +25,14 @@ const MathPractice = () => {
     showConfetti,
     totalAnswers,
     correctPercentage,
+    allowedOperations,
     
     setUserAnswer,
     setShowDifficultyDialog,
     setShowStatsDialog,
     setMaxValue,
     setDifficulty,
+    toggleOperation,
     startNewGame,
     checkAnswer,
     endGame,
@@ -71,6 +73,8 @@ const MathPractice = () => {
         onOpenChange={setShowDifficultyDialog}
         maxValue={maxValue}
         setMaxValue={setMaxValue}
+        allowedOperations={allowedOperations}
+        toggleOperation={toggleOperation}
         setDifficulty={setDifficulty}
       />
 

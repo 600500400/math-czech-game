@@ -34,6 +34,8 @@ const SpellingPractice = () => {
     setShowStatsDialog,
     toggleGroup,
     setGroups,
+    selectAll,
+    deselectAll,
     startNewGame,
     handleAnswerI,
     handleAnswerY,
@@ -85,6 +87,8 @@ const SpellingPractice = () => {
         selectedGroups={selectedGroups}
         toggleGroup={toggleGroup}
         setGroups={setGroups}
+        selectAll={selectAll}
+        deselectAll={deselectAll}
       />
 
       {/* Word Problem Dialog */}

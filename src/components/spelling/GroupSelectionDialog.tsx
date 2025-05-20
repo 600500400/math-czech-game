@@ -12,6 +12,8 @@ interface GroupSelectionDialogProps {
   selectedGroups: string[];
   toggleGroup: (groupName: string) => void;
   setGroups: () => void;
+  selectAll: () => void;
+  deselectAll: () => void;
 }
 
 export const GroupSelectionDialog = ({
@@ -20,7 +22,9 @@ export const GroupSelectionDialog = ({
   spellingGroups,
   selectedGroups,
   toggleGroup,
-  setGroups
+  setGroups,
+  selectAll,
+  deselectAll
 }: GroupSelectionDialogProps) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -29,7 +33,24 @@ export const GroupSelectionDialog = ({
           <DialogTitle className="text-xl text-center text-orange-500">Výběr skupin vyjmenovaných slov</DialogTitle>
         </DialogHeader>
         <div className="py-4">
-          <p className="mb-4 text-center">Vyber si, která vyjmenovaná slova chceš procvičovat:</p>
+          <div className="flex justify-between mb-4">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={selectAll}
+              className="border-orange-300 hover:bg-orange-50"
+            >
+              Vybrat vše
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={deselectAll}
+              className="border-orange-300 hover:bg-orange-50"
+            >
+              Zrušit výběr
+            </Button>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {spellingGroups.map(group => (
               <div 

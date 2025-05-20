@@ -12,7 +12,9 @@ export function useSpellingGame() {
     showGroupDialog,
     setShowGroupDialog,
     toggleGroup,
-    setGroups
+    setGroups,
+    selectAll,
+    deselectAll
   } = useGroupSelection();
 
   const {
@@ -80,6 +82,8 @@ export function useSpellingGame() {
     setShowStatsDialog,
     toggleGroup,
     setGroups,
+    selectAll,
+    deselectAll,
     startNewGame,
     handleAnswerI,
     handleAnswerY,

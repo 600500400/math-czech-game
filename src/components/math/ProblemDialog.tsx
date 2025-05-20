@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Problem } from "@/types/mathTypes";
+import NumericKeyboard from "./NumericKeyboard";
 
 interface ProblemDialogProps {
   open: boolean;
@@ -35,6 +36,14 @@ const ProblemDialog: React.FC<ProblemDialogProps> = ({
   totalAnswers,
   correctPercentage
 }) => {
+  const handleKeyboardInput = (key: string) => {
+    setUserAnswer(prev => prev + key);
+  };
+
+  const handleClear = () => {
+    setUserAnswer("");
+  };
+
   return (
     <Dialog open={open} onOpenChange={(open) => !open && endGame()}>
       <DialogContent>
@@ -56,6 +65,15 @@ const ProblemDialog: React.FC<ProblemDialogProps> = ({
             className="text-lg"
             autoFocus
           />
+          
+          {/* Numeric Keyboard */}
+          <div className="mt-4">
+            <NumericKeyboard 
+              onKeyPress={handleKeyboardInput}
+              onClear={handleClear}
+              onSubmit={checkAnswer}
+            />
+          </div>
           
           {/* In-game statistics */}
           {totalAnswers > 0 && (

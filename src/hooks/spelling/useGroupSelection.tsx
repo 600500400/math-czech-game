@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
+import { spellingGroups } from "@/data/spellingData";
 
 export function useGroupSelection() {
   const { toast } = useToast();
@@ -13,6 +14,15 @@ export function useGroupSelection() {
         ? current.filter(name => name !== groupName)
         : [...current, groupName]
     );
+  };
+
+  const selectAll = () => {
+    const allGroups = spellingGroups.map(group => group.name);
+    setSelectedGroups(allGroups);
+  };
+
+  const deselectAll = () => {
+    setSelectedGroups([]);
   };
 
   const setGroups = () => {
@@ -36,6 +46,8 @@ export function useGroupSelection() {
     showGroupDialog,
     setShowGroupDialog,
     toggleGroup,
-    setGroups
+    setGroups,
+    selectAll,
+    deselectAll
   };
 }
