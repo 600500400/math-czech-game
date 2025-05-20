@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +10,7 @@ import { FunGraphics } from "./spelling/FunGraphics";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis } from "recharts";
+import { ConfettiExplosion } from "@/components/ui/confetti-explosion";
 
 type Operation = "+" | "-" | "*" | "/";
 type Problem = {
@@ -42,6 +42,7 @@ const MathPractice = () => {
   const [gameEnded, setGameEnded] = useState(false);
   const [lastAnswerCorrect, setLastAnswerCorrect] = useState<boolean | null>(null);
   const [showAnimation, setShowAnimation] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const totalAnswers = correctAnswers + wrongAnswers;
   const correctPercentage = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 0;
@@ -121,7 +122,11 @@ const MathPractice = () => {
     setLastAnswerCorrect(isCorrect);
     setShowAnimation(true);
     
+    // Trigger confetti for correct answers
     if (isCorrect) {
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 2000);
+      
       toast({
         title: "Správně!",
         variant: "default",
@@ -177,6 +182,9 @@ const MathPractice = () => {
 
   return (
     <div className="space-y-4">
+      {/* Confetti effect */}
+      <ConfettiExplosion trigger={showConfetti} particleCount={30} />
+      
       <h1 className="text-3xl font-bold text-center text-orange-500">Procvičování matematiky</h1>
       
       <div className="flex justify-between items-center">

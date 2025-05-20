@@ -2,6 +2,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { renderWordWithCurrentGap } from "@/utils/spellingUtils";
+import { Star } from "lucide-react";
 
 interface WordProblemDialogProps {
   open: boolean;
@@ -35,35 +36,41 @@ export const WordProblemDialog = ({
   
   return (
     <Dialog open={open} onOpenChange={(open) => !open && onEndGame()}>
-      <DialogContent>
+      <DialogContent className="bg-gradient-to-b from-blue-50 to-white border-2 border-blue-200 rounded-xl shadow-xl">
         <DialogHeader>
-          <DialogTitle>Doplňte správné i/y</DialogTitle>
+          <DialogTitle className="text-center text-xl font-bold text-blue-600 flex items-center justify-center gap-2">
+            <Star className="h-5 w-5 text-yellow-400" />
+            Doplňte správné i/y
+            <Star className="h-5 w-5 text-yellow-400" />
+          </DialogTitle>
         </DialogHeader>
         <div className="py-4">
           {displayedWord && (
             <div className="space-y-4">
-              <p className="text-center font-medium">
+              <p className="text-center font-medium bg-yellow-100 py-2 px-4 rounded-lg border border-yellow-200 shadow-sm">
                 {isPhrase ? "Věta/spojení" : `Vyjmenované slovo po ${wordGroup}`}
               </p>
-              <p className="text-2xl font-bold text-center mb-4 whitespace-pre-wrap">
-                {renderWordWithCurrentGap(currentWord, missingPositions, correctLetters, currentPosition)}
-              </p>
-              <p className="text-center text-gray-600">
+              <div className="bg-white p-4 rounded-lg border-2 border-dashed border-blue-300 shadow-inner">
+                <p className="text-2xl font-bold text-center mb-4 whitespace-pre-wrap">
+                  {renderWordWithCurrentGap(currentWord, missingPositions, correctLetters, currentPosition)}
+                </p>
+              </div>
+              <p className="text-center text-gray-600 italic">
                 Doplňte pouze písmeno i/y na zvýrazněné místo
               </p>
             </div>
           )}
-          <div className="flex justify-center items-center gap-4">
+          <div className="flex justify-center items-center gap-6 mt-6">
             <Button 
               onClick={onAnswerI}
-              className="text-2xl px-6 py-4 bg-blue-500 hover:bg-blue-600"
+              className="text-3xl px-8 py-6 bg-blue-500 hover:bg-blue-600 rounded-xl shadow-lg transform hover:scale-105 transition-transform"
               size="lg"
             >
               i
             </Button>
             <Button 
               onClick={onAnswerY}
-              className="text-2xl px-6 py-4 bg-green-500 hover:bg-green-600"
+              className="text-3xl px-8 py-6 bg-green-500 hover:bg-green-600 rounded-xl shadow-lg transform hover:scale-105 transition-transform"
               size="lg"
             >
               y
@@ -73,7 +80,7 @@ export const WordProblemDialog = ({
         <DialogFooter className="flex flex-col sm:flex-row gap-2">
           <Button 
             onClick={onEndGame}
-            className="w-full sm:w-auto bg-red-500 hover:bg-red-600"
+            className="w-full sm:w-auto bg-red-500 hover:bg-red-600 rounded-lg shadow-md"
           >
             Ukončit hru
           </Button>

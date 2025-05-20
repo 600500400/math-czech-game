@@ -7,6 +7,8 @@ import { GameControls } from "./spelling/GameControls";
 import { GameHeader } from "./spelling/GameHeader";
 import { useSpellingGame } from "@/hooks/useSpellingGame";
 import { spellingGroups } from "@/data/spellingData";
+import { ConfettiExplosion } from "@/components/ui/confetti-explosion";
+import { useState, useEffect } from "react";
 
 const SpellingPractice = () => {
   const {
@@ -38,10 +40,24 @@ const SpellingPractice = () => {
     endGame,
   } = useSpellingGame();
 
+  const [showConfetti, setShowConfetti] = useState(false);
+  
+  // Trigger confetti when correct answer is given
+  useEffect(() => {
+    if (lastAnswerCorrect === true && showAnimation) {
+      setShowConfetti(true);
+      const timer = setTimeout(() => setShowConfetti(false), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [lastAnswerCorrect, showAnimation]);
+
   const hasStats = correctAnswers > 0 || wrongAnswers > 0;
 
   return (
     <div className="space-y-4">
+      {/* Confetti effect when answers are correct */}
+      <ConfettiExplosion trigger={showConfetti} particleCount={30} />
+      
       <GameHeader 
         problemCount={problemCount}
         correctAnswers={correctAnswers}
