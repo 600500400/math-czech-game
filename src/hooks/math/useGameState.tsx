@@ -14,6 +14,8 @@ export function useGameState() {
   const [showDifficultyDialog, setShowDifficultyDialog] = useState(false);
   const [showStatsDialog, setShowStatsDialog] = useState(false);
   const [maxValue, setMaxValue] = useState(10);
+  const [maxMultiplyValue, setMaxMultiplyValue] = useState(10);
+  const [maxDivideValue, setMaxDivideValue] = useState(10);
   const [difficultySet, setDifficultySet] = useState(false);
   const [allowedOperations, setAllowedOperations] = useState<Operation[]>(["+", "-", "*", "/"]);
   const [gameEnded, setGameEnded] = useState(false);
@@ -44,6 +46,10 @@ export function useGameState() {
     setShowStatsDialog,
     maxValue,
     setMaxValue,
+    maxMultiplyValue,
+    setMaxMultiplyValue,
+    maxDivideValue,
+    setMaxDivideValue,
     difficultySet,
     setDifficultySet,
     allowedOperations,

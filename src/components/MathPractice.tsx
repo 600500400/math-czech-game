@@ -18,6 +18,8 @@ const MathPractice = () => {
     showDifficultyDialog,
     showStatsDialog,
     maxValue,
+    maxMultiplyValue,
+    maxDivideValue,
     difficultySet,
     gameEnded,
     lastAnswerCorrect,
@@ -31,6 +33,8 @@ const MathPractice = () => {
     setShowDifficultyDialog,
     setShowStatsDialog,
     setMaxValue,
+    setMaxMultiplyValue,
+    setMaxDivideValue,
     setDifficulty,
     toggleOperation,
     startNewGame,
@@ -70,7 +74,11 @@ const MathPractice = () => {
         open={showDifficultyDialog}
         onOpenChange={setShowDifficultyDialog}
         maxValue={maxValue}
+        maxMultiplyValue={maxMultiplyValue}
+        maxDivideValue={maxDivideValue}
         setMaxValue={setMaxValue}
+        setMaxMultiplyValue={setMaxMultiplyValue}
+        setMaxDivideValue={setMaxDivideValue}
         allowedOperations={allowedOperations}
         toggleOperation={toggleOperation}
         setDifficulty={setDifficulty}

@@ -1,7 +1,7 @@
 
 import { Problem, Operation } from "@/types/mathTypes";
 
-export function useProblemGenerator({ maxValue, allowedOperations }) {
+export function useProblemGenerator({ maxValue, maxMultiplyValue, maxDivideValue, allowedOperations }) {
   const generateProblem = (): Problem => {
     if (allowedOperations.length === 0) {
       // Default to addition if somehow no operations are selected
@@ -17,8 +17,9 @@ export function useProblemGenerator({ maxValue, allowedOperations }) {
 
     switch (operation) {
       case "*":
-        num1 = Math.floor(Math.random() * 10) + 1;
-        num2 = Math.floor(Math.random() * 10) + 1;
+        // Použijeme maxMultiplyValue místo pevné hodnoty 10
+        num1 = Math.floor(Math.random() * maxMultiplyValue) + 1;
+        num2 = Math.floor(Math.random() * maxMultiplyValue) + 1;
         result = num1 * num2;
         break;
       case "+":
@@ -27,8 +28,10 @@ export function useProblemGenerator({ maxValue, allowedOperations }) {
         result = num1 + num2;
         break;
       case "/":
-        num2 = Math.floor(Math.random() * 10) + 1; // Ensure divisor is not zero
-        num1 = num2 * (Math.floor(Math.random() * 10) + 1); // Ensure clean division
+        // Použijeme maxDivideValue místo pevné hodnoty 10
+        num2 = Math.floor(Math.random() * maxDivideValue) + 1; // Ensure divisor is not zero
+        // Pro dělení generujeme násobek divisoru pro zajištění celých výsledků
+        num1 = num2 * (Math.floor(Math.random() * maxDivideValue) + 1); 
         result = num1 / num2;
         break;
       case "-":

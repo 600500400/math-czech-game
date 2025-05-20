@@ -6,6 +6,8 @@ export function useDifficultySettings({
   allowedOperations,
   setAllowedOperations,
   maxValue,
+  maxMultiplyValue,
+  maxDivideValue,
   setDifficultySet,
   setShowDifficultyDialog,
 }) {
@@ -31,7 +33,8 @@ export function useDifficultySettings({
   };
 
   const setDifficulty = () => {
-    if (maxValue > 0) {
+    // Validace všech max. hodnot
+    if (maxValue > 0 && maxMultiplyValue > 0 && maxDivideValue > 0) {
       setDifficultySet(true);
       setShowDifficultyDialog(false);
       
@@ -46,12 +49,12 @@ export function useDifficultySettings({
       
       toast({
         title: "Obtížnost nastavena",
-        description: `Maximální hodnota: ${maxValue}, Operace: ${selectedOps}`,
+        description: `Maximální hodnoty: ${maxValue} (±), ${maxMultiplyValue} (×), ${maxDivideValue} (÷), Operace: ${selectedOps}`,
       });
     } else {
       toast({
         title: "Chyba",
-        description: "Zadejte platnou hodnotu větší než 0.",
+        description: "Všechny hodnoty musí být větší než 0.",
         variant: "destructive",
       });
     }

@@ -9,6 +9,8 @@ export function useMathGame() {
   
   const problemGenerator = useProblemGenerator({ 
     maxValue: gameState.maxValue, 
+    maxMultiplyValue: gameState.maxMultiplyValue,
+    maxDivideValue: gameState.maxDivideValue,
     allowedOperations: gameState.allowedOperations 
   });
   
@@ -16,6 +18,8 @@ export function useMathGame() {
     allowedOperations: gameState.allowedOperations,
     setAllowedOperations: gameState.setAllowedOperations,
     maxValue: gameState.maxValue,
+    maxMultiplyValue: gameState.maxMultiplyValue,
+    maxDivideValue: gameState.maxDivideValue,
     setDifficultySet: gameState.setDifficultySet,
     setShowDifficultyDialog: gameState.setShowDifficultyDialog,
   });

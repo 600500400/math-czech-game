@@ -12,7 +12,11 @@ interface DifficultyDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   maxValue: number;
+  maxMultiplyValue: number;
+  maxDivideValue: number;
   setMaxValue: (value: number) => void;
+  setMaxMultiplyValue: (value: number) => void;
+  setMaxDivideValue: (value: number) => void;
   allowedOperations: Operation[];
   toggleOperation: (operation: Operation) => void;
   setDifficulty: () => void;
@@ -22,7 +26,11 @@ const DifficultyDialog: React.FC<DifficultyDialogProps> = ({
   open, 
   onOpenChange, 
   maxValue, 
+  maxMultiplyValue,
+  maxDivideValue,
   setMaxValue,
+  setMaxMultiplyValue,
+  setMaxDivideValue,
   allowedOperations,
   toggleOperation,
   setDifficulty 
@@ -48,6 +56,28 @@ const DifficultyDialog: React.FC<DifficultyDialogProps> = ({
               type="number"
               value={maxValue}
               onChange={(e) => setMaxValue(parseInt(e.target.value) || 0)}
+              min={1}
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="max-multiply-value" className="mb-2 block">Maximální hodnota pro násobení:</Label>
+            <Input
+              id="max-multiply-value"
+              type="number"
+              value={maxMultiplyValue}
+              onChange={(e) => setMaxMultiplyValue(parseInt(e.target.value) || 0)}
+              min={1}
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="max-divide-value" className="mb-2 block">Maximální hodnota pro dělení:</Label>
+            <Input
+              id="max-divide-value"
+              type="number"
+              value={maxDivideValue}
+              onChange={(e) => setMaxDivideValue(parseInt(e.target.value) || 0)}
               min={1}
             />
           </div>
