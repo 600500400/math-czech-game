@@ -88,8 +88,9 @@ export const StatisticsDialog = ({
                   <YAxis />
                   <Bar 
                     dataKey="value" 
-                    fill={(entry: any) => entry.color || "#4ade80"}
-                    stroke={(entry: any) => entry.color || "#4ade80"}
+                    fill="#4ade80"
+                    name="value"
+                    stroke="#4ade80"
                   />
                   <ChartTooltip content={<ChartTooltipContent />} />
                 </BarChart>
