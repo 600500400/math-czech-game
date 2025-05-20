@@ -18,38 +18,44 @@ export const ConfettiExplosion: React.FC<ConfettiProps> = ({
   const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
-    if (!trigger) return;
-
-    setShowConfetti(true);
-    const newParticles = [];
-    
-    for (let i = 0; i < particleCount; i++) {
-      const style = {
-        left: `${Math.random() * 100}%`,
-        top: `${Math.random() * 100}%`,
-        backgroundColor: colors[Math.floor(Math.random() * colors.length)],
-        animationDuration: `${0.5 + Math.random() * 1}s`,
-        animationDelay: `${Math.random() * 0.5}s`,
-      };
-      
-      newParticles.push(
-        <div
-          key={i}
-          className="absolute rounded-full w-2 h-2 opacity-0 animate-confetti"
-          style={style}
-        />
-      );
-    }
-    
-    setParticles(newParticles);
-    
-    const timer = setTimeout(() => {
+    if (!trigger) {
       setShowConfetti(false);
-      setParticles([]);
-    }, duration);
-    
-    return () => clearTimeout(timer);
-  }, [trigger, duration, particleCount, colors]);
+      return;
+    }
+
+    // Only set showConfetti to true and generate particles if it's not already shown
+    if (!showConfetti) {
+      setShowConfetti(true);
+      const newParticles = [];
+      
+      for (let i = 0; i < particleCount; i++) {
+        const style = {
+          left: `${Math.random() * 100}%`,
+          top: `${Math.random() * 100}%`,
+          backgroundColor: colors[Math.floor(Math.random() * colors.length)],
+          animationDuration: `${0.5 + Math.random() * 1}s`,
+          animationDelay: `${Math.random() * 0.5}s`,
+        };
+        
+        newParticles.push(
+          <div
+            key={i}
+            className="absolute rounded-full w-2 h-2 opacity-0 animate-confetti"
+            style={style}
+          />
+        );
+      }
+      
+      setParticles(newParticles);
+      
+      const timer = setTimeout(() => {
+        setShowConfetti(false);
+        setParticles([]);
+      }, duration);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [trigger, duration, particleCount, colors]); // Make sure to include all dependencies
   
   if (!showConfetti) return null;
   
