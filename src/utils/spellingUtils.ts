@@ -1,5 +1,5 @@
 
-import { SpellingGroup } from "@/data/spellingData";
+import { SpellingGroup } from "@/types/spellingTypes";
 import { removeDiacritics } from "@/lib/utils";
 
 // Funkce pro generování problému
