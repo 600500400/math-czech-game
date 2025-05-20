@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Keyboard, Plus, Minus, Divide, Multiply } from "lucide-react";
+import { Keyboard, Plus, Minus, Divide, X as Multiply } from "lucide-react";
 import { useState } from "react";
 
 interface NumericKeyboardProps {

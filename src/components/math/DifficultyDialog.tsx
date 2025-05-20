@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Plus, Minus, Multiply, Divide } from "lucide-react";
+import { Plus, Minus, X as Multiply, Divide } from "lucide-react";
 import { Operation } from "@/types/mathTypes";
 
 interface DifficultyDialogProps {

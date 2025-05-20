@@ -37,7 +37,8 @@ const ProblemDialog: React.FC<ProblemDialogProps> = ({
   correctPercentage
 }) => {
   const handleKeyboardInput = (key: string) => {
-    setUserAnswer(prev => prev + key);
+    // Fix: Use a direct string concatenation instead of a function
+    setUserAnswer(userAnswer + key);
   };
 
   const handleClear = () => {
