@@ -54,18 +54,20 @@ const SpellingPractice = () => {
   const hasStats = correctAnswers > 0 || wrongAnswers > 0;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 relative">
       {/* Confetti effect when answers are correct */}
       <ConfettiExplosion trigger={showConfetti} particleCount={30} />
+      
+      {/* Fun Graphics Component - moved outside dialogs for visibility */}
+      {showAnimation && (
+        <FunGraphics isCorrect={lastAnswerCorrect} showAnimation={showAnimation} />
+      )}
       
       <GameHeader 
         problemCount={problemCount}
         correctAnswers={correctAnswers}
         wrongAnswers={wrongAnswers}
       />
-      
-      {/* Fun Graphics Component */}
-      <FunGraphics isCorrect={lastAnswerCorrect} showAnimation={showAnimation} />
 
       <GameControls 
         selectedGroupsCount={selectedGroups.length}

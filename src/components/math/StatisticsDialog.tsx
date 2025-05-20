@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { BarChart, Bar, XAxis, YAxis } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Cell } from "recharts";
 import { ChartDataItem } from "@/types/mathTypes";
 
 interface StatisticsDialogProps {
@@ -72,7 +72,7 @@ const StatisticsDialog: React.FC<StatisticsDialogProps> = ({
             </TableBody>
           </Table>
           
-          {/* Graph */}
+          {/* Graph with colored bars */}
           {totalAnswers > 0 && (
             <div className="h-48">
               <ChartContainer config={{
@@ -83,11 +83,13 @@ const StatisticsDialog: React.FC<StatisticsDialogProps> = ({
                   <XAxis dataKey="name" />
                   <YAxis />
                   <Bar 
-                    dataKey="value" 
-                    fill="#4ade80"
-                    stroke="#4ade80"
+                    dataKey="value"
                     name="Hodnota"
-                  />
+                  >
+                    {chartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Bar>
                   <ChartTooltip content={<ChartTooltipContent />} />
                 </BarChart>
               </ChartContainer>

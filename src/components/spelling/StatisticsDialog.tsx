@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { BarChart, Bar, XAxis, YAxis } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Cell } from "recharts";
 
 interface StatisticsDialogProps {
   open: boolean;
@@ -76,7 +76,7 @@ export const StatisticsDialog = ({
             </TableBody>
           </Table>
           
-          {/* Graph */}
+          {/* Graph with colored bars */}
           {totalAnswers > 0 && (
             <div className="h-48">
               <ChartContainer config={{
@@ -88,10 +88,12 @@ export const StatisticsDialog = ({
                   <YAxis />
                   <Bar 
                     dataKey="value" 
-                    fill="#4ade80"
                     name="value"
-                    stroke="#4ade80"
-                  />
+                  >
+                    {chartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Bar>
                   <ChartTooltip content={<ChartTooltipContent />} />
                 </BarChart>
               </ChartContainer>

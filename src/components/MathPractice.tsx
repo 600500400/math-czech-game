@@ -39,14 +39,16 @@ const MathPractice = () => {
   } = useMathGame();
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 relative">
       {/* Confetti effect */}
       <ConfettiExplosion trigger={showConfetti} particleCount={30} />
       
-      <h1 className="text-3xl font-bold text-center text-orange-500">Procvičování matematiky</h1>
+      {/* Fun Graphics Component - moved outside dialogs for visibility */}
+      {showAnimation && (
+        <FunGraphics isCorrect={lastAnswerCorrect} showAnimation={showAnimation} />
+      )}
       
-      {/* Fun Graphics Component */}
-      <FunGraphics isCorrect={lastAnswerCorrect} showAnimation={showAnimation} />
+      <h1 className="text-3xl font-bold text-center text-orange-500">Procvičování matematiky</h1>
       
       {/* Game Controls */}
       <GameControls 
