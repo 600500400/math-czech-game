@@ -69,11 +69,8 @@ const SpellingPractice = () => {
         <ConfettiExplosion 
           trigger={showConfetti} 
           particleCount={30}
-          particleSize={10}
           duration={2000}
-          force={0.8}
-          width={1600}
-          zIndex={9999}
+          colors={['#FFC700', '#FF0000', '#2E3191', '#41D3BD', '#FB5607']}
         />
       </div>
       
