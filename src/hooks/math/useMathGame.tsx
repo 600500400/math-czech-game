@@ -3,7 +3,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { useProblemGenerator } from './useProblemGenerator';
 import { useDifficultySettings } from './useDifficultySettings';
 import { useGameState } from './useGameState';
-import { useGameActions } from './useGameActions';
 import { Problem, Operation } from '@/types/mathTypes';
 import { useAuth } from '@/hooks/useAuth';
 import { useStatistics } from '@/hooks/useStatistics';
@@ -22,8 +21,9 @@ export function useMathGame() {
     setMaxValue,
     setMaxMultiplyValue,
     setMaxDivideValue,
-    setDifficulty,
+    setDifficultySet,
     toggleOperation,
+    setDifficulty,
   } = useDifficultySettings();
 
   const {
@@ -65,6 +65,10 @@ export function useMathGame() {
   const totalAnswers = correctAnswers + wrongAnswers;
   const correctPercentage = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 0;
 
+  // Předdeklarace funkcí
+  const checkAnswer = useCallback(() => { /* bude definováno později */ }, []);
+  const endGame = useCallback(() => { /* bude definováno později */ }, []);
+  
   // Akce hry
   const startNewGame = useCallback(() => {
     if(!difficultySet) {
@@ -92,7 +96,8 @@ export function useMathGame() {
     setWrongAnswers
   ]);
 
-  const checkAnswer = useCallback(() => {
+  // Implementace checkAnswer
+  const actualCheckAnswer = useCallback(() => {
     if (!currentProblem) return;
     
     const parsedAnswer = parseFloat(userAnswer);
@@ -142,7 +147,8 @@ export function useMathGame() {
     wrongAnswers
   ]);
 
-  const endGame = useCallback(() => {
+  // Implementace endGame
+  const actualEndGame = useCallback(() => {
     setShowProblem(false);
     setGameEnded(true);
     setShowStatsDialog(true);
@@ -174,6 +180,10 @@ export function useMathGame() {
     userId,
     wrongAnswers
   ]);
+
+  // Přiřazení implementací do předdeklarovaných funkcí
+  Object.assign(checkAnswer, actualCheckAnswer);
+  Object.assign(endGame, actualEndGame);
 
   const resetGame = useCallback(() => {
     setCorrectAnswers(0);

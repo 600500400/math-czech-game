@@ -1,9 +1,9 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { spellingGroups } from "../data/spellingData";
-import { generateProblem, generateMissingPositions } from "../utils/spellingUtils";
 import { useAuth } from "./useAuth";
 import { useStatistics } from "./useStatistics";
+import { SpellingGroup } from "@/types/spellingTypes";
 
 export const useSpellingGame = () => {
   const { authState } = useAuth();
@@ -53,7 +53,7 @@ export const useSpellingGame = () => {
 
   // Nastavení všech/žádné skupiny
   const selectAll = () => {
-    setSelectedGroups(spellingGroups.map(g => g.id));
+    setSelectedGroups(spellingGroups.map(g => g.name));
   };
 
   const deselectAll = () => {
@@ -65,6 +65,56 @@ export const useSpellingGame = () => {
     setSelectedGroups(groups);
   };
 
+  // Pomocné funkce pro generování problémů a pozic
+  const generateProblem = (selectedGroups: string[]) => {
+    // Výběr náhodné skupiny ze seznamu vybraných skupin
+    const groupName = selectedGroups[Math.floor(Math.random() * selectedGroups.length)];
+    const group = spellingGroups.find(g => g.name === groupName);
+    
+    if (!group || !group.words || group.words.length === 0) {
+      return { word: "", group: "", isPhrase: false };
+    }
+
+    // Výběr náhodného slova ze skupiny
+    const wordObj = group.words[Math.floor(Math.random() * group.words.length)];
+    const isPhrase = wordObj.word.includes(" ");
+    
+    return {
+      word: wordObj.word,
+      group: groupName,
+      isPhrase
+    };
+  };
+
+  const generateMissingPositions = (word: string) => {
+    // Najít všechny pozice, kde je 'i' nebo 'y'
+    const positions: number[] = [];
+    const letters: string[] = [];
+    
+    for (let i = 0; i < word.length; i++) {
+      const lowerChar = word[i].toLowerCase();
+      if (lowerChar === 'i' || lowerChar === 'y') {
+        positions.push(i);
+        letters.push(lowerChar);
+      }
+    }
+    
+    // Vytvořit slovo s mezerami na místech i/y
+    let displayWord = '';
+    for (let i = 0; i < word.length; i++) {
+      if (positions.includes(i)) {
+        displayWord += '_';
+      } else {
+        displayWord += word[i];
+      }
+    }
+    
+    return { displayWord, positions, letters };
+  };
+
+  // Předdeklarace endGame
+  const endGame = useCallback(() => { /* bude definováno později */ }, []);
+
   // Generování nového problému
   const generateNewProblem = useCallback(() => {
     if (selectedGroups.length === 0) {
@@ -72,12 +122,12 @@ export const useSpellingGame = () => {
       return null;
     }
 
-    const { word, group, isPhrase: newIsPhrase } = generateProblem(selectedGroups);
+    const { word, group, isPhrase } = generateProblem(selectedGroups);
     const { displayWord, positions, letters } = generateMissingPositions(word);
     
     setCurrentWord(word);
     setWordGroup(group);
-    setIsPhrase(newIsPhrase);
+    setIsPhrase(isPhrase);
     setDisplayedWord(displayWord);
     setMissingPositions(positions);
     setCorrectLetters(letters);
@@ -142,12 +192,8 @@ export const useSpellingGame = () => {
     }, 1000);
   }, [correctAnswers, correctLetters, currentPosition, endGame, generateNewProblem, missingPositions.length, problemCount, wrongAnswers]);
 
-  // Odpovědi na i/y
-  const handleAnswerI = useCallback(() => handleAnswer("i"), [handleAnswer]);
-  const handleAnswerY = useCallback(() => handleAnswer("y"), [handleAnswer]);
-
-  // Ukončení hry
-  const endGame = useCallback(() => {
+  // Implementace endGame
+  const actualEndGame = useCallback(() => {
     setShowProblem(false);
     setShowStatsDialog(true);
     
@@ -160,6 +206,13 @@ export const useSpellingGame = () => {
       });
     }
   }, [correctAnswers, saveSpellingStatistics, selectedGroups, userId, wrongAnswers]);
+
+  // Přiřazení implementací do předdeklarovaných funkcí
+  Object.assign(endGame, actualEndGame);
+
+  // Odpovědi na i/y
+  const handleAnswerI = useCallback(() => handleAnswer("i"), [handleAnswer]);
+  const handleAnswerY = useCallback(() => handleAnswer("y"), [handleAnswer]);
 
   return {
     correctAnswers,

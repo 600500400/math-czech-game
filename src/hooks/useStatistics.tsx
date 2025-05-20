@@ -85,7 +85,7 @@ export const useStatistics = (userId: string | null) => {
   // Načtení matematických statistik
   const { data: mathStats, isLoading: mathStatsLoading } = useQuery({
     queryKey: ["mathStatistics", userId],
-    queryFn: async (): Promise<MathStatistics[]> => {
+    queryFn: async () => {
       if (!userId) return [];
 
       const { data, error } = await supabase
@@ -95,7 +95,14 @@ export const useStatistics = (userId: string | null) => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data;
+      
+      // Upravíme formát JSON dat, aby odpovídal očekávanému typu
+      return data.map(item => ({
+        ...item,
+        difficulty_level: typeof item.difficulty_level === 'string'
+          ? JSON.parse(item.difficulty_level)
+          : item.difficulty_level
+      })) as MathStatistics[];
     },
     enabled: !!userId,
   });
@@ -113,7 +120,7 @@ export const useStatistics = (userId: string | null) => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data;
+      return data as SpellingStatistics[];
     },
     enabled: !!userId,
   });
@@ -137,8 +144,16 @@ export const useStatistics = (userId: string | null) => {
       if (mathResult.error) throw mathResult.error;
       if (spellingResult.error) throw spellingResult.error;
 
+      // Upravíme formát JSON dat pro matematiku
+      const formattedMathStats = mathResult.data.map(item => ({
+        ...item,
+        difficulty_level: typeof item.difficulty_level === 'string'
+          ? JSON.parse(item.difficulty_level)
+          : item.difficulty_level
+      }));
+
       return {
-        mathStats: mathResult.data as MathStatistics[],
+        mathStats: formattedMathStats as MathStatistics[],
         spellingStats: spellingResult.data as SpellingStatistics[],
       };
     } catch (error) {

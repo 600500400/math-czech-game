@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -94,7 +93,15 @@ const ParentDashboard = () => {
           
         if (spellingError) throw spellingError;
         
-        setChildMathStats(mathData as MathStatistics[]);
+        // Upravíme formát JSON dat pro matematiku
+        const formattedMathStats = mathData.map(item => ({
+          ...item,
+          difficulty_level: typeof item.difficulty_level === 'string'
+            ? JSON.parse(item.difficulty_level)
+            : item.difficulty_level
+        }));
+        
+        setChildMathStats(formattedMathStats as MathStatistics[]);
         setChildSpellingStats(spellingData as SpellingStatistics[]);
       } catch (error) {
         console.error("Error fetching child statistics:", error);
@@ -133,14 +140,22 @@ const ParentDashboard = () => {
     ? Math.round((childSpellingTotal.correct / childSpellingTotal.total) * 100) 
     : 0;
     
-  // Data pro grafy
-  const prepareChartData = (stats: { correct: number; wrong: number }) => [
-    { name: "Správně", value: stats.correct, color: "#4ade80" },
-    { name: "Špatně", value: stats.wrong, color: "#f87171" }
+  // Data a konfigurace pro grafy
+  const mathChartData = [
+    { name: "Správně", value: childMathTotal.correct, color: "#4ade80" },
+    { name: "Špatně", value: childMathTotal.wrong, color: "#f87171" }
   ];
   
-  const mathChartData = prepareChartData(childMathTotal);
-  const spellingChartData = prepareChartData(childSpellingTotal);
+  const spellingChartData = [
+    { name: "Správně", value: childSpellingTotal.correct, color: "#4ade80" },
+    { name: "Špatně", value: childSpellingTotal.wrong, color: "#f87171" }
+  ];
+  
+  // Konfigurace pro grafy
+  const chartConfig = {
+    Správně: { color: "#4ade80" },
+    Špatně: { color: "#f87171" }
+  };
   
   // Formát data
   const formatDate = (dateString: string) => {
@@ -237,7 +252,7 @@ const ParentDashboard = () => {
                       </div>
                       {childMathTotal.total > 0 && (
                         <div className="h-48">
-                          <ChartContainer>
+                          <ChartContainer config={chartConfig}>
                             <BarChart data={mathChartData}>
                               <CartesianGrid strokeDasharray="3 3" />
                               <XAxis dataKey="name" />
@@ -281,7 +296,7 @@ const ParentDashboard = () => {
                       </div>
                       {childSpellingTotal.total > 0 && (
                         <div className="h-48">
-                          <ChartContainer>
+                          <ChartContainer config={chartConfig}>
                             <BarChart data={spellingChartData}>
                               <CartesianGrid strokeDasharray="3 3" />
                               <XAxis dataKey="name" />

@@ -1,17 +1,15 @@
 
+import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Operation } from "@/types/mathTypes";
 
-export function useDifficultySettings({
-  allowedOperations,
-  setAllowedOperations,
-  maxValue,
-  maxMultiplyValue,
-  maxDivideValue,
-  setDifficultySet,
-  setShowDifficultyDialog,
-}) {
+export function useDifficultySettings() {
   const { toast } = useToast();
+  const [maxValue, setMaxValue] = useState(10);
+  const [maxMultiplyValue, setMaxMultiplyValue] = useState(10);
+  const [maxDivideValue, setMaxDivideValue] = useState(10);
+  const [difficultySet, setDifficultySet] = useState(false);
+  const [allowedOperations, setAllowedOperations] = useState<Operation[]>(["+", "-", "*", "/"]);
 
   const toggleOperation = (operation: Operation) => {
     setAllowedOperations(current => {
@@ -36,7 +34,6 @@ export function useDifficultySettings({
     // Validace všech max. hodnot
     if (maxValue > 0 && maxMultiplyValue > 0 && maxDivideValue > 0) {
       setDifficultySet(true);
-      setShowDifficultyDialog(false);
       
       const operationDescriptions = {
         "+": "sčítání",
@@ -61,6 +58,16 @@ export function useDifficultySettings({
   };
 
   return {
+    maxValue,
+    maxMultiplyValue,
+    maxDivideValue,
+    difficultySet,
+    allowedOperations,
+    setMaxValue,
+    setMaxMultiplyValue,
+    setMaxDivideValue,
+    setDifficultySet,
+    setAllowedOperations,
     toggleOperation,
     setDifficulty,
   };
