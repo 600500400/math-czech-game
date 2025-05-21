@@ -5,12 +5,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatDate } from "@/utils/dateUtils";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Button } from "./ui/button";
+import { RefreshCw } from "lucide-react";
+import { toast } from "sonner";
 
 const StatisticsViewer = () => {
   const { authState } = useAuth();
   const userId = authState.user?.id || null;
   const { mathStats, spellingStats, mathStatsLoading, spellingStatsLoading } = useStatistics(userId);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   
   useEffect(() => {
     // Debugging information
@@ -19,6 +23,21 @@ const StatisticsViewer = () => {
     console.log("StatisticsViewer - Math Stats:", mathStats);
     console.log("StatisticsViewer - Spelling Stats:", spellingStats);
   }, [authState, userId, mathStats, spellingStats]);
+
+  // Funkce pro ruční obnovení dat
+  const handleRefreshData = () => {
+    if (!userId) return;
+    
+    setIsRefreshing(true);
+    toast.info("Obnovuji statistiky...");
+    
+    // Obnovení dat pomocí queryClient
+    // Použijeme setTimeout pro simulaci načítání
+    setTimeout(() => {
+      window.location.reload(); // Jednoduché řešení pro obnovení dat
+      setIsRefreshing(false);
+    }, 1000);
+  };
 
   if (!authState.isAuthenticated) {
     return (
@@ -33,7 +52,8 @@ const StatisticsViewer = () => {
   if (mathStatsLoading || spellingStatsLoading) {
     return (
       <Card>
-        <CardContent className="pt-4">
+        <CardContent className="pt-4 flex flex-col items-center justify-center">
+          <RefreshCw className="h-8 w-8 animate-spin text-orange-500 mb-2" />
           <p className="text-center text-gray-500">Načítání statistik...</p>
         </CardContent>
       </Card>
@@ -52,8 +72,17 @@ const StatisticsViewer = () => {
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-center">Moje statistiky</CardTitle>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={handleRefreshData}
+          disabled={isRefreshing}
+        >
+          <RefreshCw className={`h-4 w-4 mr-1 ${isRefreshing ? "animate-spin" : ""}`} />
+          Obnovit
+        </Button>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="spelling">

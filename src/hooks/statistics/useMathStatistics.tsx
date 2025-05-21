@@ -24,18 +24,18 @@ export const useMathStatistics = (userId: string | null) => {
     }) => {
       if (!userId) throw new Error("Uživatel není přihlášen");
 
-      console.log("Saving math statistics:", { userId, correctAnswers, wrongAnswers, operation });
+      console.log("Ukládání statistik matematiky:", { userId, correctAnswers, wrongAnswers, operation });
       
       const isLocalMode = await checkLocalUserMode();
       const timestamp = new Date().toISOString();
       
       if (isLocalMode) {
-        console.log("Using local user mode for math statistics");
+        console.log("Použití lokálního režimu pro statistiky matematiky");
         
         try {
           // Get unique storage key for this user
           const storageKey = getLocalStorageKey('mathStats');
-          console.log("Using storage key:", storageKey);
+          console.log("Použití lokálního klíče:", storageKey);
           
           // Load existing stats
           const localStatsStr = localStorage.getItem(storageKey);
@@ -57,21 +57,26 @@ export const useMathStatistics = (userId: string | null) => {
           
           // Save back to localStorage
           localStorage.setItem(storageKey, JSON.stringify(localStats));
-          console.log("Saved local math statistics:", newStat);
+          console.log("Lokální statistiky matematiky uloženy:", newStat);
           
           // Update QueryClient for immediate UI update
           queryClient.setQueryData(["mathStatistics", userId], localStats);
           
           return newStat;
         } catch (error) {
-          console.error("Error saving local math statistics:", error);
+          console.error("Chyba ukládání lokálních statistik matematiky:", error);
           throw error;
         }
       }
         
       // Saving to Supabase for authenticated users
       try {
-        console.log("Saving math statistics to Supabase");
+        console.log("Ukládání statistik matematiky do Supabase");
+        
+        // Zkontrolujeme připojení k Supabase
+        const currentSession = await supabase.auth.getSession();
+        console.log("Aktuální session při ukládání matematiky:", currentSession);
+        
         const { data, error } = await supabase
           .from("math_statistics")
           .insert({
@@ -85,18 +90,39 @@ export const useMathStatistics = (userId: string | null) => {
           .select();
 
         if (error) {
-          console.error("Supabase error when saving math stats:", error);
+          console.error("Chyba Supabase při ukládání statistik matematiky:", error);
+          // Zkusíme uložit lokálně jako záložní řešení
+          const backupKey = `backup_mathStats_${userId}`;
+          const backupStatsStr = localStorage.getItem(backupKey);
+          const backupStats = backupStatsStr ? JSON.parse(backupStatsStr) : [];
+          
+          const backupStat = {
+            id: "backup-" + Date.now(),
+            user_id: userId,
+            correct_answers: correctAnswers,
+            wrong_answers: wrongAnswers,
+            operation: operation,
+            difficulty_level: difficultyLevel,
+            created_at: timestamp,
+            error: error.message
+          };
+          
+          backupStats.push(backupStat);
+          localStorage.setItem(backupKey, JSON.stringify(backupStats));
+          console.log("Statistiky matematiky uloženy záložně kvůli chybě Supabase:", backupStat);
+          
           throw error;
         }
         
-        console.log("Successfully saved math statistics to Supabase:", data);
+        console.log("Statistiky matematiky úspěšně uloženy do Supabase:", data);
         
         // Update QueryClient for immediate UI update
         queryClient.invalidateQueries({ queryKey: ["mathStatistics", userId] });
         
         return data[0];
       } catch (error) {
-        console.error("Failed to save math statistics to Supabase:", error);
+        console.error("Selhání ukládání statistik matematiky do Supabase:", error);
+        toast.error(`Nepodařilo se uložit statistiky do databáze. Zkontrolujte připojení.`);
         throw error;
       }
     },
@@ -121,17 +147,21 @@ export const useMathStatistics = (userId: string | null) => {
         if (isLocalMode) {
           // Load from localStorage for local users with unique key
           const storageKey = getLocalStorageKey('mathStats');
-          console.log("Loading math statistics from localStorage with key:", storageKey);
+          console.log("Načítání statistik matematiky z localStorage s klíčem:", storageKey);
           
           const localStatsStr = localStorage.getItem(storageKey);
           const localStats = localStatsStr ? JSON.parse(localStatsStr) : [];
           
-          console.log("Loaded local math statistics:", localStats);
+          console.log("Načtené lokální statistiky matematiky:", localStats);
           return localStats;
         }
 
         // Load from Supabase for authenticated users
-        console.log("Loading math statistics from Supabase for user:", userId);
+        console.log("Načítání statistik matematiky ze Supabase pro uživatele:", userId);
+        
+        // Zkontrolujeme připojení
+        const currentSession = await supabase.auth.getSession();
+        console.log("Aktuální session při načítání matematických statistik:", currentSession);
         
         const { data, error } = await supabase
           .from("math_statistics")
@@ -140,14 +170,21 @@ export const useMathStatistics = (userId: string | null) => {
           .order("created_at", { ascending: false });
 
         if (error) {
-          console.error("Error loading math statistics from Supabase:", error);
+          console.error("Chyba načítání statistik matematiky ze Supabase:", error);
+          // Zkusíme načíst lokální zálohy
+          const backupKey = `backup_mathStats_${userId}`;
+          const backupStatsStr = localStorage.getItem(backupKey);
+          if (backupStatsStr) {
+            console.log("Načítám záložní matematické statistiky z localStorage");
+            return JSON.parse(backupStatsStr);
+          }
           throw error;
         }
         
-        console.log("Successfully loaded math statistics from Supabase:", data);
+        console.log("Statistiky matematiky úspěšně načteny ze Supabase:", data);
         return data as MathStatistics[];
       } catch (error) {
-        console.error("Failed to load math statistics:", error);
+        console.error("Selhání načítání statistik matematiky:", error);
         return [];
       }
     },

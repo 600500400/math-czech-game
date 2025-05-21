@@ -1,6 +1,7 @@
 
 import { useCallback } from "react";
 import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 
 export interface UseGameControlsProps {
   selectedGroups: string[];
@@ -33,8 +34,6 @@ export const useGameControls = ({
   saveSpellingStatistics,
   userId
 }: UseGameControlsProps) => {
-  const { toast } = useToast();
-
   // Start new game handler
   const startNewGame = useCallback(() => {
     if (selectedGroups.length === 0) {
@@ -66,13 +65,54 @@ export const useGameControls = ({
     setShowProblem(false);
     setShowStatsDialog(true);
     
-    // Save statistics if user is logged in
+    // Save statistics if user is logged in and there are some results
     if (userId && saveSpellingStatistics && (correctAnswers > 0 || wrongAnswers > 0)) {
-      saveSpellingStatistics.mutate({
-        correctAnswers: correctAnswers,
-        wrongAnswers: wrongAnswers,
-        wordGroup: selectedGroups.join(',')
+      console.log("Ukládám statistiky na konci hry:", {
+        correctAnswers,
+        wrongAnswers,
+        wordGroups: selectedGroups
       });
+      
+      try {
+        // Pokus o uložení statistik
+        saveSpellingStatistics.mutate({
+          correctAnswers: correctAnswers,
+          wrongAnswers: wrongAnswers,
+          wordGroup: selectedGroups.join(',')
+        }, {
+          onSuccess: () => {
+            console.log("Statistiky úspěšně uloženy");
+            toast.success("Statistiky hry byly úspěšně uloženy");
+          },
+          onError: (error: any) => {
+            console.error("Chyba při ukládání statistik:", error);
+            toast.error("Statistiky nemohly být uloženy do databáze, ale byly zálohovány lokálně");
+            
+            // Záložní uložení do localStorage
+            try {
+              const backupKey = `emergency_spellingStats_${userId}`;
+              const existingBackup = localStorage.getItem(backupKey);
+              const backupArray = existingBackup ? JSON.parse(existingBackup) : [];
+              
+              backupArray.push({
+                id: "emergency-" + Date.now(),
+                correct_answers: correctAnswers,
+                wrong_answers: wrongAnswers,
+                word_group: selectedGroups.join(','),
+                created_at: new Date().toISOString(),
+                error: error.message || "Unknown error"
+              });
+              
+              localStorage.setItem(backupKey, JSON.stringify(backupArray));
+            } catch (backupError) {
+              console.error("Ani záložní uložení se nepodařilo:", backupError);
+            }
+          }
+        });
+      } catch (error) {
+        console.error("Neočekávaná chyba při volání mutace:", error);
+        toast.error("Nastala chyba při ukládání statistik");
+      }
     }
   }, [
     correctAnswers, 

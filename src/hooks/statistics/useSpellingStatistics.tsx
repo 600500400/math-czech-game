@@ -22,18 +22,18 @@ export const useSpellingStatistics = (userId: string | null) => {
     }) => {
       if (!userId) throw new Error("Uživatel není přihlášen");
 
-      console.log("Saving spelling statistics:", { userId, correctAnswers, wrongAnswers, wordGroup });
+      console.log("Ukládání statistik pravopisu:", { userId, correctAnswers, wrongAnswers, wordGroup });
       
       const isLocalMode = await checkLocalUserMode();
       const timestamp = new Date().toISOString();
       
       if (isLocalMode) {
-        console.log("Using local user mode for spelling statistics");
+        console.log("Použití lokálního režimu pro statistiky pravopisu");
         
         try {
           // Get unique storage key for this user
           const storageKey = getLocalStorageKey('spellingStats');
-          console.log("Using storage key:", storageKey);
+          console.log("Použití lokálního klíče:", storageKey);
           
           // Load existing stats
           const localStatsStr = localStorage.getItem(storageKey);
@@ -54,21 +54,26 @@ export const useSpellingStatistics = (userId: string | null) => {
           
           // Save back to localStorage
           localStorage.setItem(storageKey, JSON.stringify(localStats));
-          console.log("Saved local spelling statistics:", newStat);
+          console.log("Lokální statistiky pravopisu uloženy:", newStat);
           
           // Update QueryClient for immediate UI update
           queryClient.setQueryData(["spellingStatistics", userId], localStats);
           
           return newStat;
         } catch (error) {
-          console.error("Error saving local spelling statistics:", error);
+          console.error("Chyba ukládání lokálních statistik pravopisu:", error);
           throw error;
         }
       }
         
       // Saving to Supabase for authenticated users
       try {
-        console.log("Saving spelling statistics to Supabase");
+        console.log("Ukládání statistik pravopisu do Supabase");
+        
+        // Zkontrolujeme připojení k Supabase
+        const currentSession = await supabase.auth.getSession();
+        console.log("Aktuální session při ukládání:", currentSession);
+        
         const { data, error } = await supabase
           .from("spelling_statistics")
           .insert({
@@ -81,18 +86,38 @@ export const useSpellingStatistics = (userId: string | null) => {
           .select();
 
         if (error) {
-          console.error("Supabase error when saving spelling stats:", error);
+          console.error("Chyba Supabase při ukládání statistik pravopisu:", error);
+          // Zkusíme uložit lokálně jako záložní řešení
+          const backupKey = `backup_spellingStats_${userId}`;
+          const backupStatsStr = localStorage.getItem(backupKey);
+          const backupStats = backupStatsStr ? JSON.parse(backupStatsStr) : [];
+          
+          const backupStat = {
+            id: "backup-" + Date.now(),
+            user_id: userId,
+            correct_answers: correctAnswers,
+            wrong_answers: wrongAnswers,
+            word_group: wordGroup,
+            created_at: timestamp,
+            error: error.message
+          };
+          
+          backupStats.push(backupStat);
+          localStorage.setItem(backupKey, JSON.stringify(backupStats));
+          console.log("Statistiky uloženy záložně kvůli chybě Supabase:", backupStat);
+          
           throw error;
         }
         
-        console.log("Successfully saved spelling statistics to Supabase:", data);
+        console.log("Statistiky pravopisu úspěšně uloženy do Supabase:", data);
         
         // Update QueryClient for immediate UI update
         queryClient.invalidateQueries({ queryKey: ["spellingStatistics", userId] });
         
         return data[0];
       } catch (error) {
-        console.error("Failed to save spelling statistics to Supabase:", error);
+        console.error("Selhání ukládání statistik pravopisu do Supabase:", error);
+        toast.error(`Nepodařilo se uložit statistiky do databáze. Zkontrolujte připojení.`);
         throw error;
       }
     },
@@ -117,17 +142,21 @@ export const useSpellingStatistics = (userId: string | null) => {
         if (isLocalMode) {
           // Load from localStorage for local users with unique key
           const storageKey = getLocalStorageKey('spellingStats');
-          console.log("Loading spelling statistics from localStorage with key:", storageKey);
+          console.log("Načítání statistik pravopisu z localStorage s klíčem:", storageKey);
           
           const localStatsStr = localStorage.getItem(storageKey);
           const localStats = localStatsStr ? JSON.parse(localStatsStr) : [];
           
-          console.log("Loaded local spelling statistics:", localStats);
+          console.log("Načtené lokální statistiky pravopisu:", localStats);
           return localStats;
         }
 
         // Load from Supabase for authenticated users
-        console.log("Loading spelling statistics from Supabase for user:", userId);
+        console.log("Načítání statistik pravopisu ze Supabase pro uživatele:", userId);
+        
+        // Zkontrolujeme připojení
+        const currentSession = await supabase.auth.getSession();
+        console.log("Aktuální session při načítání statistik:", currentSession);
         
         const { data, error } = await supabase
           .from("spelling_statistics")
@@ -136,14 +165,21 @@ export const useSpellingStatistics = (userId: string | null) => {
           .order("created_at", { ascending: false });
 
         if (error) {
-          console.error("Error loading spelling statistics from Supabase:", error);
+          console.error("Chyba načítání statistik pravopisu ze Supabase:", error);
+          // Zkusíme načíst lokální zálohy
+          const backupKey = `backup_spellingStats_${userId}`;
+          const backupStatsStr = localStorage.getItem(backupKey);
+          if (backupStatsStr) {
+            console.log("Načítám záložní statistiky z localStorage");
+            return JSON.parse(backupStatsStr);
+          }
           throw error;
         }
         
-        console.log("Successfully loaded spelling statistics from Supabase:", data);
+        console.log("Statistiky pravopisu úspěšně načteny ze Supabase:", data);
         return data as SpellingStatistics[];
       } catch (error) {
-        console.error("Failed to load spelling statistics:", error);
+        console.error("Selhání načítání statistik pravopisu:", error);
         return [];
       }
     },
