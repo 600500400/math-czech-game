@@ -16,3 +16,18 @@ export const cleanupAuthState = () => {
     }
   });
 };
+
+// Attempt a global sign out and ignore any errors
+export const attemptGlobalSignOut = async (supabase: any) => {
+  try {
+    await supabase.auth.signOut({ scope: 'global' });
+  } catch (err) {
+    // Continue even if this fails
+    console.log("Global sign out attempt failed, continuing", err);
+  }
+};
+
+// Force page reload for clean state
+export const forcePageReload = (path: string = '/') => {
+  window.location.href = path;
+};
