@@ -76,6 +76,7 @@ export const useSpellingGame = () => {
     
     // Group selection
     selectedGroups: groupSelection.selectedGroups,
+    allSelected: groupSelection.allSelected, // Add the allSelected state
     
     // Handlers and actions
     totalAnswers: gameStats.totalAnswers,
@@ -83,6 +84,7 @@ export const useSpellingGame = () => {
     setShowStatsDialog: gameStats.setShowStatsDialog,
     toggleGroup: groupSelection.toggleGroup,
     setGroups: groupSelection.setGroups,
+    toggleAllGroups: groupSelection.toggleAllGroups, // Add the toggleAllGroups function
     selectAll: groupSelection.selectAll,
     deselectAll: groupSelection.deselectAll,
     startNewGame: gameControls.startNewGame,

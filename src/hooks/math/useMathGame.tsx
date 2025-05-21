@@ -16,7 +16,8 @@ export function useMathGame() {
   const [maxValue, setMaxValue] = useState(20);
   const [maxMultiplyValue, setMaxMultiplyValue] = useState(10);
   const [maxDivideValue, setMaxDivideValue] = useState(10);
-  const [allowedOperations, setAllowedOperations] = useState<Operation[]>(["+", "-"]);
+  // Set all operations selected by default
+  const [allowedOperations, setAllowedOperations] = useState<Operation[]>(["+", "-", "*", "/"]);
   
   // Calculate derived statistics
   const totalAnswers = correctAnswers + wrongAnswers;

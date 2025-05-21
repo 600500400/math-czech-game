@@ -1,3 +1,4 @@
+
 import { GroupSelectionDialog } from "./spelling/GroupSelectionDialog";
 import { WordProblemDialog } from "./spelling/WordProblemDialog";
 import { StatisticsDialog } from "./spelling/StatisticsDialog";
@@ -28,13 +29,13 @@ const SpellingPractice = () => {
     lastAnswerCorrect,
     showAnimation,
     totalAnswers,
+    allSelected,
     
     setShowGroupDialog,
     setShowStatsDialog,
     toggleGroup,
     setGroups,
-    selectAll,
-    deselectAll,
+    toggleAllGroups,
     startNewGame,
     handleAnswerI,
     handleAnswerY,
@@ -94,9 +95,9 @@ const SpellingPractice = () => {
         spellingGroups={spellingGroups}
         selectedGroups={selectedGroups}
         toggleGroup={toggleGroup}
-        setGroups={setGroups} // Fixed: Passing the function reference directly without arguments
-        selectAll={selectAll}
-        deselectAll={deselectAll}
+        setGroups={setGroups}
+        toggleAllGroups={toggleAllGroups}
+        allSelected={allSelected}
       />
 
       {/* Word Problem Dialog */}
