@@ -60,6 +60,8 @@ export const useStatistics = (userId: string | null) => {
     }) => {
       if (!userId) throw new Error("Uživatel není přihlášen");
 
+      console.log("Saving spelling statistics:", { userId, correctAnswers, wrongAnswers, wordGroup });
+      
       const { data, error } = await supabase
         .from("spelling_statistics")
         .insert({
@@ -70,7 +72,11 @@ export const useStatistics = (userId: string | null) => {
         })
         .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase error when saving spelling stats:", error);
+        throw error;
+      }
+      
       return data[0];
     },
     onSuccess: () => {
@@ -78,7 +84,7 @@ export const useStatistics = (userId: string | null) => {
     },
     onError: (error: any) => {
       console.error("Chyba při ukládání statistik pravopisu:", error);
-      toast.error("Nepodařilo se uložit statistiky pravopisu");
+      toast.error(`Nepodařilo se uložit statistiky pravopisu: ${error.message || 'Neznámá chyba'}`);
     },
   });
 
