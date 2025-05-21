@@ -37,12 +37,16 @@ const ProblemDialog: React.FC<ProblemDialogProps> = ({
   correctPercentage
 }) => {
   const handleKeyboardInput = (key: string) => {
-    // Fix: Use a direct string concatenation instead of a function
     setUserAnswer(userAnswer + key);
   };
 
   const handleClear = () => {
     setUserAnswer("");
+  };
+  
+  // Add a direct handler for ending the game
+  const handleEndGame = () => {
+    endGame();
   };
 
   return (
@@ -98,7 +102,7 @@ const ProblemDialog: React.FC<ProblemDialogProps> = ({
             Odpovědět
           </Button>
           <Button 
-            onClick={endGame}
+            onClick={handleEndGame} // Fixed: Using the direct handler function
             className="w-full sm:w-auto bg-red-500 hover:bg-red-600"
           >
             Ukončit hru

@@ -11,7 +11,7 @@ interface GroupSelectionDialogProps {
   spellingGroups: SpellingGroup[];
   selectedGroups: string[];
   toggleGroup: (groupName: string) => void;
-  setGroups: (groups: string[]) => void; // Fixed: changed the type to accept a parameter
+  setGroups: () => void; // Changed: removed parameter as it wasn't properly handled
   selectAll: () => void;
   deselectAll: () => void;
 }
@@ -79,7 +79,7 @@ export const GroupSelectionDialog = ({
       </div>
       <DialogFooter>
         <Button 
-          onClick={() => setGroups(selectedGroups)} // Fixed: passing the selectedGroups parameter
+          onClick={setGroups} // Fixed: removed parameter, now properly calls the setGroups function
           className="bg-orange-500 hover:bg-orange-600 w-full text-lg py-6"
         >
           Potvrdit výběr

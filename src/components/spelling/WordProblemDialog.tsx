@@ -34,6 +34,11 @@ export const WordProblemDialog = ({
   onEndGame
 }: WordProblemDialogProps) => {
   
+  // Add a handler that calls onEndGame directly
+  const handleEndGame = () => {
+    onEndGame();
+  };
+  
   return (
     <Dialog open={open} onOpenChange={(open) => !open && onEndGame()}>
       <DialogContent className="z-[8000] bg-gradient-to-b from-blue-50 to-white border-2 border-blue-200 rounded-xl shadow-xl">
@@ -79,7 +84,7 @@ export const WordProblemDialog = ({
         </div>
         <DialogFooter className="flex flex-col sm:flex-row gap-2">
           <Button 
-            onClick={onEndGame}
+            onClick={handleEndGame} // Fixed: Using the direct handler function instead
             className="w-full sm:w-auto bg-red-500 hover:bg-red-600 rounded-lg shadow-md"
           >
             Ukončit hru
