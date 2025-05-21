@@ -139,7 +139,7 @@ const StatisticsViewer = () => {
               
               <Button 
                 variant="ghost" 
-                size="xs" 
+                size="sm" 
                 className="h-6 text-xs" 
                 onClick={handleRefreshData}
                 disabled={isRefreshing}
