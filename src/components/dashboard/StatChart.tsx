@@ -1,6 +1,6 @@
 
 import React from "react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer, Tooltip } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
 interface ChartDataItem {
@@ -27,20 +27,20 @@ const StatChart: React.FC<StatChartProps> = ({ data, showChart }) => {
 
   return (
     <div className="h-48">
-      <ChartContainer config={chartConfig}>
+      <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
           <YAxis />
-          <Bar dataKey="value" name="Počet">
+          <Tooltip />
+          <Bar dataKey="value" fill="#8884d8">
             {data.map((entry, index) => (
               <CartesianGrid key={`cell-${index}`} fill={entry.color} />
             ))}
           </Bar>
-          <ChartTooltip content={<ChartTooltipContent />} />
           <Legend />
         </BarChart>
-      </ChartContainer>
+      </ResponsiveContainer>
     </div>
   );
 };

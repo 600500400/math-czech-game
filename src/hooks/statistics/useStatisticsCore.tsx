@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 
 export const useStatisticsCore = (userId: string | null) => {
-  const [isLocalMode, setIsLocalMode] = useState<boolean | null>(null);
+  const [isLocalMode, setIsLocalMode] = useState<boolean | null>(true); // Nastaveno jako true pro výchozí hodnotu
   const [dbStatus, setDbStatus] = useState<"checking" | "connected" | "disconnected">("checking");
   
   // Efekt pro automatickou kontrolu režimu
@@ -46,54 +46,13 @@ export const useStatisticsCore = (userId: string | null) => {
 
   // Check if user is in local mode (without Supabase authentication)
   const checkLocalUserMode = async () => {
-    if (!userId) {
-      return true; // Pokud nemáme userId, defaultně používáme lokální režim
-    }
-    
-    try {
-      // Kontrola, zda je uživatel "local user"
-      const localUserStr = localStorage.getItem('localUser');
-      if (localUserStr) {
-        console.log("Detekován lokální uživatel:", localUserStr);
-        return true;
-      }
-      
-      // Kontrola připojení k Supabase
-      try {
-        const session = await supabase.auth.getSession();
-        console.log("Kontrola Supabase session:", session);
-        
-        if (!session.data.session) {
-          console.log("Nejsou aktivní session data - používám lokální režim");
-          return true;
-        }
-        
-        // Ověříme existenci uživatelského profilu
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("id")
-          .eq("id", userId)
-          .single();
-          
-        if (error || !data) {
-          console.log("Profil nenalezen - používám lokální režim:", error);
-          return true;
-        }
-        
-        console.log("Supabase profil nalezen:", data);
-        return false; // Můžeme použít Supabase
-      } catch (error) {
-        console.error("Chyba při kontrole Supabase:", error);
-        return true; // Při chybě použijeme lokální režim
-      }
-    } catch (e) {
-      console.error("Neočekávaná chyba při kontrole režimu:", e);
-      return true; // Při jakékoliv chybě defaultně lokální
-    }
+    // Vždy používáme lokální režim, dokud není explicitně prokázáno jinak
+    return true;
   };
 
   // Get a unique key for storing statistics for a specific user
   const getLocalStorageKey = (baseKey: string) => {
+    // Zajištění jedinečného klíče pro každého uživatele
     const storageKey = userId ? `${baseKey}_${userId}` : baseKey;
     console.log(`Generovaný storage klíč: ${storageKey} pro uživatele ${userId || 'anonym'}`);
     return storageKey;
@@ -106,68 +65,20 @@ export const useStatisticsCore = (userId: string | null) => {
     try {
       console.log("Fetching statistics for child ID:", childId);
       
-      // Ověříme, jestli musíme používat lokální data
-      const mustUseLocal = await checkLocalUserMode();
+      // Vždy používáme lokální data
+      console.log("Používám lokální data pro dítě:", childId);
+      const mathKey = `mathStats_${childId}`;
+      const spellingKey = `spellingStats_${childId}`;
       
-      if (mustUseLocal) {
-        console.log("Používám lokální data pro dítě:", childId);
-        const mathKey = `mathStats_${childId}`;
-        const spellingKey = `spellingStats_${childId}`;
-        
-        const mathData = localStorage.getItem(mathKey);
-        const spellingData = localStorage.getItem(spellingKey);
-        
-        return {
-          mathStats: mathData ? JSON.parse(mathData) : [],
-          spellingStats: spellingData ? JSON.parse(spellingData) : []
-        };
-      }
+      const mathData = localStorage.getItem(mathKey);
+      const spellingData = localStorage.getItem(spellingKey);
       
-      // Try to load from Supabase first
-      const { data: mathStats, error: mathError } = await supabase
-        .from("math_statistics")
-        .select("*")
-        .eq("user_id", childId)
-        .order("created_at", { ascending: false });
-
-      if (mathError) {
-        console.error("Error loading math statistics from Supabase:", mathError);
-        // Fall back to local storage if Supabase fails
-        const localMathKey = `mathStats_${childId}`;
-        const localMathStats = localStorage.getItem(localMathKey);
-        
-        return {
-          mathStats: localMathStats ? JSON.parse(localMathStats) : [],
-          spellingStats: []
-        };
-      }
-
-      const { data: spellingStats, error: spellingError } = await supabase
-        .from("spelling_statistics")
-        .select("*")
-        .eq("user_id", childId)
-        .order("created_at", { ascending: false });
-
-      if (spellingError) {
-        console.error("Error loading spelling statistics from Supabase:", spellingError);
-        // Fall back to local storage for spelling stats
-        const localSpellingKey = `spellingStats_${childId}`;
-        const localSpellingStats = localStorage.getItem(localSpellingKey);
-        
-        return {
-          mathStats: mathStats || [],
-          spellingStats: localSpellingStats ? JSON.parse(localSpellingStats) : []
-        };
-      }
-
-      console.log("Statistics loaded successfully:", {
-        mathStats: mathStats || [],
-        spellingStats: spellingStats || []
-      });
-
+      console.log("Načtená matematická data:", mathData ? JSON.parse(mathData) : []);
+      console.log("Načtená data pravopisu:", spellingData ? JSON.parse(spellingData) : []);
+      
       return {
-        mathStats: mathStats || [],
-        spellingStats: spellingStats || []
+        mathStats: mathData ? JSON.parse(mathData) : [],
+        spellingStats: spellingData ? JSON.parse(spellingData) : []
       };
     } catch (error) {
       console.error("Unexpected error fetching child statistics:", error);
@@ -175,10 +86,41 @@ export const useStatisticsCore = (userId: string | null) => {
     }
   };
 
+  // Nová funkce pro resetování statistik konkrétního uživatele
+  const resetUserStatistics = (specificUserId: string) => {
+    try {
+      localStorage.removeItem(`mathStats_${specificUserId}`);
+      localStorage.removeItem(`spellingStats_${specificUserId}`);
+      console.log(`Statistiky pro uživatele ${specificUserId} byly resetovány`);
+      return true;
+    } catch (error) {
+      console.error(`Chyba při resetování statistik uživatele ${specificUserId}:`, error);
+      return false;
+    }
+  };
+
+  // Nová funkce pro výpis všech lokálních klíčů
+  const listAllLocalStatistics = () => {
+    const stats = {};
+    Object.keys(localStorage).forEach(key => {
+      if (key.includes('Stats_')) {
+        try {
+          stats[key] = JSON.parse(localStorage.getItem(key) || '[]');
+        } catch (e) {
+          stats[key] = 'Chyba při načítání';
+        }
+      }
+    });
+    console.log("Všechny lokální statistiky:", stats);
+    return stats;
+  };
+
   return {
     checkLocalUserMode,
     getLocalStorageKey,
     getChildStatistics,
+    resetUserStatistics,
+    listAllLocalStatistics,
     isLocalMode,
     dbStatus
   };

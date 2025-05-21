@@ -2,7 +2,7 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useStatistics } from "@/hooks/useStatistics";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useStatisticsConnection } from "@/hooks/useStatisticsConnection";
 import DatabaseConnectionStatus from "./statistics/DatabaseConnectionStatus";
 import EmptyStatisticsState from "./statistics/EmptyStatisticsState";
@@ -11,6 +11,7 @@ import UnauthenticatedState from "./statistics/UnauthenticatedState";
 import StatisticsTabs from "./statistics/StatisticsTabs";
 import DiagnosticsPanel from "./statistics/DiagnosticsPanel";
 import { useDiagnostics } from "@/hooks/statistics/useDiagnostics";
+import StatisticsDebugger from "./statistics/StatisticsDebugger";
 
 const StatisticsViewer = () => {
   const { authState } = useAuth();
@@ -34,35 +35,13 @@ const StatisticsViewer = () => {
   
   // Přidáme stav pro dlouhé načítání
   const [loadingTooLong, setLoadingTooLong] = useState(false);
+  const [showDebugger, setShowDebugger] = useState(false);
   
-  // Pokud načítání trvá příliš dlouho, ukážeme možnost zkusit to znovu
-  useEffect(() => {
-    if (mathStatsLoading || spellingStatsLoading) {
-      const timer = setTimeout(() => {
-        setLoadingTooLong(true);
-      }, 5000);
-      
-      return () => clearTimeout(timer);
-    } else {
-      setLoadingTooLong(false);
-    }
-  }, [mathStatsLoading, spellingStatsLoading]);
+  // Zobrazíme diagnostický nástroj pouze v případě problémů
+  const toggleDebugger = () => {
+    setShowDebugger(!showDebugger);
+  };
   
-  useEffect(() => {
-    // Debugging information
-    console.log("StatisticsViewer - Auth State:", authState);
-    console.log("StatisticsViewer - User ID:", userId);
-    console.log("StatisticsViewer - Math Stats:", mathStats);
-    console.log("StatisticsViewer - Spelling Stats:", spellingStats);
-    console.log("StatisticsViewer - Is Local Storage Mode:", isLocalStorageMode);
-
-    // Výpis všech klíčů v localStorage pro diagnostiku
-    console.log("Aktuální localStorage klíče:");
-    Object.keys(localStorage).forEach(key => {
-      console.log(` - ${key}: ${localStorage.getItem(key)?.substring(0, 30)}...`);
-    });
-  }, [authState, userId, mathStats, spellingStats, isLocalStorageMode]);
-
   if (!authState.isAuthenticated) {
     return (
       <Card>
@@ -90,52 +69,51 @@ const StatisticsViewer = () => {
     );
   }
 
-  if (mathStats.length === 0 && spellingStats.length === 0) {
-    return (
+  return (
+    <>
       <Card>
-        <CardContent className="pt-4">
-          <EmptyStatisticsState 
-            dbConnectionStatus={dbConnectionStatus}
-            isLocalStorageMode={isLocalStorageMode}
-            isRefreshing={isRefreshing}
-            onRefresh={handleRefreshData}
-          />
+        <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <CardTitle className="text-center">Moje statistiky</CardTitle>
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={toggleDebugger}
+              className="text-xs"
+            >
+              {showDebugger ? "Skrýt diagnostiku" : "Diagnostika"}
+            </Button>
+            <DatabaseConnectionStatus 
+              status="disconnected" 
+              isRefreshing={isRefreshing}
+              onRefresh={handleRefreshData}
+              isLocalStorageMode={true}
+            />
+          </div>
+        </CardHeader>
+        <CardContent>
+          {mathStats.length === 0 && spellingStats.length === 0 ? (
+            <EmptyStatisticsState 
+              dbConnectionStatus="disconnected"
+              isLocalStorageMode={true}
+              isRefreshing={isRefreshing}
+              onRefresh={handleRefreshData}
+            />
+          ) : (
+            <StatisticsTabs
+              mathStats={mathStats}
+              spellingStats={spellingStats}
+            />
+          )}
+          
+          {/* Diagnostický nástroj */}
+          {showDebugger && <StatisticsDebugger userId={userId} />}
         </CardContent>
       </Card>
-    );
-  }
-
-  return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-center">Moje statistiky</CardTitle>
-        <DatabaseConnectionStatus 
-          status={dbConnectionStatus} 
-          isRefreshing={isRefreshing}
-          onRefresh={handleRefreshData}
-          isLocalStorageMode={isLocalStorageMode}
-        />
-      </CardHeader>
-      <CardContent>
-        <StatisticsTabs
-          mathStats={mathStats}
-          spellingStats={spellingStats}
-        />
-        
-        {/* Diagnostické informace a nástroje */}
-        <DiagnosticsPanel
-          isLocalStorageMode={isLocalStorageMode}
-          connectionStatus={connectionStatus}
-          userId={userId}
-          statsCount={mathStats.length + spellingStats.length}
-          onTestConnection={testSupabaseConnection}
-          onRefreshData={handleRefreshData}
-          onExportStatistics={exportLocalStatistics}
-          isRefreshing={isRefreshing}
-        />
-      </CardContent>
-    </Card>
+    </>
   );
 };
 
 export default StatisticsViewer;
+
+import { Button } from "@/components/ui/button";
