@@ -62,6 +62,14 @@ export const useStatistics = (userId: string | null) => {
 
       console.log("Saving spelling statistics:", { userId, correctAnswers, wrongAnswers, wordGroup });
       
+      // Make sure supabase client has the latest session
+      const { data: sessionData } = await supabase.auth.getSession();
+      
+      if (!sessionData.session) {
+        console.error("No active session found when saving spelling stats");
+        throw new Error("Není aktivní relace");
+      }
+      
       const { data, error } = await supabase
         .from("spelling_statistics")
         .insert({
