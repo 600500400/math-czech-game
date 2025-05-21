@@ -1,113 +1,47 @@
 
-import { useCallback } from "react";
-import { useAuth } from "../useAuth";
-import { useStatistics } from "../useStatistics";
-import { useGroupSelection } from "./useGroupSelection";
-import { useGameStatistics } from "./useGameStatistics";
-import { useWordProblem } from "./useWordProblem";
-import { useAnimationState } from "./useAnimationState";
-import { useGameUI } from "./useGameUI";
+import { useGameMechanics } from "./useGameMechanics";
 
 export const useSpellingGame = () => {
-  const { authState } = useAuth();
-  const userId = authState.user?.id || null;
-  const { saveSpellingStatistics } = useStatistics(userId);
+  const gameMechanics = useGameMechanics();
   
-  // Specialized hooks for different concerns
-  const groupSelection = useGroupSelection();
-  const gameStats = useGameStatistics();
-  const animation = useAnimationState();
-  const gameUI = useGameUI();
-  
-  // Word problem handling
-  const wordProblem = useWordProblem({
-    selectedGroups: groupSelection.selectedGroups,
-    onCorrectAnswer: gameStats.incrementCorrect,
-    onWrongAnswer: gameStats.incrementWrong,
-    showAnimation: animation.showAnimation,
-    setLastAnswerCorrect: animation.setLastAnswerCorrect,
-    setShowAnimation: animation.setShowAnimation
-  });
-
-  // End game handler
-  const endGame = useCallback(() => {
-    gameUI.setShowProblem(false);
-    gameStats.setShowStatsDialog(true);
-    
-    // Save statistics if user is logged in
-    if (userId && (gameStats.correctAnswers > 0 || gameStats.wrongAnswers > 0)) {
-      saveSpellingStatistics.mutate({
-        correctAnswers: gameStats.correctAnswers,
-        wrongAnswers: gameStats.wrongAnswers,
-        wordGroup: groupSelection.selectedGroups.join(',')
-      });
-    }
-  }, [
-    gameStats.correctAnswers, 
-    gameStats.wrongAnswers, 
-    gameStats.setShowStatsDialog, 
-    groupSelection.selectedGroups, 
-    saveSpellingStatistics, 
-    userId,
-    gameUI
-  ]);
-
-  // Start new game handler
-  const startNewGame = useCallback(() => {
-    if (groupSelection.selectedGroups.length === 0) {
-      groupSelection.setShowGroupDialog(true);
-      return;
-    }
-    
-    gameStats.incrementProblemCount();
-    gameStats.setCorrectAnswers(0);
-    gameStats.setWrongAnswers(0);
-    gameUI.resetGame();
-    
-    const problem = wordProblem.generateNewProblem();
-    if (problem) {
-      gameUI.setShowProblem(true);
-    }
-  }, [gameStats, groupSelection, wordProblem, gameUI]);
-
   return {
     // Game statistics
-    correctAnswers: gameStats.correctAnswers,
-    wrongAnswers: gameStats.wrongAnswers,
-    problemCount: gameUI.problemCount,
+    correctAnswers: gameMechanics.correctAnswers,
+    wrongAnswers: gameMechanics.wrongAnswers,
+    problemCount: gameMechanics.problemCount,
     
     // Word problem state
-    currentWord: wordProblem.currentWord,
-    displayedWord: wordProblem.displayedWord,
-    wordGroup: wordProblem.wordGroup,
-    isPhrase: wordProblem.isPhrase,
-    correctLetters: wordProblem.correctLetters,
-    missingPositions: wordProblem.missingPositions,
-    currentPosition: wordProblem.currentPosition,
+    currentWord: gameMechanics.currentWord,
+    displayedWord: gameMechanics.displayedWord,
+    wordGroup: gameMechanics.wordGroup,
+    isPhrase: gameMechanics.isPhrase,
+    correctLetters: gameMechanics.correctLetters,
+    missingPositions: gameMechanics.missingPositions,
+    currentPosition: gameMechanics.currentPosition,
     
     // Dialog visibility
-    showProblem: gameUI.showProblem,
-    showGroupDialog: groupSelection.showGroupDialog,
-    showStatsDialog: gameStats.showStatsDialog,
+    showProblem: gameMechanics.showProblem,
+    showGroupDialog: gameMechanics.showGroupDialog,
+    showStatsDialog: gameMechanics.showStatsDialog,
     
     // Animation state
-    lastAnswerCorrect: animation.lastAnswerCorrect,
-    showAnimation: animation.showAnimation,
+    lastAnswerCorrect: gameMechanics.lastAnswerCorrect,
+    showAnimation: gameMechanics.showAnimation,
     
     // Group selection
-    selectedGroups: groupSelection.selectedGroups,
+    selectedGroups: gameMechanics.selectedGroups,
     
     // Handlers and actions
-    totalAnswers: gameStats.totalAnswers,
-    setShowGroupDialog: groupSelection.setShowGroupDialog,
-    setShowStatsDialog: gameStats.setShowStatsDialog,
-    toggleGroup: groupSelection.toggleGroup,
-    setGroups: groupSelection.setGroups,
-    selectAll: groupSelection.selectAll,
-    deselectAll: groupSelection.deselectAll,
-    startNewGame,
-    handleAnswerI: wordProblem.handleAnswerI,
-    handleAnswerY: wordProblem.handleAnswerY,
-    endGame,
+    totalAnswers: gameMechanics.totalAnswers,
+    setShowGroupDialog: gameMechanics.setShowGroupDialog,
+    setShowStatsDialog: gameMechanics.setShowStatsDialog,
+    toggleGroup: gameMechanics.toggleGroup,
+    setGroups: gameMechanics.setGroups,
+    selectAll: gameMechanics.selectAll,
+    deselectAll: gameMechanics.deselectAll,
+    startNewGame: gameMechanics.startNewGame,
+    handleAnswerI: gameMechanics.handleAnswerI,
+    handleAnswerY: gameMechanics.handleAnswerY,
+    endGame: gameMechanics.endGame,
   };
 };
