@@ -32,7 +32,7 @@ export const GameControls = ({
       <Button 
         onClick={onShowGroupDialog} 
         variant="outline"
-        className="w-full border-orange-300 text-orange-600 hover:bg-orange-50"
+        className="w-full border-orange-300 text-orange-600 hover:bg-orange-50 py-2"
       >
         <Settings size={16} className="mr-2" /> Vybrat skupiny slov
       </Button>

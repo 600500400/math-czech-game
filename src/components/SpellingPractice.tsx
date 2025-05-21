@@ -4,7 +4,6 @@ import { WordProblemDialog } from "./spelling/WordProblemDialog";
 import { StatisticsDialog } from "./spelling/StatisticsDialog";
 import { FunGraphics } from "./spelling/FunGraphics";
 import { GameControls } from "./spelling/GameControls";
-import { GameHeader } from "./spelling/GameHeader";
 import { useSpellingGame } from "@/hooks/spelling/useSpellingGame";
 import { spellingGroups } from "@/data/spellingData";
 import { ConfettiExplosion } from "@/components/ui/confetti-explosion";
@@ -74,11 +73,7 @@ const SpellingPractice = () => {
         />
       </div>
       
-      <GameHeader 
-        problemCount={problemCount}
-        correctAnswers={correctAnswers}
-        wrongAnswers={wrongAnswers}
-      />
+      <h1 className="text-3xl font-bold text-center text-orange-500">Procvičování vyjmenovaných slov</h1>
 
       <GameControls 
         selectedGroupsCount={selectedGroups.length}
