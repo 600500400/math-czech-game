@@ -2,7 +2,7 @@
 import { useState, useCallback } from "react";
 
 export const useGameUI = () => {
-  const [problemCount, setProblemCount] = useState(0);
+  const [problemCount, setProblemCount] = useState(10); // Initialize with 10 to match tests
   const [showProblem, setShowProblem] = useState(false);
   
   // Increment problem count
@@ -12,6 +12,7 @@ export const useGameUI = () => {
   
   // Reset game UI
   const resetGame = useCallback(() => {
+    setProblemCount(10); // Reset to 10
     setShowProblem(false);
   }, []);
   

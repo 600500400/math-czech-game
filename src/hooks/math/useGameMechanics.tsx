@@ -41,33 +41,38 @@ export function useGameMechanics({
     
     // Select a random operation from allowed ones
     const operation = allowedOperations[Math.floor(Math.random() * allowedOperations.length)];
-    let num1: number, num2: number;
+    let num1: number, num2: number, result: number;
     
     // Generate appropriate numbers based on operation and difficulty
     switch (operation) {
       case "+":
         num1 = Math.floor(Math.random() * maxValue) + 1;
         num2 = Math.floor(Math.random() * maxValue) + 1;
+        result = num1 + num2;
         break;
       case "-":
         num1 = Math.floor(Math.random() * maxValue) + 1;
         num2 = Math.floor(Math.random() * num1) + 1; // Ensure num2 <= num1 to avoid negative results
+        result = num1 - num2;
         break;
       case "*":
         num1 = Math.floor(Math.random() * maxMultiplyValue) + 1;
         num2 = Math.floor(Math.random() * maxMultiplyValue) + 1;
+        result = num1 * num2;
         break;
       case "/":
         num2 = Math.floor(Math.random() * maxDivideValue) + 1; // Divisor
         const multiplier = Math.floor(Math.random() * maxDivideValue) + 1;
         num1 = num2 * multiplier; // Ensure division results in an integer
+        result = num1 / num2;
         break;
       default:
         num1 = 0;
         num2 = 0;
+        result = 0;
     }
     
-    return { num1, num2, operation };
+    return { num1, num2, operation, result };
   }, [allowedOperations, maxValue, maxMultiplyValue, maxDivideValue]);
   
   // Check if the user's answer is correct
