@@ -1,10 +1,10 @@
 
 import '@testing-library/jest-dom';
 import { expect, vi, afterEach } from 'vitest';
-import matchers from '@testing-library/jest-dom';
 
 // Add jest-dom matchers to Vitest's expect
-expect.extend(matchers);
+// We don't need to explicitly import matchers since '@testing-library/jest-dom'
+// automatically extends expect when imported
 
 // Export Vitest functions globally
 global.expect = expect;
