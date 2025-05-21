@@ -20,7 +20,7 @@ const StatisticsViewer = () => {
     console.log("StatisticsViewer - Spelling Stats:", spellingStats);
   }, [authState, userId, mathStats, spellingStats]);
 
-  if (!authState.isAuthenticated && !localStorage.getItem('localUser')) {
+  if (!authState.isAuthenticated) {
     return (
       <Card>
         <CardContent className="pt-4">

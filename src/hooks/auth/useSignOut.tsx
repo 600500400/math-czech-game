@@ -8,15 +8,15 @@ export const useSignOut = (setAuthState: React.Dispatch<React.SetStateAction<Aut
     try {
       setAuthState((prev) => ({ ...prev, isLoading: true }));
       
+      // Get current user ID before cleanup
+      const currentUserId = localStorage.getItem('localUser') ? 
+        JSON.parse(localStorage.getItem('localUser')!).id : null;
+      
       // Clean up auth state
       cleanupAuthState();
       
       // Remove local user
       localStorage.removeItem('localUser');
-      
-      // Remove local statistics
-      localStorage.removeItem('mathStats');
-      localStorage.removeItem('spellingStats');
       
       // Attempt global sign out
       await attemptGlobalSignOut(supabase);

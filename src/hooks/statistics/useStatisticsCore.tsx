@@ -11,6 +11,11 @@ export const useStatisticsCore = (userId: string | null) => {
     return !!localUserStr;
   };
 
+  // Získání unikátního klíče pro ukládání statistik konkrétního uživatele
+  const getLocalStorageKey = (baseKey: string) => {
+    return userId ? `${baseKey}_${userId}` : baseKey;
+  };
+
   // Získání statistik dětí (pro rodiče)
   const getChildStatistics = async (childId: string) => {
     if (!childId) return { mathStats: [], spellingStats: [] };
@@ -47,6 +52,7 @@ export const useStatisticsCore = (userId: string | null) => {
 
   return {
     checkLocalUserMode,
+    getLocalStorageKey,
     getChildStatistics
   };
 };

@@ -13,13 +13,13 @@ export const useLocalUser = (setAuthState: React.Dispatch<React.SetStateAction<A
     
     localStorage.setItem('localUser', JSON.stringify(localUser));
     
-    // Inicializace prázdných polí pro statistiky
-    if (!localStorage.getItem('mathStats')) {
-      localStorage.setItem('mathStats', JSON.stringify([]));
+    // Inicializace prázdných polí pro statistiky s ID uživatele v klíči
+    if (!localStorage.getItem(`mathStats_${user.id}`)) {
+      localStorage.setItem(`mathStats_${user.id}`, JSON.stringify([]));
     }
     
-    if (!localStorage.getItem('spellingStats')) {
-      localStorage.setItem('spellingStats', JSON.stringify([]));
+    if (!localStorage.getItem(`spellingStats_${user.id}`)) {
+      localStorage.setItem(`spellingStats_${user.id}`, JSON.stringify([]));
     }
     
     setAuthState({

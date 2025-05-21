@@ -7,7 +7,7 @@ import { useStatisticsCore } from "./useStatisticsCore";
 
 export const useSpellingStatistics = (userId: string | null) => {
   const queryClient = useQueryClient();
-  const { checkLocalUserMode } = useStatisticsCore(userId);
+  const { checkLocalUserMode, getLocalStorageKey } = useStatisticsCore(userId);
 
   // Uložení statistik pravopisu
   const saveSpellingStatistics = useMutation({
@@ -29,8 +29,9 @@ export const useSpellingStatistics = (userId: string | null) => {
       if (isLocalMode) {
         console.log("Using local user mode for spelling statistics");
         
-        // Ukládání do localStorage pro nepřihlášené uživatele
-        const localStatsStr = localStorage.getItem('spellingStats');
+        // Ukládání do localStorage pro lokální uživatele s unikátním klíčem
+        const storageKey = getLocalStorageKey('spellingStats');
+        const localStatsStr = localStorage.getItem(storageKey);
         const localStats = localStatsStr ? JSON.parse(localStatsStr) : [];
         
         const newStat = {
@@ -43,7 +44,7 @@ export const useSpellingStatistics = (userId: string | null) => {
         };
         
         localStats.push(newStat);
-        localStorage.setItem('spellingStats', JSON.stringify(localStats));
+        localStorage.setItem(storageKey, JSON.stringify(localStats));
         
         // Aktualizace QueryClient pro okamžitou aktualizaci UI
         queryClient.setQueryData(["spellingStatistics", userId], localStats);
@@ -90,8 +91,9 @@ export const useSpellingStatistics = (userId: string | null) => {
       const isLocalMode = await checkLocalUserMode();
       
       if (isLocalMode) {
-        // Načítání z localStorage pro nepřihlášené uživatele
-        const localStatsStr = localStorage.getItem('spellingStats');
+        // Načítání z localStorage pro lokální uživatele s unikátním klíčem
+        const storageKey = getLocalStorageKey('spellingStats');
+        const localStatsStr = localStorage.getItem(storageKey);
         return localStatsStr ? JSON.parse(localStatsStr) : [];
       }
 

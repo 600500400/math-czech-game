@@ -7,7 +7,7 @@ import { useStatisticsCore } from "./useStatisticsCore";
 
 export const useMathStatistics = (userId: string | null) => {
   const queryClient = useQueryClient();
-  const { checkLocalUserMode } = useStatisticsCore(userId);
+  const { checkLocalUserMode, getLocalStorageKey } = useStatisticsCore(userId);
 
   // Uložení statistik matematiky s možností ukládat lokálně nebo do Supabase
   const saveMathStatistics = useMutation({
@@ -31,8 +31,9 @@ export const useMathStatistics = (userId: string | null) => {
       if (isLocalMode) {
         console.log("Using local user mode for math statistics");
         
-        // Ukládání do localStorage pro nepřihlášené uživatele
-        const localStatsStr = localStorage.getItem('mathStats');
+        // Ukládání do localStorage pro lokální uživatele s unikátním klíčem
+        const storageKey = getLocalStorageKey('mathStats');
+        const localStatsStr = localStorage.getItem(storageKey);
         const localStats = localStatsStr ? JSON.parse(localStatsStr) : [];
         
         const newStat = {
@@ -46,7 +47,7 @@ export const useMathStatistics = (userId: string | null) => {
         };
         
         localStats.push(newStat);
-        localStorage.setItem('mathStats', JSON.stringify(localStats));
+        localStorage.setItem(storageKey, JSON.stringify(localStats));
         
         // Aktualizace QueryClient pro okamžitou aktualizaci UI
         queryClient.setQueryData(["mathStatistics", userId], localStats);
@@ -94,8 +95,9 @@ export const useMathStatistics = (userId: string | null) => {
       const isLocalMode = await checkLocalUserMode();
       
       if (isLocalMode) {
-        // Načítání z localStorage pro nepřihlášené uživatele
-        const localStatsStr = localStorage.getItem('mathStats');
+        // Načítání z localStorage pro lokální uživatele s unikátním klíčem
+        const storageKey = getLocalStorageKey('mathStats');
+        const localStatsStr = localStorage.getItem(storageKey);
         return localStatsStr ? JSON.parse(localStatsStr) : [];
       }
 
