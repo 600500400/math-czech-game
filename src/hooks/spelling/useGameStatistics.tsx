@@ -24,6 +24,8 @@ export function useGameStatistics() {
     incrementCorrect,
     incrementWrong,
     totalAnswers,
-    hasStats
+    hasStats,
+    setCorrectAnswers,
+    setWrongAnswers
   };
 }

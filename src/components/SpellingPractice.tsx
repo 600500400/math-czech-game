@@ -1,11 +1,10 @@
-
 import { GroupSelectionDialog } from "./spelling/GroupSelectionDialog";
 import { WordProblemDialog } from "./spelling/WordProblemDialog";
 import { StatisticsDialog } from "./spelling/StatisticsDialog";
 import { FunGraphics } from "./spelling/FunGraphics";
 import { GameControls } from "./spelling/GameControls";
 import { GameHeader } from "./spelling/GameHeader";
-import { useSpellingGame } from "@/hooks/useSpellingGame";
+import { useSpellingGame } from "@/hooks/spelling/useSpellingGame";
 import { spellingGroups } from "@/data/spellingData";
 import { ConfettiExplosion } from "@/components/ui/confetti-explosion";
 import { useState, useEffect } from "react";
