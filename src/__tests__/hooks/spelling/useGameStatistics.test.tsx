@@ -1,6 +1,7 @@
 
 import { renderHook, act } from '@testing-library/react';
 import { describe, test, expect } from 'vitest';
+import '@testing-library/jest-dom';
 import { useGameStatistics } from '@/hooks/spelling/useGameStatistics';
 
 describe('useGameStatistics', () => {

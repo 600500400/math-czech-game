@@ -2,6 +2,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, test, expect, vi } from 'vitest';
+import '@testing-library/jest-dom';
 import { GameControls } from '@/components/spelling/GameControls';
 
 describe('GameControls', () => {

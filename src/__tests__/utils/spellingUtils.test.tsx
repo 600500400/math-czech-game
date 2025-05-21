@@ -1,6 +1,7 @@
 
 import { renderWordWithCurrentGap, checkSpellingAnswer } from '@/utils/spellingUtils';
 import { describe, test, expect } from 'vitest';
+import '@testing-library/jest-dom';
 
 describe('spellingUtils', () => {
   describe('renderWordWithCurrentGap', () => {

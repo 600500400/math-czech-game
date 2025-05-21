@@ -1,6 +1,7 @@
 
 import { renderHook, act } from '@testing-library/react';
 import { describe, test, expect, vi } from 'vitest';
+import '@testing-library/jest-dom';
 import { useGroupSelection } from '@/hooks/spelling/useGroupSelection';
 
 // Mock the useToast hook
