@@ -1,6 +1,5 @@
 
-import { supabase } from "@/integrations/supabase/client";
-import { cleanupAuthState, attemptGlobalSignOut, forcePageReload } from "@/utils/authUtils";
+import { cleanupAuthState } from "@/utils/authUtils";
 import { AuthState } from "@/types/authTypes";
 import { toast } from "sonner";
 
@@ -39,9 +38,6 @@ export const useSignOut = (setAuthState: React.Dispatch<React.SetStateAction<Aut
       // Odstraníme pouze lokálního uživatele
       localStorage.removeItem('localUser');
       
-      // Pokusíme se o globální odhlášení ze všech zařízení
-      await attemptGlobalSignOut(supabase);
-      
       // Zkontrolujeme zachování statistik po odhlášení
       if (currentUserId) {
         const mathStatsKey = `mathStats_${currentUserId}`;
@@ -68,7 +64,7 @@ export const useSignOut = (setAuthState: React.Dispatch<React.SetStateAction<Aut
       toast.success("Odhlášení proběhlo úspěšně");
       
       // Vynucené přesměrování pro čistý stav
-      forcePageReload('/auth');
+      window.location.href = '/auth';
     } catch (error: any) {
       console.error("Chyba při odhlášení:", error);
       setAuthState((prev) => ({

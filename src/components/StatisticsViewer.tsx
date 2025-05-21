@@ -3,15 +3,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { useStatistics } from "@/hooks/useStatistics";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState, useEffect } from "react";
-import { useStatisticsConnection } from "@/hooks/useStatisticsConnection";
-import DatabaseConnectionStatus from "./statistics/DatabaseConnectionStatus";
 import EmptyStatisticsState from "./statistics/EmptyStatisticsState";
 import LoadingStatisticsState from "./statistics/LoadingStatisticsState";
 import UnauthenticatedState from "./statistics/UnauthenticatedState";
 import StatisticsTabs from "./statistics/StatisticsTabs";
-import DiagnosticsPanel from "./statistics/DiagnosticsPanel";
-import { useDiagnostics } from "@/hooks/statistics/useDiagnostics";
-import StatisticsDebugger from "./statistics/StatisticsDebugger";
 import { Button } from "@/components/ui/button";
 import { RefreshCcw } from "lucide-react";
 import { toast } from "sonner";
@@ -28,25 +23,8 @@ const StatisticsViewer = () => {
     isLoading
   } = useStatistics(userId);
   
-  const { 
-    dbConnectionStatus, 
-    isLocalStorageMode, 
-    isRefreshing, 
-    handleRefreshData,
-    connectionStatus,
-    retryCount
-  } = useStatisticsConnection(userId);
-  
-  // Diagnostic tools
-  const { testSupabaseConnection, exportLocalStatistics } = useDiagnostics(
-    userId, 
-    mathStats, 
-    spellingStats
-  );
-  
   // Přidáme stav pro dlouhé načítání
   const [loadingTooLong, setLoadingTooLong] = useState(false);
-  const [showDebugger, setShowDebugger] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   
   // Efekt pro kontrolu dlouhého načítání
@@ -83,20 +61,11 @@ const StatisticsViewer = () => {
     }
   }, [userId, mathStatsLoading, spellingStatsLoading, mathStats, spellingStats, refreshTrigger]);
   
-  // Zobrazíme diagnostický nástroj pouze v případě problémů
-  const toggleDebugger = () => {
-    setShowDebugger(!showDebugger);
-  };
-  
   if (!authState.isAuthenticated) {
     return (
       <Card>
         <CardContent>
-          <UnauthenticatedState 
-            dbConnectionStatus={dbConnectionStatus}
-            isRefreshing={isRefreshing}
-            onRefresh={handleRefreshData}
-          />
+          <UnauthenticatedState />
         </CardContent>
       </Card>
     );
@@ -107,7 +76,6 @@ const StatisticsViewer = () => {
       <Card>
         <CardContent>
           <LoadingStatisticsState 
-            retryConnection={loadingTooLong ? handleRefreshData : undefined}
             hasRetried={loadingTooLong}
           />
         </CardContent>
@@ -126,44 +94,21 @@ const StatisticsViewer = () => {
               size="sm" 
               onClick={handleManualRefresh}
               className="text-xs flex items-center gap-1"
-              disabled={isRefreshing}
             >
               <RefreshCcw className="h-3 w-3" />
               Obnovit
             </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={toggleDebugger}
-              className="text-xs"
-            >
-              {showDebugger ? "Skrýt diagnostiku" : "Diagnostika"}
-            </Button>
-            <DatabaseConnectionStatus 
-              status="disconnected" 
-              isRefreshing={isRefreshing}
-              onRefresh={handleRefreshData}
-              isLocalStorageMode={true}
-            />
           </div>
         </CardHeader>
         <CardContent>
           {mathStats.length === 0 && spellingStats.length === 0 ? (
-            <EmptyStatisticsState 
-              dbConnectionStatus="disconnected"
-              isLocalStorageMode={true}
-              isRefreshing={isRefreshing}
-              onRefresh={handleRefreshData}
-            />
+            <EmptyStatisticsState />
           ) : (
             <StatisticsTabs
               mathStats={mathStats}
               spellingStats={spellingStats}
             />
           )}
-          
-          {/* Diagnostický nástroj */}
-          {showDebugger && <StatisticsDebugger userId={userId} />}
         </CardContent>
       </Card>
     </>

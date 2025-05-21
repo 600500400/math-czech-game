@@ -92,13 +92,17 @@ export function useMathGame() {
       allowedOperations,
       setDifficultySet
     );
+    
+    // Close the difficulty dialog when set
+    setShowDifficultyDialog(false);
   }, [
     difficultySetDifficulty,
     maxValue,
     maxMultiplyValue,
     maxDivideValue,
     allowedOperations,
-    setDifficultySet
+    setDifficultySet,
+    setShowDifficultyDialog
   ]);
   
   // Wrapper for start new game to properly initialize
