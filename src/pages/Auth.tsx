@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { v4 as uuidv4 } from 'uuid';
 
 // Předem definovaní uživatelé s UUID formátem ID
 const DEFAULT_USERS = [
@@ -24,6 +23,8 @@ const Auth = () => {
   
   // Inicializace stabilních ID pro uživatele při prvním načtení
   useEffect(() => {
+    console.log("Inicializuji uložiště pro všechny uživatele...");
+    
     // Zkontrolujeme a připravíme úložiště pro všechny uživatele
     DEFAULT_USERS.forEach(user => {
       // Inicializace prázdných polí pro statistiky, pokud neexistují
@@ -33,11 +34,17 @@ const Auth = () => {
       if (!localStorage.getItem(mathKey)) {
         console.log(`Inicializace prázdného pole pro matematické statistiky uživatele ${user.username}`);
         localStorage.setItem(mathKey, JSON.stringify([]));
+      } else {
+        const stats = JSON.parse(localStorage.getItem(mathKey) || "[]");
+        console.log(`Uživatel ${user.username} má ${stats.length} matematických záznamů`);
       }
       
       if (!localStorage.getItem(spellingKey)) {
         console.log(`Inicializace prázdného pole pro statistiky pravopisu uživatele ${user.username}`);
         localStorage.setItem(spellingKey, JSON.stringify([]));
+      } else {
+        const stats = JSON.parse(localStorage.getItem(spellingKey) || "[]");
+        console.log(`Uživatel ${user.username} má ${stats.length} záznamů pravopisu`);
       }
     });
     
@@ -69,6 +76,15 @@ const Auth = () => {
         mathStats: mathStats ? JSON.parse(mathStats).length : 0,
         spellingStats: spellingStats ? JSON.parse(spellingStats).length : 0
       });
+      
+      // Uistíme se, že statistiky existují
+      if (!mathStats) {
+        localStorage.setItem(mathKey, JSON.stringify([]));
+      }
+      
+      if (!spellingStats) {
+        localStorage.setItem(spellingKey, JSON.stringify([]));
+      }
       
       setLocalUser(user);
       toast.success(`Přihlášen jako ${user.username}`);

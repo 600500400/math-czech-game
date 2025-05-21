@@ -32,11 +32,11 @@ export const useSignOut = (setAuthState: React.Dispatch<React.SetStateAction<Aut
         });
       }
       
-      // Čistíme pouze autentizační data
+      // DŮLEŽITÉ: Čistíme pouze autentizační data, NE statistiky
       const cleanupResult = cleanupAuthState();
       console.log("Vyčištění auth stavu:", cleanupResult);
       
-      // Odstraníme lokálního uživatele
+      // Odstraníme pouze lokálního uživatele
       localStorage.removeItem('localUser');
       
       // Pokusíme se o globální odhlášení ze všech zařízení

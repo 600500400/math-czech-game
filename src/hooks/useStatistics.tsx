@@ -3,15 +3,16 @@ import { useAuth } from "@/hooks/useAuth";
 import { useMathStatistics } from "./statistics/useMathStatistics";
 import { useSpellingStatistics } from "./statistics/useSpellingStatistics";
 import { useStatisticsCore } from "./statistics/useStatisticsCore";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
 /**
  * Main hook for statistics functionality that combines both math and spelling statistics
  */
 export const useStatistics = (userId: string | null) => {
-  const { authState } = useAuth(); // Získáme aktuální stav autentizace
+  const { authState } = useAuth();
   const queryClient = useQueryClient();
+  const [lastRefreshId, setLastRefreshId] = useState("");
   
   // Použijeme userId z parametru nebo z authState (pojistka)
   const effectiveUserId = userId || authState.user?.id || null;
@@ -37,10 +38,16 @@ export const useStatistics = (userId: string | null) => {
   
   // Efekt pro invalidaci query cache při změně uživatele
   useEffect(() => {
-    if (effectiveUserId) {
+    if (effectiveUserId && effectiveUserId !== lastRefreshId) {
+      console.log(`Nový uživatel detekován (${effectiveUserId}), přenačítám data...`);
+      
       // Vynucené přenačtení dat při změně uživatele
       queryClient.invalidateQueries({ queryKey: ["mathStatistics"] });
       queryClient.invalidateQueries({ queryKey: ["spellingStatistics"] });
+      
+      // Zavoláme refetch funkce přímo
+      refetchMathStats();
+      refetchSpellingStats();
       
       // Inicializace prázdných polí pro statistiky, pokud neexistují
       const mathKey = `mathStats_${effectiveUserId}`;
@@ -55,8 +62,22 @@ export const useStatistics = (userId: string | null) => {
       }
       
       console.log(`Statistiky pro uživatele ${effectiveUserId} inicializovány nebo zkontrolovány`);
+      
+      // Uložíme ID pro kontrolu další změny
+      setLastRefreshId(effectiveUserId);
     }
-  }, [effectiveUserId, queryClient]);
+  }, [effectiveUserId, queryClient, refetchMathStats, refetchSpellingStats, lastRefreshId]);
+  
+  // Funkce pro manuální přenačtení všech statistik
+  const forceRefreshAllStatistics = () => {
+    if (effectiveUserId) {
+      console.log(`Manuální přenačtení statistik pro uživatele ${effectiveUserId}`);
+      refetchMathStats();
+      refetchSpellingStats();
+      return true;
+    }
+    return false;
+  };
   
   // Kontrola režimu
   checkLocalUserMode().then(isLocalMode => {
@@ -79,8 +100,10 @@ export const useStatistics = (userId: string | null) => {
     // Společné funkce
     getChildStatistics,
     checkLocalUserMode,
+    forceRefreshAllStatistics,
     
     // Metadata
     currentUserId: effectiveUserId,
+    isLoading: mathStatsLoading || spellingStatsLoading
   };
 };

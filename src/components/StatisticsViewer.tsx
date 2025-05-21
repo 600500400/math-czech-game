@@ -14,11 +14,20 @@ import { useDiagnostics } from "@/hooks/statistics/useDiagnostics";
 import StatisticsDebugger from "./statistics/StatisticsDebugger";
 import { Button } from "@/components/ui/button";
 import { RefreshCcw } from "lucide-react";
+import { toast } from "sonner";
 
 const StatisticsViewer = () => {
   const { authState } = useAuth();
   const userId = authState.user?.id || null;
-  const { mathStats, spellingStats, mathStatsLoading, spellingStatsLoading } = useStatistics(userId);
+  const { 
+    mathStats, 
+    spellingStats, 
+    mathStatsLoading, 
+    spellingStatsLoading,
+    forceRefreshAllStatistics,
+    isLoading
+  } = useStatistics(userId);
+  
   const { 
     dbConnectionStatus, 
     isLocalStorageMode, 
@@ -40,10 +49,27 @@ const StatisticsViewer = () => {
   const [showDebugger, setShowDebugger] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   
+  // Efekt pro kontrolu dlouhého načítání
+  useEffect(() => {
+    if (isLoading) {
+      const timer = setTimeout(() => {
+        setLoadingTooLong(true);
+      }, 3000); // Po 3 sekundách označíme načítání jako dlouhé
+      
+      return () => clearTimeout(timer);
+    } else {
+      setLoadingTooLong(false);
+    }
+  }, [isLoading]);
+  
   // Funkce pro ruční znovunačtení statistik
   const handleManualRefresh = () => {
     setRefreshTrigger(prev => prev + 1);
-    handleRefreshData();
+    if (forceRefreshAllStatistics()) {
+      toast.info(`Přenačítání statistik pro uživatele ${userId}...`);
+    } else {
+      toast.error("Nelze přenačíst statistiky - žádný uživatel není přihlášen");
+    }
   };
   
   // Efekt pro kontrolu, zda statistiky byly správně načteny
