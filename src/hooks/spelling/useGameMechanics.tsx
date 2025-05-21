@@ -7,8 +7,10 @@ import { useAnimationState } from "./useAnimationState";
 import { useGameUI } from "./useGameUI";
 import { useAuth } from "../useAuth";
 import { useStatistics } from "../useStatistics";
+import { useGameControls } from "./useGameControls";
 
 export const useGameMechanics = () => {
+  // Core authentication and statistics
   const { authState } = useAuth();
   const userId = authState.user?.id || null;
   const { saveSpellingStatistics } = useStatistics(userId);
@@ -29,51 +31,27 @@ export const useGameMechanics = () => {
     setShowAnimation: animation.setShowAnimation
   });
 
-  // End game handler
-  const endGame = useCallback(() => {
-    gameUI.setShowProblem(false);
-    gameStats.setShowStatsDialog(true);
-    
-    // Save statistics if user is logged in
-    if (userId && (gameStats.correctAnswers > 0 || gameStats.wrongAnswers > 0)) {
-      saveSpellingStatistics.mutate({
-        correctAnswers: gameStats.correctAnswers,
-        wrongAnswers: gameStats.wrongAnswers,
-        wordGroup: groupSelection.selectedGroups.join(',')
-      });
-    }
-  }, [
-    gameStats.correctAnswers, 
-    gameStats.wrongAnswers, 
-    gameStats.setShowStatsDialog, 
-    groupSelection.selectedGroups, 
-    saveSpellingStatistics, 
-    userId,
-    gameUI
-  ]);
-
-  // Start new game handler
-  const startNewGame = useCallback(() => {
-    if (groupSelection.selectedGroups.length === 0) {
-      groupSelection.setShowGroupDialog(true);
-      return;
-    }
-    
-    gameStats.incrementProblemCount();
-    gameStats.setCorrectAnswers(0);
-    gameStats.setWrongAnswers(0);
-    gameUI.resetGame();
-    
-    const problem = wordProblem.generateNewProblem();
-    if (problem) {
-      gameUI.setShowProblem(true);
-    }
-  }, [gameStats, groupSelection, wordProblem, gameUI]);
+  // Game control functions
+  const gameControls = useGameControls({
+    selectedGroups: groupSelection.selectedGroups,
+    correctAnswers: gameStats.correctAnswers,
+    wrongAnswers: gameStats.wrongAnswers,
+    showProblem: gameUI.showProblem,
+    setShowGroupDialog: groupSelection.setShowGroupDialog,
+    setShowStatsDialog: gameStats.setShowStatsDialog,
+    generateNewProblem: wordProblem.generateNewProblem,
+    incrementProblemCount: gameUI.incrementProblemCount,
+    setCorrectAnswers: gameStats.setCorrectAnswers,
+    setWrongAnswers: gameStats.setWrongAnswers,
+    setShowProblem: gameUI.setShowProblem,
+    saveSpellingStatistics: saveSpellingStatistics,
+    userId: userId
+  });
 
   return {
     // Game control functions
-    startNewGame,
-    endGame,
+    startNewGame: gameControls.startNewGame,
+    endGame: gameControls.endGame,
     
     // Components from individual hooks
     ...gameStats,
