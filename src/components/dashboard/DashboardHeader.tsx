@@ -27,7 +27,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           Zpět na aplikaci
         </Button>
         <Button onClick={onSignOut} variant="destructive">
-          Odhlásit se
+          Změnit uživatele
         </Button>
       </div>
     </div>

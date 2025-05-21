@@ -44,7 +44,7 @@ const UserMenu = () => {
       <Link to="/auth">
         <Button variant="outline" size="sm">
           <UserIcon className="mr-2 h-4 w-4" />
-          Přihlásit se
+          Vybrat uživatele
         </Button>
       </Link>
     );
@@ -87,7 +87,7 @@ const UserMenu = () => {
         <DropdownMenuSeparator />
         <DropdownMenuItem className="flex items-center cursor-pointer" onClick={() => signOut()}>
           <LogOut className="mr-2 h-4 w-4" />
-          <span>Odhlásit se</span>
+          <span>Změnit uživatele</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
