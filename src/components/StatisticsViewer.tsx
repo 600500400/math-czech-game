@@ -5,13 +5,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatDate } from "@/utils/dateUtils";
+import { useEffect } from "react";
 
 const StatisticsViewer = () => {
   const { authState } = useAuth();
   const userId = authState.user?.id || null;
   const { mathStats, spellingStats, mathStatsLoading, spellingStatsLoading } = useStatistics(userId);
+  
+  useEffect(() => {
+    // Pro účely debugování
+    console.log("StatisticsViewer - Auth State:", authState);
+    console.log("StatisticsViewer - User ID:", userId);
+    console.log("StatisticsViewer - Math Stats:", mathStats);
+    console.log("StatisticsViewer - Spelling Stats:", spellingStats);
+  }, [authState, userId, mathStats, spellingStats]);
 
-  if (!authState.isAuthenticated) {
+  if (!authState.isAuthenticated && !localStorage.getItem('localUser')) {
     return (
       <Card>
         <CardContent className="pt-4">

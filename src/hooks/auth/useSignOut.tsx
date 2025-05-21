@@ -14,6 +14,10 @@ export const useSignOut = (setAuthState: React.Dispatch<React.SetStateAction<Aut
       // Remove local user
       localStorage.removeItem('localUser');
       
+      // Remove local statistics
+      localStorage.removeItem('mathStats');
+      localStorage.removeItem('spellingStats');
+      
       // Attempt global sign out
       await attemptGlobalSignOut(supabase);
       

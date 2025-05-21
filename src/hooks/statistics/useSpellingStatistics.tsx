@@ -1,11 +1,12 @@
 
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SpellingStatistics } from "@/types/authTypes";
 import { toast } from "sonner";
 import { useStatisticsCore } from "./useStatisticsCore";
 
 export const useSpellingStatistics = (userId: string | null) => {
+  const queryClient = useQueryClient();
   const { checkLocalUserMode } = useStatisticsCore(userId);
 
   // Uložení statistik pravopisu
@@ -27,8 +28,12 @@ export const useSpellingStatistics = (userId: string | null) => {
       
       if (isLocalMode) {
         console.log("Using local user mode for spelling statistics");
-        toast.info("Statistiky pravopisu uloženy lokálně");
-        return {
+        
+        // Ukládání do localStorage pro nepřihlášené uživatele
+        const localStatsStr = localStorage.getItem('spellingStats');
+        const localStats = localStatsStr ? JSON.parse(localStatsStr) : [];
+        
+        const newStat = {
           id: "local-" + Date.now(),
           user_id: userId,
           correct_answers: correctAnswers,
@@ -36,8 +41,17 @@ export const useSpellingStatistics = (userId: string | null) => {
           word_group: wordGroup,
           created_at: new Date().toISOString()
         };
+        
+        localStats.push(newStat);
+        localStorage.setItem('spellingStats', JSON.stringify(localStats));
+        
+        // Aktualizace QueryClient pro okamžitou aktualizaci UI
+        queryClient.setQueryData(["spellingStatistics", userId], localStats);
+        
+        return newStat;
       }
         
+      // Ukládání do Supabase pro přihlášené uživatele
       const { data, error } = await supabase
         .from("spelling_statistics")
         .insert({
@@ -52,6 +66,9 @@ export const useSpellingStatistics = (userId: string | null) => {
         console.error("Supabase error when saving spelling stats:", error);
         throw error;
       }
+      
+      // Aktualizace QueryClient pro okamžitou aktualizaci UI
+      queryClient.invalidateQueries({ queryKey: ["spellingStatistics", userId] });
       
       return data[0];
     },
@@ -69,14 +86,27 @@ export const useSpellingStatistics = (userId: string | null) => {
     queryKey: ["spellingStatistics", userId],
     queryFn: async (): Promise<SpellingStatistics[]> => {
       if (!userId) return [];
+      
+      const isLocalMode = await checkLocalUserMode();
+      
+      if (isLocalMode) {
+        // Načítání z localStorage pro nepřihlášené uživatele
+        const localStatsStr = localStorage.getItem('spellingStats');
+        return localStatsStr ? JSON.parse(localStatsStr) : [];
+      }
 
+      // Načítání z Supabase pro přihlášené uživatele
       const { data, error } = await supabase
         .from("spelling_statistics")
         .select("*")
         .eq("user_id", userId)
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error loading spelling statistics:", error);
+        throw error;
+      }
+      
       return data as SpellingStatistics[];
     },
     enabled: !!userId,
