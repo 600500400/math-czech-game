@@ -7,12 +7,13 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { v4 as uuidv4 } from 'uuid';
 
-// Předem definovaní uživatelé
+// Předem definovaní uživatelé s UUID formátem ID
 const DEFAULT_USERS = [
-  { id: "misa-id", email: "", username: "Míša", role: "child" },
-  { id: "gabi-id", email: "", username: "Gábi", role: "child" },
-  { id: "guest-id", email: "", username: "Host", role: "child" },
+  { id: uuidv4(), email: "", username: "Míša", role: "child" },
+  { id: uuidv4(), email: "", username: "Gábi", role: "child" },
+  { id: uuidv4(), email: "", username: "Host", role: "child" },
 ];
 
 const Auth = () => {
