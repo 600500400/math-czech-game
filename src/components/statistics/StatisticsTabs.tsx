@@ -2,6 +2,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StatisticsTable from "./StatisticsTable";
 import { MathStatistics, SpellingStatistics } from "@/types/authTypes";
+import { Abc, Check } from "lucide-react";
 
 interface StatisticsTabsProps {
   mathStats: MathStatistics[];
@@ -11,9 +12,19 @@ interface StatisticsTabsProps {
 const StatisticsTabs = ({ mathStats, spellingStats }: StatisticsTabsProps) => {
   return (
     <Tabs defaultValue="spelling">
-      <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="spelling">Vyjmenovaná slova</TabsTrigger>
-        <TabsTrigger value="math">Matematika</TabsTrigger>
+      <TabsList className="grid w-full grid-cols-2 p-2">
+        <TabsTrigger 
+          value="spelling" 
+          className="text-base py-3 data-[state=active]:bg-orange-100 data-[state=active]:text-orange-800 data-[state=active]:shadow-sm"
+        >
+          <Abc className="mr-2 h-5 w-5" /> Vyjmenovaná slova
+        </TabsTrigger>
+        <TabsTrigger 
+          value="math" 
+          className="text-base py-3 data-[state=active]:bg-blue-100 data-[state=active]:text-blue-800 data-[state=active]:shadow-sm"
+        >
+          <Check className="mr-2 h-5 w-5" /> Matematika
+        </TabsTrigger>
       </TabsList>
       
       <TabsContent value="spelling" className="mt-4">

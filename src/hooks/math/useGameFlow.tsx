@@ -34,7 +34,7 @@ export function useGameFlow({
   const [showProblem, setShowProblem] = useState(false);
   const [showDifficultyDialog, setShowDifficultyDialog] = useState(false);
   const [showStatsDialog, setShowStatsDialog] = useState(false);
-  const [difficultySet, setDifficultySet] = useState(false);
+  const [difficultySet, setDifficultySet] = useState(true); // Default to true so game can start immediately
   const [gameEnded, setGameEnded] = useState(false);
   const [problemCount, setProblemCount] = useState(10);
 

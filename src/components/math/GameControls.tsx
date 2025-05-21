@@ -3,6 +3,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Settings } from "lucide-react";
 
 interface GameControlsProps {
   problemCount: number;
@@ -59,19 +60,21 @@ const GameControls: React.FC<GameControlsProps> = ({
       )}
 
       <div className="space-y-2">
-        <Button 
-          onClick={onSetDifficulty} 
-          className="w-full bg-orange-500 hover:bg-orange-600"
-        >
-          Nastavit obtížnost
-        </Button>
-        
+        {/* Main action button - more prominent */}
         <Button 
           onClick={onStartGame} 
-          className="w-full bg-orange-500 hover:bg-orange-600" 
-          disabled={!difficultySet}
+          className="w-full bg-orange-500 hover:bg-orange-600 text-lg py-6" 
         >
           Spustit hru
+        </Button>
+        
+        {/* Secondary action - less prominent */}
+        <Button 
+          onClick={onSetDifficulty} 
+          variant="outline"
+          className="w-full border-orange-300 text-orange-600 hover:bg-orange-50"
+        >
+          <Settings size={16} className="mr-2" /> Nastavit obtížnost
         </Button>
         
         {totalAnswers > 0 && (
