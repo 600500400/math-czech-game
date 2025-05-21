@@ -5,6 +5,7 @@ import SpellingPractice from "../SpellingPractice";
 import { useAuth } from "@/hooks/useAuth";
 import { useStatistics } from "@/hooks/useStatistics";
 import { Badge } from "@/components/ui/badge";
+import { FileText, Calculator } from "lucide-react";
 
 interface PracticeTabsProps {
   defaultTab?: "spelling" | "math";
@@ -41,13 +42,13 @@ const PracticeTabs = ({ defaultTab = "spelling" }: PracticeTabsProps) => {
           value="spelling"
           className="text-base py-4 data-[state=active]:bg-orange-100 data-[state=active]:text-orange-800 data-[state=active]:shadow-sm data-[state=inactive]:bg-gray-50"
         >
-          Vyjmenovaná slova
+          <FileText className="mr-2 h-5 w-5" /> Vyjmenovaná slova
         </TabsTrigger>
         <TabsTrigger 
           value="math"
           className="text-base py-4 data-[state=active]:bg-blue-100 data-[state=active]:text-blue-800 data-[state=active]:shadow-sm data-[state=inactive]:bg-gray-50"
         >
-          Matematika
+          <Calculator className="mr-2 h-5 w-5" /> Matematika
         </TabsTrigger>
       </TabsList>
       
