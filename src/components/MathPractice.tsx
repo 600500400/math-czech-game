@@ -35,6 +35,7 @@ const MathPractice = () => {
     setMaxValue,
     setMaxMultiplyValue,
     setMaxDivideValue,
+    
     setDifficulty,
     toggleOperation,
     startNewGame,
@@ -44,13 +45,23 @@ const MathPractice = () => {
     handleKeyPress,
   } = useMathGame();
 
+  // Helper function that wraps the original toggleOperation with required parameters
+  const handleToggleOperation = (operation) => {
+    toggleOperation(operation, allowedOperations, setAllowedOperations);
+  };
+
+  // Helper function that wraps the original setDifficulty with required parameters
+  const handleSetDifficulty = () => {
+    setDifficulty(maxValue, maxMultiplyValue, maxDivideValue, allowedOperations, setDifficultySet);
+  };
+
   return (
     <div className="space-y-4 relative">
       {/* Fun Graphics & Confetti Components - moved above dialogs for visibility */}
       {showAnimation && (
         <FunGraphics isCorrect={lastAnswerCorrect} showAnimation={showAnimation} />
       )}
-      <ConfettiExplosion trigger={showConfetti} particleCount={30} />
+      {showConfetti && <ConfettiExplosion particleCount={30} />}
       
       <h1 className="text-3xl font-bold text-center text-orange-500">Procvičování matematiky</h1>
       
@@ -80,8 +91,8 @@ const MathPractice = () => {
         setMaxMultiplyValue={setMaxMultiplyValue}
         setMaxDivideValue={setMaxDivideValue}
         allowedOperations={allowedOperations}
-        toggleOperation={toggleOperation}
-        setDifficulty={setDifficulty}
+        toggleOperation={handleToggleOperation}
+        setDifficulty={handleSetDifficulty}
       />
 
       {/* Problem Dialog */}

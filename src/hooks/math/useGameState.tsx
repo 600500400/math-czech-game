@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Problem, Operation } from "@/types/mathTypes";
 
@@ -7,7 +7,7 @@ export function useGameState() {
   const { toast } = useToast();
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [wrongAnswers, setWrongAnswers] = useState(0);
-  const [problemCount, setProblemCount] = useState(0);
+  const [problemCount, setProblemCount] = useState(10); // Default to 10 problems
   const [currentProblem, setCurrentProblem] = useState<Problem | null>(null);
   const [userAnswer, setUserAnswer] = useState("");
   const [showProblem, setShowProblem] = useState(false);
@@ -23,6 +23,7 @@ export function useGameState() {
   const [showAnimation, setShowAnimation] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
 
+  // Calculated properties
   const totalAnswers = correctAnswers + wrongAnswers;
   const correctPercentage = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 0;
 
@@ -62,6 +63,8 @@ export function useGameState() {
     setShowAnimation,
     showConfetti,
     setShowConfetti,
+    
+    // Calculated properties
     totalAnswers,
     correctPercentage,
   };

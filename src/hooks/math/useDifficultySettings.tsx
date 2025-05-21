@@ -1,17 +1,12 @@
 
-import { useState } from "react";
+import { useCallback } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Operation } from "@/types/mathTypes";
 
 export function useDifficultySettings() {
   const { toast } = useToast();
-  const [maxValue, setMaxValue] = useState(10);
-  const [maxMultiplyValue, setMaxMultiplyValue] = useState(10);
-  const [maxDivideValue, setMaxDivideValue] = useState(10);
-  const [difficultySet, setDifficultySet] = useState(false);
-  const [allowedOperations, setAllowedOperations] = useState<Operation[]>(["+", "-", "*", "/"]);
 
-  const toggleOperation = (operation: Operation) => {
+  const toggleOperation = useCallback((operation: Operation, allowedOperations: Operation[], setAllowedOperations: (ops: Operation[]) => void) => {
     setAllowedOperations(current => {
       if (current.includes(operation)) {
         // Don't allow removing the last operation
@@ -28,9 +23,15 @@ export function useDifficultySettings() {
         return [...current, operation];
       }
     });
-  };
+  }, [toast]);
 
-  const setDifficulty = () => {
+  const setDifficulty = useCallback((
+    maxValue: number, 
+    maxMultiplyValue: number, 
+    maxDivideValue: number,
+    allowedOperations: Operation[],
+    setDifficultySet: (value: boolean) => void
+  ) => {
     // Validace všech max. hodnot
     if (maxValue > 0 && maxMultiplyValue > 0 && maxDivideValue > 0) {
       setDifficultySet(true);
@@ -55,19 +56,9 @@ export function useDifficultySettings() {
         variant: "destructive",
       });
     }
-  };
+  }, [toast]);
 
   return {
-    maxValue,
-    maxMultiplyValue,
-    maxDivideValue,
-    difficultySet,
-    allowedOperations,
-    setMaxValue,
-    setMaxMultiplyValue,
-    setMaxDivideValue,
-    setDifficultySet,
-    setAllowedOperations,
     toggleOperation,
     setDifficulty,
   };
