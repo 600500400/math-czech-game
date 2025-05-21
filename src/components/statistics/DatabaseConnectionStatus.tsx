@@ -1,5 +1,5 @@
 
-import { AlertTriangle, Database, RefreshCw } from "lucide-react";
+import { AlertTriangle, Database, RefreshCw, Wifi, WifiOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface DatabaseConnectionStatusProps {
@@ -25,18 +25,18 @@ const DatabaseConnectionStatus = ({
     <div className={`flex items-center gap-2 ${className}`}>
       {status === "connected" ? (
         <span className="text-green-500 flex items-center gap-1">
-          <span className="h-2 w-2 rounded-full bg-green-500 inline-block"></span>
+          <Wifi className="h-4 w-4" />
           {compact ? null : isLocalStorageMode ? "Lokální režim" : "Online"}
         </span>
       ) : status === "checking" ? (
         <span className="text-amber-500 flex items-center gap-1">
           <RefreshCw className="h-3 w-3 animate-spin" />
-          {!compact && "Kontrola"}
+          {!compact && "Kontrola spojení"}
         </span>
       ) : (
         <span className="text-red-500 flex items-center gap-1">
-          <AlertTriangle className="h-3 w-3" />
-          {!compact && "Offline"}
+          <WifiOff className="h-4 w-4" />
+          {!compact && "Offline režim"}
         </span>
       )}
       
@@ -47,6 +47,7 @@ const DatabaseConnectionStatus = ({
           onClick={onRefresh}
           disabled={isRefreshing}
           className={compact ? "h-8 p-1" : ""}
+          title="Znovu zkontrolovat připojení"
         >
           <RefreshCw className={`h-4 w-4 ${!compact && "mr-1"} ${isRefreshing ? "animate-spin" : ""}`} />
           {!compact && "Obnovit"}
