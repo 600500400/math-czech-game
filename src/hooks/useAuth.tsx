@@ -1,24 +1,17 @@
 
 import { useContext } from "react";
-import { useNavigate } from "react-router-dom";
-import { useEffect } from "react"; // Changed import to fix the error
 import { AuthContext } from "@/contexts/AuthContext";
 
-// Hook for using authentication context
+/**
+ * Custom hook that provides access to the authentication context
+ * @returns The authentication context containing auth state and methods
+ */
 export const useAuth = () => {
-  return useContext(AuthContext);
-};
-
-// Hook for requiring authentication
-export const useRequireAuth = (redirectTo = "/auth") => {
-  const { authState } = useAuth();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!authState.isLoading && !authState.isAuthenticated) {
-      navigate(redirectTo);
-    }
-  }, [authState.isLoading, authState.isAuthenticated, navigate, redirectTo]);
-
-  return authState;
+  const context = useContext(AuthContext);
+  
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  
+  return context;
 };
