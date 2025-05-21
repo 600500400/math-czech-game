@@ -1,5 +1,6 @@
 
 import { renderWordWithCurrentGap, checkSpellingAnswer } from '@/utils/spellingUtils';
+import { describe, test, expect } from 'vitest';
 
 describe('spellingUtils', () => {
   describe('renderWordWithCurrentGap', () => {
