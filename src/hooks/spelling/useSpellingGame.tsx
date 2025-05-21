@@ -1,5 +1,5 @@
 
-import { useState, useCallback } from "react";
+import { useCallback } from "react";
 import { useAuth } from "../useAuth";
 import { useStatistics } from "../useStatistics";
 import { useGroupSelection } from "./useGroupSelection";
