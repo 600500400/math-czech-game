@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import MathPractice from "../components/MathPractice";
 import SpellingPractice from "../components/SpellingPractice";
@@ -10,7 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { BarChart2, Database, Gamepad2, RefreshCw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { checkSupabaseConnection } from "@/integrations/supabase/client";
+import { checkSupabaseConnection, ConnectionCheckResult } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const Index = () => {

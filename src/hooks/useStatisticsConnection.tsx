@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
-import { checkSupabaseConnection } from "@/integrations/supabase/client";
+import { checkSupabaseConnection, ConnectionCheckResult } from "@/integrations/supabase/client";
 import { useStatistics } from "@/hooks/useStatistics";
 
 export const useStatisticsConnection = (userId: string | null) => {
@@ -35,7 +35,7 @@ export const useStatisticsConnection = (userId: string | null) => {
       return {
         success: false,
         skipped: true
-      };
+      } as ConnectionCheckResult;
     }
     
     try {
@@ -80,7 +80,7 @@ export const useStatisticsConnection = (userId: string | null) => {
       return {
         success: false,
         error
-      };
+      } as ConnectionCheckResult;
     }
   }, [checkLocalUserMode, retryCount, lastCheckTime]);
   

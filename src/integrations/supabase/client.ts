@@ -3,6 +3,17 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 import { toast } from 'sonner';
 
+// Interface for the return value of checkSupabaseConnection
+export interface ConnectionCheckResult {
+  success: boolean;
+  error?: any;
+  elapsed?: number;
+  data?: any;
+  offline?: boolean;
+  timeout?: boolean;
+  skipped?: boolean;
+}
+
 // Důležité: Ujistíme se, že URL a klíč jsou správné
 const SUPABASE_URL = "https://giyrynavkqezdzhygwvk.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdpeXJ5bmF2a3FlemR6aHlnd3ZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc3NzU2NjUsImV4cCI6MjA2MzM1MTY2NX0.tjVm14v_jHbp2AWZEJRsp32Zw5Amd7t5XiKYFJaNbws";
@@ -78,7 +89,7 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
 });
 
 // Export pomocné funkce pro logování stavu připojení s vylepšeným logováním
-export const checkSupabaseConnection = async () => {
+export const checkSupabaseConnection = async (): Promise<ConnectionCheckResult> => {
   try {
     // Nejprve zkontrolujeme základní síťové připojení
     const networkConnected = await testNetworkConnection();
@@ -91,7 +102,7 @@ export const checkSupabaseConnection = async () => {
     const startTime = Date.now();
     
     // Nastavíme timeout pro kontrolu
-    const timeoutPromise = new Promise((_, reject) => {
+    const timeoutPromise = new Promise<ConnectionCheckResult>((_, reject) => {
       setTimeout(() => reject({ message: "Timeout při kontrole spojení" }), 10000);
     });
     
