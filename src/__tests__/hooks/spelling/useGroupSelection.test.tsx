@@ -1,7 +1,7 @@
 
 import { renderHook, act } from '@testing-library/react';
+import { describe, test, expect, vi } from 'vitest';
 import { useGroupSelection } from '@/hooks/spelling/useGroupSelection';
-import { vi } from 'vitest';
 
 // Mock the useToast hook
 vi.mock('@/components/ui/use-toast', () => ({

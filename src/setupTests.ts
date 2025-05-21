@@ -1,6 +1,10 @@
 
 import '@testing-library/jest-dom';
-import { vi } from 'vitest';
+import { expect, vi, afterEach } from 'vitest';
+
+// Export Vitest functions globally
+global.expect = expect;
+global.vi = vi;
 
 // Mock the console.log methods
 global.console.log = vi.fn();

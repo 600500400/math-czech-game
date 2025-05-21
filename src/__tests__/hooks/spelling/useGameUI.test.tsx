@@ -1,5 +1,6 @@
 
 import { renderHook, act } from '@testing-library/react';
+import { describe, test, expect } from 'vitest';
 import { useGameUI } from '@/hooks/spelling/useGameUI';
 
 describe('useGameUI', () => {
