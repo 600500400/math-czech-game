@@ -9,25 +9,29 @@ export const useSignOut = (setAuthState: React.Dispatch<React.SetStateAction<Aut
       setAuthState((prev) => ({ ...prev, isLoading: true }));
       
       // Get current user ID before cleanup
-      const currentUserId = localStorage.getItem('localUser') ? 
-        JSON.parse(localStorage.getItem('localUser')!).id : null;
+      const localUserStr = localStorage.getItem('localUser');
+      const currentUserId = localUserStr ? 
+        JSON.parse(localUserStr).id : null;
       
-      // Important: DO NOT clear the user's statistics when signing out
-      // We only want to clear authentication data, not user data
+      console.log("Začínám odhlašování uživatele s ID:", currentUserId);
       
-      // Clean up auth state
-      cleanupAuthState();
+      // DŮLEŽITÉ: NIKDY nečistíme statistiky při odhlášení
+      // Záměrně necháváme statistiky v localStorage, aby byly dostupné i po odhlášení
       
-      // Remove local user
+      // Čistíme pouze autentizační data
+      const cleanupResult = cleanupAuthState();
+      console.log("Vyčištění auth stavu:", cleanupResult);
+      
+      // Odstraníme lokálního uživatele
       localStorage.removeItem('localUser');
       
-      // Attempt global sign out
+      // Pokusíme se o globální odhlášení ze všech zařízení
       await attemptGlobalSignOut(supabase);
       
-      // Force page reload for clean state
+      // Vynucené přesměrování pro čistý stav
       forcePageReload('/auth');
     } catch (error: any) {
-      console.error("Sign out error:", error);
+      console.error("Chyba při odhlášení:", error);
       setAuthState((prev) => ({
         ...prev,
         isLoading: false,

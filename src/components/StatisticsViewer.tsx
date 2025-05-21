@@ -3,13 +3,15 @@ import { useAuth } from "@/hooks/useAuth";
 import { useStatistics } from "@/hooks/useStatistics";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useStatisticsConnection } from "@/hooks/useStatisticsConnection";
 import DatabaseConnectionStatus from "./statistics/DatabaseConnectionStatus";
 import StatisticsTable from "./statistics/StatisticsTable";
 import EmptyStatisticsState from "./statistics/EmptyStatisticsState";
 import LoadingStatisticsState from "./statistics/LoadingStatisticsState";
 import UnauthenticatedState from "./statistics/UnauthenticatedState";
+import { Button } from "./ui/button";
+import { AlertCircle, Database } from "lucide-react";
 
 const StatisticsViewer = () => {
   const { authState } = useAuth();
@@ -19,8 +21,26 @@ const StatisticsViewer = () => {
     dbConnectionStatus, 
     isLocalStorageMode, 
     isRefreshing, 
-    handleRefreshData 
+    handleRefreshData,
+    connectionStatus,
+    retryCount
   } = useStatisticsConnection(userId);
+  
+  // Přidáme stav pro dlouhé načítání
+  const [loadingTooLong, setLoadingTooLong] = useState(false);
+  
+  // Pokud načítání trvá příliš dlouho, ukážeme možnost zkusit to znovu
+  useEffect(() => {
+    if (mathStatsLoading || spellingStatsLoading) {
+      const timer = setTimeout(() => {
+        setLoadingTooLong(true);
+      }, 5000);
+      
+      return () => clearTimeout(timer);
+    } else {
+      setLoadingTooLong(false);
+    }
+  }, [mathStatsLoading, spellingStatsLoading]);
   
   useEffect(() => {
     // Debugging information
@@ -35,7 +55,11 @@ const StatisticsViewer = () => {
     return (
       <Card>
         <CardContent>
-          <UnauthenticatedState />
+          <UnauthenticatedState 
+            dbConnectionStatus={dbConnectionStatus}
+            isRefreshing={isRefreshing}
+            onRefresh={handleRefreshData}
+          />
         </CardContent>
       </Card>
     );
@@ -45,7 +69,10 @@ const StatisticsViewer = () => {
     return (
       <Card>
         <CardContent>
-          <LoadingStatisticsState />
+          <LoadingStatisticsState 
+            retryConnection={loadingTooLong ? handleRefreshData : undefined}
+            hasRetried={loadingTooLong}
+          />
         </CardContent>
       </Card>
     );
@@ -98,6 +125,36 @@ const StatisticsViewer = () => {
             />
           </TabsContent>
         </Tabs>
+        
+        {/* Diagnostické informace pro lokální režim */}
+        {isLocalStorageMode && retryCount > 3 && (
+          <div className="mt-6 p-3 bg-amber-50 rounded-lg border border-amber-200">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5" />
+              <div>
+                <h4 className="text-sm font-medium text-amber-800">Diagnostické informace</h4>
+                <p className="text-xs text-amber-600 mt-1">
+                  Aplikace běží v offline režimu. Vaše statistiky jsou ukládány lokálně a budou synchronizovány, až bude k dispozici připojení.
+                </p>
+                <div className="mt-2 text-xs text-amber-600">
+                  <p>Status připojení: {connectionStatus}</p>
+                  <p>Počet pokusů o připojení: {retryCount}</p>
+                </div>
+                <div className="mt-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={handleRefreshData}
+                    disabled={isRefreshing}
+                  >
+                    <Database className="h-4 w-4 mr-1" />
+                    Diagnostikovat připojení
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

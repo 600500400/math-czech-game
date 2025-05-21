@@ -11,15 +11,31 @@ export const useStatisticsConnection = (userId: string | null) => {
   const [isLocalStorageMode, setIsLocalStorageMode] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
   const [lastCheckTime, setLastCheckTime] = useState(0);
+  const [connectionHistory, setConnectionHistory] = useState<{time: number, success: boolean}[]>([]);
+  
+  // Přidání do historie kontrol
+  const addToHistory = (success: boolean) => {
+    setConnectionHistory(prev => {
+      const newHistory = [...prev, {time: Date.now(), success}];
+      // Omezení velikosti historie
+      if (newHistory.length > 10) {
+        return newHistory.slice(-10);
+      }
+      return newHistory;
+    });
+  };
   
   // Vylepšená kontrola připojení s exponenciálním backoff
   const checkConnection = useCallback(async (forceCheck = false) => {
     const now = Date.now();
     
-    // Omezení četnosti kontrol (ne častěji než každých 5 sekund)
-    if (!forceCheck && now - lastCheckTime < 5000) {
+    // Omezení četnosti kontrol (ne častěji než každé 3 sekundy)
+    if (!forceCheck && now - lastCheckTime < 3000) {
       console.log("Příliš časté kontroly spojení, přeskakuji...");
-      return;
+      return {
+        success: false,
+        skipped: true
+      };
     }
     
     try {
@@ -28,17 +44,13 @@ export const useStatisticsConnection = (userId: string | null) => {
       console.log(`Kontrola připojení k databázi (pokus ${retryCount + 1})...`);
       
       // Přidání timeoutu pro případ, že by Supabase nereagoval
-      const connectionPromise = checkSupabaseConnection();
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error("Timeout při kontrole spojení")), 5000);
-      });
-      
-      const result = await Promise.race([connectionPromise, timeoutPromise]) as any;
+      const result = await checkSupabaseConnection();
       
       if (result.success) {
         setDbConnectionStatus("connected");
         setRetryCount(0); // Reset počtu pokusů při úspěchu
         console.log("Database connection verified:", result);
+        addToHistory(true);
         
         // Zjistíme, zda jsme v lokálním režimu
         const localMode = await checkLocalUserMode();
@@ -47,17 +59,28 @@ export const useStatisticsConnection = (userId: string | null) => {
         if (localMode) {
           console.log("Aplikace je v lokálním režimu pro statistiky");
         }
+        
+        return result;
       } else {
         setDbConnectionStatus("disconnected");
         setIsLocalStorageMode(true);
         setRetryCount(prev => prev + 1);
         console.error("Database connection problem:", result.error);
+        addToHistory(false);
+        
+        return result;
       }
     } catch (error) {
       setDbConnectionStatus("error");
       setIsLocalStorageMode(true);
       setRetryCount(prev => prev + 1);
       console.error("Error checking database:", error);
+      addToHistory(false);
+      
+      return {
+        success: false,
+        error
+      };
     }
   }, [checkLocalUserMode, retryCount, lastCheckTime]);
   
@@ -85,41 +108,82 @@ export const useStatisticsConnection = (userId: string | null) => {
   // Kontrola při návratu do aplikace (když uživatel přepne zpět z jiné záložky)
   useEffect(() => {
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible' && dbConnectionStatus !== "connected") {
+      if (document.visibilityState === 'visible') {
         console.log("Uživatel se vrátil do aplikace, kontroluji připojení");
-        checkConnection(true);
+        
+        // Při návratu do aplikace, počkáme 2 sekundy na ustálení síťového připojení
+        setTimeout(() => {
+          checkConnection(true);
+        }, 2000);
       }
     };
     
     document.addEventListener("visibilitychange", handleVisibilityChange);
     return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
-  }, [dbConnectionStatus, checkConnection]);
+  }, [checkConnection]);
+  
+  // Kontrola při online/offline změnách
+  useEffect(() => {
+    const handleOnline = () => {
+      console.log("🌐 Zařízení přešlo do online režimu, kontroluji připojení...");
+      toast.info("Internetové připojení obnoveno, kontroluji připojení k databázi");
+      
+      // Počkáme 2 sekundy na ustálení síťového připojení
+      setTimeout(() => {
+        checkConnection(true);
+      }, 2000);
+    };
+    
+    const handleOffline = () => {
+      console.log("⚠️ Zařízení přešlo do offline režimu");
+      toast.warning("Internetové připojení ztraceno, přepínám do offline režimu");
+      setDbConnectionStatus("disconnected");
+      setIsLocalStorageMode(true);
+    };
+    
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, [checkConnection]);
   
   // Funkce pro ruční obnovení dat
   const handleRefreshData = async () => {
-    if (!userId) return;
+    if (isRefreshing) {
+      console.log("Obnovení již probíhá, ignoruji požadavek");
+      return;
+    }
     
     setIsRefreshing(true);
     toast.info("Obnovuji statistiky a kontroluji připojení...");
     
     try {
       // Kontrola připojení k databázi
-      const connectionResult = await checkSupabaseConnection();
+      const result = await checkConnection(true);
       
-      if (connectionResult.success) {
-        setDbConnectionStatus("connected");
-        setRetryCount(0);
-        toast.success(`Připojení k databázi funkční (${connectionResult.elapsed}ms)`);
+      setIsRefreshing(false);
+      
+      if (result.success) {
+        toast.success(`Připojení k databázi funkční (${result.elapsed}ms)`);
         
         // Pokud jsme v lokálním režimu, zkontrolujeme znovu
         const localMode = await checkLocalUserMode();
         setIsLocalStorageMode(localMode);
         
-        // Reset stránky pro načtení aktuálních dat
-        window.location.reload();
+        if (localMode) {
+          toast.info("Používám lokální režim pro statistiky");
+        } else {
+          // Reload stránky pro načtení aktuálních dat z databáze
+          window.location.reload();
+        }
+      } else if (result.offline) {
+        toast.error("Internetové připojení není dostupné. Používám lokální režim.");
+      } else if (result.timeout) {
+        toast.error("Vypršel čas pro připojení k databázi. Používám lokální režim.");
       } else {
-        setDbConnectionStatus("disconnected");
-        setRetryCount(prev => prev + 1);
         toast.error("Problém s připojením k databázi. Používám lokální úložiště.");
       }
     } catch (err) {
@@ -129,12 +193,35 @@ export const useStatisticsConnection = (userId: string | null) => {
     }
   };
   
+  // Analýza připojení
+  const analyzeConnection = () => {
+    if (connectionHistory.length === 0) {
+      return "Zatím neproběhly žádné kontroly připojení";
+    }
+    
+    const successCount = connectionHistory.filter(h => h.success).length;
+    const successRate = (successCount / connectionHistory.length) * 100;
+    
+    if (successRate === 0) {
+      return "Všechny pokusy o připojení selhaly";
+    } else if (successRate < 30) {
+      return "Velmi nestabilní připojení";
+    } else if (successRate < 70) {
+      return "Nestabilní připojení";
+    } else if (successRate < 100) {
+      return "Občasné výpadky připojení";
+    } else {
+      return "Stabilní připojení";
+    }
+  };
+  
   return {
     dbConnectionStatus,
     isLocalStorageMode,
     isRefreshing,
     handleRefreshData,
     checkConnection,
-    retryCount
+    retryCount,
+    connectionStatus: analyzeConnection()
   };
 };
