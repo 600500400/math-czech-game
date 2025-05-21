@@ -1,31 +1,40 @@
 
 import { useState } from "react";
 
-export function useGameStatistics() {
+export const useGameStatistics = () => {
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [wrongAnswers, setWrongAnswers] = useState(0);
-  const [problemCount, setProblemCount] = useState(0);
   const [showStatsDialog, setShowStatsDialog] = useState(false);
   
-  const incrementProblemCount = () => setProblemCount(prev => prev + 1);
-  const incrementCorrect = () => setCorrectAnswers(prev => prev + 1);
-  const incrementWrong = () => setWrongAnswers(prev => prev + 1);
-  
+  // Calculate total answers for statistics
   const totalAnswers = correctAnswers + wrongAnswers;
-  const hasStats = totalAnswers > 0;
-
+  
+  // Increment counters
+  const incrementCorrect = () => {
+    setCorrectAnswers(prev => prev + 1);
+  };
+  
+  const incrementWrong = () => {
+    setWrongAnswers(prev => prev + 1);
+  };
+  
+  // Increment problem counter (implemented separately in useGameUI)
+  const incrementProblemCount = () => {
+    // This is a placeholder - actual implementation in useGameUI
+  };
+  
   return {
     correctAnswers,
     wrongAnswers,
-    problemCount,
+    totalAnswers,
     showStatsDialog,
+    
+    setCorrectAnswers,
+    setWrongAnswers,
     setShowStatsDialog,
-    incrementProblemCount,
+    
     incrementCorrect,
     incrementWrong,
-    totalAnswers,
-    hasStats,
-    setCorrectAnswers,
-    setWrongAnswers
+    incrementProblemCount
   };
-}
+};

@@ -1,22 +1,27 @@
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 
-export function useGameUI() {
-  // UI visibility state
+export const useGameUI = () => {
+  const [problemCount, setProblemCount] = useState(0);
   const [showProblem, setShowProblem] = useState(false);
-  const [problemCount, setProblemCount] = useState(10);
   
-  // Game reset and start functions
-  const resetGame = () => {
-    setProblemCount(10);
-  };
+  // Increment problem count
+  const incrementProblemCount = useCallback(() => {
+    setProblemCount(prev => prev + 1);
+  }, []);
   
-  // Export all the UI-related state and functions
+  // Reset game UI
+  const resetGame = useCallback(() => {
+    setShowProblem(false);
+  }, []);
+  
   return {
-    showProblem,
-    setShowProblem,
     problemCount,
+    showProblem,
+    
     setProblemCount,
+    setShowProblem,
+    incrementProblemCount,
     resetGame
   };
-}
+};
