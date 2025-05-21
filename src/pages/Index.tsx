@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import UserMenu from "@/components/UserMenu";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { BarChart2, Gamepad2, RefreshCw } from "lucide-react";
+import { BarChart2, Database, Gamepad2, RefreshCw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { checkSupabaseConnection } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -27,18 +27,34 @@ const Index = () => {
         const result = await checkSupabaseConnection();
         if (result.success) {
           setDatabaseStatus("connected");
-          console.log("Databáze je připojena");
+          console.log("Databáze je připojena:", result);
+          toast.success("Připojení k databázi úspěšné");
         } else {
           setDatabaseStatus("disconnected");
           console.error("Problém s připojením k databázi:", result.error);
+          toast.warning("Problém s připojením k databázi - statistiky budou uloženy lokálně");
         }
       } catch (error) {
         setDatabaseStatus("error");
         console.error("Chyba při kontrole databáze:", error);
+        toast.error("Chyba při kontrole databáze");
       }
     };
     
     checkConnection();
+    
+    // Nastavíme interval pro pravidelnou kontrolu, ale pouze když je stránka aktivní
+    const visibilityHandler = () => {
+      if (document.visibilityState === 'visible') {
+        checkConnection();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', visibilityHandler);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', visibilityHandler);
+    };
   }, []);
   
   // Funkce pro manuální kontrolu/obnovení připojení
@@ -51,7 +67,7 @@ const Index = () => {
       
       if (result.success) {
         setDatabaseStatus("connected");
-        toast.success("Připojení k databázi úspěšné!");
+        toast.success(`Připojení k databázi úspěšné! (${result.elapsed}ms)`);
       } else {
         setDatabaseStatus("disconnected");
         toast.error("Problém s připojením k databázi");
@@ -79,12 +95,13 @@ const Index = () => {
             size="sm" 
             className="flex items-center gap-1"
             onClick={handleCheckConnection}
+            title="Zkontrolovat připojení k databázi"
           >
-            <RefreshCw className={`h-3 w-3 ${databaseStatus === "checking" ? "animate-spin" : ""}`} />
+            <Database className="h-4 w-4" />
             <div className={`h-2 w-2 rounded-full ${
               databaseStatus === "connected" ? "bg-green-500" : 
               databaseStatus === "disconnected" ? "bg-red-500" :
-              databaseStatus === "error" ? "bg-amber-500" :
+              databaseStatus === "checking" ? "bg-amber-500 animate-pulse" :
               "bg-gray-500"
             }`} />
           </Button>
@@ -130,22 +147,42 @@ const Index = () => {
             <StatisticsViewer />
           )}
           
-          {/* Status databáze */}
+          {/* Status databáze - detailnější oznámení při problému */}
           {databaseStatus !== "connected" && (
             <Card className="w-full max-w-md mx-auto mt-4">
               <CardContent className="pt-4">
-                <p className="text-center text-amber-600 flex items-center justify-center gap-2">
-                  {databaseStatus === "checking" ? (
-                    <>
-                      <RefreshCw className="h-4 w-4 animate-spin" /> 
-                      Kontroluji připojení k databázi...
-                    </>
-                  ) : databaseStatus === "disconnected" ? (
-                    "Problém s připojením k databázi. Statistiky budou uloženy lokálně."
-                  ) : (
-                    "Chyba při komunikaci s databází. Statistiky budou uloženy lokálně."
-                  )}
-                </p>
+                <div className="flex flex-col gap-2">
+                  <p className="text-center text-amber-600 flex items-center justify-center gap-2 font-medium">
+                    {databaseStatus === "checking" ? (
+                      <>
+                        <RefreshCw className="h-4 w-4 animate-spin" /> 
+                        Kontroluji připojení k databázi...
+                      </>
+                    ) : databaseStatus === "disconnected" ? (
+                      <>
+                        <Database className="h-4 w-4" />
+                        Problém s připojením k databázi. Statistiky budou uloženy lokálně.
+                      </>
+                    ) : (
+                      <>
+                        <Database className="h-4 w-4" />
+                        Chyba při komunikaci s databází. Statistiky budou uloženy lokálně.
+                      </>
+                    )}
+                  </p>
+                  
+                  <div className="flex justify-center mt-1">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleCheckConnection}
+                      className="text-xs"
+                    >
+                      <RefreshCw className={`h-3 w-3 mr-1 ${databaseStatus === "checking" ? "animate-spin" : ""}`} />
+                      Zkusit znovu
+                    </Button>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           )}
