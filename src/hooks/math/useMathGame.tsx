@@ -10,9 +10,16 @@ import { useAnswerHandler } from './useAnswerHandler';
 import { useGameFinisher } from './useGameFinisher';
 
 export function useMathGame() {
-  const { user } = useAuth();
-  const userId = user?.id || null;
-  const { saveMathStatistics } = useStatistics(userId);
+  const { authState } = useAuth();
+  const userId = authState?.user?.id || null;
+  const { saveMathStatistics: saveStats } = useStatistics(userId);
+  
+  // Function to wrap the mutation.mutate function to match expected signature
+  const saveMathStatistics = (data: any) => {
+    if (saveStats && typeof saveStats === 'function') {
+      saveStats(data);
+    }
+  };
   
   // Use our modular hooks
   const {
@@ -56,8 +63,8 @@ export function useMathGame() {
 
   // Difficulty settings
   const {
-    toggleOperation,
-    setDifficulty
+    toggleOperation: difficultyToggleOperation,
+    setDifficulty: difficultySetDifficulty
   } = useDifficultySettings();
 
   // Problem generator
@@ -100,6 +107,29 @@ export function useMathGame() {
     setCurrentProblem,
     endGame
   });
+
+  // Wrapper for toggleOperation
+  const toggleOperation = useCallback((operation: Operation) => {
+    difficultyToggleOperation(operation, allowedOperations, setAllowedOperations);
+  }, [difficultyToggleOperation, allowedOperations, setAllowedOperations]);
+
+  // Wrapper for setDifficulty
+  const setDifficulty = useCallback(() => {
+    difficultySetDifficulty(
+      maxValue,
+      maxMultiplyValue,
+      maxDivideValue,
+      allowedOperations,
+      setDifficultySet
+    );
+  }, [
+    difficultySetDifficulty,
+    maxValue,
+    maxMultiplyValue,
+    maxDivideValue,
+    allowedOperations,
+    setDifficultySet
+  ]);
 
   // Start a new game
   const startNewGame = useCallback(() => {
@@ -164,6 +194,7 @@ export function useMathGame() {
     setMaxValue,
     setMaxMultiplyValue,
     setMaxDivideValue,
+    setAllowedOperations,
     
     // Actions
     setDifficulty,

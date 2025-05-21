@@ -35,6 +35,7 @@ const MathPractice = () => {
     setMaxValue,
     setMaxMultiplyValue,
     setMaxDivideValue,
+    setAllowedOperations,
     
     setDifficulty,
     toggleOperation,
@@ -47,12 +48,12 @@ const MathPractice = () => {
 
   // Helper function that wraps the original toggleOperation with required parameters
   const handleToggleOperation = (operation) => {
-    toggleOperation(operation, allowedOperations, setAllowedOperations);
+    toggleOperation(operation);
   };
 
   // Helper function that wraps the original setDifficulty with required parameters
   const handleSetDifficulty = () => {
-    setDifficulty(maxValue, maxMultiplyValue, maxDivideValue, allowedOperations, setDifficultySet);
+    setDifficulty();
   };
 
   return (
