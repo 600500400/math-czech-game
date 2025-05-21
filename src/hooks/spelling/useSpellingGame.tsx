@@ -6,20 +6,18 @@ import { useGroupSelection } from "./useGroupSelection";
 import { useGameStatistics } from "./useGameStatistics";
 import { useWordProblem } from "./useWordProblem";
 import { useAnimationState } from "./useAnimationState";
+import { useGameUI } from "./useGameUI";
 
 export const useSpellingGame = () => {
   const { authState } = useAuth();
   const userId = authState.user?.id || null;
   const { saveSpellingStatistics } = useStatistics(userId);
   
-  // Reuse existing hooks
+  // Specialized hooks for different concerns
   const groupSelection = useGroupSelection();
   const gameStats = useGameStatistics();
-  
-  // New specialized hooks
-  const [problemCount, setProblemCount] = useState(10);
-  const [showProblem, setShowProblem] = useState(false);
   const animation = useAnimationState();
+  const gameUI = useGameUI();
   
   // Word problem handling
   const wordProblem = useWordProblem({
@@ -33,7 +31,7 @@ export const useSpellingGame = () => {
 
   // End game handler
   const endGame = useCallback(() => {
-    setShowProblem(false);
+    gameUI.setShowProblem(false);
     gameStats.setShowStatsDialog(true);
     
     // Save statistics if user is logged in
@@ -50,7 +48,8 @@ export const useSpellingGame = () => {
     gameStats.setShowStatsDialog, 
     groupSelection.selectedGroups, 
     saveSpellingStatistics, 
-    userId
+    userId,
+    gameUI
   ]);
 
   // Start new game handler
@@ -63,19 +62,19 @@ export const useSpellingGame = () => {
     gameStats.incrementProblemCount();
     gameStats.setCorrectAnswers(0);
     gameStats.setWrongAnswers(0);
-    setProblemCount(10); // Reset problem count
+    gameUI.resetGame();
     
     const problem = wordProblem.generateNewProblem();
     if (problem) {
-      setShowProblem(true);
+      gameUI.setShowProblem(true);
     }
-  }, [gameStats, groupSelection, wordProblem]);
+  }, [gameStats, groupSelection, wordProblem, gameUI]);
 
   return {
     // Game statistics
     correctAnswers: gameStats.correctAnswers,
     wrongAnswers: gameStats.wrongAnswers,
-    problemCount,
+    problemCount: gameUI.problemCount,
     
     // Word problem state
     currentWord: wordProblem.currentWord,
@@ -87,7 +86,7 @@ export const useSpellingGame = () => {
     currentPosition: wordProblem.currentPosition,
     
     // Dialog visibility
-    showProblem,
+    showProblem: gameUI.showProblem,
     showGroupDialog: groupSelection.showGroupDialog,
     showStatsDialog: gameStats.showStatsDialog,
     
