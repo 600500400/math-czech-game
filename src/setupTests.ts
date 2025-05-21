@@ -1,6 +1,7 @@
 
 import '@testing-library/jest-dom';
 import { expect, vi, afterEach } from 'vitest';
+import matchers from '@testing-library/jest-dom';
 
 // Add jest-dom matchers to Vitest's expect
 expect.extend(matchers);
@@ -38,6 +39,3 @@ vi.mock('@/components/ui/toast', () => ({
 afterEach(() => {
   vi.clearAllMocks();
 });
-
-// Get the matchers from jest-dom
-import * as matchers from '@testing-library/jest-dom/matchers';
