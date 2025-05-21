@@ -14,22 +14,27 @@ export interface ConnectionCheckResult {
   skipped?: boolean;
 }
 
-// Důležité: Ujistíme se, že URL a klíč jsou správné
+// Klíče Supabase - zajistíme, že jsou správně
 const SUPABASE_URL = "https://giyrynavkqezdzhygwvk.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdpeXJ5bmF2a3FlemR6aHlnd3ZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc3NzU2NjUsImV4cCI6MjA2MzM1MTY2NX0.tjVm14v_jHbp2AWZEJRsp32Zw5Amd7t5XiKYFJaNbws";
 
 // Kompletní reset Supabase instance pro odstranění případných zombie připojení
+// ALE DŮLEŽITÉ: Nikdy neodstraňujeme klíče statistik! Jen auth klíče!
 const resetSupabaseCache = () => {
   // Vyčistíme localStorage od potenciálně problémových klíčů
   Object.keys(localStorage).forEach(key => {
-    if (key.startsWith('sb-') || key.includes('supabase')) {
+    if ((key.startsWith('sb-') || key.includes('supabase'))
+        && !key.includes('Stats_')  // Nikdy nemažeme statistiky!
+        && !key.startsWith('mathStats_')
+        && !key.startsWith('spellingStats_')
+        && key !== 'localUser') {
       console.log(`Čistím localStorage klíč: ${key}`);
       localStorage.removeItem(key);
     }
   });
 };
 
-// Resetujeme před vytvořením nového klienta
+// Resetujeme před vytvořením nového klienta, ale jen auth klíče
 resetSupabaseCache();
 
 // Test síťového připojení před inicializací Supabase
@@ -113,7 +118,7 @@ export const checkSupabaseConnection = async (): Promise<ConnectionCheckResult> 
         const authSession = await supabase.auth.getSession();
         console.log("Aktuální session:", authSession);
         
-        // Jednoduchá kontrola oprávnění
+        // Jednoduchá kontrola oprávnění - zkusíme udělat velmi jednoduchý dotaz
         const { data, error } = await supabase.from("profiles").select("count").limit(1);
         
         const elapsed = Date.now() - startTime;

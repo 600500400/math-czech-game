@@ -13,10 +13,12 @@ export const cleanupAuthState = () => {
   Object.keys(localStorage).forEach((key) => {
     // Only remove auth-related keys, NOT user data like statistics
     if ((key.startsWith('supabase.auth.') || key.includes('sb-') || key === 'localUser') 
-        && !key.includes('Stats_')) {
+        && !key.includes('Stats_')
+        && !key.startsWith('mathStats_')
+        && !key.startsWith('spellingStats_')) {
       localStorage.removeItem(key);
       result.removed.push(key);
-    } else if (key.includes('Stats_')) {
+    } else if (key.includes('Stats_') || key.startsWith('mathStats_') || key.startsWith('spellingStats_')) {
       // Ponecháváme statistiky
       result.kept.push(key);
     }

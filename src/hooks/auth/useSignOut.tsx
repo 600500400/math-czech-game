@@ -28,6 +28,15 @@ export const useSignOut = (setAuthState: React.Dispatch<React.SetStateAction<Aut
       // Pokusíme se o globální odhlášení ze všech zařízení
       await attemptGlobalSignOut(supabase);
       
+      // Aktualizujeme stav bez přesměrování
+      setAuthState({
+        user: null,
+        profile: null,
+        isLoading: false,
+        isAuthenticated: false,
+        error: null
+      });
+      
       // Vynucené přesměrování pro čistý stav
       forcePageReload('/auth');
     } catch (error: any) {

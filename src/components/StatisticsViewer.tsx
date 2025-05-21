@@ -11,7 +11,9 @@ import EmptyStatisticsState from "./statistics/EmptyStatisticsState";
 import LoadingStatisticsState from "./statistics/LoadingStatisticsState";
 import UnauthenticatedState from "./statistics/UnauthenticatedState";
 import { Button } from "./ui/button";
-import { AlertCircle, Database } from "lucide-react";
+import { AlertCircle, Database, Download } from "lucide-react";
+import { supabase, checkSupabaseConnection } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const StatisticsViewer = () => {
   const { authState } = useAuth();
@@ -49,7 +51,76 @@ const StatisticsViewer = () => {
     console.log("StatisticsViewer - Math Stats:", mathStats);
     console.log("StatisticsViewer - Spelling Stats:", spellingStats);
     console.log("StatisticsViewer - Is Local Storage Mode:", isLocalStorageMode);
+
+    // Výpis všech klíčů v localStorage pro diagnostiku
+    console.log("Aktuální localStorage klíče:");
+    Object.keys(localStorage).forEach(key => {
+      console.log(` - ${key}: ${localStorage.getItem(key)?.substring(0, 30)}...`);
+    });
   }, [authState, userId, mathStats, spellingStats, isLocalStorageMode]);
+
+  // Funkce pro vynucené testování připojení k Supabase
+  const testSupabaseConnection = async () => {
+    toast.info("Testuji přímé připojení k Supabase...");
+    
+    try {
+      const result = await checkSupabaseConnection();
+      if (result.success) {
+        toast.success(`Přímé připojení k Supabase úspěšné (${result.elapsed}ms)`);
+        
+        // Zkusíme načíst profily
+        const { data, error } = await supabase.from('profiles').select('*').limit(5);
+        
+        if (error) {
+          toast.error(`Chyba při načítání profilů: ${error.message}`);
+        } else {
+          toast.success(`Načteno ${data?.length || 0} profilů z databáze`);
+          console.log("Profily:", data);
+        }
+        
+      } else {
+        toast.error(`Problém s připojením k Supabase: ${result.error?.message || 'Neznámá chyba'}`);
+      }
+    } catch (error: any) {
+      console.error("Chyba při testování Supabase:", error);
+      toast.error(`Neočekávaná chyba: ${error.message || 'Neznámá chyba'}`);
+    }
+  };
+
+  // Funkce pro export lokálních statistik
+  const exportLocalStatistics = () => {
+    const statsData = {
+      user: userId,
+      timestamp: new Date().toISOString(),
+      mathStats: mathStats,
+      spellingStats: spellingStats,
+      localStorage: {}
+    };
+    
+    // Přidáme obsah localStorage (pouze statistiky)
+    Object.keys(localStorage).forEach(key => {
+      if (key.includes('Stats_') || key.startsWith('mathStats_') || key.startsWith('spellingStats_')) {
+        try {
+          statsData.localStorage[key] = JSON.parse(localStorage.getItem(key) || '[]');
+        } catch (e) {
+          statsData.localStorage[key] = localStorage.getItem(key);
+        }
+      }
+    });
+    
+    // Vytvoříme a stáhneme soubor
+    const dataStr = JSON.stringify(statsData, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    
+    const exportFileDefaultName = `procvicka-stats-${new Date().toISOString().split('T')[0]}.json`;
+    
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+    
+    toast.success("Statistiky exportovány do JSON souboru");
+  };
 
   if (!authState.isAuthenticated) {
     return (
@@ -126,35 +197,57 @@ const StatisticsViewer = () => {
           </TabsContent>
         </Tabs>
         
-        {/* Diagnostické informace pro lokální režim */}
-        {isLocalStorageMode && retryCount > 3 && (
-          <div className="mt-6 p-3 bg-amber-50 rounded-lg border border-amber-200">
-            <div className="flex items-start gap-2">
-              <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5" />
-              <div>
-                <h4 className="text-sm font-medium text-amber-800">Diagnostické informace</h4>
-                <p className="text-xs text-amber-600 mt-1">
-                  Aplikace běží v offline režimu. Vaše statistiky jsou ukládány lokálně a budou synchronizovány, až bude k dispozici připojení.
-                </p>
-                <div className="mt-2 text-xs text-amber-600">
-                  <p>Status připojení: {connectionStatus}</p>
-                  <p>Počet pokusů o připojení: {retryCount}</p>
-                </div>
-                <div className="mt-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={handleRefreshData}
-                    disabled={isRefreshing}
-                  >
-                    <Database className="h-4 w-4 mr-1" />
-                    Diagnostikovat připojení
-                  </Button>
-                </div>
+        {/* Diagnostické informace a nástroje */}
+        <div className="mt-6 p-3 bg-amber-50 rounded-lg border border-amber-200">
+          <div className="flex items-start gap-2">
+            <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5" />
+            <div>
+              <h4 className="text-sm font-medium text-amber-800">Diagnostické informace</h4>
+              <p className="text-xs text-amber-600 mt-1">
+                {isLocalStorageMode 
+                  ? "Aplikace běží v offline režimu. Vaše statistiky jsou ukládány lokálně."
+                  : "Aplikace je připojena k databázi Supabase."}
+              </p>
+              
+              <div className="mt-2 text-xs text-amber-600">
+                <p>Status připojení: {connectionStatus}</p>
+                <p>Režim: {isLocalStorageMode ? 'Lokální úložiště' : 'Online databáze'}</p>
+                <p>Uživatelské ID: {userId || 'Neuvedeno'}</p>
+                <p>Počet uložených statistik: {mathStats.length + spellingStats.length}</p>
+              </div>
+              
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleRefreshData}
+                  disabled={isRefreshing}
+                >
+                  <Database className="h-4 w-4 mr-1" />
+                  Zkontrolovat připojení
+                </Button>
+                
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={testSupabaseConnection}
+                >
+                  <Database className="h-4 w-4 mr-1" />
+                  Test Supabase
+                </Button>
+                
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={exportLocalStatistics}
+                >
+                  <Download className="h-4 w-4 mr-1" />
+                  Exportovat statistiky
+                </Button>
               </div>
             </div>
           </div>
-        )}
+        </div>
       </CardContent>
     </Card>
   );
