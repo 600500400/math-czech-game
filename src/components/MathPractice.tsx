@@ -2,7 +2,7 @@
 import { useMathGame } from "@/hooks/math/useMathGame";
 import { ConfettiExplosion } from "@/components/ui/confetti-explosion";
 import { FunGraphics } from "./spelling/FunGraphics";
-import GameControls from "./math/GameControls";
+import CustomGameControls from "./math/CustomGameControls";
 import DifficultyDialog from "./math/DifficultyDialog";
 import ProblemDialog from "./math/ProblemDialog";
 import StatisticsDialog from "./math/StatisticsDialog";
@@ -66,8 +66,8 @@ const MathPractice = () => {
       
       <h1 className="text-3xl font-bold text-center text-orange-500">Procvičování matematiky</h1>
       
-      {/* Game Controls */}
-      <GameControls 
+      {/* Custom Game Controls without counters */}
+      <CustomGameControls 
         problemCount={problemCount}
         correctAnswers={correctAnswers}
         wrongAnswers={wrongAnswers}
