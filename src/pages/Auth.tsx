@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,15 +11,38 @@ import { v4 as uuidv4 } from 'uuid';
 
 // Předem definovaní uživatelé s UUID formátem ID
 const DEFAULT_USERS = [
-  { id: uuidv4(), email: "", username: "Míša", role: "child" },
-  { id: uuidv4(), email: "", username: "Gábi", role: "child" },
-  { id: uuidv4(), email: "", username: "Host", role: "child" },
+  { id: "58d94646-332a-40f1-86fb-0861c1c48a66", email: "", username: "Míša", role: "child" },
+  { id: "f7f45db0-49e4-4218-a420-4812442fc0e1", email: "", username: "Gábi", role: "child" },
+  { id: "2f7c5c1d-f69d-4aee-a373-bc7f416b08f2", email: "", username: "Host", role: "child" },
 ];
 
 const Auth = () => {
   const { authState, setLocalUser } = useAuth();
   const navigate = useNavigate();
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
+  const [initializing, setInitializing] = useState(true);
+  
+  // Inicializace stabilních ID pro uživatele při prvním načtení
+  useEffect(() => {
+    // Zkontrolujeme a připravíme úložiště pro všechny uživatele
+    DEFAULT_USERS.forEach(user => {
+      // Inicializace prázdných polí pro statistiky, pokud neexistují
+      const mathKey = `mathStats_${user.id}`;
+      const spellingKey = `spellingStats_${user.id}`;
+      
+      if (!localStorage.getItem(mathKey)) {
+        console.log(`Inicializace prázdného pole pro matematické statistiky uživatele ${user.username}`);
+        localStorage.setItem(mathKey, JSON.stringify([]));
+      }
+      
+      if (!localStorage.getItem(spellingKey)) {
+        console.log(`Inicializace prázdného pole pro statistiky pravopisu uživatele ${user.username}`);
+        localStorage.setItem(spellingKey, JSON.stringify([]));
+      }
+    });
+    
+    setInitializing(false);
+  }, []);
   
   // Pokud je uživatel již přihlášen, přesměrujeme ho na hlavní stránku
   if (authState.isAuthenticated && !authState.isLoading) {
@@ -33,6 +56,20 @@ const Auth = () => {
     const user = DEFAULT_USERS.find(u => u.username === selectedUser);
     if (user) {
       // Nastavíme uživatele přímo v auth stavu bez přihlášení přes Supabase
+      console.log(`Přihlašování uživatele ${user.username} s ID ${user.id}`);
+      
+      // Zkontrolujeme statistiky před přihlášením
+      const mathKey = `mathStats_${user.id}`;
+      const spellingKey = `spellingStats_${user.id}`;
+      
+      const mathStats = localStorage.getItem(mathKey);
+      const spellingStats = localStorage.getItem(spellingKey);
+      
+      console.log(`Statistiky uživatele ${user.username} před přihlášením:`, {
+        mathStats: mathStats ? JSON.parse(mathStats).length : 0,
+        spellingStats: spellingStats ? JSON.parse(spellingStats).length : 0
+      });
+      
       setLocalUser(user);
       toast.success(`Přihlášen jako ${user.username}`);
       navigate("/");
@@ -67,7 +104,7 @@ const Auth = () => {
             <Button 
               onClick={handleLogin} 
               className="w-full bg-orange-500 hover:bg-orange-600" 
-              disabled={authState.isLoading || !selectedUser}
+              disabled={authState.isLoading || !selectedUser || initializing}
             >
               {authState.isLoading ? "Přihlašování..." : "Pokračovat"}
             </Button>

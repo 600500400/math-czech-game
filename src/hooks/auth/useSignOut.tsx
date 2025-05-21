@@ -2,6 +2,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { cleanupAuthState, attemptGlobalSignOut, forcePageReload } from "@/utils/authUtils";
 import { AuthState } from "@/types/authTypes";
+import { toast } from "sonner";
 
 export const useSignOut = (setAuthState: React.Dispatch<React.SetStateAction<AuthState>>) => {
   const signOut = async () => {
@@ -17,6 +18,19 @@ export const useSignOut = (setAuthState: React.Dispatch<React.SetStateAction<Aut
       
       // DŮLEŽITÉ: NIKDY nečistíme statistiky při odhlášení
       // Záměrně necháváme statistiky v localStorage, aby byly dostupné i po odhlášení
+      // Kontrola existence statistik před odhlášením
+      if (currentUserId) {
+        const mathStatsKey = `mathStats_${currentUserId}`;
+        const spellingStatsKey = `spellingStats_${currentUserId}`;
+        
+        const mathStats = localStorage.getItem(mathStatsKey);
+        const spellingStats = localStorage.getItem(spellingStatsKey);
+        
+        console.log("Statistiky před odhlášením:", {
+          mathStats: mathStats ? JSON.parse(mathStats).length : 0,
+          spellingStats: spellingStats ? JSON.parse(spellingStats).length : 0
+        });
+      }
       
       // Čistíme pouze autentizační data
       const cleanupResult = cleanupAuthState();
@@ -28,6 +42,20 @@ export const useSignOut = (setAuthState: React.Dispatch<React.SetStateAction<Aut
       // Pokusíme se o globální odhlášení ze všech zařízení
       await attemptGlobalSignOut(supabase);
       
+      // Zkontrolujeme zachování statistik po odhlášení
+      if (currentUserId) {
+        const mathStatsKey = `mathStats_${currentUserId}`;
+        const spellingStatsKey = `spellingStats_${currentUserId}`;
+        
+        const mathStats = localStorage.getItem(mathStatsKey);
+        const spellingStats = localStorage.getItem(spellingStatsKey);
+        
+        console.log("Statistiky po odhlášení (měly by zůstat zachované):", {
+          mathStats: mathStats ? JSON.parse(mathStats).length : 0,
+          spellingStats: spellingStats ? JSON.parse(spellingStats).length : 0
+        });
+      }
+      
       // Aktualizujeme stav bez přesměrování
       setAuthState({
         user: null,
@@ -36,6 +64,8 @@ export const useSignOut = (setAuthState: React.Dispatch<React.SetStateAction<Aut
         isAuthenticated: false,
         error: null
       });
+      
+      toast.success("Odhlášení proběhlo úspěšně");
       
       // Vynucené přesměrování pro čistý stav
       forcePageReload('/auth');
@@ -46,6 +76,7 @@ export const useSignOut = (setAuthState: React.Dispatch<React.SetStateAction<Aut
         isLoading: false,
         error: error.message || "Chyba při odhlášení",
       }));
+      toast.error(`Chyba při odhlášení: ${error.message || "Neznámá chyba"}`);
     }
   };
 

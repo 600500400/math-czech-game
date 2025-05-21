@@ -75,7 +75,7 @@ export const useMathStatistics = (userId: string | null) => {
   });
 
   // Load math statistics
-  const { data: mathStats, isLoading: mathStatsLoading } = useQuery({
+  const { data: mathStats, isLoading: mathStatsLoading, refetch } = useQuery({
     queryKey: ["mathStatistics", userId],
     queryFn: async (): Promise<MathStatistics[]> => {
       if (!userId) return [];
@@ -86,21 +86,36 @@ export const useMathStatistics = (userId: string | null) => {
         console.log("Načítání statistik matematiky z localStorage s klíčem:", storageKey);
         
         const localStatsStr = localStorage.getItem(storageKey);
-        const localStats = localStatsStr ? JSON.parse(localStatsStr) : [];
         
-        console.log("Načtené lokální statistiky matematiky:", localStats);
-        return localStats;
+        if (!localStatsStr) {
+          console.log(`Žádné statistiky matematiky nenalezeny pro klíč ${storageKey}, inicializace prázdným polem`);
+          localStorage.setItem(storageKey, JSON.stringify([]));
+          return [];
+        }
+        
+        try {
+          const localStats = JSON.parse(localStatsStr);
+          console.log(`Načtené lokální statistiky matematiky pro uživatele ${userId}:`, localStats);
+          return localStats;
+        } catch (parseError) {
+          console.error("Chyba parsování statistik matematiky:", parseError);
+          // Resetuj poškozená data
+          localStorage.setItem(storageKey, JSON.stringify([]));
+          return [];
+        }
       } catch (error) {
         console.error("Selhání načítání statistik matematiky:", error);
         return [];
       }
     },
     enabled: !!userId,
+    staleTime: 30000, // Považuj data za aktuální po dobu 30 sekund
   });
 
   return {
     saveMathStatistics,
     mathStats: mathStats || [],
-    mathStatsLoading
+    mathStatsLoading,
+    refetchMathStats: refetch
   };
 };

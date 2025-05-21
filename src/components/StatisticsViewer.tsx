@@ -2,7 +2,7 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useStatistics } from "@/hooks/useStatistics";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useStatisticsConnection } from "@/hooks/useStatisticsConnection";
 import DatabaseConnectionStatus from "./statistics/DatabaseConnectionStatus";
 import EmptyStatisticsState from "./statistics/EmptyStatisticsState";
@@ -12,6 +12,8 @@ import StatisticsTabs from "./statistics/StatisticsTabs";
 import DiagnosticsPanel from "./statistics/DiagnosticsPanel";
 import { useDiagnostics } from "@/hooks/statistics/useDiagnostics";
 import StatisticsDebugger from "./statistics/StatisticsDebugger";
+import { Button } from "@/components/ui/button";
+import { RefreshCcw } from "lucide-react";
 
 const StatisticsViewer = () => {
   const { authState } = useAuth();
@@ -36,6 +38,24 @@ const StatisticsViewer = () => {
   // Přidáme stav pro dlouhé načítání
   const [loadingTooLong, setLoadingTooLong] = useState(false);
   const [showDebugger, setShowDebugger] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  
+  // Funkce pro ruční znovunačtení statistik
+  const handleManualRefresh = () => {
+    setRefreshTrigger(prev => prev + 1);
+    handleRefreshData();
+  };
+  
+  // Efekt pro kontrolu, zda statistiky byly správně načteny
+  useEffect(() => {
+    if (userId && !mathStatsLoading && !spellingStatsLoading) {
+      console.log("Statistiky zkontrolovány po přihlášení:", {
+        mathStatsCount: mathStats?.length || 0,
+        spellingStatsCount: spellingStats?.length || 0,
+        userId
+      });
+    }
+  }, [userId, mathStatsLoading, spellingStatsLoading, mathStats, spellingStats, refreshTrigger]);
   
   // Zobrazíme diagnostický nástroj pouze v případě problémů
   const toggleDebugger = () => {
@@ -78,6 +98,16 @@ const StatisticsViewer = () => {
             <Button 
               variant="outline" 
               size="sm" 
+              onClick={handleManualRefresh}
+              className="text-xs flex items-center gap-1"
+              disabled={isRefreshing}
+            >
+              <RefreshCcw className="h-3 w-3" />
+              Obnovit
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
               onClick={toggleDebugger}
               className="text-xs"
             >
@@ -115,5 +145,3 @@ const StatisticsViewer = () => {
 };
 
 export default StatisticsViewer;
-
-import { Button } from "@/components/ui/button";

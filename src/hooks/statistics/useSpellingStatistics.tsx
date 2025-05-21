@@ -72,7 +72,7 @@ export const useSpellingStatistics = (userId: string | null) => {
   });
 
   // Load spelling statistics
-  const { data: spellingStats, isLoading: spellingStatsLoading } = useQuery({
+  const { data: spellingStats, isLoading: spellingStatsLoading, refetch } = useQuery({
     queryKey: ["spellingStatistics", userId],
     queryFn: async (): Promise<SpellingStatistics[]> => {
       if (!userId) return [];
@@ -83,21 +83,36 @@ export const useSpellingStatistics = (userId: string | null) => {
         console.log("Načítání statistik pravopisu z localStorage s klíčem:", storageKey);
         
         const localStatsStr = localStorage.getItem(storageKey);
-        const localStats = localStatsStr ? JSON.parse(localStatsStr) : [];
         
-        console.log("Načtené lokální statistiky pravopisu:", localStats);
-        return localStats;
+        if (!localStatsStr) {
+          console.log(`Žádné statistiky pravopisu nenalezeny pro klíč ${storageKey}, inicializace prázdným polem`);
+          localStorage.setItem(storageKey, JSON.stringify([]));
+          return [];
+        }
+        
+        try {
+          const localStats = JSON.parse(localStatsStr);
+          console.log(`Načtené lokální statistiky pravopisu pro uživatele ${userId}:`, localStats);
+          return localStats;
+        } catch (parseError) {
+          console.error("Chyba parsování statistik pravopisu:", parseError);
+          // Resetuj poškozená data
+          localStorage.setItem(storageKey, JSON.stringify([]));
+          return [];
+        }
       } catch (error) {
         console.error("Selhání načítání statistik pravopisu:", error);
         return [];
       }
     },
     enabled: !!userId,
+    staleTime: 30000, // Považuj data za aktuální po dobu 30 sekund
   });
 
   return {
     saveSpellingStatistics,
     spellingStats: spellingStats || [],
-    spellingStatsLoading
+    spellingStatsLoading,
+    refetchSpellingStats: refetch
   };
 };
