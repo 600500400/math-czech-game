@@ -13,12 +13,14 @@ const AuthContext = createContext<{
   signUp: (email: string, password: string, username: string, role?: 'child' | 'parent' | 'teacher') => Promise<void>;
   signOut: () => Promise<void>;
   cleanupAuthState: () => void;
+  setLocalUser: (user: { id: string, username: string, role: string }) => void;
 }>({
   authState: { user: null, profile: null, isLoading: true, isAuthenticated: false, error: null },
   signIn: async () => {},
   signUp: async () => {},
   signOut: async () => {},
   cleanupAuthState: () => {},
+  setLocalUser: () => {},
 });
 
 // Funkce pro vyčištění auth state
@@ -27,7 +29,7 @@ const cleanupAuthState = () => {
   localStorage.removeItem('supabase.auth.token');
   // Odstranění všech Supabase auth klíčů z localStorage
   Object.keys(localStorage).forEach((key) => {
-    if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+    if (key.startsWith('supabase.auth.') || key.includes('sb-') || key === 'localUser') {
       localStorage.removeItem(key);
     }
   });
@@ -172,7 +174,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Vyčištění auth stavu
       cleanupAuthState();
       
-      // Pokus o globální odhlášení
+      // Odhlášení lokálního uživatele
+      localStorage.removeItem('localUser');
+      
+      // Pokus o globální odhlášení ze Supabase
       try {
         await supabase.auth.signOut({ scope: 'global' });
       } catch (err) {
@@ -191,9 +196,49 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // Nastavení lokálního uživatele (bez Supabase autentizace)
+  const setLocalUser = (user: { id: string, username: string, role: string }) => {
+    const localUser = {
+      id: user.id,
+      username: user.username,
+      role: user.role,
+      created_at: new Date().toISOString()
+    };
+    
+    localStorage.setItem('localUser', JSON.stringify(localUser));
+    
+    setAuthState({
+      user: { id: user.id } as User,
+      profile: localUser as UserProfile,
+      isLoading: false,
+      isAuthenticated: true,
+      error: null
+    });
+  };
+
   // Načtení stavu přihlášení při prvním načtení
   useEffect(() => {
-    // Nejprve nastavíme posluchače událostí autentizace
+    // Nejprve zkontrolujeme, jestli máme uloženého lokálního uživatele
+    const localUserStr = localStorage.getItem('localUser');
+    
+    if (localUserStr) {
+      try {
+        const localUser = JSON.parse(localUserStr);
+        setAuthState({
+          user: { id: localUser.id } as User,
+          profile: localUser as UserProfile,
+          isLoading: false,
+          isAuthenticated: true,
+          error: null
+        });
+        return;
+      } catch (e) {
+        console.error("Error parsing local user:", e);
+        localStorage.removeItem('localUser');
+      }
+    }
+    
+    // Pokud nemáme lokálního uživatele, zkontrolujeme Supabase relaci
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         // Synchronně aktualizujeme stav
@@ -236,6 +281,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         signUp,
         signOut,
         cleanupAuthState,
+        setLocalUser,
       }}
     >
       {children}

@@ -6,16 +6,17 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 // Předem definovaní uživatelé
 const DEFAULT_USERS = [
-  { email: "misa@example.com", password: "procvickaapp", username: "Míša", role: "child" },
-  { email: "gabi@example.com", password: "procvickaapp", username: "Gábi", role: "child" },
-  { email: "guest@example.com", password: "procvickaapp", username: "Host", role: "child" },
+  { id: "misa-id", email: "", username: "Míša", role: "child" },
+  { id: "gabi-id", email: "", username: "Gábi", role: "child" },
+  { id: "guest-id", email: "", username: "Host", role: "child" },
 ];
 
 const Auth = () => {
-  const { signIn, authState } = useAuth();
+  const { authState, setLocalUser } = useAuth();
   const navigate = useNavigate();
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   
@@ -30,7 +31,10 @@ const Auth = () => {
     
     const user = DEFAULT_USERS.find(u => u.username === selectedUser);
     if (user) {
-      await signIn(user.email, user.password);
+      // Nastavíme uživatele přímo v auth stavu bez přihlášení přes Supabase
+      setLocalUser(user);
+      toast.success(`Přihlášen jako ${user.username}`);
+      navigate("/");
     }
   };
 
