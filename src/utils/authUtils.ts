@@ -5,7 +5,9 @@ export const cleanupAuthState = () => {
   localStorage.removeItem('supabase.auth.token');
   // Remove all Supabase auth keys from localStorage
   Object.keys(localStorage).forEach((key) => {
-    if (key.startsWith('supabase.auth.') || key.includes('sb-') || key === 'localUser') {
+    // Only remove auth-related keys, NOT user data like statistics
+    if ((key.startsWith('supabase.auth.') || key.includes('sb-') || key === 'localUser') 
+        && !key.includes('Stats_')) {
       localStorage.removeItem(key);
     }
   });

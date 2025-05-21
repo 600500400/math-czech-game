@@ -12,6 +12,9 @@ export const useSignOut = (setAuthState: React.Dispatch<React.SetStateAction<Aut
       const currentUserId = localStorage.getItem('localUser') ? 
         JSON.parse(localStorage.getItem('localUser')!).id : null;
       
+      // Important: DO NOT clear the user's statistics when signing out
+      // We only want to clear authentication data, not user data
+      
       // Clean up auth state
       cleanupAuthState();
       

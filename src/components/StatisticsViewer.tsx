@@ -13,7 +13,7 @@ const StatisticsViewer = () => {
   const { mathStats, spellingStats, mathStatsLoading, spellingStatsLoading } = useStatistics(userId);
   
   useEffect(() => {
-    // Pro účely debugování
+    // Debugging information
     console.log("StatisticsViewer - Auth State:", authState);
     console.log("StatisticsViewer - User ID:", userId);
     console.log("StatisticsViewer - Math Stats:", mathStats);

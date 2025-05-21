@@ -11,6 +11,7 @@ export const useLocalUser = (setAuthState: React.Dispatch<React.SetStateAction<A
       created_at: new Date().toISOString()
     };
     
+    // Save local user to localStorage
     localStorage.setItem('localUser', JSON.stringify(localUser));
     
     // Inicializace prázdných polí pro statistiky s ID uživatele v klíči
@@ -22,6 +23,7 @@ export const useLocalUser = (setAuthState: React.Dispatch<React.SetStateAction<A
       localStorage.setItem(`spellingStats_${user.id}`, JSON.stringify([]));
     }
     
+    // Update auth state with the local user
     setAuthState({
       user: { id: user.id } as any,
       profile: localUser as UserProfile,
