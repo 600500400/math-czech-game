@@ -106,10 +106,6 @@ const MathPractice = () => {
         handleKeyPress={handleKeyPress}
         checkAnswer={checkAnswer}
         endGame={endGame}
-        correctAnswers={correctAnswers}
-        wrongAnswers={wrongAnswers}
-        totalAnswers={totalAnswers}
-        correctPercentage={correctPercentage}
       />
 
       {/* Statistics Dialog */}
