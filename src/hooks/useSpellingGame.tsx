@@ -59,9 +59,10 @@ export const useSpellingGame = () => {
     setSelectedGroups([]);
   };
 
-  // Nastavení skupin
-  const setGroups = (groups: string[]) => {
-    setSelectedGroups(groups);
+  // Nastavení skupin - updated to be a function without parameters
+  const setGroups = () => {
+    // This function now doesn't need parameters as it uses the current selectedGroups state
+    // This matches the signature in GroupSelectionDialog props
   };
 
   // Pomocné funkce pro generování problémů a pozic
@@ -235,7 +236,7 @@ export const useSpellingGame = () => {
     setShowGroupDialog,
     setShowStatsDialog,
     toggleGroup,
-    setGroups,
+    setGroups,  // This now returns the function without parameters
     selectAll,
     deselectAll,
     startNewGame,
