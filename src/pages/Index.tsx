@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import UserMenu from "@/components/UserMenu";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { ChartBar, GameController } from "lucide-react";
+import { BarChart2, Gamepad2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const Index = () => {
@@ -37,14 +37,14 @@ const Index = () => {
               className={activeTab === "practice" ? "bg-orange-500 hover:bg-orange-600 flex-1" : "flex-1"}
               onClick={() => setActiveTab("practice")}
             >
-              <GameController className="mr-2 h-4 w-4" /> Procvičování
+              <Gamepad2 className="mr-2 h-4 w-4" /> Procvičování
             </Button>
             <Button 
               variant={activeTab === "statistics" ? "default" : "outline"}
               className={activeTab === "statistics" ? "bg-orange-500 hover:bg-orange-600 flex-1" : "flex-1"}
               onClick={() => setActiveTab("statistics")}
             >
-              <ChartBar className="mr-2 h-4 w-4" /> Statistiky
+              <BarChart2 className="mr-2 h-4 w-4" /> Statistiky
             </Button>
           </div>
           
