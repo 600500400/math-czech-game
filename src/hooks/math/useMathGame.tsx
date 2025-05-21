@@ -12,12 +12,12 @@ import { useGameFinisher } from './useGameFinisher';
 export function useMathGame() {
   const { authState } = useAuth();
   const userId = authState?.user?.id || null;
-  const { saveMathStatistics: saveStats } = useStatistics(userId);
+  const { saveMathStatistics: saveStatsMutation } = useStatistics(userId);
   
   // Function to wrap the mutation.mutate function to match expected signature
   const saveMathStatistics = (data: any) => {
-    if (saveStats && typeof saveStats === 'function') {
-      saveStats(data);
+    if (saveStatsMutation && typeof saveStatsMutation.mutate === 'function') {
+      saveStatsMutation.mutate(data);
     }
   };
   
