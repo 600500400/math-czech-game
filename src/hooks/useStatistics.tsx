@@ -34,7 +34,7 @@ export const useStatistics = (userId: string | null) => {
     refetchSpellingStats 
   } = useSpellingStatistics(effectiveUserId);
   
-  const { getChildStatistics, checkLocalUserMode } = useStatisticsCore(effectiveUserId);
+  const { getChildStatistics, checkLocalUserMode, resetUserStatistics } = useStatisticsCore(effectiveUserId);
   
   // Efekt pro invalidaci query cache při změně uživatele
   useEffect(() => {
@@ -101,6 +101,7 @@ export const useStatistics = (userId: string | null) => {
     getChildStatistics,
     checkLocalUserMode,
     forceRefreshAllStatistics,
+    resetUserStatistics, // Added this function to the return object
     
     // Metadata
     currentUserId: effectiveUserId,
