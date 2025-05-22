@@ -77,7 +77,6 @@ const MathPractice = () => {
         gameEnded={gameEnded}
         onSetDifficulty={() => setShowDifficultyDialog(true)}
         onStartGame={startNewGame}
-        onShowStats={() => setShowStatsDialog(true)}
         onResetGame={resetGame}
       />
 

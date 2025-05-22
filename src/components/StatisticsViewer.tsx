@@ -8,8 +8,9 @@ import LoadingStatisticsState from "./statistics/LoadingStatisticsState";
 import UnauthenticatedState from "./statistics/UnauthenticatedState";
 import StatisticsTabs from "./statistics/StatisticsTabs";
 import { Button } from "@/components/ui/button";
-import { RefreshCcw } from "lucide-react";
+import { RefreshCcw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 const StatisticsViewer = () => {
   const { authState } = useAuth();
@@ -20,6 +21,7 @@ const StatisticsViewer = () => {
     mathStatsLoading, 
     spellingStatsLoading,
     forceRefreshAllStatistics,
+    resetUserStatistics,
     isLoading
   } = useStatistics(userId);
   
@@ -47,6 +49,21 @@ const StatisticsViewer = () => {
       toast.info(`Přenačítání statistik pro uživatele ${userId}...`);
     } else {
       toast.error("Nelze přenačíst statistiky - žádný uživatel není přihlášen");
+    }
+  };
+
+  // Funkce pro resetování statistik
+  const handleResetStatistics = () => {
+    if (!userId) {
+      toast.error("Nelze resetovat statistiky - žádný uživatel není přihlášen");
+      return;
+    }
+
+    if (resetUserStatistics(userId)) {
+      toast.success(`Statistiky pro uživatele ${authState.profile?.username || userId} byly resetovány`);
+      forceRefreshAllStatistics();
+    } else {
+      toast.error("Resetování statistik se nezdařilo");
     }
   };
   
@@ -83,6 +100,8 @@ const StatisticsViewer = () => {
     );
   }
 
+  const hasStats = mathStats.length > 0 || spellingStats.length > 0;
+
   return (
     <>
       <Card>
@@ -98,6 +117,34 @@ const StatisticsViewer = () => {
               <RefreshCcw className="h-3 w-3" />
               Obnovit
             </Button>
+
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  disabled={!hasStats}
+                  className="text-xs flex items-center gap-1 text-red-500 border-red-200 hover:bg-red-50 hover:text-red-600"
+                >
+                  <Trash2 className="h-3 w-3" />
+                  Resetovat
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Resetovat statistiky</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Opravdu chcete smazat všechny statistiky? Tato akce je nevratná a odstraní všechny záznamy o matematice i pravopisu.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Zrušit</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleResetStatistics} className="bg-red-500 hover:bg-red-600">
+                    Resetovat
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </CardHeader>
         <CardContent>

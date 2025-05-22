@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Settings, BarChart3, RotateCcw, Play } from "lucide-react";
+import { Settings, RotateCcw, Play } from "lucide-react";
 
 interface CustomGameControlsProps {
   problemCount: number;
@@ -12,7 +12,6 @@ interface CustomGameControlsProps {
   gameEnded: boolean;
   onSetDifficulty: () => void;
   onStartGame: () => void;
-  onShowStats: () => void;
   onResetGame: () => void;
 }
 
@@ -21,7 +20,6 @@ const CustomGameControls = ({
   gameEnded,
   onSetDifficulty,
   onStartGame,
-  onShowStats,
   onResetGame
 }: CustomGameControlsProps) => {
   return (
@@ -46,27 +44,16 @@ const CustomGameControls = ({
         Nastavit obtížnost
       </Button>
       
-      {/* Additional Controls Row */}
-      <div className="flex gap-2 justify-between">
-        <Button 
-          variant="ghost" 
-          className="flex-1 text-blue-500 hover:text-blue-600 hover:bg-blue-50"
-          onClick={onShowStats}
-        >
-          <BarChart3 className="mr-2 h-5 w-5" />
-          Statistiky
-        </Button>
-        
-        <Button 
-          variant="ghost" 
-          className="flex-1 text-gray-500 hover:text-gray-600 hover:bg-gray-50"
-          onClick={onResetGame}
-          disabled={!gameEnded}
-        >
-          <RotateCcw className="mr-2 h-5 w-5" />
-          Reset
-        </Button>
-      </div>
+      {/* Reset Button */}
+      <Button 
+        variant="ghost" 
+        className="text-gray-500 hover:text-gray-600 hover:bg-gray-50"
+        onClick={onResetGame}
+        disabled={!gameEnded}
+      >
+        <RotateCcw className="mr-2 h-5 w-5" />
+        Reset
+      </Button>
     </div>
   );
 };

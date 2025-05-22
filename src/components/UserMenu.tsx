@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { UserIcon, LogOut, ChartBarIcon, Settings, User } from 'lucide-react';
+import { UserIcon, LogOut, ChartBarIcon, Settings } from 'lucide-react';
 
 const UserMenu = () => {
   const { authState, signOut } = useAuth();
@@ -78,12 +78,6 @@ const UserMenu = () => {
             </Link>
           </DropdownMenuItem>
         )}
-        <DropdownMenuItem asChild>
-          <Link to="/" className="flex items-center cursor-pointer" onClick={() => setOpen(false)}>
-            <User className="mr-2 h-4 w-4" />
-            <span>Procvička</span>
-          </Link>
-        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem className="flex items-center cursor-pointer" onClick={() => signOut()}>
           <LogOut className="mr-2 h-4 w-4" />
