@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Settings, RotateCcw, Play } from "lucide-react";
+import { Settings, Play } from "lucide-react";
 
 interface CustomGameControlsProps {
   problemCount: number;
@@ -44,16 +44,7 @@ const CustomGameControls = ({
         Nastavit obtížnost
       </Button>
       
-      {/* Reset Button */}
-      <Button 
-        variant="ghost" 
-        className="text-gray-500 hover:text-gray-600 hover:bg-gray-50"
-        onClick={onResetGame}
-        disabled={!gameEnded}
-      >
-        <RotateCcw className="mr-2 h-5 w-5" />
-        Reset
-      </Button>
+      {/* Odstraněno tlačítko Reset */}
     </div>
   );
 };
