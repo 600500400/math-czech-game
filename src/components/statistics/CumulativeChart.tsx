@@ -71,12 +71,12 @@ const CumulativeChart: React.FC<CumulativeChartProps> = ({ data, type }) => {
         Kumulovaný progres v čase
       </h3>
       
-      <div className="h-72 mb-8">
+      <div className="h-80">
         <ChartContainer config={chartConfig}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart 
               data={chartData} 
-              margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+              margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
               <XAxis 
@@ -84,7 +84,7 @@ const CumulativeChart: React.FC<CumulativeChartProps> = ({ data, type }) => {
                 tick={{ fontSize: 12 }}
                 angle={-45}
                 textAnchor="end"
-                height={50}
+                height={60}
                 interval={Math.max(0, Math.floor(chartData.length / 6))}
               />
               <YAxis 
@@ -124,18 +124,20 @@ const CumulativeChart: React.FC<CumulativeChartProps> = ({ data, type }) => {
         </ChartContainer>
       </div>
       
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t-2 border-gray-200 mt-8">
-        <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg border border-green-200">
-          <div className="w-4 h-4 bg-green-400 rounded-full flex-shrink-0"></div>
-          <span className="text-sm font-medium text-green-800">Celkem správných odpovědí</span>
-        </div>
-        <div className="flex items-center gap-3 p-4 bg-red-50 rounded-lg border border-red-200">
-          <div className="w-4 h-4 bg-red-400 rounded-full flex-shrink-0"></div>
-          <span className="text-sm font-medium text-red-800">Celkem špatných odpovědí</span>
-        </div>
-        <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <div className="w-4 h-4 bg-blue-500 rounded-full flex-shrink-0"></div>
-          <span className="text-sm font-medium text-blue-800">Celkem všech odpovědí</span>
+      <div className="mt-12 pt-6 border-t-2 border-gray-200">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg border border-green-200">
+            <div className="w-4 h-4 bg-green-400 rounded-full flex-shrink-0"></div>
+            <span className="text-sm font-medium text-green-800">Celkem správných odpovědí</span>
+          </div>
+          <div className="flex items-center gap-3 p-4 bg-red-50 rounded-lg border border-red-200">
+            <div className="w-4 h-4 bg-red-400 rounded-full flex-shrink-0"></div>
+            <span className="text-sm font-medium text-red-800">Celkem špatných odpovědí</span>
+          </div>
+          <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <div className="w-4 h-4 bg-blue-500 rounded-full flex-shrink-0"></div>
+            <span className="text-sm font-medium text-blue-800">Celkem všech odpovědí</span>
+          </div>
         </div>
       </div>
     </div>
