@@ -1,6 +1,7 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import StatisticsTable from "./StatisticsTable";
+import DetailedStatisticsTable from "./DetailedStatisticsTable";
+import CumulativeChart from "./CumulativeChart";
 import { MathStatistics, SpellingStatistics } from "@/types/authTypes";
 import { FileText, Calculator } from "lucide-react";
 
@@ -25,6 +26,14 @@ const StatisticsTabs = ({ mathStats, spellingStats }: StatisticsTabsProps) => {
   const totalMathWrong = mathStats.reduce((sum, stat) => 
     sum + stat.wrong_answers, 0);
 
+  // Calculate overall accuracy
+  const spellingAccuracy = totalSpellingProblems > 0 
+    ? Math.round((totalSpellingCorrect / totalSpellingProblems) * 100) 
+    : 0;
+  const mathAccuracy = totalMathProblems > 0 
+    ? Math.round((totalMathCorrect / totalMathProblems) * 100) 
+    : 0;
+
   return (
     <Tabs defaultValue="spelling">
       <TabsList className="grid w-full grid-cols-2 mb-6">
@@ -42,7 +51,7 @@ const StatisticsTabs = ({ mathStats, spellingStats }: StatisticsTabsProps) => {
         </TabsTrigger>
       </TabsList>
       
-      <TabsContent value="spelling" className="mt-4">
+      <TabsContent value="spelling" className="mt-4 space-y-6">
         <div className="mb-4 flex justify-between items-center bg-orange-50 px-4 py-3 rounded-lg">
           <div className="text-gray-700">
             <span className="font-medium">Počet slov:</span> <span className="text-blue-600">{totalSpellingProblems}</span>
@@ -54,16 +63,19 @@ const StatisticsTabs = ({ mathStats, spellingStats }: StatisticsTabsProps) => {
             <div className="text-gray-700">
               <span className="font-medium">Špatně:</span> <span className="text-red-600">{totalSpellingWrong}</span>
             </div>
+            <div className="text-gray-700">
+              <span className="font-medium">Úspěšnost:</span> <span className="text-blue-600">{spellingAccuracy}%</span>
+            </div>
           </div>
         </div>
         
-        <StatisticsTable 
+        <DetailedStatisticsTable 
           type="spelling" 
           data={spellingStats} 
         />
       </TabsContent>
       
-      <TabsContent value="math" className="mt-4">
+      <TabsContent value="math" className="mt-4 space-y-6">
         <div className="mb-4 flex justify-between items-center bg-blue-50 px-4 py-3 rounded-lg">
           <div className="text-gray-700">
             <span className="font-medium">Počet příkladů:</span> <span className="text-blue-600">{totalMathProblems}</span>
@@ -75,13 +87,23 @@ const StatisticsTabs = ({ mathStats, spellingStats }: StatisticsTabsProps) => {
             <div className="text-gray-700">
               <span className="font-medium">Špatně:</span> <span className="text-red-600">{totalMathWrong}</span>
             </div>
+            <div className="text-gray-700">
+              <span className="font-medium">Úspěšnost:</span> <span className="text-blue-600">{mathAccuracy}%</span>
+            </div>
           </div>
         </div>
         
-        <StatisticsTable 
+        <DetailedStatisticsTable 
           type="math" 
           data={mathStats} 
         />
+        
+        {mathStats.length > 0 && (
+          <CumulativeChart 
+            data={mathStats} 
+            type="math" 
+          />
+        )}
       </TabsContent>
     </Tabs>
   );
