@@ -71,48 +71,52 @@ const CumulativeChart: React.FC<CumulativeChartProps> = ({ data, type }) => {
         Kumulovaný progres v čase
       </h3>
       
-      <div className="h-64">
+      <div className="h-80">
         <ChartContainer config={chartConfig}>
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+            <LineChart 
+              data={chartData} 
+              margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+            >
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
               <XAxis 
                 dataKey="date" 
                 tick={{ fontSize: 12 }}
                 angle={-45}
                 textAnchor="end"
-                height={60}
+                height={80}
+                interval={0}
               />
-              <YAxis tick={{ fontSize: 12 }} />
+              <YAxis 
+                tick={{ fontSize: 12 }}
+                domain={[0, 'dataMax + 1']}
+              />
               <ChartTooltip 
                 content={<ChartTooltipContent />}
                 labelFormatter={(label) => `Datum: ${label}`}
-                formatter={(value, name) => {
-                  return [value, chartConfig[name as keyof typeof chartConfig]?.label];
-                }}
               />
               <Line 
                 type="monotone" 
                 dataKey="cumulativeCorrect" 
                 stroke="#4ade80" 
-                strokeWidth={3}
-                dot={{ fill: "#4ade80", strokeWidth: 2, r: 4 }}
+                strokeWidth={2}
+                dot={{ fill: "#4ade80", strokeWidth: 2, r: 3 }}
                 name="cumulativeCorrect"
               />
               <Line 
                 type="monotone" 
                 dataKey="cumulativeWrong" 
                 stroke="#f87171" 
-                strokeWidth={3}
-                dot={{ fill: "#f87171", strokeWidth: 2, r: 4 }}
+                strokeWidth={2}
+                dot={{ fill: "#f87171", strokeWidth: 2, r: 3 }}
                 name="cumulativeWrong"
               />
               <Line 
                 type="monotone" 
                 dataKey="cumulativeTotal" 
                 stroke="#3b82f6" 
-                strokeWidth={3}
-                dot={{ fill: "#3b82f6", strokeWidth: 2, r: 4 }}
+                strokeWidth={2}
+                dot={{ fill: "#3b82f6", strokeWidth: 2, r: 3 }}
                 name="cumulativeTotal"
               />
             </LineChart>

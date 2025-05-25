@@ -1,7 +1,6 @@
 
 import { useState, useEffect } from "react";
 import { checkSupabaseConnection } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 
 export function useAppConnection() {
   const [databaseStatus, setDatabaseStatus] = useState<"checking" | "connected" | "disconnected" | "error">("checking");
@@ -15,16 +14,13 @@ export function useAppConnection() {
         if (result.success) {
           setDatabaseStatus("connected");
           console.log("Databáze je připojena:", result);
-          toast.success("Připojení k databázi úspěšné");
         } else {
           setDatabaseStatus("disconnected");
-          console.error("Problém s připojením k databázi:", result.error);
-          toast.warning("Problém s připojením k databázi - statistiky budou uloženy lokálně");
+          console.log("Aplikace běží v offline režimu");
         }
       } catch (error) {
         setDatabaseStatus("error");
-        console.error("Chyba při kontrole databáze:", error);
-        toast.error("Chyba při kontrole databáze");
+        console.log("Aplikace běží v offline režimu");
       }
     };
     
@@ -48,20 +44,19 @@ export function useAppConnection() {
   const handleCheckConnection = async () => {
     try {
       setDatabaseStatus("checking");
-      toast.info("Kontroluji připojení k databázi...");
       
       const result = await checkSupabaseConnection();
       
       if (result.success) {
         setDatabaseStatus("connected");
-        toast.success(`Připojení k databázi úspěšné! (${result.elapsed}ms)`);
+        console.log("Připojení k databázi úspěšné");
       } else {
         setDatabaseStatus("disconnected");
-        toast.error("Problém s připojením k databázi");
+        console.log("Aplikace běží v offline režimu");
       }
     } catch (error) {
       setDatabaseStatus("error");
-      toast.error("Chyba při kontrole připojení k databázi");
+      console.log("Aplikace běží v offline režimu");
     }
   };
 

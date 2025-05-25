@@ -9,29 +9,16 @@ interface DatabaseStatusNoticeProps {
 }
 
 const DatabaseStatusNotice = ({ status, onCheck }: DatabaseStatusNoticeProps) => {
-  if (status === "connected") return null;
+  // Nezobrazovat nic, pokud je připojeno nebo pokud je stav "disconnected" nebo "error"
+  if (status === "connected" || status === "disconnected" || status === "error") return null;
   
   return (
     <Card className="w-full max-w-md mx-auto mt-4">
       <CardContent className="pt-4">
         <div className="flex flex-col gap-2">
           <p className="text-center text-amber-600 flex items-center justify-center gap-2 font-medium">
-            {status === "checking" ? (
-              <>
-                <RefreshCw className="h-4 w-4 animate-spin" /> 
-                Kontroluji připojení k databázi...
-              </>
-            ) : status === "disconnected" ? (
-              <>
-                <WifiOff className="h-4 w-4" />
-                Problém s připojením k databázi. Statistiky budou uloženy lokálně.
-              </>
-            ) : (
-              <>
-                <Database className="h-4 w-4" />
-                Chyba při komunikaci s databází. Statistiky budou uloženy lokálně.
-              </>
-            )}
+            <RefreshCw className="h-4 w-4 animate-spin" /> 
+            Kontroluji připojení k databázi...
           </p>
           
           <div className="flex justify-center mt-1">
