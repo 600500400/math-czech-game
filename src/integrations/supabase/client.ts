@@ -60,7 +60,7 @@ const testNetworkConnection = async () => {
 testNetworkConnection().then(isConnected => {
   if (!isConnected) {
     console.warn("Problém s internetovým připojením detekován. Aplikace poběží v offline režimu.");
-    toast.warning("Problém s internetovým připojením. Aplikace poběží v offline režimu.");
+    // Odstraněno automatické zobrazení toast zprávy
   }
 });
 
@@ -155,19 +155,13 @@ export const checkSupabaseConnection = async (): Promise<ConnectionCheckResult> 
   }
 };
 
-// Automatická kontrola připojení při načtení
+// Automatická kontrola připojení při načtení - bez zobrazování toast zpráv
 checkSupabaseConnection().then(result => {
   if (result.success) {
     console.log("Databáze je připravena k použití");
-    toast.success("Připojení k databázi Supabase úspěšné");
+    // Odstraněno automatické zobrazení success toast zprávy
   } else {
     console.error("Problém s databází. Data budou ukládána lokálně.");
-    if (result.offline) {
-      toast.warning("Internetové připojení není dostupné. Přepínám do offline režimu.");
-    } else if (result.timeout) {
-      toast.error("Vypršel čas pro připojení k databázi. Přepínám do offline režimu.");
-    } else {
-      toast.warning("Problém s připojením k databázi. Data budou ukládána lokálně.");
-    }
+    // Odstraněny všechny automatické toast zprávy při problémech
   }
 });
