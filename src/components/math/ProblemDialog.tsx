@@ -44,9 +44,20 @@ const ProblemDialog: React.FC<ProblemDialogProps> = ({
     setUserAnswer("");
   };
   
-  // Add a direct handler for ending the game
   const handleEndGame = () => {
     endGame();
+  };
+
+  // Function to format operation display
+  const formatOperation = (operation: string): string => {
+    switch (operation) {
+      case "*":
+        return "·";
+      case "/":
+        return ":";
+      default:
+        return operation;
+    }
   };
 
   return (
@@ -61,7 +72,7 @@ const ProblemDialog: React.FC<ProblemDialogProps> = ({
         <div className="py-4">
           {currentProblem && (
             <p className="text-2xl font-bold text-center mb-4">
-              {currentProblem.num1} {currentProblem.operation} {currentProblem.num2} = ?
+              {currentProblem.num1} {formatOperation(currentProblem.operation)} {currentProblem.num2} = ?
             </p>
           )}
           <Input
@@ -102,7 +113,7 @@ const ProblemDialog: React.FC<ProblemDialogProps> = ({
             Odpovědět
           </Button>
           <Button 
-            onClick={handleEndGame} // Fixed: Using the direct handler function
+            onClick={handleEndGame}
             className="w-full sm:w-auto bg-red-500 hover:bg-red-600"
           >
             Ukončit hru

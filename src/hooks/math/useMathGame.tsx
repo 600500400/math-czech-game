@@ -1,156 +1,145 @@
 
-import { useState, useCallback } from 'react';
-import { Operation } from '@/types/mathTypes';
-import { useAuth } from '@/hooks/useAuth';
-import { useStatistics } from '@/hooks/useStatistics';
-import { useDifficultySettings } from './useDifficultySettings';
-import { useGameMechanics } from './useGameMechanics';
-import { useGameFlow } from './useGameFlow';
+import { useCallback, useState, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { useStatistics } from "@/hooks/useStatistics";
+import { useGameState } from "./useGameState";
+import { useProblemGenerator } from "./useProblemGenerator";
+import { useAnswerHandler } from "./useAnswerHandler";
+import { useDifficultySettings } from "./useDifficultySettings";
+import { useGameFlow } from "./useGameFlow";
 
 export function useMathGame() {
-  // Core state
-  const [correctAnswers, setCorrectAnswers] = useState(0);
-  const [wrongAnswers, setWrongAnswers] = useState(0);
+  const { authState } = useAuth();
+  const userId = authState?.user?.id || null;
+  const { saveMathStatistics } = useStatistics(userId);
   
-  // Game difficulty settings
-  const [maxValue, setMaxValue] = useState(20);
-  const [maxMultiplyValue, setMaxMultiplyValue] = useState(10);
-  const [maxDivideValue, setMaxDivideValue] = useState(10);
-  // Set all operations selected by default
-  const [allowedOperations, setAllowedOperations] = useState<Operation[]>(["+", "-", "*", "/"]);
+  const gameState = useGameState();
+  const [gameStartTime, setGameStartTime] = useState<Date | null>(null);
   
-  // Calculate derived statistics
-  const totalAnswers = correctAnswers + wrongAnswers;
-  const correctPercentage = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 0;
-
-  // Use our specialized hooks
-  const {
-    toggleOperation: difficultyToggleOperation,
-    setDifficulty: difficultySetDifficulty
-  } = useDifficultySettings();
-  
-  const {
-    currentProblem,
-    userAnswer,
-    lastAnswerCorrect,
-    showAnimation,
-    showConfetti,
-    setUserAnswer,
-    setCurrentProblem,
-    generateProblem,
-    checkAnswer,
-    handleKeyPress,
-  } = useGameMechanics({
-    maxValue,
-    maxMultiplyValue,
-    maxDivideValue,
-    allowedOperations,
-    correctAnswers,
-    wrongAnswers,
-    problemCount: 10,
-    setCorrectAnswers,
-    setWrongAnswers
-  });
-  
-  const {
-    showProblem,
-    showDifficultyDialog,
-    showStatsDialog,
-    difficultySet,
-    gameEnded,
-    problemCount,
-    setShowProblem,
-    setShowDifficultyDialog,
-    setShowStatsDialog,
-    setDifficultySet,
-    setProblemCount,
-    startNewGame: startGame,
-    endGame,
-    resetGame,
-  } = useGameFlow({
-    allowedOperations,
-    maxValue,
-    maxMultiplyValue,
-    maxDivideValue,
-    correctAnswers,
-    wrongAnswers,
-    generateProblem,
-    setCurrentProblem,
-    resetUserAnswer: () => setUserAnswer("")
+  const problemGenerator = useProblemGenerator({
+    allowedOperations: gameState.allowedOperations,
+    maxValue: gameState.maxValue,
+    maxMultiplyValue: gameState.maxMultiplyValue,
+    maxDivideValue: gameState.maxDivideValue,
   });
 
-  // Wrapper for toggleOperation
-  const toggleOperation = useCallback((operation: Operation) => {
-    difficultyToggleOperation(operation, allowedOperations, setAllowedOperations);
-  }, [difficultyToggleOperation, allowedOperations, setAllowedOperations]);
+  const answerHandler = useAnswerHandler({
+    currentProblem: gameState.currentProblem,
+    userAnswer: gameState.userAnswer,
+    correctAnswers: gameState.correctAnswers,
+    wrongAnswers: gameState.wrongAnswers,
+    setCorrectAnswers: gameState.setCorrectAnswers,
+    setWrongAnswers: gameState.setWrongAnswers,
+    setUserAnswer: gameState.setUserAnswer,
+    setCurrentProblem: gameState.setCurrentProblem,
+    setLastAnswerCorrect: gameState.setLastAnswerCorrect,
+    setShowAnimation: gameState.setShowAnimation,
+    setShowConfetti: gameState.setShowConfetti,
+    generateProblem: problemGenerator.generateProblem,
+  });
 
-  // Wrapper for setDifficulty
-  const setDifficulty = useCallback(() => {
-    difficultySetDifficulty(
-      maxValue,
-      maxMultiplyValue,
-      maxDivideValue,
-      allowedOperations,
-      setDifficultySet
-    );
-    
-    // Close the difficulty dialog when set
-    setShowDifficultyDialog(false);
-  }, [
-    difficultySetDifficulty,
-    maxValue,
-    maxMultiplyValue,
-    maxDivideValue,
-    allowedOperations,
-    setDifficultySet,
-    setShowDifficultyDialog
-  ]);
-  
-  // Wrapper for start new game to properly initialize
+  const difficultySettings = useDifficultySettings();
+
+  const gameFlow = useGameFlow({
+    allowedOperations: gameState.allowedOperations,
+    maxValue: gameState.maxValue,
+    maxMultiplyValue: gameState.maxMultiplyValue,
+    maxDivideValue: gameState.maxDivideValue,
+    correctAnswers: gameState.correctAnswers,
+    wrongAnswers: gameState.wrongAnswers,
+    generateProblem: problemGenerator.generateProblem,
+    setCurrentProblem: gameState.setCurrentProblem,
+    resetUserAnswer: () => gameState.setUserAnswer(""),
+  });
+
+  // Enhanced start game function with timer
   const startNewGame = useCallback(() => {
-    setCorrectAnswers(0);
-    setWrongAnswers(0);
-    startGame();
-  }, [startGame]);
+    setGameStartTime(new Date());
+    gameFlow.startNewGame();
+  }, [gameFlow]);
+
+  // Enhanced end game function with duration calculation
+  const endGame = useCallback(() => {
+    const gameDuration = gameStartTime 
+      ? Math.round((new Date().getTime() - gameStartTime.getTime()) / 1000)
+      : 0;
+
+    gameFlow.setShowProblem(false);
+    gameFlow.setGameEnded(true);
+    gameFlow.setShowStatsDialog(true);
+    
+    // Save statistics with duration if user is logged in
+    if (userId && (gameState.correctAnswers > 0 || gameState.wrongAnswers > 0)) {
+      const operationString = gameState.allowedOperations.join(',');
+      
+      saveMathStatistics({
+        correctAnswers: gameState.correctAnswers,
+        wrongAnswers: gameState.wrongAnswers,
+        operation: operationString,
+        difficultyLevel: {
+          maxValue: gameState.maxValue,
+          maxMultiplyValue: gameState.maxMultiplyValue,
+          maxDivideValue: gameState.maxDivideValue
+        },
+        gameDuration: gameDuration
+      });
+    }
+  }, [
+    gameState.correctAnswers, 
+    gameState.wrongAnswers, 
+    gameState.allowedOperations, 
+    gameState.maxValue, 
+    gameState.maxMultiplyValue, 
+    gameState.maxDivideValue, 
+    userId, 
+    saveMathStatistics,
+    gameStartTime,
+    gameFlow
+  ]);
+
+  const toggleOperation = useCallback((operation) => {
+    difficultySettings.toggleOperation(
+      operation, 
+      gameState.allowedOperations, 
+      gameState.setAllowedOperations
+    );
+  }, [difficultySettings, gameState.allowedOperations, gameState.setAllowedOperations]);
+
+  const setDifficulty = useCallback(() => {
+    difficultySettings.setDifficulty(
+      gameState.maxValue,
+      gameState.maxMultiplyValue,
+      gameState.maxDivideValue,
+      gameState.allowedOperations,
+      gameState.setDifficultySet
+    );
+  }, [
+    difficultySettings,
+    gameState.maxValue,
+    gameState.maxMultiplyValue,
+    gameState.maxDivideValue,
+    gameState.allowedOperations,
+    gameState.setDifficultySet
+  ]);
 
   return {
-    // State
-    correctAnswers,
-    wrongAnswers,
-    problemCount,
-    currentProblem,
-    userAnswer,
-    showProblem,
-    showDifficultyDialog,
-    showStatsDialog,
-    maxValue,
-    maxMultiplyValue,
-    maxDivideValue,
-    difficultySet,
-    allowedOperations,
-    gameEnded,
-    lastAnswerCorrect,
-    showAnimation,
-    showConfetti,
-    totalAnswers,
-    correctPercentage,
+    // All existing game state
+    ...gameState,
     
-    // State setters
-    setUserAnswer,
-    setShowDifficultyDialog,
-    setShowStatsDialog,
-    setMaxValue,
-    setMaxMultiplyValue,
-    setMaxDivideValue,
-    setAllowedOperations,
+    // Game flow functions
+    ...gameFlow,
+    startNewGame, // Use our enhanced version
+    endGame, // Use our enhanced version
     
-    // Actions
-    setDifficulty,
+    // Answer handling
+    checkAnswer: answerHandler.checkAnswer,
+    handleKeyPress: answerHandler.handleKeyPress,
+    
+    // Difficulty settings
     toggleOperation,
-    startNewGame,
-    checkAnswer,
-    endGame,
-    resetGame,
-    handleKeyPress,
+    setDifficulty,
+    
+    // Timer info
+    gameStartTime,
   };
 }

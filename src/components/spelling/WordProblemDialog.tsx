@@ -1,6 +1,7 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { renderWordWithCurrentGap } from "@/utils/spellingUtils";
 import { Star } from "lucide-react";
 
@@ -17,6 +18,8 @@ interface WordProblemDialogProps {
   onAnswerI: () => void;
   onAnswerY: () => void;
   onEndGame: () => void;
+  correctAnswers?: number;
+  wrongAnswers?: number;
 }
 
 export const WordProblemDialog = ({
@@ -31,13 +34,17 @@ export const WordProblemDialog = ({
   currentPosition,
   onAnswerI,
   onAnswerY,
-  onEndGame
+  onEndGame,
+  correctAnswers = 0,
+  wrongAnswers = 0
 }: WordProblemDialogProps) => {
   
-  // Add a handler that calls onEndGame directly
   const handleEndGame = () => {
     onEndGame();
   };
+
+  const totalAnswers = correctAnswers + wrongAnswers;
+  const correctPercentage = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 0;
   
   return (
     <Dialog open={open} onOpenChange={(open) => !open && onEndGame()}>
@@ -63,6 +70,17 @@ export const WordProblemDialog = ({
               <p className="text-center text-gray-600 italic">
                 Doplňte pouze písmeno i/y na zvýrazněné místo
               </p>
+
+              {/* In-game statistics - same as math game */}
+              {totalAnswers > 0 && (
+                <div className="mt-4 space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-green-500">Správně: {correctAnswers}</span>
+                    <span className="text-red-500">Špatně: {wrongAnswers}</span>
+                  </div>
+                  <Progress value={correctPercentage} className="h-2" />
+                </div>
+              )}
             </div>
           )}
           <div className="flex justify-center items-center gap-6 mt-6">
@@ -84,7 +102,7 @@ export const WordProblemDialog = ({
         </div>
         <DialogFooter className="flex flex-col sm:flex-row gap-2">
           <Button 
-            onClick={handleEndGame} // Fixed: Using the direct handler function instead
+            onClick={handleEndGame}
             className="w-full sm:w-auto bg-red-500 hover:bg-red-600 rounded-lg shadow-md"
           >
             Ukončit hru

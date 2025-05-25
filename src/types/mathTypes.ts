@@ -29,4 +29,23 @@ export interface MathGameState {
   lastAnswerCorrect: boolean | null;
   showAnimation: boolean;
   showConfetti: boolean;
+  gameStartTime?: Date;
+  gameDuration?: number;
+}
+
+export interface DifficultyLevel {
+  maxValue: number;
+  maxMultiplyValue: number;
+  maxDivideValue: number;
+}
+
+export interface DetailedMathStatistics {
+  id: string;
+  user_id: string;
+  correct_answers: number;
+  wrong_answers: number;
+  operation: string;
+  difficulty_level: DifficultyLevel;
+  game_duration: number; // in seconds
+  created_at: string;
 }

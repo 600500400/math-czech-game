@@ -95,7 +95,7 @@ const SpellingPractice = () => {
         allSelected={allSelected}
       />
 
-      {/* Word Problem Dialog */}
+      {/* Word Problem Dialog with statistics */}
       <WordProblemDialog
         open={showProblem}
         onOpenChange={(open) => {
@@ -111,6 +111,8 @@ const SpellingPractice = () => {
         onAnswerI={handleAnswerI}
         onAnswerY={handleAnswerY}
         onEndGame={endGame}
+        correctAnswers={correctAnswers}
+        wrongAnswers={wrongAnswers}
       />
       
       {/* Statistics Dialog */}
