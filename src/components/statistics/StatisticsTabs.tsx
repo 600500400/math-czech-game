@@ -35,7 +35,7 @@ const StatisticsTabs = ({ mathStats, spellingStats }: StatisticsTabsProps) => {
     : 0;
 
   return (
-    <Tabs defaultValue="spelling">
+    <Tabs defaultValue="spelling" className="w-full">
       <TabsList className="grid w-full grid-cols-2 mb-6">
         <TabsTrigger 
           value="spelling" 
@@ -54,17 +54,17 @@ const StatisticsTabs = ({ mathStats, spellingStats }: StatisticsTabsProps) => {
       <TabsContent value="spelling" className="mt-4 space-y-6">
         <div className="mb-4 flex justify-between items-center bg-orange-50 px-4 py-3 rounded-lg">
           <div className="text-gray-700">
-            <span className="font-medium">Počet slov:</span> <span className="text-blue-600">{totalSpellingProblems}</span>
+            <span className="font-medium">Počet slov:</span> <span className="text-blue-600 font-bold">{totalSpellingProblems}</span>
           </div>
           <div className="flex gap-4">
             <div className="text-gray-700">
-              <span className="font-medium">Správně:</span> <span className="text-green-600">{totalSpellingCorrect}</span>
+              <span className="font-medium">Správně:</span> <span className="text-green-600 font-bold">{totalSpellingCorrect}</span>
             </div>
             <div className="text-gray-700">
-              <span className="font-medium">Špatně:</span> <span className="text-red-600">{totalSpellingWrong}</span>
+              <span className="font-medium">Špatně:</span> <span className="text-red-600 font-bold">{totalSpellingWrong}</span>
             </div>
             <div className="text-gray-700">
-              <span className="font-medium">Úspěšnost:</span> <span className="text-blue-600">{spellingAccuracy}%</span>
+              <span className="font-medium">Úspěšnost:</span> <span className="text-blue-600 font-bold">{spellingAccuracy}%</span>
             </div>
           </div>
         </div>
@@ -73,22 +73,29 @@ const StatisticsTabs = ({ mathStats, spellingStats }: StatisticsTabsProps) => {
           type="spelling" 
           data={spellingStats} 
         />
+        
+        {spellingStats.length > 0 && (
+          <CumulativeChart 
+            data={spellingStats} 
+            type="spelling" 
+          />
+        )}
       </TabsContent>
       
       <TabsContent value="math" className="mt-4 space-y-6">
         <div className="mb-4 flex justify-between items-center bg-blue-50 px-4 py-3 rounded-lg">
           <div className="text-gray-700">
-            <span className="font-medium">Počet příkladů:</span> <span className="text-blue-600">{totalMathProblems}</span>
+            <span className="font-medium">Počet příkladů:</span> <span className="text-blue-600 font-bold">{totalMathProblems}</span>
           </div>
           <div className="flex gap-4">
             <div className="text-gray-700">
-              <span className="font-medium">Správně:</span> <span className="text-green-600">{totalMathCorrect}</span>
+              <span className="font-medium">Správně:</span> <span className="text-green-600 font-bold">{totalMathCorrect}</span>
             </div>
             <div className="text-gray-700">
-              <span className="font-medium">Špatně:</span> <span className="text-red-600">{totalMathWrong}</span>
+              <span className="font-medium">Špatně:</span> <span className="text-red-600 font-bold">{totalMathWrong}</span>
             </div>
             <div className="text-gray-700">
-              <span className="font-medium">Úspěšnost:</span> <span className="text-blue-600">{mathAccuracy}%</span>
+              <span className="font-medium">Úspěšnost:</span> <span className="text-blue-600 font-bold">{mathAccuracy}%</span>
             </div>
           </div>
         </div>

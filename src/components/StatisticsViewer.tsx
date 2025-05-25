@@ -1,3 +1,4 @@
+
 import { useAuth } from "@/hooks/useAuth";
 import { useStatistics } from "@/hooks/useStatistics";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+
 const StatisticsViewer = () => {
   const {
     authState
@@ -23,12 +25,15 @@ const StatisticsViewer = () => {
     forceRefreshAllStatistics
   } = useStatistics(authState.user?.id || null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  
   if (!authState.isAuthenticated) {
     return <UnauthenticatedState />;
   }
+  
   if (isLoading) {
     return <LoadingStatisticsState />;
   }
+  
   const handleResetStatistics = () => {
     if (currentUserId) {
       const success = resetUserStatistics(currentUserId);
@@ -41,13 +46,17 @@ const StatisticsViewer = () => {
       setShowDeleteDialog(false);
     }
   };
+  
   const hasAnyStats = mathStats && mathStats.length > 0 || spellingStats && spellingStats.length > 0;
+  
   if (!hasAnyStats) {
     return <EmptyStatisticsState />;
   }
-  return <Card className="w-full max-w-md mx-auto">
+  
+  return (
+    <Card className="w-full max-w-6xl mx-auto">
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-xl">Statistiky</CardTitle>
+        <CardTitle className="text-xl">Podrobné statistiky</CardTitle>
         <div className="flex items-center gap-2">
           <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
             <AlertDialogTrigger asChild>
@@ -73,9 +82,11 @@ const StatisticsViewer = () => {
           </AlertDialog>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-6">
         <StatisticsTabs mathStats={mathStats} spellingStats={spellingStats} />
       </CardContent>
-    </Card>;
+    </Card>
+  );
 };
+
 export default StatisticsViewer;

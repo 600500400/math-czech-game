@@ -38,55 +38,65 @@ const DetailedStatisticsTable: React.FC<DetailedStatisticsTableProps> = ({ type,
   };
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Datum</TableHead>
-          <TableHead>
-            {type === "math" ? "Operace" : "Skupina slov"}
-          </TableHead>
-          <TableHead>Správně</TableHead>
-          <TableHead>Špatně</TableHead>
-          <TableHead>Úspěšnost</TableHead>
-          {type === "math" && (
-            <>
-              <TableHead>Obtížnost</TableHead>
-              <TableHead>Doba hry</TableHead>
-            </>
-          )}
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {data.map((stat) => {
-          const total = stat.correct_answers + stat.wrong_answers;
-          const accuracy = total > 0 ? Math.round((stat.correct_answers / total) * 100) : 0;
-          
-          return (
-            <TableRow key={stat.id}>
-              <TableCell>{formatDate(stat.created_at)}</TableCell>
-              <TableCell>
-                {type === "math" 
-                  ? (stat as MathStatistics).operation 
-                  : (stat as SpellingStatistics).word_group}
-              </TableCell>
-              <TableCell className="text-green-600">{stat.correct_answers}</TableCell>
-              <TableCell className="text-red-600">{stat.wrong_answers}</TableCell>
-              <TableCell className="font-medium">{accuracy}%</TableCell>
-              {type === "math" && (
-                <>
-                  <TableCell className="text-sm">
-                    {formatDifficulty((stat as MathStatistics).difficulty_level)}
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {formatDuration((stat as MathStatistics).game_duration)}
-                  </TableCell>
-                </>
-              )}
-            </TableRow>
-          );
-        })}
-      </TableBody>
-    </Table>
+    <div className="overflow-x-auto">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="min-w-[120px]">Datum</TableHead>
+            <TableHead className="min-w-[100px]">
+              {type === "math" ? "Operace" : "Skupina slov"}
+            </TableHead>
+            <TableHead className="text-center">Správně</TableHead>
+            <TableHead className="text-center">Špatně</TableHead>
+            <TableHead className="text-center">Úspěšnost</TableHead>
+            {type === "math" && (
+              <>
+                <TableHead className="min-w-[150px]">Obtížnost</TableHead>
+                <TableHead className="text-center">Doba hry</TableHead>
+              </>
+            )}
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {data.map((stat) => {
+            const total = stat.correct_answers + stat.wrong_answers;
+            const accuracy = total > 0 ? Math.round((stat.correct_answers / total) * 100) : 0;
+            
+            return (
+              <TableRow key={stat.id}>
+                <TableCell className="whitespace-nowrap">
+                  {formatDate(stat.created_at)}
+                </TableCell>
+                <TableCell>
+                  {type === "math" 
+                    ? (stat as MathStatistics).operation 
+                    : (stat as SpellingStatistics).word_group}
+                </TableCell>
+                <TableCell className="text-center text-green-600 font-medium">
+                  {stat.correct_answers}
+                </TableCell>
+                <TableCell className="text-center text-red-600 font-medium">
+                  {stat.wrong_answers}
+                </TableCell>
+                <TableCell className="text-center font-bold">
+                  {accuracy}%
+                </TableCell>
+                {type === "math" && (
+                  <>
+                    <TableCell className="text-sm">
+                      {formatDifficulty((stat as MathStatistics).difficulty_level)}
+                    </TableCell>
+                    <TableCell className="text-center text-sm">
+                      {formatDuration((stat as MathStatistics).game_duration)}
+                    </TableCell>
+                  </>
+                )}
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
+    </div>
   );
 };
 
