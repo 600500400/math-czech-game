@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthState, UserProfile } from "@/types/authTypes";
-import { User } from "@supabase/supabase-js";
+import { User as SupabaseUser } from "@supabase/supabase-js";
 
 export const useAuthState = () => {
   const [authState, setAuthState] = useState<AuthState>({
@@ -22,7 +22,7 @@ export const useAuthState = () => {
       try {
         const localUser = JSON.parse(localUserStr);
         setAuthState({
-          user: { id: localUser.id } as User,
+          user: { id: localUser.id } as any,
           profile: localUser as UserProfile,
           isLoading: false,
           isAuthenticated: true,
@@ -41,7 +41,7 @@ export const useAuthState = () => {
         // Update state synchronously
         setAuthState(prev => ({
           ...prev,
-          user: session?.user || null,
+          user: session?.user ? { id: session.user.id } as any : null,
           isAuthenticated: !!session?.user,
         }));
 
@@ -65,7 +65,7 @@ export const useAuthState = () => {
       if (session?.user) {
         fetchUserProfile(session.user.id).then(profile => {
           setAuthState({
-            user: session.user,
+            user: { id: session.user.id } as any,
             profile,
             isLoading: false,
             isAuthenticated: true,

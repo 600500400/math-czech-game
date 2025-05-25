@@ -14,7 +14,13 @@ export interface AuthContextType {
 
 // Default context values
 const defaultContext: AuthContextType = {
-  authState: { user: null, profile: null, isLoading: true, isAuthenticated: false, error: null },
+  authState: { 
+    user: null, 
+    profile: null, 
+    isLoading: true, 
+    isAuthenticated: false, 
+    error: null 
+  },
   signIn: async () => {},
   signUp: async () => {},
   signOut: async () => {},

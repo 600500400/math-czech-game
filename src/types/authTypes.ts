@@ -1,4 +1,5 @@
 
+
 export interface User {
   id: string;
   email: string;
@@ -9,8 +10,10 @@ export interface User {
 
 export interface AuthState {
   user: User | null;
+  profile: UserProfile | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  error: string | null;
 }
 
 export interface MathStatistics {
@@ -50,3 +53,4 @@ export interface ParentProfile extends UserProfile {
   role: 'parent';
   children?: ChildProfile[];
 }
+
