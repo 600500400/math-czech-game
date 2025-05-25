@@ -66,17 +66,17 @@ const CumulativeChart: React.FC<CumulativeChartProps> = ({ data, type }) => {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <h3 className="text-lg font-semibold text-gray-700">
         Kumulovaný progres v čase
       </h3>
       
-      <div className="h-96">
+      <div className="h-72 mb-8">
         <ChartContainer config={chartConfig}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart 
               data={chartData} 
-              margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+              margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
               <XAxis 
@@ -84,8 +84,8 @@ const CumulativeChart: React.FC<CumulativeChartProps> = ({ data, type }) => {
                 tick={{ fontSize: 12 }}
                 angle={-45}
                 textAnchor="end"
-                height={60}
-                interval={Math.max(0, Math.floor(chartData.length / 8))}
+                height={50}
+                interval={Math.max(0, Math.floor(chartData.length / 6))}
               />
               <YAxis 
                 tick={{ fontSize: 12 }}
@@ -99,24 +99,24 @@ const CumulativeChart: React.FC<CumulativeChartProps> = ({ data, type }) => {
                 type="monotone" 
                 dataKey="cumulativeCorrect" 
                 stroke="#4ade80" 
-                strokeWidth={3}
-                dot={{ fill: "#4ade80", strokeWidth: 2, r: 4 }}
+                strokeWidth={2}
+                dot={{ fill: "#4ade80", strokeWidth: 2, r: 3 }}
                 name="cumulativeCorrect"
               />
               <Line 
                 type="monotone" 
                 dataKey="cumulativeWrong" 
                 stroke="#f87171" 
-                strokeWidth={3}
-                dot={{ fill: "#f87171", strokeWidth: 2, r: 4 }}
+                strokeWidth={2}
+                dot={{ fill: "#f87171", strokeWidth: 2, r: 3 }}
                 name="cumulativeWrong"
               />
               <Line 
                 type="monotone" 
                 dataKey="cumulativeTotal" 
                 stroke="#3b82f6" 
-                strokeWidth={3}
-                dot={{ fill: "#3b82f6", strokeWidth: 2, r: 4 }}
+                strokeWidth={2}
+                dot={{ fill: "#3b82f6", strokeWidth: 2, r: 3 }}
                 name="cumulativeTotal"
               />
             </LineChart>
@@ -124,7 +124,7 @@ const CumulativeChart: React.FC<CumulativeChartProps> = ({ data, type }) => {
         </ChartContainer>
       </div>
       
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t-2 border-gray-200">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t-2 border-gray-200 mt-8">
         <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg border border-green-200">
           <div className="w-4 h-4 bg-green-400 rounded-full flex-shrink-0"></div>
           <span className="text-sm font-medium text-green-800">Celkem správných odpovědí</span>
