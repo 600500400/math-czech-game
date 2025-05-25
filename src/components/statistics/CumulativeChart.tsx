@@ -66,7 +66,7 @@ const CumulativeChart: React.FC<CumulativeChartProps> = ({ data, type }) => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <h3 className="text-lg font-semibold text-gray-700">
         Kumulovaný progres v čase
       </h3>
@@ -76,7 +76,7 @@ const CumulativeChart: React.FC<CumulativeChartProps> = ({ data, type }) => {
           <ResponsiveContainer width="100%" height="100%">
             <LineChart 
               data={chartData} 
-              margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+              margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
               <XAxis 
@@ -99,24 +99,24 @@ const CumulativeChart: React.FC<CumulativeChartProps> = ({ data, type }) => {
                 type="monotone" 
                 dataKey="cumulativeCorrect" 
                 stroke="#4ade80" 
-                strokeWidth={2}
-                dot={{ fill: "#4ade80", strokeWidth: 2, r: 3 }}
+                strokeWidth={3}
+                dot={{ fill: "#4ade80", strokeWidth: 2, r: 4 }}
                 name="cumulativeCorrect"
               />
               <Line 
                 type="monotone" 
                 dataKey="cumulativeWrong" 
                 stroke="#f87171" 
-                strokeWidth={2}
-                dot={{ fill: "#f87171", strokeWidth: 2, r: 3 }}
+                strokeWidth={3}
+                dot={{ fill: "#f87171", strokeWidth: 2, r: 4 }}
                 name="cumulativeWrong"
               />
               <Line 
                 type="monotone" 
                 dataKey="cumulativeTotal" 
                 stroke="#3b82f6" 
-                strokeWidth={2}
-                dot={{ fill: "#3b82f6", strokeWidth: 2, r: 3 }}
+                strokeWidth={3}
+                dot={{ fill: "#3b82f6", strokeWidth: 2, r: 4 }}
                 name="cumulativeTotal"
               />
             </LineChart>
@@ -124,18 +124,18 @@ const CumulativeChart: React.FC<CumulativeChartProps> = ({ data, type }) => {
         </ChartContainer>
       </div>
       
-      <div className="text-sm text-gray-600 space-y-1 pt-2">
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 bg-green-400 rounded"></div>
-          <span>Celkem správných odpovědí</span>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-gray-200">
+        <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
+          <div className="w-4 h-4 bg-green-400 rounded-full flex-shrink-0"></div>
+          <span className="text-sm font-medium text-green-800">Celkem správných odpovědí</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 bg-red-400 rounded"></div>
-          <span>Celkem špatných odpovědí</span>
+        <div className="flex items-center gap-3 p-3 bg-red-50 rounded-lg">
+          <div className="w-4 h-4 bg-red-400 rounded-full flex-shrink-0"></div>
+          <span className="text-sm font-medium text-red-800">Celkem špatných odpovědí</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 bg-blue-500 rounded"></div>
-          <span>Celkem všech odpovědí</span>
+        <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
+          <div className="w-4 h-4 bg-blue-500 rounded-full flex-shrink-0"></div>
+          <span className="text-sm font-medium text-blue-800">Celkem všech odpovědí</span>
         </div>
       </div>
     </div>
