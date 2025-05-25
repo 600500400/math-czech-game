@@ -15,15 +15,17 @@ export const useMathStatistics = (userId: string | null) => {
       wrongAnswers,
       operation,
       difficultyLevel,
+      gameDuration,
     }: {
       correctAnswers: number;
       wrongAnswers: number;
       operation: string;
       difficultyLevel: any;
+      gameDuration?: number;
     }) => {
       if (!userId) throw new Error("Uživatel není přihlášen");
 
-      console.log("Ukládání statistik matematiky:", { userId, correctAnswers, wrongAnswers, operation });
+      console.log("Ukládání statistik matematiky:", { userId, correctAnswers, wrongAnswers, operation, gameDuration });
       
       try {
         // Vždy používáme lokální režim
@@ -45,6 +47,7 @@ export const useMathStatistics = (userId: string | null) => {
           wrong_answers: wrongAnswers,
           operation: operation,
           difficulty_level: difficultyLevel,
+          game_duration: gameDuration || 0,
           created_at: timestamp
         };
         

@@ -29,6 +29,7 @@ export interface MathStatistics {
     maxMultiplyValue: number;
     maxDivideValue: number;
   };
+  game_duration?: number; // in seconds
   created_at: string;
 }
 
