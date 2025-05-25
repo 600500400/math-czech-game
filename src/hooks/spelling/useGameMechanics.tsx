@@ -45,7 +45,10 @@ export const useGameMechanics = () => {
     setWrongAnswers: gameStats.setWrongAnswers,
     setShowProblem: gameUI.setShowProblem,
     saveSpellingStatistics: saveSpellingStatistics,
-    userId: userId
+    userId: userId,
+    startGameTimer: gameStats.startGameTimer,
+    resetGameTimer: gameStats.resetGameTimer,
+    getGameDuration: gameStats.getGameDuration
   });
 
   return {

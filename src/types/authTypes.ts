@@ -1,43 +1,52 @@
 
-import { User } from "@supabase/supabase-js";
-
-export type UserRole = 'parent' | 'child' | 'teacher';
-
-export interface UserProfile {
+export interface User {
   id: string;
+  email: string;
   username: string;
-  role: UserRole;
+  role: 'parent' | 'child';
   created_at: string;
 }
 
 export interface AuthState {
   user: User | null;
-  profile: UserProfile | null;
-  isLoading: boolean;
   isAuthenticated: boolean;
-  error: string | null;
+  isLoading: boolean;
 }
 
 export interface MathStatistics {
   id: string;
   user_id: string;
+  operation: string;
   correct_answers: number;
   wrong_answers: number;
-  operation: string;
-  difficulty_level: {
-    maxValue: number;
-    maxMultiplyValue: number;
-    maxDivideValue: number;
-  };
-  game_duration?: number; // in seconds
+  difficulty_level: any;
   created_at: string;
+  game_duration?: number;
 }
 
 export interface SpellingStatistics {
   id: string;
   user_id: string;
+  word_group: string;
   correct_answers: number;
   wrong_answers: number;
-  word_group: string;
+  difficulty_level: any;
+  game_duration?: number;
   created_at: string;
+}
+
+export interface UserProfile {
+  id: string;
+  username: string;
+  role: 'parent' | 'child';
+  created_at: string;
+}
+
+export interface ChildProfile extends UserProfile {
+  role: 'child';
+}
+
+export interface ParentProfile extends UserProfile {
+  role: 'parent';
+  children?: ChildProfile[];
 }
