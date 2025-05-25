@@ -1,10 +1,11 @@
 
 
+
 export interface User {
   id: string;
   email: string;
   username: string;
-  role: 'parent' | 'child';
+  role: 'parent' | 'child' | 'teacher';
   created_at: string;
 }
 
@@ -33,7 +34,7 @@ export interface SpellingStatistics {
   word_group: string;
   correct_answers: number;
   wrong_answers: number;
-  difficulty_level: any;
+  difficulty_level: string[];
   game_duration?: number;
   created_at: string;
 }
@@ -41,7 +42,7 @@ export interface SpellingStatistics {
 export interface UserProfile {
   id: string;
   username: string;
-  role: 'parent' | 'child';
+  role: 'parent' | 'child' | 'teacher';
   created_at: string;
 }
 
@@ -53,4 +54,5 @@ export interface ParentProfile extends UserProfile {
   role: 'parent';
   children?: ChildProfile[];
 }
+
 
