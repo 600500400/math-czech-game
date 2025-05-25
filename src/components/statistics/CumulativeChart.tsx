@@ -71,17 +71,17 @@ const CumulativeChart: React.FC<CumulativeChartProps> = ({ data, type }) => {
         Kumulovaný progres v čase
       </h3>
       
-      <div className="h-80">
+      <div className="h-64">
         <ChartContainer config={chartConfig}>
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+            <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
               <XAxis 
                 dataKey="date" 
                 tick={{ fontSize: 12 }}
                 angle={-45}
                 textAnchor="end"
-                height={80}
+                height={60}
               />
               <YAxis tick={{ fontSize: 12 }} />
               <ChartTooltip 
@@ -96,7 +96,7 @@ const CumulativeChart: React.FC<CumulativeChartProps> = ({ data, type }) => {
                 dataKey="cumulativeCorrect" 
                 stroke="#4ade80" 
                 strokeWidth={3}
-                dot={{ fill: "#4ade80", strokeWidth: 2, r: 5 }}
+                dot={{ fill: "#4ade80", strokeWidth: 2, r: 4 }}
                 name="cumulativeCorrect"
               />
               <Line 
@@ -104,7 +104,7 @@ const CumulativeChart: React.FC<CumulativeChartProps> = ({ data, type }) => {
                 dataKey="cumulativeWrong" 
                 stroke="#f87171" 
                 strokeWidth={3}
-                dot={{ fill: "#f87171", strokeWidth: 2, r: 5 }}
+                dot={{ fill: "#f87171", strokeWidth: 2, r: 4 }}
                 name="cumulativeWrong"
               />
               <Line 
@@ -112,7 +112,7 @@ const CumulativeChart: React.FC<CumulativeChartProps> = ({ data, type }) => {
                 dataKey="cumulativeTotal" 
                 stroke="#3b82f6" 
                 strokeWidth={3}
-                dot={{ fill: "#3b82f6", strokeWidth: 2, r: 5 }}
+                dot={{ fill: "#3b82f6", strokeWidth: 2, r: 4 }}
                 name="cumulativeTotal"
               />
             </LineChart>
@@ -120,7 +120,7 @@ const CumulativeChart: React.FC<CumulativeChartProps> = ({ data, type }) => {
         </ChartContainer>
       </div>
       
-      <div className="text-sm text-gray-600 space-y-1">
+      <div className="text-sm text-gray-600 space-y-1 pt-2">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 bg-green-400 rounded"></div>
           <span>Celkem správných odpovědí</span>
