@@ -23,23 +23,6 @@ export function useMathGame() {
     maxDivideValue: gameState.maxDivideValue,
   });
 
-  const answerHandler = useAnswerHandler({
-    currentProblem: gameState.currentProblem,
-    userAnswer: gameState.userAnswer,
-    correctAnswers: gameState.correctAnswers,
-    wrongAnswers: gameState.wrongAnswers,
-    setCorrectAnswers: gameState.setCorrectAnswers,
-    setWrongAnswers: gameState.setWrongAnswers,
-    setUserAnswer: gameState.setUserAnswer,
-    setCurrentProblem: gameState.setCurrentProblem,
-    setLastAnswerCorrect: gameState.setLastAnswerCorrect,
-    setShowAnimation: gameState.setShowAnimation,
-    setShowConfetti: gameState.setShowConfetti,
-    generateProblem: problemGenerator.generateProblem,
-  });
-
-  const difficultySettings = useDifficultySettings();
-
   const gameFlow = useGameFlow({
     allowedOperations: gameState.allowedOperations,
     maxValue: gameState.maxValue,
@@ -51,12 +34,6 @@ export function useMathGame() {
     setCurrentProblem: gameState.setCurrentProblem,
     resetUserAnswer: () => gameState.setUserAnswer(""),
   });
-
-  // Enhanced start game function with timer
-  const startNewGame = useCallback(() => {
-    setGameStartTime(new Date());
-    gameFlow.startNewGame();
-  }, [gameFlow]);
 
   // Enhanced end game function with duration calculation
   const endGame = useCallback(() => {
@@ -72,7 +49,7 @@ export function useMathGame() {
     if (userId && (gameState.correctAnswers > 0 || gameState.wrongAnswers > 0)) {
       const operationString = gameState.allowedOperations.join(',');
       
-      saveMathStatistics({
+      saveMathStatistics.mutate({
         correctAnswers: gameState.correctAnswers,
         wrongAnswers: gameState.wrongAnswers,
         operation: operationString,
@@ -96,6 +73,31 @@ export function useMathGame() {
     gameStartTime,
     gameFlow
   ]);
+
+  const answerHandler = useAnswerHandler({
+    currentProblem: gameState.currentProblem,
+    userAnswer: gameState.userAnswer,
+    correctAnswers: gameState.correctAnswers,
+    wrongAnswers: gameState.wrongAnswers,
+    problemCount: gameFlow.problemCount,
+    setCorrectAnswers: gameState.setCorrectAnswers,
+    setWrongAnswers: gameState.setWrongAnswers,
+    setUserAnswer: gameState.setUserAnswer,
+    setCurrentProblem: gameState.setCurrentProblem,
+    setLastAnswerCorrect: gameState.setLastAnswerCorrect,
+    setShowAnimation: gameState.setShowAnimation,
+    setShowConfetti: gameState.setShowConfetti,
+    generateProblem: problemGenerator.generateProblem,
+    endGame: endGame,
+  });
+
+  const difficultySettings = useDifficultySettings();
+
+  // Enhanced start game function with timer
+  const startNewGame = useCallback(() => {
+    setGameStartTime(new Date());
+    gameFlow.startNewGame();
+  }, [gameFlow]);
 
   const toggleOperation = useCallback((operation) => {
     difficultySettings.toggleOperation(

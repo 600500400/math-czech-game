@@ -102,6 +102,7 @@ export function useGameFlow({
     setShowDifficultyDialog,
     setShowStatsDialog,
     setDifficultySet,
+    setGameEnded,
     setProblemCount,
     
     startNewGame,
