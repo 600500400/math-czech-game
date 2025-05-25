@@ -17,6 +17,9 @@ export interface UseGameControlsProps {
   setShowProblem: (show: boolean) => void;
   saveSpellingStatistics?: any;
   userId?: string | null;
+  startGameTimer: () => void;
+  resetGameTimer: () => void;
+  getGameDuration: () => number;
 }
 
 export const useGameControls = ({
@@ -32,7 +35,10 @@ export const useGameControls = ({
   setWrongAnswers,
   setShowProblem,
   saveSpellingStatistics,
-  userId
+  userId,
+  startGameTimer,
+  resetGameTimer,
+  getGameDuration
 }: UseGameControlsProps) => {
   // Start new game handler
   const startNewGame = useCallback(() => {
@@ -45,6 +51,8 @@ export const useGameControls = ({
     setCorrectAnswers(0);
     setWrongAnswers(0);
     setShowProblem(false);
+    resetGameTimer();
+    startGameTimer();
     
     const problem = generateNewProblem();
     if (problem) {
@@ -57,11 +65,14 @@ export const useGameControls = ({
     setCorrectAnswers, 
     setWrongAnswers, 
     setShowProblem, 
-    setShowGroupDialog
+    setShowGroupDialog,
+    startGameTimer,
+    resetGameTimer
   ]);
 
   // End game handler
   const endGame = useCallback(() => {
+    const gameDuration = getGameDuration();
     setShowProblem(false);
     setShowStatsDialog(true);
     
@@ -70,7 +81,8 @@ export const useGameControls = ({
       console.log("Ukládám statistiky na konci hry:", {
         correctAnswers,
         wrongAnswers,
-        wordGroups: selectedGroups
+        wordGroups: selectedGroups,
+        gameDuration
       });
       
       try {
@@ -78,7 +90,12 @@ export const useGameControls = ({
         saveSpellingStatistics.mutate({
           correctAnswers: correctAnswers,
           wrongAnswers: wrongAnswers,
-          wordGroup: selectedGroups.join(',')
+          wordGroup: selectedGroups.join(','),
+          gameDuration: gameDuration,
+          difficulty: {
+            selectedGroups: selectedGroups,
+            wordCount: correctAnswers + wrongAnswers
+          }
         }, {
           onSuccess: () => {
             console.log("Statistiky úspěšně uloženy");
@@ -99,6 +116,11 @@ export const useGameControls = ({
                 correct_answers: correctAnswers,
                 wrong_answers: wrongAnswers,
                 word_group: selectedGroups.join(','),
+                game_duration: gameDuration,
+                difficulty_level: {
+                  selectedGroups: selectedGroups,
+                  wordCount: correctAnswers + wrongAnswers
+                },
                 created_at: new Date().toISOString(),
                 error: error.message || "Unknown error"
               });
@@ -114,6 +136,8 @@ export const useGameControls = ({
         toast.error("Nastala chyba při ukládání statistik");
       }
     }
+    
+    resetGameTimer();
   }, [
     correctAnswers, 
     wrongAnswers, 
@@ -121,7 +145,9 @@ export const useGameControls = ({
     selectedGroups, 
     saveSpellingStatistics, 
     userId,
-    setShowProblem
+    setShowProblem,
+    getGameDuration,
+    resetGameTimer
   ]);
 
   return {

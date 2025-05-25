@@ -15,6 +15,7 @@ export interface SpellingGameState {
   currentPosition: number;
   lastAnswerCorrect: boolean | null;
   showAnimation: boolean;
+  gameStartTime?: number; // Added for tracking game duration
 }
 
 export interface SpellingWord {
@@ -27,4 +28,9 @@ export interface SpellingGroup {
   name: string;
   words: SpellingWord[];
   phrases?: string[];
+}
+
+export interface SpellingDifficulty {
+  selectedGroups: string[];
+  wordCount: number;
 }

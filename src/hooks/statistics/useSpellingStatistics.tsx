@@ -14,14 +14,18 @@ export const useSpellingStatistics = (userId: string | null) => {
       correctAnswers,
       wrongAnswers,
       wordGroup,
+      gameDuration,
+      difficulty,
     }: {
       correctAnswers: number;
       wrongAnswers: number;
       wordGroup: string;
+      gameDuration?: number;
+      difficulty?: any;
     }) => {
       if (!userId) throw new Error("Uživatel není přihlášen");
 
-      console.log("Ukládání statistik pravopisu:", { userId, correctAnswers, wrongAnswers, wordGroup });
+      console.log("Ukládání statistik pravopisu:", { userId, correctAnswers, wrongAnswers, wordGroup, gameDuration, difficulty });
       
       try {
         // Vždy používáme lokální režim
@@ -42,6 +46,8 @@ export const useSpellingStatistics = (userId: string | null) => {
           correct_answers: correctAnswers,
           wrong_answers: wrongAnswers,
           word_group: wordGroup,
+          game_duration: gameDuration || 0,
+          difficulty_level: difficulty || { selectedGroups: wordGroup.split(','), wordCount: correctAnswers + wrongAnswers },
           created_at: timestamp
         };
         

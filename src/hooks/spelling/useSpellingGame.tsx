@@ -47,7 +47,10 @@ export const useSpellingGame = () => {
     setWrongAnswers: gameStats.setWrongAnswers,
     setShowProblem: gameUI.setShowProblem,
     saveSpellingStatistics: saveSpellingStatistics,
-    userId: userId
+    userId: userId,
+    startGameTimer: gameStats.startGameTimer,
+    resetGameTimer: gameStats.resetGameTimer,
+    getGameDuration: gameStats.getGameDuration
   });
   
   return {
@@ -76,7 +79,7 @@ export const useSpellingGame = () => {
     
     // Group selection
     selectedGroups: groupSelection.selectedGroups,
-    allSelected: groupSelection.allSelected, // Add the allSelected state
+    allSelected: groupSelection.allSelected,
     
     // Handlers and actions
     totalAnswers: gameStats.totalAnswers,
@@ -84,7 +87,7 @@ export const useSpellingGame = () => {
     setShowStatsDialog: gameStats.setShowStatsDialog,
     toggleGroup: groupSelection.toggleGroup,
     setGroups: groupSelection.setGroups,
-    toggleAllGroups: groupSelection.toggleAllGroups, // Add the toggleAllGroups function
+    toggleAllGroups: groupSelection.toggleAllGroups,
     selectAll: groupSelection.selectAll,
     deselectAll: groupSelection.deselectAll,
     startNewGame: gameControls.startNewGame,

@@ -32,9 +32,17 @@ const DetailedStatisticsTable: React.FC<DetailedStatisticsTableProps> = ({ type,
     return minutes > 0 ? `${minutes}m ${remainingSeconds}s` : `${remainingSeconds}s`;
   };
 
-  const formatDifficulty = (difficulty: any) => {
+  const formatMathDifficulty = (difficulty: any) => {
     if (!difficulty) return "N/A";
     return `±${difficulty.maxValue}, ×${difficulty.maxMultiplyValue}, ÷${difficulty.maxDivideValue}`;
+  };
+
+  const formatSpellingDifficulty = (difficulty: any) => {
+    if (!difficulty) return "N/A";
+    if (difficulty.selectedGroups && Array.isArray(difficulty.selectedGroups)) {
+      return `${difficulty.selectedGroups.length} skupin`;
+    }
+    return "N/A";
   };
 
   return (
@@ -49,12 +57,8 @@ const DetailedStatisticsTable: React.FC<DetailedStatisticsTableProps> = ({ type,
             <TableHead className="text-center">Správně</TableHead>
             <TableHead className="text-center">Špatně</TableHead>
             <TableHead className="text-center">Úspěšnost</TableHead>
-            {type === "math" && (
-              <>
-                <TableHead className="min-w-[150px]">Obtížnost</TableHead>
-                <TableHead className="text-center">Doba hry</TableHead>
-              </>
-            )}
+            <TableHead className="min-w-[150px]">Obtížnost</TableHead>
+            <TableHead className="text-center">Doba hry</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -81,16 +85,14 @@ const DetailedStatisticsTable: React.FC<DetailedStatisticsTableProps> = ({ type,
                 <TableCell className="text-center font-bold">
                   {accuracy}%
                 </TableCell>
-                {type === "math" && (
-                  <>
-                    <TableCell className="text-sm">
-                      {formatDifficulty((stat as MathStatistics).difficulty_level)}
-                    </TableCell>
-                    <TableCell className="text-center text-sm">
-                      {formatDuration((stat as MathStatistics).game_duration)}
-                    </TableCell>
-                  </>
-                )}
+                <TableCell className="text-sm">
+                  {type === "math" 
+                    ? formatMathDifficulty((stat as MathStatistics).difficulty_level)
+                    : formatSpellingDifficulty((stat as SpellingStatistics).difficulty_level)}
+                </TableCell>
+                <TableCell className="text-center text-sm">
+                  {formatDuration((stat as any).game_duration)}
+                </TableCell>
               </TableRow>
             );
           })}
