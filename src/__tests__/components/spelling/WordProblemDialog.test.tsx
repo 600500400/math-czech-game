@@ -1,5 +1,7 @@
+
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, test, expect, vi } from 'vitest';
 import '@testing-library/jest-dom';
 import { WordProblemDialog } from '@/components/spelling/WordProblemDialog';
@@ -33,26 +35,29 @@ describe('WordProblemDialog', () => {
     expect(screen.getByText('Věta/spojení')).toBeInTheDocument();
   });
 
-  test('should call onAnswerI when i button is clicked', () => {
+  test('should call onAnswerI when i button is clicked', async () => {
+    const user = userEvent.setup();
     render(<WordProblemDialog {...defaultProps} />);
     
-    fireEvent.click(screen.getByText('i'));
+    await user.click(screen.getByText('i'));
     
     expect(defaultProps.onAnswerI).toHaveBeenCalledTimes(1);
   });
 
-  test('should call onAnswerY when y button is clicked', () => {
+  test('should call onAnswerY when y button is clicked', async () => {
+    const user = userEvent.setup();
     render(<WordProblemDialog {...defaultProps} />);
     
-    fireEvent.click(screen.getByText('y'));
+    await user.click(screen.getByText('y'));
     
     expect(defaultProps.onAnswerY).toHaveBeenCalledTimes(1);
   });
 
-  test('should call onEndGame when end game button is clicked', () => {
+  test('should call onEndGame when end game button is clicked', async () => {
+    const user = userEvent.setup();
     render(<WordProblemDialog {...defaultProps} />);
     
-    fireEvent.click(screen.getByText('Ukončit hru'));
+    await user.click(screen.getByText('Ukončit hru'));
     
     expect(defaultProps.onEndGame).toHaveBeenCalledTimes(1);
   });
@@ -62,7 +67,7 @@ describe('WordProblemDialog', () => {
     
     // Close the dialog (this is an implementation detail of the shadcn/ui Dialog component)
     const closeButton = document.querySelector('[data-radix-collection-item]');
-    if (closeButton) fireEvent.click(closeButton);
+    if (closeButton) closeButton.click();
     
     expect(defaultProps.onOpenChange).toHaveBeenCalled();
   });

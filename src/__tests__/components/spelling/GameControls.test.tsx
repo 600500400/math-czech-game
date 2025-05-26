@@ -1,5 +1,7 @@
+
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, test, expect, vi } from 'vitest';
 import '@testing-library/jest-dom';
 import { GameControls } from '@/components/spelling/GameControls';
@@ -46,24 +48,27 @@ describe('GameControls', () => {
     expect(screen.queryByText('Zobrazit statistiky')).not.toBeInTheDocument();
   });
 
-  test('Group button click should trigger onShowGroupDialog', () => {
+  test('Group button click should trigger onShowGroupDialog', async () => {
+    const user = userEvent.setup();
     render(<GameControls {...defaultProps} />);
     
-    fireEvent.click(screen.getByText('Vybrat skupiny slov'));
+    await user.click(screen.getByText('Vybrat skupiny slov'));
     expect(defaultProps.onShowGroupDialog).toHaveBeenCalledTimes(1);
   });
 
-  test('Start game button click should trigger onStartGame', () => {
+  test('Start game button click should trigger onStartGame', async () => {
+    const user = userEvent.setup();
     render(<GameControls {...defaultProps} />);
     
-    fireEvent.click(screen.getByText('Spustit hru'));
+    await user.click(screen.getByText('Spustit hru'));
     expect(defaultProps.onStartGame).toHaveBeenCalledTimes(1);
   });
 
-  test('Stats button click should trigger onShowStats', () => {
+  test('Stats button click should trigger onShowStats', async () => {
+    const user = userEvent.setup();
     render(<GameControls {...defaultProps} hasStats={true} />);
     
-    fireEvent.click(screen.getByText('Zobrazit statistiky'));
+    await user.click(screen.getByText('Zobrazit statistiky'));
     expect(defaultProps.onShowStats).toHaveBeenCalledTimes(1);
   });
 });
