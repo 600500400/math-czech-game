@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { BarChart, Bar, XAxis, YAxis, Cell } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Cell, ResponsiveContainer } from "recharts";
 
 interface StatisticsDialogProps {
   open: boolean;
@@ -37,7 +37,7 @@ export const StatisticsDialog = ({
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl">
+      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-center text-xl">Statistika</DialogTitle>
         </DialogHeader>
@@ -76,26 +76,28 @@ export const StatisticsDialog = ({
             </TableBody>
           </Table>
           
-          {/* Graph with colored bars */}
+          {/* Graph with colored bars - reduced height and proper margins */}
           {totalAnswers > 0 && (
-            <div className="h-48">
+            <div className="h-32 mb-4">
               <ChartContainer config={{
                 correct: { color: "#4ade80" },
                 wrong: { color: "#f87171" }
               }}>
-                <BarChart data={chartData}>
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Bar 
-                    dataKey="value" 
-                    name="value"
-                  >
-                    {chartData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Bar>
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                </BarChart>
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Bar 
+                      dataKey="value" 
+                      name="value"
+                    >
+                      {chartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Bar>
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                  </BarChart>
+                </ResponsiveContainer>
               </ChartContainer>
             </div>
           )}
