@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
+import { screen } from '@testing-library/dom';
 import userEvent from '@testing-library/user-event';
 import { describe, test, expect, vi } from 'vitest';
 import '@testing-library/jest-dom';
@@ -62,12 +63,15 @@ describe('WordProblemDialog', () => {
     expect(defaultProps.onEndGame).toHaveBeenCalledTimes(1);
   });
 
-  test('should call onEndGame when dialog is closed', () => {
+  test('should call onEndGame when dialog is closed', async () => {
+    const user = userEvent.setup();
     render(<WordProblemDialog {...defaultProps} />);
     
-    // Close the dialog (this is an implementation detail of the shadcn/ui Dialog component)
+    // Close the dialog using userEvent for proper typing
     const closeButton = document.querySelector('[data-radix-collection-item]');
-    if (closeButton) closeButton.click();
+    if (closeButton) {
+      await user.click(closeButton as HTMLElement);
+    }
     
     expect(defaultProps.onOpenChange).toHaveBeenCalled();
   });
