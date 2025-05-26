@@ -31,14 +31,19 @@ const StatisticsDialog: React.FC<StatisticsDialogProps> = ({
     { name: "Špatně", value: wrongAnswers, color: "#f87171" },
   ];
 
+  const chartConfig = {
+    correct: { color: "#4ade80" },
+    wrong: { color: "#f87171" }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-center text-xl">Statistika matematiky</DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-6 py-4">
+        <div className="space-y-4 py-4">
           {/* Progress bar */}
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
@@ -72,20 +77,31 @@ const StatisticsDialog: React.FC<StatisticsDialogProps> = ({
             </TableBody>
           </Table>
           
-          {/* Graph with colored bars - reduced height and proper margins */}
+          {/* Graph with colored bars - fixed height and proper configuration */}
           {totalAnswers > 0 && (
-            <div className="h-32 mb-4">
-              <ChartContainer config={{
-                correct: { color: "#4ade80" },
-                wrong: { color: "#f87171" }
-              }}>
+            <div className="w-full h-40 mb-6">
+              <ChartContainer config={chartConfig} className="w-full h-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
-                    <XAxis dataKey="name" />
-                    <YAxis />
+                  <BarChart 
+                    data={chartData} 
+                    margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                    barCategoryGap="20%"
+                  >
+                    <XAxis 
+                      dataKey="name" 
+                      tick={{ fontSize: 12 }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <YAxis 
+                      tick={{ fontSize: 12 }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
                     <Bar 
                       dataKey="value"
-                      name="Hodnota"
+                      radius={[4, 4, 0, 0]}
+                      maxBarSize={60}
                     >
                       {chartData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
@@ -99,7 +115,7 @@ const StatisticsDialog: React.FC<StatisticsDialogProps> = ({
           )}
         </div>
         
-        <DialogFooter>
+        <DialogFooter className="mt-4">
           <Button 
             onClick={() => onOpenChange(false)}
             className="bg-orange-500 hover:bg-orange-600 w-full"
