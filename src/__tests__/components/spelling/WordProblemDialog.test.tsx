@@ -1,7 +1,5 @@
-
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
-import { screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, test, expect, vi } from 'vitest';
 import '@testing-library/jest-dom';
 import { WordProblemDialog } from '@/components/spelling/WordProblemDialog';
