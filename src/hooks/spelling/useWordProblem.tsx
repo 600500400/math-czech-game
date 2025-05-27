@@ -1,6 +1,5 @@
-
 import { useState, useCallback } from "react";
-import { SpellingGroup } from "@/types/spellingTypes";
+import { SpellingGroup, SpellingAnswer } from "@/types/spellingTypes";
 import { spellingGroups } from "@/data/spellingData";
 
 interface UseWordProblemProps {
@@ -10,6 +9,7 @@ interface UseWordProblemProps {
   showAnimation: boolean;
   setLastAnswerCorrect: (isCorrect: boolean | null) => void;
   setShowAnimation: (show: boolean) => void;
+  addAnswer: (answer: SpellingAnswer) => void;
 }
 
 export const useWordProblem = ({
@@ -18,7 +18,8 @@ export const useWordProblem = ({
   onWrongAnswer,
   showAnimation,
   setLastAnswerCorrect,
-  setShowAnimation
+  setShowAnimation,
+  addAnswer
 }: UseWordProblemProps) => {
   // State for current word
   const [currentWord, setCurrentWord] = useState("");
@@ -168,6 +169,20 @@ export const useWordProblem = ({
     console.log("💭 handleAnswer: Normalizované správné písmeno:", normalizedCorrect);
     console.log("💭 handleAnswer: Je odpověď správná?", isCorrect);
     
+    // Create detailed answer record
+    const answerRecord: SpellingAnswer = {
+      word: currentWord,
+      position: currentPosition,
+      userAnswer: answer,
+      correctAnswer: normalizedCorrect,
+      isCorrect,
+      timestamp: new Date().toISOString(),
+      wordGroup: wordGroup
+    };
+    
+    // Add to answers array
+    addAnswer(answerRecord);
+    
     // Aktualizace statistik
     if (isCorrect) {
       onCorrectAnswer();
@@ -197,7 +212,7 @@ export const useWordProblem = ({
         generateNewProblem();
       }
     }, 1000);
-  }, [correctLetters, currentPosition, generateNewProblem, missingPositions.length, onCorrectAnswer, onWrongAnswer, setLastAnswerCorrect, setShowAnimation]);
+  }, [correctLetters, currentPosition, generateNewProblem, missingPositions.length, onCorrectAnswer, onWrongAnswer, setLastAnswerCorrect, setShowAnimation, addAnswer, currentWord, wordGroup]);
 
   // Odpovědi na i/y
   const handleAnswerI = useCallback(() => handleAnswer("i"), [handleAnswer]);

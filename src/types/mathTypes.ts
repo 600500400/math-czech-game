@@ -8,6 +8,14 @@ export interface Problem {
   result: number;
 }
 
+export interface MathAnswer {
+  problem: Problem;
+  userAnswer: number;
+  correctAnswer: number;
+  isCorrect: boolean;
+  timestamp: string;
+}
+
 export interface ChartDataItem {
   name: string;
   value: number;
@@ -31,6 +39,7 @@ export interface MathGameState {
   showConfetti: boolean;
   gameStartTime?: Date;
   gameDuration?: number;
+  answers: MathAnswer[]; // New field for detailed answers
 }
 
 export interface DifficultyLevel {
@@ -48,4 +57,5 @@ export interface DetailedMathStatistics {
   difficulty_level: DifficultyLevel;
   game_duration: number; // in seconds
   created_at: string;
+  answers?: MathAnswer[]; // Optional detailed answers
 }

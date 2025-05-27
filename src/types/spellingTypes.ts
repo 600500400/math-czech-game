@@ -1,4 +1,14 @@
 
+export interface SpellingAnswer {
+  word: string;
+  position: number;
+  userAnswer: string;
+  correctAnswer: string;
+  isCorrect: boolean;
+  timestamp: string;
+  wordGroup: string;
+}
+
 export interface SpellingGameState {
   correctAnswers: number;
   wrongAnswers: number;
@@ -15,7 +25,8 @@ export interface SpellingGameState {
   currentPosition: number;
   lastAnswerCorrect: boolean | null;
   showAnimation: boolean;
-  gameStartTime?: number; // Added for tracking game duration
+  gameStartTime?: number;
+  answers: SpellingAnswer[]; // New field for detailed answers
 }
 
 export interface SpellingWord {

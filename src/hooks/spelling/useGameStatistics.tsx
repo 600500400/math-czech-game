@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { SpellingAnswer } from "@/types/spellingTypes";
 
 export const useGameStatistics = () => {
   const [correctAnswers, setCorrectAnswers] = useState(0);
@@ -7,6 +8,7 @@ export const useGameStatistics = () => {
   const [showStatsDialog, setShowStatsDialog] = useState(false);
   const [problemCount, setProblemCount] = useState(0);
   const [gameStartTime, setGameStartTime] = useState<number | null>(null);
+  const [answers, setAnswers] = useState<SpellingAnswer[]>([]);
   
   // Calculate total answers for statistics
   const totalAnswers = correctAnswers + wrongAnswers;
@@ -44,6 +46,16 @@ export const useGameStatistics = () => {
     setProblemCount(prev => prev + 1);
   };
   
+  // Add detailed answer
+  const addAnswer = (answer: SpellingAnswer) => {
+    setAnswers(prev => [...prev, answer]);
+  };
+  
+  // Reset answers
+  const resetAnswers = () => {
+    setAnswers([]);
+  };
+  
   return {
     correctAnswers,
     wrongAnswers,
@@ -52,6 +64,7 @@ export const useGameStatistics = () => {
     showStatsDialog,
     hasStats,
     gameStartTime,
+    answers,
     
     setCorrectAnswers,
     setWrongAnswers,
@@ -63,6 +76,8 @@ export const useGameStatistics = () => {
     incrementProblemCount,
     startGameTimer,
     resetGameTimer,
-    getGameDuration
+    getGameDuration,
+    addAnswer,
+    resetAnswers
   };
 };

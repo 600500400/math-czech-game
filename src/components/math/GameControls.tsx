@@ -3,7 +3,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Settings } from "lucide-react";
+import { Settings, AlertCircle } from "lucide-react";
 
 interface GameControlsProps {
   problemCount: number;
@@ -17,6 +17,7 @@ interface GameControlsProps {
   onStartGame: () => void;
   onShowStats: () => void;
   onResetGame: () => void;
+  onShowErrors: () => void;
 }
 
 const GameControls: React.FC<GameControlsProps> = ({
@@ -31,6 +32,7 @@ const GameControls: React.FC<GameControlsProps> = ({
   onStartGame,
   onShowStats,
   onResetGame,
+  onShowErrors,
 }) => {
   return (
     <div className="space-y-4">
@@ -78,12 +80,23 @@ const GameControls: React.FC<GameControlsProps> = ({
         </Button>
         
         {totalAnswers > 0 && (
-          <Button
-            onClick={onShowStats}
-            className="w-full bg-blue-500 hover:bg-blue-600"
-          >
-            Zobrazit statistiku
-          </Button>
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              onClick={onShowStats}
+              className="w-full bg-blue-500 hover:bg-blue-600"
+            >
+              Zobrazit statistiku
+            </Button>
+            
+            <Button
+              onClick={onShowErrors}
+              variant="outline"
+              className="w-full border-red-300 text-red-600 hover:bg-red-50"
+            >
+              <AlertCircle size={16} className="mr-1" />
+              Chyby
+            </Button>
+          </div>
         )}
 
         {gameEnded && (

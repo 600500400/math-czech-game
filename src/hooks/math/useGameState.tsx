@@ -1,13 +1,13 @@
 
 import { useState, useCallback } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { Problem, Operation } from "@/types/mathTypes";
+import { Problem, Operation, MathAnswer } from "@/types/mathTypes";
 
 export function useGameState() {
   const { toast } = useToast();
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [wrongAnswers, setWrongAnswers] = useState(0);
-  const [problemCount, setProblemCount] = useState(10); // Default to 10 problems
+  const [problemCount, setProblemCount] = useState(10);
   const [currentProblem, setCurrentProblem] = useState<Problem | null>(null);
   const [userAnswer, setUserAnswer] = useState("");
   const [showProblem, setShowProblem] = useState(false);
@@ -22,10 +22,21 @@ export function useGameState() {
   const [lastAnswerCorrect, setLastAnswerCorrect] = useState<boolean | null>(null);
   const [showAnimation, setShowAnimation] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [answers, setAnswers] = useState<MathAnswer[]>([]);
 
   // Calculated properties
   const totalAnswers = correctAnswers + wrongAnswers;
   const correctPercentage = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 0;
+
+  // Add answer to the answers array
+  const addAnswer = useCallback((answer: MathAnswer) => {
+    setAnswers(prev => [...prev, answer]);
+  }, []);
+
+  // Reset answers
+  const resetAnswers = useCallback(() => {
+    setAnswers([]);
+  }, []);
 
   return {
     // State
@@ -63,9 +74,15 @@ export function useGameState() {
     setShowAnimation,
     showConfetti,
     setShowConfetti,
+    answers,
+    setAnswers,
     
     // Calculated properties
     totalAnswers,
     correctPercentage,
+    
+    // Answer management
+    addAnswer,
+    resetAnswers,
   };
 }
