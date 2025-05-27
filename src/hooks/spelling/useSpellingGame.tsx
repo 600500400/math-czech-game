@@ -30,7 +30,8 @@ export const useSpellingGame = () => {
     onWrongAnswer: gameStats.incrementWrong,
     showAnimation: animation.showAnimation,
     setLastAnswerCorrect: animation.setLastAnswerCorrect,
-    setShowAnimation: animation.setShowAnimation
+    setShowAnimation: animation.setShowAnimation,
+    addAnswer: gameStats.addAnswer
   });
 
   // Game controls with all necessary dependencies
@@ -83,6 +84,7 @@ export const useSpellingGame = () => {
     
     // Handlers and actions
     totalAnswers: gameStats.totalAnswers,
+    answers: gameStats.answers,
     setShowGroupDialog: groupSelection.setShowGroupDialog,
     setShowStatsDialog: gameStats.setShowStatsDialog,
     toggleGroup: groupSelection.toggleGroup,

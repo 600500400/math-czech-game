@@ -28,7 +28,8 @@ export const useGameMechanics = () => {
     onWrongAnswer: gameStats.incrementWrong,
     showAnimation: animation.showAnimation,
     setLastAnswerCorrect: animation.setLastAnswerCorrect,
-    setShowAnimation: animation.setShowAnimation
+    setShowAnimation: animation.setShowAnimation,
+    addAnswer: gameStats.addAnswer
   });
 
   // Game control functions

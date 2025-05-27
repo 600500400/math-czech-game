@@ -88,6 +88,7 @@ export function useMathGame() {
     setShowAnimation: gameState.setShowAnimation,
     setShowConfetti: gameState.setShowConfetti,
     generateProblem: problemGenerator.generateProblem,
+    addAnswer: gameState.addAnswer,
     endGame: endGame,
   });
 
