@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import AppHeader from "@/components/layout/AppHeader";
 import AppNavigation from "@/components/layout/AppNavigation";
+import AppFooter from "@/components/layout/AppFooter";
 import PracticeSection from "@/components/practice/PracticeSection";
 import StatisticsViewer from "@/components/StatisticsViewer";
 import WelcomeCard from "@/components/auth/WelcomeCard";
@@ -39,6 +40,8 @@ const HomePage = () => {
       ) : (
         <WelcomeCard />
       )}
+      
+      <AppFooter />
     </div>
   );
 };

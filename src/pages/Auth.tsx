@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -7,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import AppFooter from "@/components/layout/AppFooter";
 
 // Předem definovaní uživatelé s UUID formátem ID
 const DEFAULT_USERS = [
@@ -94,7 +94,7 @@ const Auth = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-50 p-4">
+    <div className="flex flex-col justify-center items-center min-h-screen bg-gray-50 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">Procvička App</CardTitle>
@@ -134,6 +134,7 @@ const Auth = () => {
           </p>
         </CardFooter>
       </Card>
+      <AppFooter />
     </div>
   );
 };
