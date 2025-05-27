@@ -2,15 +2,14 @@
 /**
  * Formátuje datum ve formátu ISO na lokalizovaný formát
  * @param isoDate ISO formát datumu
- * @returns Lokalizované datum ve formátu dd.mm.yyyy hh:mm
+ * @returns Lokalizované datum ve zkráceném formátu d.m.yy h'h'
  */
 export function formatDate(isoDate: string): string {
   const date = new Date(isoDate);
   return date.toLocaleString('cs-CZ', { 
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
+    day: 'numeric',
+    month: 'numeric',
+    year: '2-digit',
+    hour: 'numeric'
+  }).replace(/\s/, ' ') + 'h';
 }
