@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -13,6 +12,7 @@ const DEFAULT_USERS = [
   { id: "58d94646-332a-40f1-86fb-0861c1c48a66", email: "", username: "Míša", role: "child" },
   { id: "f7f45db0-49e4-4218-a420-4812442fc0e1", email: "", username: "Gábi", role: "child" },
   { id: "2f7c5c1d-f69d-4aee-a373-bc7f416b08f2", email: "", username: "Host", role: "child" },
+  { id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890", email: "", username: "Áďa", role: "child" },
 ];
 
 const Auth = () => {
