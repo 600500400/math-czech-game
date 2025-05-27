@@ -1,16 +1,26 @@
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DetailedStatisticsTable from "./DetailedStatisticsTable";
 import CumulativeChart from "./CumulativeChart";
+import MathErrorsSection from "./MathErrorsSection";
+import SpellingErrorsSection from "./SpellingErrorsSection";
 import { MathStatistics, SpellingStatistics } from "@/types/authTypes";
 import { FileText, Calculator } from "lucide-react";
+import { MathAnswer } from "@/types/mathTypes";
+import { SpellingAnswer } from "@/types/spellingTypes";
 
 interface StatisticsTabsProps {
   mathStats: MathStatistics[];
   spellingStats: SpellingStatistics[];
+  mathAnswers?: MathAnswer[];
+  spellingAnswers?: SpellingAnswer[];
 }
 
-const StatisticsTabs = ({ mathStats, spellingStats }: StatisticsTabsProps) => {
+const StatisticsTabs = ({ 
+  mathStats, 
+  spellingStats, 
+  mathAnswers = [], 
+  spellingAnswers = [] 
+}: StatisticsTabsProps) => {
   // Calculate cumulative statistics for both categories
   const totalSpellingProblems = spellingStats.reduce((sum, stat) => 
     sum + stat.correct_answers + stat.wrong_answers, 0);
@@ -80,6 +90,8 @@ const StatisticsTabs = ({ mathStats, spellingStats }: StatisticsTabsProps) => {
             type="spelling" 
           />
         )}
+
+        <SpellingErrorsSection answers={spellingAnswers} />
       </TabsContent>
       
       <TabsContent value="math" className="mt-4 space-y-6">
@@ -111,6 +123,8 @@ const StatisticsTabs = ({ mathStats, spellingStats }: StatisticsTabsProps) => {
             type="math" 
           />
         )}
+
+        <MathErrorsSection answers={mathAnswers} />
       </TabsContent>
     </Tabs>
   );

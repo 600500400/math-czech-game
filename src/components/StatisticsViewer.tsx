@@ -1,8 +1,9 @@
 
 import { useAuth } from "@/hooks/useAuth";
 import { useStatistics } from "@/hooks/useStatistics";
+import { useDetailedAnswers } from "@/hooks/statistics/useDetailedAnswers";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import EmptyStatisticsState from "./statistics/EmptyStatisticsState";
 import LoadingStatisticsState from "./statistics/LoadingStatisticsState";
 import UnauthenticatedState from "./statistics/UnauthenticatedState";
@@ -13,9 +14,7 @@ import { toast } from "sonner";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 const StatisticsViewer = () => {
-  const {
-    authState
-  } = useAuth();
+  const { authState } = useAuth();
   const {
     mathStats,
     spellingStats,
@@ -24,6 +23,8 @@ const StatisticsViewer = () => {
     resetUserStatistics,
     forceRefreshAllStatistics
   } = useStatistics(authState.user?.id || null);
+  
+  const { mathAnswers, spellingAnswers, clearAllAnswers } = useDetailedAnswers(currentUserId);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   
   if (!authState.isAuthenticated) {
@@ -38,6 +39,7 @@ const StatisticsViewer = () => {
     if (currentUserId) {
       const success = resetUserStatistics(currentUserId);
       if (success) {
+        clearAllAnswers(); // Also clear detailed answers
         toast.success("Statistiky byly úspěšně vymazány");
         forceRefreshAllStatistics();
       } else {
@@ -83,7 +85,12 @@ const StatisticsViewer = () => {
         </div>
       </CardHeader>
       <CardContent className="p-6">
-        <StatisticsTabs mathStats={mathStats} spellingStats={spellingStats} />
+        <StatisticsTabs 
+          mathStats={mathStats} 
+          spellingStats={spellingStats}
+          mathAnswers={mathAnswers}
+          spellingAnswers={spellingAnswers}
+        />
       </CardContent>
     </Card>
   );
