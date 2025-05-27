@@ -37,14 +37,6 @@ const DetailedStatisticsTable: React.FC<DetailedStatisticsTableProps> = ({ type,
     return `±${difficulty.maxValue}, ×${difficulty.maxMultiplyValue}, ÷${difficulty.maxDivideValue}`;
   };
 
-  const formatSpellingDifficulty = (difficulty: any) => {
-    if (!difficulty) return "N/A";
-    if (difficulty.selectedGroups && Array.isArray(difficulty.selectedGroups)) {
-      return `${difficulty.selectedGroups.length} skupin`;
-    }
-    return "N/A";
-  };
-
   return (
     <div className="overflow-x-auto">
       <Table>
@@ -57,7 +49,9 @@ const DetailedStatisticsTable: React.FC<DetailedStatisticsTableProps> = ({ type,
             <TableHead className="text-center">Správně</TableHead>
             <TableHead className="text-center">Špatně</TableHead>
             <TableHead className="text-center">Úspěšnost</TableHead>
-            <TableHead className="min-w-[150px]">Obtížnost</TableHead>
+            {type === "math" && (
+              <TableHead className="min-w-[150px]">Obtížnost</TableHead>
+            )}
             <TableHead className="text-center">Doba hry</TableHead>
           </TableRow>
         </TableHeader>
@@ -85,11 +79,11 @@ const DetailedStatisticsTable: React.FC<DetailedStatisticsTableProps> = ({ type,
                 <TableCell className="text-center font-bold">
                   {accuracy}%
                 </TableCell>
-                <TableCell className="text-sm">
-                  {type === "math" 
-                    ? formatMathDifficulty((stat as MathStatistics).difficulty_level)
-                    : formatSpellingDifficulty((stat as SpellingStatistics).difficulty_level)}
-                </TableCell>
+                {type === "math" && (
+                  <TableCell className="text-sm">
+                    {formatMathDifficulty((stat as MathStatistics).difficulty_level)}
+                  </TableCell>
+                )}
                 <TableCell className="text-center text-sm">
                   {formatDuration((stat as any).game_duration)}
                 </TableCell>
