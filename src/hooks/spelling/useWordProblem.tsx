@@ -33,37 +33,70 @@ export const useWordProblem = ({
 
   // Pomocné funkce pro generování problémů a pozic
   const generateProblem = (selectedGroups: string[]) => {
+    console.log("🎯 generateProblem: Začínám generování s vybranými skupinami:", selectedGroups);
+    
     // Výběr náhodné skupiny ze seznamu vybraných skupin
     const groupName = selectedGroups[Math.floor(Math.random() * selectedGroups.length)];
     const group = spellingGroups.find(g => g.name === groupName);
     
+    console.log("🎯 generateProblem: Vybraná skupina:", groupName, "nalezena:", !!group);
+    
     if (!group || !group.words || group.words.length === 0) {
+      console.error("🎯 generateProblem: Skupina nemá slova!");
       return { word: "", group: "", isPhrase: false };
     }
 
-    // Výběr náhodného slova ze skupiny
-    const wordObj = group.words[Math.floor(Math.random() * group.words.length)];
-    const isPhrase = wordObj.word.includes(" ");
+    // Pokusíme se najít slovo s i/y (max 50 pokusů)
+    let attempts = 0;
+    const maxAttempts = 50;
     
-    return {
-      word: wordObj.word,
-      group: groupName,
-      isPhrase
-    };
+    while (attempts < maxAttempts) {
+      const wordObj = group.words[Math.floor(Math.random() * group.words.length)];
+      const word = wordObj.word;
+      const isPhrase = word.includes(" ");
+      
+      console.log(`🎯 generateProblem: Pokus ${attempts + 1}: testuju slovo "${word}"`);
+      
+      // Kontrola, zda slovo obsahuje i/y/í/ý
+      const hasTargetLetters = /[iyíý]/i.test(word);
+      
+      console.log(`🎯 generateProblem: Slovo "${word}" obsahuje i/y/í/ý:`, hasTargetLetters);
+      
+      if (hasTargetLetters) {
+        console.log(`🎯 generateProblem: ✅ Vybrané slovo: "${word}" ze skupiny ${groupName}`);
+        return {
+          word: word,
+          group: groupName,
+          isPhrase
+        };
+      }
+      
+      attempts++;
+    }
+    
+    console.error(`🎯 generateProblem: ❌ Nenalezeno vhodné slovo po ${maxAttempts} pokusech`);
+    return { word: "", group: "", isPhrase: false };
   };
 
   const generateMissingPositions = (word: string) => {
+    console.log("🔍 generateMissingPositions: Analyzuji slovo:", word);
+    
     // Najít všechny pozice, kde je 'i' nebo 'y'
     const positions: number[] = [];
     const letters: string[] = [];
     
     for (let i = 0; i < word.length; i++) {
-      const lowerChar = word[i].toLowerCase();
-      if (lowerChar === 'i' || lowerChar === 'y') {
+      const char = word[i];
+      const lowerChar = char.toLowerCase();
+      if (lowerChar === 'i' || lowerChar === 'y' || lowerChar === 'í' || lowerChar === 'ý') {
         positions.push(i);
         letters.push(lowerChar);
+        console.log(`🔍 generateMissingPositions: Pozice ${i}: "${char}" -> "${lowerChar}"`);
       }
     }
+    
+    console.log("🔍 generateMissingPositions: Nalezené pozice:", positions);
+    console.log("🔍 generateMissingPositions: Nalezená písmena:", letters);
     
     // Vytvořit slovo s mezerami na místech i/y
     let displayWord = '';
@@ -75,17 +108,38 @@ export const useWordProblem = ({
       }
     }
     
+    console.log("🔍 generateMissingPositions: Zobrazované slovo:", displayWord);
+    
     return { displayWord, positions, letters };
   };
 
   // Generování nového problému
   const generateNewProblem = useCallback(() => {
+    console.log("🚀 generateNewProblem: Spouštím generování nového problému");
+    
     if (selectedGroups.length === 0) {
+      console.error("🚀 generateNewProblem: Žádné vybrané skupiny!");
       return null;
     }
 
     const { word, group, isPhrase } = generateProblem(selectedGroups);
+    
+    if (!word) {
+      console.error("🚀 generateNewProblem: Nepodařilo se vygenerovat slovo!");
+      return null;
+    }
+    
     const { displayWord, positions, letters } = generateMissingPositions(word);
+    
+    console.log("🚀 generateNewProblem: Nastavuji stav s:", {
+      currentWord: word,
+      displayedWord: displayWord,
+      wordGroup: group,
+      isPhrase,
+      missingPositions: positions,
+      correctLetters: letters,
+      currentPosition: 0
+    });
     
     setCurrentWord(word);
     setWordGroup(group);
@@ -100,7 +154,19 @@ export const useWordProblem = ({
 
   // Odpověď na otázku
   const handleAnswer = useCallback((answer: "i" | "y") => {
-    const isCorrect = correctLetters[currentPosition] === answer;
+    console.log("💭 handleAnswer: Odpovídám:", answer);
+    console.log("💭 handleAnswer: Současná pozice:", currentPosition);
+    console.log("💭 handleAnswer: Správná písmena:", correctLetters);
+    console.log("💭 handleAnswer: Správné písmeno na pozici:", correctLetters[currentPosition]);
+    
+    const correctLetter = correctLetters[currentPosition];
+    
+    // Normalizace pro porovnání (í->i, ý->y)
+    const normalizedCorrect = correctLetter === 'í' ? 'i' : correctLetter === 'ý' ? 'y' : correctLetter;
+    const isCorrect = normalizedCorrect === answer;
+    
+    console.log("💭 handleAnswer: Normalizované správné písmeno:", normalizedCorrect);
+    console.log("💭 handleAnswer: Je odpověď správná?", isCorrect);
     
     // Aktualizace statistik
     if (isCorrect) {
@@ -123,9 +189,11 @@ export const useWordProblem = ({
     setTimeout(() => {
       if (currentPosition + 1 < missingPositions.length) {
         // Další písmeno ve stejném slově
+        console.log("💭 handleAnswer: Posun na další pozici:", currentPosition + 1);
         setCurrentPosition(prev => prev + 1);
       } else {
         // Všechna písmena ve slově byla zodpovězena
+        console.log("💭 handleAnswer: Generuji nové slovo");
         generateNewProblem();
       }
     }, 1000);

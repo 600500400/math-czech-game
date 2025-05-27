@@ -4,7 +4,7 @@ import { removeDiacritics } from "@/lib/utils";
 
 // Funkce pro generování problému
 export function generateSpellingProblem(selectedGroups: string[], spellingGroups: SpellingGroup[]) {
-  console.log("Generování problému pro skupiny:", selectedGroups);
+  console.log("⚙️ generateSpellingProblem: Generování problému pro skupiny:", selectedGroups);
   
   // Filtrujeme skupiny podle výběru
   const availableGroups = spellingGroups.filter(group => 
@@ -12,22 +12,22 @@ export function generateSpellingProblem(selectedGroups: string[], spellingGroups
   );
   
   if (availableGroups.length === 0) {
-    console.log("Žádné dostupné skupiny");
+    console.log("⚙️ generateSpellingProblem: Žádné dostupné skupiny");
     return null;
   }
   
   // Náhodně vybereme skupinu
   const randomGroup = availableGroups[Math.floor(Math.random() * availableGroups.length)];
-  console.log("Vybraná skupina:", randomGroup.name);
+  console.log("⚙️ generateSpellingProblem: Vybraná skupina:", randomGroup.name);
   
   // Náhodně rozhodneme, zda použijeme frázi nebo slovo
   const usePhrase = randomGroup.phrases && randomGroup.phrases.length > 0 && Math.random() > 0.7;
   
   if (usePhrase && randomGroup.phrases) {
-    console.log("Pokus o použití fráze");
+    console.log("⚙️ generateSpellingProblem: Pokus o použití fráze");
     // Vybereme náhodnou frázi
     const randomPhrase = randomGroup.phrases[Math.floor(Math.random() * randomGroup.phrases.length)];
-    console.log("Vybraná fráze:", randomPhrase);
+    console.log("⚙️ generateSpellingProblem: Vybraná fráze:", randomPhrase);
     
     // Najdeme všechny pozice i/y/í/ý v textu
     const positions: number[] = [];
@@ -41,7 +41,7 @@ export function generateSpellingProblem(selectedGroups: string[], spellingGroups
       }
     }
     
-    console.log("Pozice i/y ve frázi:", positions, "Písmena:", letters);
+    console.log("⚙️ generateSpellingProblem: Pozice i/y ve frázi:", positions, "Písmena:", letters);
     
     // Pokud jsou nějaké i/y ve frázi
     if (positions.length > 0) {
@@ -55,7 +55,7 @@ export function generateSpellingProblem(selectedGroups: string[], spellingGroups
         }
       }
       
-      console.log("Zobrazená fráze:", displayedPhrase);
+      console.log("⚙️ generateSpellingProblem: Zobrazená fráze:", displayedPhrase);
       
       return {
         word: randomPhrase,
@@ -71,7 +71,7 @@ export function generateSpellingProblem(selectedGroups: string[], spellingGroups
   // Pokud nepoužijeme frázi nebo žádná není k dispozici, použijeme slovo
   const words = randomGroup.words;
   if (words.length === 0) {
-    console.log("Žádná slova ve skupině");
+    console.log("⚙️ generateSpellingProblem: Žádná slova ve skupině");
     return null;
   }
   
@@ -81,7 +81,7 @@ export function generateSpellingProblem(selectedGroups: string[], spellingGroups
   
   while (attempts < maxAttempts) {
     const randomWord = words[Math.floor(Math.random() * words.length)];
-    console.log(`Pokus ${attempts + 1}: zkouším slovo "${randomWord.word}"`);
+    console.log(`⚙️ generateSpellingProblem: Pokus ${attempts + 1}: zkouším slovo "${randomWord.word}"`);
     
     // Najdeme všechny pozice i/y/í/ý ve slově
     const positions: number[] = [];
@@ -95,7 +95,7 @@ export function generateSpellingProblem(selectedGroups: string[], spellingGroups
       }
     }
     
-    console.log("Pozice i/y ve slově:", positions, "Písmena:", letters);
+    console.log("⚙️ generateSpellingProblem: Pozice i/y ve slově:", positions, "Písmena:", letters);
     
     // Pokud slovo obsahuje i/y, použijeme ho
     if (positions.length > 0) {
@@ -109,8 +109,8 @@ export function generateSpellingProblem(selectedGroups: string[], spellingGroups
         }
       }
       
-      console.log("Originální slovo:", randomWord.word);
-      console.log("Zobrazené slovo:", displayedWord);
+      console.log("⚙️ generateSpellingProblem: Originální slovo:", randomWord.word);
+      console.log("⚙️ generateSpellingProblem: Zobrazené slovo:", displayedWord);
       
       return {
         word: randomWord.word,
@@ -127,16 +127,21 @@ export function generateSpellingProblem(selectedGroups: string[], spellingGroups
   }
   
   // Pokud nenajdeme žádné vhodné slovo, vrátíme null
-  console.warn(`Nenalezeno žádné slovo s i/y ve skupině ${randomGroup.name} po ${maxAttempts} pokusech`);
+  console.warn(`⚙️ generateSpellingProblem: Nenalezeno žádné slovo s i/y ve skupině ${randomGroup.name} po ${maxAttempts} pokusech`);
   return null;
 }
 
 // Funkce pro kontrolu odpovědi
 export function checkSpellingAnswer(correctLetter: string, userAnswer: string): boolean {
+  console.log("✅ checkSpellingAnswer: Kontroluji odpověď");
+  console.log("✅ checkSpellingAnswer: Správné písmeno:", correctLetter);
+  console.log("✅ checkSpellingAnswer: Uživatelova odpověď:", userAnswer);
+  
   const correctNormalized = removeDiacritics(correctLetter).toLowerCase();
   const userNormalized = removeDiacritics(userAnswer).toLowerCase();
   
-  console.log("Kontrola odpovědi - správné:", correctNormalized, "uživatel:", userNormalized);
+  console.log("✅ checkSpellingAnswer: Normalizované správné:", correctNormalized);
+  console.log("✅ checkSpellingAnswer: Normalizované uživatel:", userNormalized);
   
   // Určení, zda je odpověď správná - kontrolujeme jen základ (i/y)
   const isCorrect = (
@@ -145,7 +150,7 @@ export function checkSpellingAnswer(correctLetter: string, userAnswer: string): 
     (correctNormalized === 'y') && (userNormalized === 'y')
   );
   
-  console.log("Výsledek kontroly:", isCorrect);
+  console.log("✅ checkSpellingAnswer: Výsledek kontroly:", isCorrect);
   return isCorrect;
 }
 
@@ -156,14 +161,16 @@ export function renderWordWithCurrentGap(
   correctLetters: string[], 
   currentPosition: number
 ): string {
-  if (!currentWord || missingPositions.length === 0) return currentWord;
+  console.log("🖼️ renderWordWithCurrentGap: ZAČÁTEK VYKRESLOVÁNÍ");
+  console.log("🖼️ renderWordWithCurrentGap: currentWord:", currentWord);
+  console.log("🖼️ renderWordWithCurrentGap: missingPositions:", missingPositions);
+  console.log("🖼️ renderWordWithCurrentGap: correctLetters:", correctLetters);
+  console.log("🖼️ renderWordWithCurrentGap: currentPosition:", currentPosition);
   
-  console.log("Vykreslování slova:", {
-    currentWord,
-    missingPositions,
-    correctLetters,
-    currentPosition
-  });
+  if (!currentWord || missingPositions.length === 0) {
+    console.log("🖼️ renderWordWithCurrentGap: Vracím původní slovo (žádné změny)");
+    return currentWord;
+  }
   
   // Vytvoříme výsledné slovo znak po znaku
   let result = '';
@@ -171,20 +178,28 @@ export function renderWordWithCurrentGap(
     const positionIndex = missingPositions.indexOf(i);
     
     if (positionIndex !== -1) {
-      // Tato pozice má být mezera
+      // Tato pozice má být mezera nebo už vyplněné písmeno
       if (positionIndex === currentPosition) {
         // Pro aktuální pozici vložíme podtržítko
         result += '_';
+        console.log(`🖼️ renderWordWithCurrentGap: Pozice ${i} (index ${positionIndex}): AKTUÁLNÍ -> '_'`);
+      } else if (positionIndex < currentPosition) {
+        // Pro už zodpovězené pozice vložíme původní písmeno
+        result += currentWord[i];
+        console.log(`🖼️ renderWordWithCurrentGap: Pozice ${i} (index ${positionIndex}): ZODPOVĚZENO -> '${currentWord[i]}'`);
       } else {
-        // Pro ostatní pozice vložíme původní písmeno
-        result += correctLetters[positionIndex];
+        // Pro budoucí pozice vložíme podtržítko
+        result += '_';
+        console.log(`🖼️ renderWordWithCurrentGap: Pozice ${i} (index ${positionIndex}): BUDOUCÍ -> '_'`);
       }
     } else {
       // Normální písmeno
       result += currentWord[i];
+      console.log(`🖼️ renderWordWithCurrentGap: Pozice ${i}: NORMÁLNÍ -> '${currentWord[i]}'`);
     }
   }
   
-  console.log("Vykreslené slovo:", result);
+  console.log("🖼️ renderWordWithCurrentGap: VÝSLEDEK:", result);
+  console.log("🖼️ renderWordWithCurrentGap: KONEC VYKRESLOVÁNÍ");
   return result;
 }
