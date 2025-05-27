@@ -18,6 +18,12 @@ const MathErrorsSection: React.FC<MathErrorsSectionProps> = ({ answers }) => {
   
   const wrongAnswers = answers.filter(answer => !answer.isCorrect);
   
+  console.log("MathErrorsSection - renderuje se s:", {
+    totalAnswers: answers.length,
+    wrongAnswers: wrongAnswers.length,
+    answers: answers
+  });
+  
   const formatOperation = (operation: string): string => {
     switch (operation) {
       case "*":
@@ -30,8 +36,11 @@ const MathErrorsSection: React.FC<MathErrorsSectionProps> = ({ answers }) => {
   };
 
   if (wrongAnswers.length === 0) {
+    console.log("MathErrorsSection - žádné chyby, nezobrazuje se");
     return null;
   }
+
+  console.log("MathErrorsSection - zobrazuje se s", wrongAnswers.length, "chybami");
 
   return (
     <Card className="mt-4">

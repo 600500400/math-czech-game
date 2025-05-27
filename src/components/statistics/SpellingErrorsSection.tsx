@@ -17,9 +17,18 @@ const SpellingErrorsSection: React.FC<SpellingErrorsSectionProps> = ({ answers }
   
   const wrongAnswers = answers.filter(answer => !answer.isCorrect);
 
+  console.log("SpellingErrorsSection - renderuje se s:", {
+    totalAnswers: answers.length,
+    wrongAnswers: wrongAnswers.length,
+    answers: answers
+  });
+
   if (wrongAnswers.length === 0) {
+    console.log("SpellingErrorsSection - žádné chyby, nezobrazuje se");
     return null;
   }
+
+  console.log("SpellingErrorsSection - zobrazuje se s", wrongAnswers.length, "chybami");
 
   return (
     <Card className="mt-4">

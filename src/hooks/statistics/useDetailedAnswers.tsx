@@ -17,8 +17,15 @@ export const useDetailedAnswers = (userId: string | null) => {
         const storedMathAnswers = localStorage.getItem(mathKey);
         const storedSpellingAnswers = localStorage.getItem(spellingKey);
         
-        setMathAnswers(storedMathAnswers ? JSON.parse(storedMathAnswers) : []);
-        setSpellingAnswers(storedSpellingAnswers ? JSON.parse(storedSpellingAnswers) : []);
+        const mathData = storedMathAnswers ? JSON.parse(storedMathAnswers) : [];
+        const spellingData = storedSpellingAnswers ? JSON.parse(storedSpellingAnswers) : [];
+        
+        console.log("useDetailedAnswers - načítání detailních odpovědí pro uživatele:", userId);
+        console.log("useDetailedAnswers - matematické odpovědi:", mathData);
+        console.log("useDetailedAnswers - pravopisné odpovědi:", spellingData);
+        
+        setMathAnswers(mathData);
+        setSpellingAnswers(spellingData);
       } catch (error) {
         console.error("Error loading detailed answers:", error);
         setMathAnswers([]);
@@ -34,6 +41,7 @@ export const useDetailedAnswers = (userId: string | null) => {
       try {
         localStorage.setItem(mathKey, JSON.stringify(answers));
         setMathAnswers(answers);
+        console.log("useDetailedAnswers - uloženy matematické odpovědi:", answers);
       } catch (error) {
         console.error("Error saving math answers:", error);
       }
@@ -47,6 +55,7 @@ export const useDetailedAnswers = (userId: string | null) => {
       try {
         localStorage.setItem(spellingKey, JSON.stringify(answers));
         setSpellingAnswers(answers);
+        console.log("useDetailedAnswers - uloženy pravopisné odpovědi:", answers);
       } catch (error) {
         console.error("Error saving spelling answers:", error);
       }
@@ -76,8 +85,18 @@ export const useDetailedAnswers = (userId: string | null) => {
       
       setMathAnswers([]);
       setSpellingAnswers([]);
+      
+      console.log("useDetailedAnswers - vymazány všechny detailní odpovědi pro uživatele:", userId);
     }
   };
+
+  console.log("useDetailedAnswers - aktuální stav:", {
+    userId,
+    mathAnswersCount: mathAnswers.length,
+    spellingAnswersCount: spellingAnswers.length,
+    mathWrongCount: mathAnswers.filter(a => !a.isCorrect).length,
+    spellingWrongCount: spellingAnswers.filter(a => !a.isCorrect).length
+  });
 
   return {
     mathAnswers,
