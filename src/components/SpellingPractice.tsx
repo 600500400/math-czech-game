@@ -29,6 +29,7 @@ const SpellingPractice = () => {
     showAnimation,
     totalAnswers,
     allSelected,
+    answers,
     
     setShowGroupDialog,
     setShowStatsDialog,
@@ -115,13 +116,14 @@ const SpellingPractice = () => {
         wrongAnswers={wrongAnswers}
       />
       
-      {/* Statistics Dialog */}
+      {/* Statistics Dialog with answers */}
       <StatisticsDialog 
         open={showStatsDialog}
         onOpenChange={setShowStatsDialog}
         correctAnswers={correctAnswers}
         wrongAnswers={wrongAnswers}
         totalAnswers={totalAnswers}
+        answers={answers}
       />
     </div>
   );

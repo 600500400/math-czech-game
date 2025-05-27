@@ -28,6 +28,7 @@ const MathPractice = () => {
     totalAnswers,
     correctPercentage,
     allowedOperations,
+    answers,
     
     setUserAnswer,
     setShowDifficultyDialog,
@@ -111,7 +112,7 @@ const MathPractice = () => {
         correctPercentage={correctPercentage}
       />
 
-      {/* Statistics Dialog */}
+      {/* Statistics Dialog with answers */}
       <StatisticsDialog 
         open={showStatsDialog}
         onOpenChange={setShowStatsDialog}
@@ -119,6 +120,7 @@ const MathPractice = () => {
         wrongAnswers={wrongAnswers}
         totalAnswers={totalAnswers}
         correctPercentage={correctPercentage}
+        answers={answers}
       />
     </div>
   );
