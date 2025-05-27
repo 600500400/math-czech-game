@@ -56,35 +56,50 @@ export function generateSpellingProblem(selectedGroups: string[], spellingGroups
   const words = randomGroup.words;
   if (words.length === 0) return null;
   
-  const randomWord = words[Math.floor(Math.random() * words.length)];
+  // Opakujeme výběr slova, dokud nenajdeme takové, které obsahuje i/y
+  let attempts = 0;
+  const maxAttempts = 50; // Zabránění nekonečné smyčce
   
-  // Najdeme všechny pozice i/y/í/ý ve slově
-  const positions: number[] = [];
-  const letters: string[] = [];
-  
-  for (let i = 0; i < randomWord.word.length; i++) {
-    const char = randomWord.word[i].toLowerCase();
-    if (char === 'i' || char === 'y' || char === 'í' || char === 'ý') {
-      positions.push(i);
-      letters.push(char);
+  while (attempts < maxAttempts) {
+    const randomWord = words[Math.floor(Math.random() * words.length)];
+    
+    // Najdeme všechny pozice i/y/í/ý ve slově
+    const positions: number[] = [];
+    const letters: string[] = [];
+    
+    for (let i = 0; i < randomWord.word.length; i++) {
+      const char = randomWord.word[i].toLowerCase();
+      if (char === 'i' || char === 'y' || char === 'í' || char === 'ý') {
+        positions.push(i);
+        letters.push(char);
+      }
     }
+    
+    // Pokud slovo obsahuje i/y, použijeme ho
+    if (positions.length > 0) {
+      // Vytvoříme slovo s podtržítky místo i/y
+      let displayedWord = randomWord.word;
+      positions.forEach((pos) => {
+        displayedWord = displayedWord.substring(0, pos) + '_' + displayedWord.substring(pos + 1);
+      });
+      
+      return {
+        word: randomWord.word,
+        displayed: displayedWord,
+        group: randomGroup.name,
+        type: randomWord.type,
+        positions,
+        letters,
+        isPhrase: false
+      };
+    }
+    
+    attempts++;
   }
   
-  // Vytvoříme slovo s podtržítky místo i/y
-  let displayedWord = randomWord.word;
-  positions.forEach((pos) => {
-    displayedWord = displayedWord.substring(0, pos) + '_' + displayedWord.substring(pos + 1);
-  });
-  
-  return {
-    word: randomWord.word,
-    displayed: displayedWord,
-    group: randomGroup.name,
-    type: randomWord.type,
-    positions,
-    letters,
-    isPhrase: false
-  };
+  // Pokud nenajdeme žádné vhodné slovo, vrátíme null
+  console.warn(`Nenalezeno žádné slovo s i/y ve skupině ${randomGroup.name} po ${maxAttempts} pokusech`);
+  return null;
 }
 
 // Funkce pro kontrolu odpovědi

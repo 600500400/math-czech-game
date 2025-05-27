@@ -1,3 +1,4 @@
+
 import { SpellingWord, SpellingGroup } from "@/types/spellingTypes";
 
 export const spellingGroups: SpellingGroup[] = [
@@ -23,6 +24,12 @@ export const spellingGroups: SpellingGroup[] = [
       { word: "bylinný", type: "příbuzné" },
       { word: "zabydlet", type: "příbuzné" },
       { word: "býčí", type: "příbuzné" },
+      { word: "obydlí", type: "příbuzné" },
+      { word: "obyvatelstvo", type: "příbuzné" },
+      { word: "obyčejně", type: "příbuzné" },
+      { word: "bystrnost", type: "příbuzné" },
+      { word: "bylinkář", type: "příbuzné" },
+      { word: "kobylka", type: "příbuzné" },
       { word: "bidlo", type: "odvozené" },
       { word: "nabídka", type: "odvozené" },
       { word: "bit", type: "odvozené" }
@@ -50,11 +57,19 @@ export const spellingGroups: SpellingGroup[] = [
       { word: "pelyněk", type: "vyjmenované" },
       { word: "plyš", type: "vyjmenované" },
       { word: "plynový", type: "vyjmenované" },
-      { word: "vzlykat", type: "vyjmenované" },
       // Příbuzná a odvozená slova
       { word: "blýskavý", type: "příbuzné" },
       { word: "zalykat", type: "příbuzné" },
       { word: "lýkožrout", type: "příbuzné" },
+      { word: "slýchat", type: "příbuzné" },
+      { word: "vyslyšet", type: "příbuzné" },
+      { word: "mlynář", type: "příbuzné" },
+      { word: "polykaný", type: "příbuzné" },
+      { word: "plynulý", type: "příbuzné" },
+      { word: "plýtvání", type: "příbuzné" },
+      { word: "vzlykot", type: "příbuzné" },
+      { word: "lysina", type: "příbuzné" },
+      { word: "plynárenský", type: "příbuzné" },
       { word: "linka", type: "odvozené" },
       { word: "list", type: "odvozené" },
       { word: "lichý", type: "odvozené" }
@@ -81,7 +96,18 @@ export const spellingGroups: SpellingGroup[] = [
       { word: "dmýchat", type: "vyjmenované" },
       { word: "chmýří", type: "vyjmenované" },
       { word: "nachomýtnout se", type: "vyjmenované" },
-      { word: "Litomyšl", type: "vyjmenované" }
+      { word: "Litomyšl", type: "vyjmenované" },
+      // Příbuzná a odvozená slova
+      { word: "umývat", type: "příbuzné" },
+      { word: "promýšlet", type: "příbuzné" },
+      { word: "omyl", type: "příbuzné" },
+      { word: "hmyzí", type: "příbuzné" },
+      { word: "myška", type: "příbuzné" },
+      { word: "zamykání", type: "příbuzné" },
+      { word: "smýkavý", type: "příbuzné" },
+      { word: "nadmýchat", type: "příbuzné" },
+      { word: "chmýřitý", type: "příbuzné" },
+      { word: "promyšlený", type: "příbuzné" }
     ]
   },
   {
@@ -100,7 +126,19 @@ export const spellingGroups: SpellingGroup[] = [
       { word: "pykat", type: "vyjmenované" },
       { word: "pýr", type: "vyjmenované" },
       { word: "pýřit se", type: "vyjmenované" },
-      { word: "čepýřit se", type: "vyjmenované" }
+      { word: "čepýřit se", type: "vyjmenované" },
+      // Příbuzná a odvozená slova
+      { word: "pyšný", type: "příbuzné" },
+      { word: "pytlovina", type: "příbuzné" },
+      { word: "pyšek", type: "příbuzné" },
+      { word: "netopýří", type: "příbuzné" },
+      { word: "pylový", type: "příbuzné" },
+      { word: "kopytník", type: "příbuzné" },
+      { word: "klopýtnout", type: "příbuzné" },
+      { word: "třpytivý", type: "příbuzné" },
+      { word: "zpytovatelný", type: "příbuzné" },
+      { word: "pýření", type: "příbuzné" },
+      { word: "čepýření", type: "příbuzné" }
     ]
   },
   {
@@ -119,7 +157,19 @@ export const spellingGroups: SpellingGroup[] = [
       { word: "sypat", type: "vyjmenované" },
       { word: "vysypat", type: "vyjmenované" },
       { word: "násyp", type: "vyjmenované" },
-      { word: "zásyp", type: "vyjmenované" }
+      { word: "zásyp", type: "vyjmenované" },
+      // Příbuzná a odvozená slova
+      { word: "synovec", type: "příbuzné" },
+      { word: "synovský", type: "příbuzné" },
+      { word: "nasytit", type: "příbuzné" },
+      { word: "sýrárna", type: "příbuzné" },
+      { word: "syrovost", type: "příbuzné" },
+      { word: "sychrák", type: "příbuzné" },
+      { word: "vysychání", type: "příbuzné" },
+      { word: "sýkorka", type: "příbuzné" },
+      { word: "syslí", type: "příbuzné" },
+      { word: "sysypání", type: "příbuzné" },
+      { word: "posypat", type: "příbuzné" }
     ]
   },
   {
@@ -138,7 +188,19 @@ export const spellingGroups: SpellingGroup[] = [
       { word: "výheň", type: "vyjmenované" },
       { word: "cavyky", type: "vyjmenované" },
       { word: "vyza", type: "vyjmenované" },
-      { word: "Vyšehrad", type: "vyjmenované" }
+      { word: "Vyšehrad", type: "vyjmenované" },
+      // Příbuzná a odvozená slova
+      { word: "výška", type: "příbuzné" },
+      { word: "povýšit", type: "příbuzné" },
+      { word: "vytí", type: "příbuzné" },
+      { word: "povýskat", type: "příbuzné" },
+      { word: "navykat", type: "příbuzné" },
+      { word: "žvýkání", type: "příbuzné" },
+      { word: "vydří", type: "příbuzné" },
+      { word: "výří", type: "příbuzné" },
+      { word: "povykat", type: "příbuzné" },
+      { word: "výhňový", type: "příbuzné" },
+      { word: "zvýšit", type: "příbuzné" }
     ]
   },
   {
@@ -155,7 +217,20 @@ export const spellingGroups: SpellingGroup[] = [
       { word: "zisk", type: "vyjmenované" },
       { word: "hezký", type: "vyjmenované" },
       { word: "prazdroj", type: "vyjmenované" },
-      { word: "zkouška", type: "vyjmenované" }
+      { word: "zkouška", type: "vyjmenované" },
+      // Příbuzná a odvozená slova
+      { word: "jazykový", type: "příbuzné" },
+      { word: "pojmenovat", type: "příbuzné" },
+      { word: "ozvěna", type: "příbuzné" },
+      { word: "výzva", type: "příbuzné" },
+      { word: "zbývat", type: "příbuzné" },
+      { word: "zvednout", type: "příbuzné" },
+      { word: "způsobný", type: "příbuzné" },
+      { word: "zykavý", type: "příbuzné" },
+      { word: "ziskovost", type: "příbuzné" },
+      { word: "hezkost", type: "příbuzné" },
+      { word: "prazdrojový", type: "příbuzné" },
+      { word: "zkušební", type: "příbuzné" }
     ]
   }
 ];
