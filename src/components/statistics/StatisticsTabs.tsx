@@ -1,8 +1,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DetailedStatisticsTable from "./DetailedStatisticsTable";
 import CumulativeChart from "./CumulativeChart";
-import MathErrorsSection from "./MathErrorsSection";
-import SpellingErrorsSection from "./SpellingErrorsSection";
 import { MathStatistics, SpellingStatistics } from "@/types/authTypes";
 import { FileText, Calculator } from "lucide-react";
 import { MathAnswer } from "@/types/mathTypes";
@@ -81,7 +79,8 @@ const StatisticsTabs = ({
         
         <DetailedStatisticsTable 
           type="spelling" 
-          data={spellingStats} 
+          data={spellingStats}
+          spellingAnswers={spellingAnswers}
         />
         
         {spellingStats.length > 0 && (
@@ -90,8 +89,6 @@ const StatisticsTabs = ({
             type="spelling" 
           />
         )}
-
-        <SpellingErrorsSection answers={spellingAnswers} />
       </TabsContent>
       
       <TabsContent value="math" className="mt-4 space-y-6">
@@ -114,7 +111,8 @@ const StatisticsTabs = ({
         
         <DetailedStatisticsTable 
           type="math" 
-          data={mathStats} 
+          data={mathStats}
+          mathAnswers={mathAnswers}
         />
         
         {mathStats.length > 0 && (
@@ -123,8 +121,6 @@ const StatisticsTabs = ({
             type="math" 
           />
         )}
-
-        <MathErrorsSection answers={mathAnswers} />
       </TabsContent>
     </Tabs>
   );

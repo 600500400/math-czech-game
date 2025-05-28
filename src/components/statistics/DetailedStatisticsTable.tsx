@@ -10,13 +10,23 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { MathStatistics, SpellingStatistics } from "@/types/authTypes";
+import { MathAnswer } from "@/types/mathTypes";
+import { SpellingAnswer } from "@/types/spellingTypes";
+import ErrorsTooltip from "./ErrorsTooltip";
 
 interface DetailedStatisticsTableProps {
   type: "math" | "spelling";
   data: MathStatistics[] | SpellingStatistics[];
+  mathAnswers?: MathAnswer[];
+  spellingAnswers?: SpellingAnswer[];
 }
 
-const DetailedStatisticsTable: React.FC<DetailedStatisticsTableProps> = ({ type, data }) => {
+const DetailedStatisticsTable: React.FC<DetailedStatisticsTableProps> = ({ 
+  type, 
+  data, 
+  mathAnswers = [], 
+  spellingAnswers = [] 
+}) => {
   if (data.length === 0) {
     return (
       <p className="text-center text-gray-500">
@@ -35,6 +45,18 @@ const DetailedStatisticsTable: React.FC<DetailedStatisticsTableProps> = ({ type,
   const formatMathDifficulty = (difficulty: any) => {
     if (!difficulty) return "N/A";
     return `±${difficulty.maxValue}, ×${difficulty.maxMultiplyValue}, ÷${difficulty.maxDivideValue}`;
+  };
+
+  // Function to get answers for a specific session
+  const getAnswersForSession = (stat: any) => {
+    const sessionTime = new Date(stat.created_at).getTime();
+    const sessionWindowMs = 5 * 60 * 1000; // 5 minutes window
+    
+    const relevantAnswers = type === "math" ? mathAnswers : spellingAnswers;
+    return relevantAnswers.filter(answer => {
+      const answerTime = new Date(answer.timestamp).getTime();
+      return Math.abs(answerTime - sessionTime) < sessionWindowMs;
+    });
   };
 
   return (
@@ -59,6 +81,7 @@ const DetailedStatisticsTable: React.FC<DetailedStatisticsTableProps> = ({ type,
           {data.map((stat) => {
             const total = stat.correct_answers + stat.wrong_answers;
             const accuracy = total > 0 ? Math.round((stat.correct_answers / total) * 100) : 0;
+            const sessionAnswers = getAnswersForSession(stat);
             
             return (
               <TableRow key={stat.id}>
@@ -73,8 +96,12 @@ const DetailedStatisticsTable: React.FC<DetailedStatisticsTableProps> = ({ type,
                 <TableCell className="text-center text-green-600 font-medium">
                   {stat.correct_answers}
                 </TableCell>
-                <TableCell className="text-center text-red-600 font-medium">
-                  {stat.wrong_answers}
+                <TableCell className="text-center">
+                  <ErrorsTooltip 
+                    wrongCount={stat.wrong_answers}
+                    answers={sessionAnswers}
+                    type={type}
+                  />
                 </TableCell>
                 <TableCell className="text-center font-bold">
                   {accuracy}%
