@@ -47,16 +47,22 @@ const DetailedStatisticsTable: React.FC<DetailedStatisticsTableProps> = ({
     return `±${difficulty.maxValue}, ×${difficulty.maxMultiplyValue}, ÷${difficulty.maxDivideValue}`;
   };
 
-  // Function to get answers for a specific session
-  const getAnswersForSession = (stat: any) => {
+  // Function to get answers for a specific session - now returns correct type
+  const getAnswersForSession = (stat: any): MathAnswer[] | SpellingAnswer[] => {
     const sessionTime = new Date(stat.created_at).getTime();
     const sessionWindowMs = 5 * 60 * 1000; // 5 minutes window
     
-    const relevantAnswers = type === "math" ? mathAnswers : spellingAnswers;
-    return relevantAnswers.filter(answer => {
-      const answerTime = new Date(answer.timestamp).getTime();
-      return Math.abs(answerTime - sessionTime) < sessionWindowMs;
-    });
+    if (type === "math") {
+      return mathAnswers.filter(answer => {
+        const answerTime = new Date(answer.timestamp).getTime();
+        return Math.abs(answerTime - sessionTime) < sessionWindowMs;
+      });
+    } else {
+      return spellingAnswers.filter(answer => {
+        const answerTime = new Date(answer.timestamp).getTime();
+        return Math.abs(answerTime - sessionTime) < sessionWindowMs;
+      });
+    }
   };
 
   return (
