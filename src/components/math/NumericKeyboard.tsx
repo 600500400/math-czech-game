@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Keyboard, Plus, Minus, Divide, X as Multiply } from "lucide-react";
 import { useState } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface NumericKeyboardProps {
   onKeyPress: (key: string) => void;
@@ -10,7 +11,8 @@ interface NumericKeyboardProps {
 }
 
 const NumericKeyboard = ({ onKeyPress, onClear, onSubmit }: NumericKeyboardProps) => {
-  const [isVisible, setIsVisible] = useState(false);
+  const isMobile = useIsMobile();
+  const [isVisible, setIsVisible] = useState(isMobile); // Na mobilu zobrazit defaultně
 
   const toggleKeyboard = () => {
     setIsVisible(prev => !prev);
@@ -18,17 +20,19 @@ const NumericKeyboard = ({ onKeyPress, onClear, onSubmit }: NumericKeyboardProps
 
   return (
     <div className="w-full">
-      <div className="flex justify-center mb-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={toggleKeyboard}
-          className="flex items-center gap-1"
-        >
-          <Keyboard size={16} />
-          {isVisible ? "Skrýt klávesnici" : "Zobrazit klávesnici"}
-        </Button>
-      </div>
+      {!isMobile && (
+        <div className="flex justify-center mb-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={toggleKeyboard}
+            className="flex items-center gap-1"
+          >
+            <Keyboard size={16} />
+            {isVisible ? "Skrýt klávesnici" : "Zobrazit klávesnici"}
+          </Button>
+        </div>
+      )}
 
       {isVisible && (
         <div className="bg-white border border-gray-200 rounded-lg p-2 shadow-md">
@@ -38,7 +42,7 @@ const NumericKeyboard = ({ onKeyPress, onClear, onSubmit }: NumericKeyboardProps
                 key={num}
                 variant="outline"
                 onClick={() => onKeyPress(num.toString())}
-                className="h-12 text-lg font-medium hover:bg-gray-100"
+                className="h-12 text-lg font-medium hover:bg-gray-100 active:bg-gray-200 touch-manipulation"
               >
                 {num}
               </Button>
@@ -46,28 +50,28 @@ const NumericKeyboard = ({ onKeyPress, onClear, onSubmit }: NumericKeyboardProps
             <Button
               variant="outline"
               onClick={() => onKeyPress("0")}
-              className="h-12 text-lg font-medium hover:bg-gray-100"
+              className="h-12 text-lg font-medium hover:bg-gray-100 active:bg-gray-200 touch-manipulation"
             >
               0
             </Button>
             <Button
               variant="outline"
               onClick={() => onKeyPress(".")}
-              className="h-12 text-lg font-medium hover:bg-gray-100"
+              className="h-12 text-lg font-medium hover:bg-gray-100 active:bg-gray-200 touch-manipulation"
             >
               .
             </Button>
             <Button
               variant="outline"
               onClick={onClear}
-              className="h-12 text-lg font-medium hover:bg-gray-100 text-red-500"
+              className="h-12 text-lg font-medium hover:bg-gray-100 active:bg-gray-200 text-red-500 touch-manipulation"
             >
               C
             </Button>
           </div>
           <Button
             onClick={onSubmit}
-            className="w-full bg-orange-500 hover:bg-orange-600 h-12 text-lg"
+            className="w-full bg-orange-500 hover:bg-orange-600 active:bg-orange-700 h-12 text-lg touch-manipulation"
           >
             Odpovědět
           </Button>

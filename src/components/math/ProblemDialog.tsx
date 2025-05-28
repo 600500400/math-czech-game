@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Problem } from "@/types/mathTypes";
 import NumericKeyboard from "./NumericKeyboard";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ProblemDialogProps {
   open: boolean;
@@ -36,6 +37,8 @@ const ProblemDialog: React.FC<ProblemDialogProps> = ({
   totalAnswers,
   correctPercentage
 }) => {
+  const isMobile = useIsMobile();
+
   const handleKeyboardInput = (key: string) => {
     setUserAnswer(userAnswer + key);
   };
@@ -62,16 +65,16 @@ const ProblemDialog: React.FC<ProblemDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={(open) => !open && endGame()}>
-      <DialogContent className="z-[9000]">
+      <DialogContent className={`z-[9000] ${isMobile ? 'max-w-[95vw] max-h-[95vh] overflow-y-auto' : ''}`}>
         <DialogHeader>
-          <DialogTitle>Řeš příklad</DialogTitle>
+          <DialogTitle className={isMobile ? "text-lg" : ""}>Řeš příklad</DialogTitle>
           <DialogDescription className="sr-only">
             Zde můžete řešit matematické příklady
           </DialogDescription>
         </DialogHeader>
-        <div className="py-4">
+        <div className="py-4 space-y-4">
           {currentProblem && (
-            <p className="text-2xl font-bold text-center mb-4">
+            <p className={`font-bold text-center mb-4 ${isMobile ? 'text-xl' : 'text-2xl'}`}>
               {currentProblem.num1} {formatOperation(currentProblem.operation)} {currentProblem.num2} = ?
             </p>
           )}
@@ -81,8 +84,10 @@ const ProblemDialog: React.FC<ProblemDialogProps> = ({
             onChange={(e) => setUserAnswer(e.target.value)}
             onKeyDown={handleKeyPress}
             placeholder="Zadej odpověď"
-            className="text-lg"
-            autoFocus
+            className={`text-lg ${isMobile ? 'h-12 text-base' : ''}`}
+            autoFocus={!isMobile}
+            inputMode="numeric"
+            pattern="[0-9]*"
           />
           
           {/* Numeric Keyboard */}
@@ -97,7 +102,7 @@ const ProblemDialog: React.FC<ProblemDialogProps> = ({
           {/* In-game statistics */}
           {totalAnswers > 0 && (
             <div className="mt-4 space-y-2">
-              <div className="flex justify-between">
+              <div className="flex justify-between text-sm">
                 <span className="text-green-500">Správně: {correctAnswers}</span>
                 <span className="text-red-500">Špatně: {wrongAnswers}</span>
               </div>
@@ -105,16 +110,16 @@ const ProblemDialog: React.FC<ProblemDialogProps> = ({
             </div>
           )}
         </div>
-        <DialogFooter className="flex flex-col sm:flex-row gap-2">
+        <DialogFooter className={`flex gap-2 ${isMobile ? 'flex-col' : 'flex-row'}`}>
           <Button 
             onClick={checkAnswer}
-            className="w-full sm:w-auto bg-orange-500 hover:bg-orange-600"
+            className={`bg-orange-500 hover:bg-orange-600 active:bg-orange-700 touch-manipulation ${isMobile ? 'w-full h-12' : 'w-auto'}`}
           >
             Odpovědět
           </Button>
           <Button 
             onClick={handleEndGame}
-            className="w-full sm:w-auto bg-red-500 hover:bg-red-600"
+            className={`bg-red-500 hover:bg-red-600 active:bg-red-700 touch-manipulation ${isMobile ? 'w-full h-12' : 'w-auto'}`}
           >
             Ukončit hru
           </Button>
