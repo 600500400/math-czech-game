@@ -8,6 +8,7 @@ import { useGameUI } from "./useGameUI";
 import { useAuth } from "../useAuth";
 import { useStatistics } from "../useStatistics";
 import { useGameControls } from "./useGameControls";
+import { useDetailedAnswers } from "../statistics/useDetailedAnswers";
 
 export const useSpellingGame = () => {
   // Get user authentication state
@@ -17,11 +18,20 @@ export const useSpellingGame = () => {
   // Get statistics mutation for saving game results
   const { saveSpellingStatistics } = useStatistics(userId);
   
+  // Get detailed answers hook
+  const { addSpellingAnswer } = useDetailedAnswers(userId);
+  
   // Specialized hooks for different concerns
   const gameStats = useGameStatistics();
   const groupSelection = useGroupSelection();
   const animation = useAnimationState();
   const gameUI = useGameUI();
+  
+  // Enhanced addAnswer function that saves to both game stats and detailed answers
+  const enhancedAddAnswer = useCallback((answer: any) => {
+    gameStats.addAnswer(answer);
+    addSpellingAnswer(answer);
+  }, [gameStats.addAnswer, addSpellingAnswer]);
   
   // Word problem handling with dependencies
   const wordProblem = useWordProblem({
@@ -31,7 +41,7 @@ export const useSpellingGame = () => {
     showAnimation: animation.showAnimation,
     setLastAnswerCorrect: animation.setLastAnswerCorrect,
     setShowAnimation: animation.setShowAnimation,
-    addAnswer: gameStats.addAnswer
+    addAnswer: enhancedAddAnswer
   });
 
   // Game controls with all necessary dependencies
