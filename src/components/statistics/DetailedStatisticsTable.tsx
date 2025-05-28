@@ -27,6 +27,13 @@ const DetailedStatisticsTable: React.FC<DetailedStatisticsTableProps> = ({
   mathAnswers = [], 
   spellingAnswers = [] 
 }) => {
+  console.log("DetailedStatisticsTable - props:", {
+    type,
+    dataCount: data.length,
+    mathAnswersCount: mathAnswers.length,
+    spellingAnswersCount: spellingAnswers.length
+  });
+
   if (data.length === 0) {
     return (
       <p className="text-center text-gray-500">
@@ -47,22 +54,34 @@ const DetailedStatisticsTable: React.FC<DetailedStatisticsTableProps> = ({
     return `±${difficulty.maxValue}, ×${difficulty.maxMultiplyValue}, ÷${difficulty.maxDivideValue}`;
   };
 
-  // Function to get answers for a specific session - properly typed
-  const getAnswersForSession = (stat: any): MathAnswer[] | SpellingAnswer[] => {
+  // Function to get answers for a specific session
+  const getAnswersForSession = (stat: any) => {
     const sessionTime = new Date(stat.created_at).getTime();
-    const sessionWindowMs = 5 * 60 * 1000; // 5 minutes window
+    const sessionWindowMs = 10 * 60 * 1000; // Increased to 10 minutes window
+    
+    let relevantAnswers;
     
     if (type === "math") {
-      return mathAnswers.filter(answer => {
+      relevantAnswers = mathAnswers.filter(answer => {
         const answerTime = new Date(answer.timestamp).getTime();
-        return Math.abs(answerTime - sessionTime) < sessionWindowMs;
+        const timeDiff = Math.abs(answerTime - sessionTime);
+        return timeDiff < sessionWindowMs;
       });
     } else {
-      return spellingAnswers.filter(answer => {
+      relevantAnswers = spellingAnswers.filter(answer => {
         const answerTime = new Date(answer.timestamp).getTime();
-        return Math.abs(answerTime - sessionTime) < sessionWindowMs;
+        const timeDiff = Math.abs(answerTime - sessionTime);
+        return timeDiff < sessionWindowMs;
       });
     }
+    
+    console.log(`getAnswersForSession - ${type}:`, {
+      sessionTime: new Date(stat.created_at),
+      relevantAnswersCount: relevantAnswers.length,
+      wrongAnswersCount: relevantAnswers.filter(a => !a.isCorrect).length
+    });
+    
+    return relevantAnswers;
   };
 
   return (
