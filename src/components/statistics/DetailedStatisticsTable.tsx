@@ -47,7 +47,7 @@ const DetailedStatisticsTable: React.FC<DetailedStatisticsTableProps> = ({
     return `±${difficulty.maxValue}, ×${difficulty.maxMultiplyValue}, ÷${difficulty.maxDivideValue}`;
   };
 
-  // Function to get answers for a specific session - now returns correct type
+  // Function to get answers for a specific session - properly typed
   const getAnswersForSession = (stat: any): MathAnswer[] | SpellingAnswer[] => {
     const sessionTime = new Date(stat.created_at).getTime();
     const sessionWindowMs = 5 * 60 * 1000; // 5 minutes window
