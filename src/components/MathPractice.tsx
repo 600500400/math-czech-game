@@ -47,16 +47,6 @@ const MathPractice = () => {
     handleKeyPress,
   } = useMathGame();
 
-  // Helper function that wraps the original toggleOperation with required parameters
-  const handleToggleOperation = (operation) => {
-    toggleOperation(operation);
-  };
-
-  // Helper function that wraps the original setDifficulty with required parameters
-  const handleSetDifficulty = () => {
-    setDifficulty();
-  };
-
   return (
     <div className="space-y-4 relative">
       {/* Fun Graphics & Confetti Components - moved above dialogs for visibility */}
@@ -92,8 +82,8 @@ const MathPractice = () => {
         setMaxMultiplyValue={setMaxMultiplyValue}
         setMaxDivideValue={setMaxDivideValue}
         allowedOperations={allowedOperations}
-        toggleOperation={handleToggleOperation}
-        setDifficulty={handleSetDifficulty}
+        toggleOperation={toggleOperation}
+        setDifficulty={setDifficulty}
       />
 
       {/* Problem Dialog */}

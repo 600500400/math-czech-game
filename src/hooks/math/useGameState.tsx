@@ -38,6 +38,15 @@ export function useGameState() {
     setAnswers([]);
   }, []);
 
+  // Increment functions for compatibility
+  const incrementCorrect = useCallback(() => {
+    setCorrectAnswers(prev => prev + 1);
+  }, []);
+
+  const incrementWrong = useCallback(() => {
+    setWrongAnswers(prev => prev + 1);
+  }, []);
+
   return {
     // State
     correctAnswers,
@@ -84,5 +93,9 @@ export function useGameState() {
     // Answer management
     addAnswer,
     resetAnswers,
+    
+    // Increment functions
+    incrementCorrect,
+    incrementWrong,
   };
 }
