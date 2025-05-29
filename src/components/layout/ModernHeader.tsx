@@ -29,13 +29,7 @@ const ModernHeader = () => {
 
           {/* Navigation - Desktop */}
           <nav className="hidden md:flex items-center space-x-6">
-            {authState.isAuthenticated && (
-              <>
-                <Button variant="ghost" className="text-gray-600 hover:text-brand-600">
-                  Statistiky
-                </Button>
-              </>
-            )}
+            {/* Removed navigation buttons */}
           </nav>
 
           {/* User Menu */}
