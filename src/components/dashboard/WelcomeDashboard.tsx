@@ -8,18 +8,15 @@ import { useState } from "react";
 
 const WelcomeDashboard = () => {
   const { authState } = useAuth();
-  const { data: stats } = useStatistics();
+  const { mathStats, spellingStats } = useStatistics(authState.user?.id || null);
   const [activeTab, setActiveTab] = useState<"practice" | "statistics">("practice");
 
   const userName = authState.profile?.username || "Uživatel";
   
   // Výpočet základních statistik
-  const mathStats = stats?.math || [];
-  const spellingStats = stats?.spelling || [];
-  
   const totalGames = mathStats.length + spellingStats.length;
-  const totalCorrect = mathStats.reduce((sum, game) => sum + game.correctAnswers, 0) +
-                      spellingStats.reduce((sum, game) => sum + game.correctAnswers, 0);
+  const totalCorrect = mathStats.reduce((sum, game) => sum + game.correct_answers, 0) +
+                      spellingStats.reduce((sum, game) => sum + game.correct_answers, 0);
   const totalAnswers = mathStats.reduce((sum, game) => sum + game.totalAnswers, 0) +
                       spellingStats.reduce((sum, game) => sum + game.totalAnswers, 0);
   
