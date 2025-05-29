@@ -78,7 +78,10 @@ const StatisticsTabs = ({
               <span className="font-medium">Špatně:</span> <span className="text-red-600 font-bold">{totalSpellingWrong}</span>
             </div>
             <div className="text-gray-700">
-              <span className="font-medium">Úspěšnost:</span> <span className="text-blue-600 font-bold">{spellingAccuracy}%</span>
+              <span className="font-medium">
+                <span className="hidden sm:inline">Úspěšnost:</span>
+                <span className="sm:hidden">Úspěch:</span>
+              </span> <span className="text-blue-600 font-bold">{spellingAccuracy}%</span>
             </div>
           </div>
         </div>
@@ -110,7 +113,10 @@ const StatisticsTabs = ({
               <span className="font-medium">Špatně:</span> <span className="text-red-600 font-bold">{totalMathWrong}</span>
             </div>
             <div className="text-gray-700">
-              <span className="font-medium">Úspěšnost:</span> <span className="text-blue-600 font-bold">{mathAccuracy}%</span>
+              <span className="font-medium">
+                <span className="hidden sm:inline">Úspěšnost:</span>
+                <span className="sm:hidden">Úspěch:</span>
+              </span> <span className="text-blue-600 font-bold">{mathAccuracy}%</span>
             </div>
           </div>
         </div>
