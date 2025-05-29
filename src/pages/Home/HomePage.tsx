@@ -20,6 +20,10 @@ const HomePage = () => {
     navigate("/auth");
     return null;
   }
+
+  const handleNavigateToTab = (tab: "practice" | "statistics") => {
+    setActiveTab(tab);
+  };
   
   return (
     <div className="min-h-screen flex flex-col bg-gradient-bg">
@@ -34,7 +38,7 @@ const HomePage = () => {
             />
             
             <main className="flex-1">
-              {activeTab === "dashboard" && <WelcomeDashboard />}
+              {activeTab === "dashboard" && <WelcomeDashboard onNavigateToTab={handleNavigateToTab} />}
               {activeTab === "practice" && <PracticeSection />}
               {activeTab === "statistics" && <StatisticsViewer />}
             </main>

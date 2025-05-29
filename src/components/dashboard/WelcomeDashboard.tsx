@@ -4,12 +4,14 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useStatistics } from "@/hooks/useStatistics";
 import { Calculator, PenTool, Target, TrendingUp, Star, Trophy } from "lucide-react";
-import { useState } from "react";
 
-const WelcomeDashboard = () => {
+interface WelcomeDashboardProps {
+  onNavigateToTab?: (tab: "practice" | "statistics") => void;
+}
+
+const WelcomeDashboard = ({ onNavigateToTab }: WelcomeDashboardProps) => {
   const { authState } = useAuth();
   const { mathStats, spellingStats } = useStatistics(authState.user?.id || null);
-  const [activeTab, setActiveTab] = useState<"practice" | "statistics">("practice");
 
   const userName = authState.profile?.username || "Uživatel";
   
@@ -25,6 +27,14 @@ const WelcomeDashboard = () => {
   // Výpočet úrovně na základě celkového počtu správných odpovědí
   const level = Math.floor(totalCorrect / 50) + 1;
   const progressToNextLevel = (totalCorrect % 50) / 50 * 100;
+
+  const handleMathPractice = () => {
+    onNavigateToTab?.("practice");
+  };
+
+  const handleSpellingPractice = () => {
+    onNavigateToTab?.("practice");
+  };
 
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6 animate-fade-in">
@@ -108,7 +118,7 @@ const WelcomeDashboard = () => {
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="glass border-0 shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer"
-              onClick={() => setActiveTab("practice")}>
+              onClick={handleMathPractice}>
           <CardContent className="p-8 text-center space-y-4">
             <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300">
               <Calculator className="w-8 h-8 text-white" />
@@ -122,7 +132,7 @@ const WelcomeDashboard = () => {
         </Card>
 
         <Card className="glass border-0 shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer"
-              onClick={() => setActiveTab("practice")}>
+              onClick={handleSpellingPractice}>
           <CardContent className="p-8 text-center space-y-4">
             <div className="w-16 h-16 bg-gradient-success rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300">
               <PenTool className="w-8 h-8 text-white" />
