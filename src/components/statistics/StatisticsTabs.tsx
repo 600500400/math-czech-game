@@ -1,4 +1,3 @@
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DetailedStatisticsTable from "./DetailedStatisticsTable";
 import CumulativeChart from "./CumulativeChart";
@@ -69,7 +68,6 @@ const StatisticsTabs = ({
         <div className="mb-4 flex justify-between items-center bg-orange-50 px-4 py-3 rounded-lg">
           <div className="text-gray-700">
             <span className="font-medium">
-              <span className="hidden sm:inline">Celkem:</span>
               <span className="sm:hidden">Vše:</span>
             </span> <span className="text-blue-600 font-bold">{totalSpellingProblems}</span>
           </div>
@@ -107,7 +105,6 @@ const StatisticsTabs = ({
         <div className="mb-4 flex justify-between items-center bg-blue-50 px-4 py-3 rounded-lg">
           <div className="text-gray-700">
             <span className="font-medium">
-              <span className="hidden sm:inline">Celkem:</span>
               <span className="sm:hidden">Vše:</span>
             </span> <span className="text-blue-600 font-bold">{totalMathProblems}</span>
           </div>
