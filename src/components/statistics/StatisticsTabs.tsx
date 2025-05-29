@@ -1,3 +1,4 @@
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DetailedStatisticsTable from "./DetailedStatisticsTable";
 import CumulativeChart from "./CumulativeChart";
@@ -49,13 +50,18 @@ const StatisticsTabs = ({
           value="spelling" 
           className="text-base py-4 data-[state=active]:bg-orange-100 data-[state=active]:text-orange-800 data-[state=active]:shadow-sm data-[state=inactive]:bg-gray-50"
         >
-          <FileText className="mr-2 h-5 w-5" /> Vyjmenovaná slova
+          <FileText className="mr-1 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+          <span className="text-xs sm:text-sm md:text-base">
+            <span className="hidden sm:inline">Vyjmenovaná slova</span>
+            <span className="sm:hidden">Pravopis</span>
+          </span>
         </TabsTrigger>
         <TabsTrigger 
           value="math" 
           className="text-base py-4 data-[state=active]:bg-blue-100 data-[state=active]:text-blue-800 data-[state=active]:shadow-sm data-[state=inactive]:bg-gray-50"
         >
-          <Calculator className="mr-2 h-5 w-5" /> Matematika
+          <Calculator className="mr-1 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+          <span className="text-xs sm:text-sm md:text-base">Matematika</span>
         </TabsTrigger>
       </TabsList>
       
