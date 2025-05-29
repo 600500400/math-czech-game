@@ -68,7 +68,7 @@ const StatisticsTabs = ({
       <TabsContent value="spelling" className="mt-4 space-y-6">
         <div className="mb-4 flex justify-between items-center bg-orange-50 px-4 py-3 rounded-lg">
           <div className="text-gray-700">
-            <span className="font-medium">Počet slov:</span> <span className="text-blue-600 font-bold">{totalSpellingProblems}</span>
+            <span className="font-medium">Celkem:</span> <span className="text-blue-600 font-bold">{totalSpellingProblems}</span>
           </div>
           <div className="flex gap-4">
             <div className="text-gray-700">
@@ -100,7 +100,7 @@ const StatisticsTabs = ({
       <TabsContent value="math" className="mt-4 space-y-6">
         <div className="mb-4 flex justify-between items-center bg-blue-50 px-4 py-3 rounded-lg">
           <div className="text-gray-700">
-            <span className="font-medium">Počet příkladů:</span> <span className="text-blue-600 font-bold">{totalMathProblems}</span>
+            <span className="font-medium">Celkem:</span> <span className="text-blue-600 font-bold">{totalMathProblems}</span>
           </div>
           <div className="flex gap-4">
             <div className="text-gray-700">

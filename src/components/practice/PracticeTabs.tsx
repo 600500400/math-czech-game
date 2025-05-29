@@ -60,7 +60,7 @@ const PracticeTabs = ({ defaultTab = "spelling" }: PracticeTabsProps) => {
       <TabsContent value="spelling">
         <div className="flex justify-between items-center mb-4">
           <p className="text-blue-500 font-medium">
-            Počet slov: <Badge variant="outline">{totalSpellingProblems || 0}</Badge>
+            Celkem: <Badge variant="outline">{totalSpellingProblems || 0}</Badge>
           </p>
           <div className="flex gap-2 items-center">
             <p className="text-green-500 font-medium">
@@ -77,7 +77,7 @@ const PracticeTabs = ({ defaultTab = "spelling" }: PracticeTabsProps) => {
       <TabsContent value="math">
         <div className="flex justify-between items-center mb-4">
           <p className="text-blue-500 font-medium">
-            Počet příkladů: <Badge variant="outline">{totalMathProblems || 0}</Badge>
+            Celkem: <Badge variant="outline">{totalMathProblems || 0}</Badge>
           </p>
           <div className="flex gap-2 items-center">
             <p className="text-green-500 font-medium">
