@@ -32,9 +32,6 @@ const ModernHeader = () => {
             {authState.isAuthenticated && (
               <>
                 <Button variant="ghost" className="text-gray-600 hover:text-brand-600">
-                  Procvičování
-                </Button>
-                <Button variant="ghost" className="text-gray-600 hover:text-brand-600">
                   Statistiky
                 </Button>
               </>
