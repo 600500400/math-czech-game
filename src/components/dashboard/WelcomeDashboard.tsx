@@ -17,8 +17,8 @@ const WelcomeDashboard = () => {
   const totalGames = mathStats.length + spellingStats.length;
   const totalCorrect = mathStats.reduce((sum, game) => sum + game.correct_answers, 0) +
                       spellingStats.reduce((sum, game) => sum + game.correct_answers, 0);
-  const totalAnswers = mathStats.reduce((sum, game) => sum + game.totalAnswers, 0) +
-                      spellingStats.reduce((sum, game) => sum + game.totalAnswers, 0);
+  const totalAnswers = mathStats.reduce((sum, game) => sum + game.correct_answers + game.wrong_answers, 0) +
+                      spellingStats.reduce((sum, game) => sum + game.correct_answers + game.wrong_answers, 0);
   
   const successRate = totalAnswers > 0 ? Math.round((totalCorrect / totalAnswers) * 100) : 0;
 
