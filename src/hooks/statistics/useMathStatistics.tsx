@@ -2,13 +2,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { MathStatistics } from "@/types/authTypes";
 import { toast } from "sonner";
-import { useStatisticsCore } from "./useStatisticsCore";
+import { supabase } from "@/integrations/supabase/client";
 
 export const useMathStatistics = (userId: string | null) => {
   const queryClient = useQueryClient();
-  const { getLocalStorageKey } = useStatisticsCore(userId);
 
-  // Save math statistics with option to save locally or to Supabase
+  // Save math statistics to Supabase
   const saveMathStatistics = useMutation({
     mutationFn: async ({
       correctAnswers,
@@ -25,50 +24,32 @@ export const useMathStatistics = (userId: string | null) => {
     }) => {
       if (!userId) throw new Error("Uživatel není přihlášen");
 
-      console.log("Ukládání statistik matematiky:", { userId, correctAnswers, wrongAnswers, operation, gameDuration });
+      console.log("Ukládání statistik matematiky do databáze:", { userId, correctAnswers, wrongAnswers, operation, gameDuration });
       
-      try {
-        // Vždy používáme lokální režim
-        const timestamp = new Date().toISOString();
-        
-        // Get unique storage key for this user
-        const storageKey = getLocalStorageKey('mathStats');
-        console.log("Použití lokálního klíče:", storageKey);
-        
-        // Load existing stats
-        const localStatsStr = localStorage.getItem(storageKey);
-        const localStats = localStatsStr ? JSON.parse(localStatsStr) : [];
-        
-        // Create new stat entry
-        const newStat = {
-          id: "local-" + Date.now(),
+      const { data, error } = await supabase
+        .from('math_statistics')
+        .insert({
           user_id: userId,
           correct_answers: correctAnswers,
           wrong_answers: wrongAnswers,
           operation: operation,
           difficulty_level: difficultyLevel,
-          game_duration: gameDuration || 0,
-          created_at: timestamp
-        };
-        
-        // Add to beginning of array for chronological display
-        localStats.unshift(newStat);
-        
-        // Save back to localStorage
-        localStorage.setItem(storageKey, JSON.stringify(localStats));
-        console.log("Lokální statistiky matematiky uloženy:", newStat);
-        
-        // Update QueryClient for immediate UI update
-        queryClient.setQueryData(["mathStatistics", userId], localStats);
-        
-        return newStat;
-      } catch (error) {
-        console.error("Chyba ukládání lokálních statistik matematiky:", error);
-        toast.error(`Nepodařilo se uložit statistiky: ${error.message || 'Neznámá chyba'}`);
+          game_duration: gameDuration || 0
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Chyba při ukládání do databáze:", error);
         throw error;
       }
+
+      console.log("Statistiky matematiky úspěšně uloženy do databáze:", data);
+      return data;
     },
     onSuccess: () => {
+      // Invalidate queries to refresh the data
+      queryClient.invalidateQueries({ queryKey: ["mathStatistics", userId] });
       toast.success("Statistiky matematiky uloženy");
     },
     onError: (error: any) => {
@@ -77,42 +58,30 @@ export const useMathStatistics = (userId: string | null) => {
     },
   });
 
-  // Load math statistics
+  // Load math statistics from Supabase
   const { data: mathStats, isLoading: mathStatsLoading, refetch } = useQuery({
     queryKey: ["mathStatistics", userId],
     queryFn: async (): Promise<MathStatistics[]> => {
       if (!userId) return [];
       
-      try {
-        // Load from localStorage with unique key
-        const storageKey = getLocalStorageKey('mathStats');
-        console.log("Načítání statistik matematiky z localStorage s klíčem:", storageKey);
-        
-        const localStatsStr = localStorage.getItem(storageKey);
-        
-        if (!localStatsStr) {
-          console.log(`Žádné statistiky matematiky nenalezeny pro klíč ${storageKey}, inicializace prázdným polem`);
-          localStorage.setItem(storageKey, JSON.stringify([]));
-          return [];
-        }
-        
-        try {
-          const localStats = JSON.parse(localStatsStr);
-          console.log(`Načtené lokální statistiky matematiky pro uživatele ${userId}:`, localStats);
-          return localStats;
-        } catch (parseError) {
-          console.error("Chyba parsování statistik matematiky:", parseError);
-          // Resetuj poškozená data
-          localStorage.setItem(storageKey, JSON.stringify([]));
-          return [];
-        }
-      } catch (error) {
-        console.error("Selhání načítání statistik matematiky:", error);
-        return [];
+      console.log("Načítání statistik matematiky z databáze pro uživatele:", userId);
+      
+      const { data, error } = await supabase
+        .from('math_statistics')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error("Chyba při načítání statistik matematiky:", error);
+        throw error;
       }
+
+      console.log("Načtené statistiky matematiky z databáze:", data);
+      return data || [];
     },
     enabled: !!userId,
-    staleTime: 30000, // Považuj data za aktuální po dobu 30 sekund
+    staleTime: 30000, // Consider data fresh for 30 seconds
   });
 
   return {

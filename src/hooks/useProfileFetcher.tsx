@@ -22,13 +22,20 @@ export const useProfileFetcher = () => {
       setIsLoading(true);
       setError(null);
       
-      // Since there are no tables yet, we'll return null
-      // This will be updated once the profiles table is created
-      console.log("Profile fetch skipped - no tables exist yet");
-      return null;
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+      
+      if (error && error.code !== 'PGRST116') {
+        throw error;
+      }
+      
+      return data as UserProfile || null;
       
     } catch (error: any) {
-      console.error("Unexpected error fetching profile:", error);
+      console.error("Error fetching profile:", error);
       setError(error.message || "Failed to fetch profile");
       return null;
     } finally {

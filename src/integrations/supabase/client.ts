@@ -16,16 +16,16 @@ export const checkSupabaseConnection = async () => {
   const startTime = Date.now();
   
   try {
-    // Test connection by trying to get the session
-    const { data, error } = await supabase.auth.getSession();
+    // Test connection by trying to query a table that should exist
+    const { data, error } = await supabase.from('profiles').select('count', { count: 'exact', head: true });
     const elapsed = Date.now() - startTime;
     
-    // If we can get a session response (even if user is not logged in), connection is working
+    // If we can query without errors, connection is working
     if (!error) {
       return {
         success: true,
         elapsed,
-        message: "Connection successful (no tables yet)"
+        message: "Database connection successful"
       };
     }
     

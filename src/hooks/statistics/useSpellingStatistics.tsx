@@ -2,13 +2,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { SpellingStatistics } from "@/types/authTypes";
 import { toast } from "sonner";
-import { useStatisticsCore } from "./useStatisticsCore";
+import { supabase } from "@/integrations/supabase/client";
 
 export const useSpellingStatistics = (userId: string | null) => {
   const queryClient = useQueryClient();
-  const { getLocalStorageKey } = useStatisticsCore(userId);
 
-  // Save spelling statistics
+  // Save spelling statistics to Supabase
   const saveSpellingStatistics = useMutation({
     mutationFn: async ({
       correctAnswers,
@@ -25,50 +24,32 @@ export const useSpellingStatistics = (userId: string | null) => {
     }) => {
       if (!userId) throw new Error("Uživatel není přihlášen");
 
-      console.log("Ukládání statistik pravopisu:", { userId, correctAnswers, wrongAnswers, wordGroup, gameDuration, difficulty });
+      console.log("Ukládání statistik pravopisu do databáze:", { userId, correctAnswers, wrongAnswers, wordGroup, gameDuration, difficulty });
       
-      try {
-        // Vždy používáme lokální režim
-        const timestamp = new Date().toISOString();
-        
-        // Get unique storage key for this user
-        const storageKey = getLocalStorageKey('spellingStats');
-        console.log("Použití lokálního klíče:", storageKey);
-        
-        // Load existing stats
-        const localStatsStr = localStorage.getItem(storageKey);
-        const localStats = localStatsStr ? JSON.parse(localStatsStr) : [];
-        
-        // Create new stat entry
-        const newStat = {
-          id: "local-" + Date.now(),
+      const { data, error } = await supabase
+        .from('spelling_statistics')
+        .insert({
           user_id: userId,
           correct_answers: correctAnswers,
           wrong_answers: wrongAnswers,
           word_group: wordGroup,
           game_duration: gameDuration || 0,
-          difficulty_level: difficulty || { selectedGroups: wordGroup.split(','), wordCount: correctAnswers + wrongAnswers },
-          created_at: timestamp
-        };
-        
-        // Add to beginning of array for chronological display
-        localStats.unshift(newStat);
-        
-        // Save back to localStorage
-        localStorage.setItem(storageKey, JSON.stringify(localStats));
-        console.log("Lokální statistiky pravopisu uloženy:", newStat);
-        
-        // Update QueryClient for immediate UI update
-        queryClient.setQueryData(["spellingStatistics", userId], localStats);
-        
-        return newStat;
-      } catch (error) {
-        console.error("Chyba ukládání lokálních statistik pravopisu:", error);
-        toast.error(`Nepodařilo se uložit statistiky: ${error.message || 'Neznámá chyba'}`);
+          difficulty_level: difficulty || { selectedGroups: wordGroup.split(','), wordCount: correctAnswers + wrongAnswers }
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Chyba při ukládání do databáze:", error);
         throw error;
       }
+
+      console.log("Statistiky pravopisu úspěšně uloženy do databáze:", data);
+      return data;
     },
     onSuccess: () => {
+      // Invalidate queries to refresh the data
+      queryClient.invalidateQueries({ queryKey: ["spellingStatistics", userId] });
       toast.success("Statistiky pravopisu uloženy");
     },
     onError: (error: any) => {
@@ -77,42 +58,30 @@ export const useSpellingStatistics = (userId: string | null) => {
     },
   });
 
-  // Load spelling statistics
+  // Load spelling statistics from Supabase
   const { data: spellingStats, isLoading: spellingStatsLoading, refetch } = useQuery({
     queryKey: ["spellingStatistics", userId],
     queryFn: async (): Promise<SpellingStatistics[]> => {
       if (!userId) return [];
       
-      try {
-        // Load from localStorage with unique key
-        const storageKey = getLocalStorageKey('spellingStats');
-        console.log("Načítání statistik pravopisu z localStorage s klíčem:", storageKey);
-        
-        const localStatsStr = localStorage.getItem(storageKey);
-        
-        if (!localStatsStr) {
-          console.log(`Žádné statistiky pravopisu nenalezeny pro klíč ${storageKey}, inicializace prázdným polem`);
-          localStorage.setItem(storageKey, JSON.stringify([]));
-          return [];
-        }
-        
-        try {
-          const localStats = JSON.parse(localStatsStr);
-          console.log(`Načtené lokální statistiky pravopisu pro uživatele ${userId}:`, localStats);
-          return localStats;
-        } catch (parseError) {
-          console.error("Chyba parsování statistik pravopisu:", parseError);
-          // Resetuj poškozená data
-          localStorage.setItem(storageKey, JSON.stringify([]));
-          return [];
-        }
-      } catch (error) {
-        console.error("Selhání načítání statistik pravopisu:", error);
-        return [];
+      console.log("Načítání statistik pravopisu z databáze pro uživatele:", userId);
+      
+      const { data, error } = await supabase
+        .from('spelling_statistics')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error("Chyba při načítání statistik pravopisu:", error);
+        throw error;
       }
+
+      console.log("Načtené statistiky pravopisu z databáze:", data);
+      return data || [];
     },
     enabled: !!userId,
-    staleTime: 30000, // Považuj data za aktuální po dobu 30 sekund
+    staleTime: 30000, // Consider data fresh for 30 seconds
   });
 
   return {

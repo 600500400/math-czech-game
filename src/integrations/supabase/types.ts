@@ -9,7 +9,159 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      math_answers: {
+        Row: {
+          correct_answer: number
+          created_at: string | null
+          id: string
+          is_correct: boolean
+          problem: Json
+          user_answer: number
+          user_id: string
+        }
+        Insert: {
+          correct_answer: number
+          created_at?: string | null
+          id?: string
+          is_correct: boolean
+          problem: Json
+          user_answer: number
+          user_id: string
+        }
+        Update: {
+          correct_answer?: number
+          created_at?: string | null
+          id?: string
+          is_correct?: boolean
+          problem?: Json
+          user_answer?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      math_statistics: {
+        Row: {
+          correct_answers: number
+          created_at: string | null
+          difficulty_level: Json
+          game_duration: number | null
+          id: string
+          operation: string
+          user_id: string
+          wrong_answers: number
+        }
+        Insert: {
+          correct_answers?: number
+          created_at?: string | null
+          difficulty_level: Json
+          game_duration?: number | null
+          id?: string
+          operation: string
+          user_id: string
+          wrong_answers?: number
+        }
+        Update: {
+          correct_answers?: number
+          created_at?: string | null
+          difficulty_level?: Json
+          game_duration?: number | null
+          id?: string
+          operation?: string
+          user_id?: string
+          wrong_answers?: number
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          full_name: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      spelling_answers: {
+        Row: {
+          correct_answer: string
+          created_at: string | null
+          id: string
+          is_correct: boolean
+          position: number
+          user_answer: string
+          user_id: string
+          word: string
+          word_group: string
+        }
+        Insert: {
+          correct_answer: string
+          created_at?: string | null
+          id?: string
+          is_correct: boolean
+          position: number
+          user_answer: string
+          user_id: string
+          word: string
+          word_group: string
+        }
+        Update: {
+          correct_answer?: string
+          created_at?: string | null
+          id?: string
+          is_correct?: boolean
+          position?: number
+          user_answer?: string
+          user_id?: string
+          word?: string
+          word_group?: string
+        }
+        Relationships: []
+      }
+      spelling_statistics: {
+        Row: {
+          correct_answers: number
+          created_at: string | null
+          difficulty_level: Json | null
+          game_duration: number | null
+          id: string
+          user_id: string
+          word_group: string
+          wrong_answers: number
+        }
+        Insert: {
+          correct_answers?: number
+          created_at?: string | null
+          difficulty_level?: Json | null
+          game_duration?: number | null
+          id?: string
+          user_id: string
+          word_group: string
+          wrong_answers?: number
+        }
+        Update: {
+          correct_answers?: number
+          created_at?: string | null
+          difficulty_level?: Json | null
+          game_duration?: number | null
+          id?: string
+          user_id?: string
+          word_group?: string
+          wrong_answers?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

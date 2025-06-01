@@ -39,7 +39,7 @@ export const useStatistics = (userId: string | null) => {
   // Efekt pro invalidaci query cache při změně uživatele
   useEffect(() => {
     if (effectiveUserId && effectiveUserId !== lastRefreshId) {
-      console.log(`Nový uživatel detekován (${effectiveUserId}), přenačítám data...`);
+      console.log(`Nový uživatel detekován (${effectiveUserId}), přenačítám data z databáze...`);
       
       // Vynucené přenačtení dat při změně uživatele
       queryClient.invalidateQueries({ queryKey: ["mathStatistics"] });
@@ -49,19 +49,7 @@ export const useStatistics = (userId: string | null) => {
       refetchMathStats();
       refetchSpellingStats();
       
-      // Inicializace prázdných polí pro statistiky, pokud neexistují
-      const mathKey = `mathStats_${effectiveUserId}`;
-      const spellingKey = `spellingStats_${effectiveUserId}`;
-      
-      if (!localStorage.getItem(mathKey)) {
-        localStorage.setItem(mathKey, JSON.stringify([]));
-      }
-      
-      if (!localStorage.getItem(spellingKey)) {
-        localStorage.setItem(spellingKey, JSON.stringify([]));
-      }
-      
-      console.log(`Statistiky pro uživatele ${effectiveUserId} inicializovány nebo zkontrolovány`);
+      console.log(`Statistiky pro uživatele ${effectiveUserId} načítány z databáze`);
       
       // Uložíme ID pro kontrolu další změny
       setLastRefreshId(effectiveUserId);
@@ -71,7 +59,7 @@ export const useStatistics = (userId: string | null) => {
   // Funkce pro manuální přenačtení všech statistik
   const forceRefreshAllStatistics = () => {
     if (effectiveUserId) {
-      console.log(`Manuální přenačtení statistik pro uživatele ${effectiveUserId}`);
+      console.log(`Manuální přenačtení statistik z databáze pro uživatele ${effectiveUserId}`);
       refetchMathStats();
       refetchSpellingStats();
       return true;
@@ -101,7 +89,7 @@ export const useStatistics = (userId: string | null) => {
     getChildStatistics,
     checkLocalUserMode,
     forceRefreshAllStatistics,
-    resetUserStatistics, // Added this function to the return object
+    resetUserStatistics,
     
     // Metadata
     currentUserId: effectiveUserId,

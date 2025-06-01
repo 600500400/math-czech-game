@@ -59,7 +59,7 @@ export const useConnectionRetry = (
         setIsLocalMode(localMode);
         
         if (localMode) {
-          console.log("Aplikace je v lokálním režimu pro statistiky");
+          console.log("Aplikace je v lokálním režimu pro fallback");
         }
         
         return result;
@@ -110,7 +110,7 @@ export const useConnectionRetry = (
     }
     
     setIsRefreshing(true);
-    toast.info("Obnovuji statistiky a kontroluji připojení...");
+    toast.info("Obnovuji statistiky a kontroluji připojení k databázi...");
     
     try {
       // Kontrola připojení k databázi
@@ -127,7 +127,7 @@ export const useConnectionRetry = (
         setIsLocalMode(localMode);
         
         if (localMode) {
-          toast.info("Používám lokální režim pro statistiky");
+          toast.info("Používám lokální režim jako fallback");
         } else {
           // Reload stránky pro načtení aktuálních dat z databáze
           window.location.reload();
@@ -137,7 +137,7 @@ export const useConnectionRetry = (
       } else if ('timeout' in result && result.timeout) {
         toast.error("Vypršel čas pro připojení k databázi. Používám lokální režim.");
       } else {
-        toast.error("Problém s připojením k databázi. Používám lokální úložiště.");
+        toast.error("Problém s připojením k databázi. Zkouším lokální fallback.");
       }
     } catch (err) {
       console.error("Chyba při obnovování dat:", err);
