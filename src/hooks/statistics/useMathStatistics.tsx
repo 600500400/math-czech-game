@@ -22,14 +22,19 @@ export const useMathStatistics = (userId: string | null) => {
       difficultyLevel: any;
       gameDuration?: number;
     }) => {
-      if (!userId) throw new Error("Uživatel není přihlášen");
+      // Get current authenticated user
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      
+      if (authError || !user) {
+        throw new Error("Uživatel není přihlášen - nelze uložit statistiky");
+      }
 
-      console.log("Ukládání statistik matematiky do databáze:", { userId, correctAnswers, wrongAnswers, operation, gameDuration });
+      console.log("Ukládání statistik matematiky do databáze pro autentifikovaného uživatele:", user.id);
       
       const { data, error } = await supabase
         .from('math_statistics')
         .insert({
-          user_id: userId,
+          user_id: user.id, // Use authenticated user ID
           correct_answers: correctAnswers,
           wrong_answers: wrongAnswers,
           operation: operation,
@@ -49,7 +54,7 @@ export const useMathStatistics = (userId: string | null) => {
     },
     onSuccess: () => {
       // Invalidate queries to refresh the data
-      queryClient.invalidateQueries({ queryKey: ["mathStatistics", userId] });
+      queryClient.invalidateQueries({ queryKey: ["mathStatistics"] });
       toast.success("Statistiky matematiky uloženy");
     },
     onError: (error: any) => {
@@ -62,14 +67,20 @@ export const useMathStatistics = (userId: string | null) => {
   const { data: mathStats, isLoading: mathStatsLoading, refetch } = useQuery({
     queryKey: ["mathStatistics", userId],
     queryFn: async (): Promise<MathStatistics[]> => {
-      if (!userId) return [];
+      // Get current authenticated user
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
       
-      console.log("Načítání statistik matematiky z databáze pro uživatele:", userId);
+      if (authError || !user) {
+        console.log("Uživatel není přihlášen - vracím prázdné statistiky");
+        return [];
+      }
+      
+      console.log("Načítání statistik matematiky z databáze pro uživatele:", user.id);
       
       const { data, error } = await supabase
         .from('math_statistics')
         .select('*')
-        .eq('user_id', userId)
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -80,7 +91,7 @@ export const useMathStatistics = (userId: string | null) => {
       console.log("Načtené statistiky matematiky z databáze:", data);
       return data || [];
     },
-    enabled: !!userId,
+    enabled: true, // Always enabled, auth check is inside the function
     staleTime: 30000, // Consider data fresh for 30 seconds
   });
 

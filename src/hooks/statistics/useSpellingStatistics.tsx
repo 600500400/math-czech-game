@@ -22,14 +22,19 @@ export const useSpellingStatistics = (userId: string | null) => {
       gameDuration?: number;
       difficulty?: any;
     }) => {
-      if (!userId) throw new Error("Uživatel není přihlášen");
+      // Get current authenticated user
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      
+      if (authError || !user) {
+        throw new Error("Uživatel není přihlášen - nelze uložit statistiky");
+      }
 
-      console.log("Ukládání statistik pravopisu do databáze:", { userId, correctAnswers, wrongAnswers, wordGroup, gameDuration, difficulty });
+      console.log("Ukládání statistik pravopisu do databáze pro autentifikovaného uživatele:", user.id);
       
       const { data, error } = await supabase
         .from('spelling_statistics')
         .insert({
-          user_id: userId,
+          user_id: user.id, // Use authenticated user ID
           correct_answers: correctAnswers,
           wrong_answers: wrongAnswers,
           word_group: wordGroup,
@@ -49,7 +54,7 @@ export const useSpellingStatistics = (userId: string | null) => {
     },
     onSuccess: () => {
       // Invalidate queries to refresh the data
-      queryClient.invalidateQueries({ queryKey: ["spellingStatistics", userId] });
+      queryClient.invalidateQueries({ queryKey: ["spellingStatistics"] });
       toast.success("Statistiky pravopisu uloženy");
     },
     onError: (error: any) => {
@@ -62,14 +67,20 @@ export const useSpellingStatistics = (userId: string | null) => {
   const { data: spellingStats, isLoading: spellingStatsLoading, refetch } = useQuery({
     queryKey: ["spellingStatistics", userId],
     queryFn: async (): Promise<SpellingStatistics[]> => {
-      if (!userId) return [];
+      // Get current authenticated user
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
       
-      console.log("Načítání statistik pravopisu z databáze pro uživatele:", userId);
+      if (authError || !user) {
+        console.log("Uživatel není přihlášen - vracím prázdné statistiky");
+        return [];
+      }
+      
+      console.log("Načítání statistik pravopisu z databáze pro uživatele:", user.id);
       
       const { data, error } = await supabase
         .from('spelling_statistics')
         .select('*')
-        .eq('user_id', userId)
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -80,7 +91,7 @@ export const useSpellingStatistics = (userId: string | null) => {
       console.log("Načtené statistiky pravopisu z databáze:", data);
       return data || [];
     },
-    enabled: !!userId,
+    enabled: true, // Always enabled, auth check is inside the function
     staleTime: 30000, // Consider data fresh for 30 seconds
   });
 

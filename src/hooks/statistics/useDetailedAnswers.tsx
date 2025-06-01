@@ -3,7 +3,6 @@ import { MathAnswer } from "@/types/mathTypes";
 import { SpellingAnswer } from "@/types/spellingTypes";
 import { useMathAnswers } from "./useMathAnswers";
 import { useSpellingAnswers } from "./useSpellingAnswers";
-import { supabase } from "@/integrations/supabase/client";
 
 export const useDetailedAnswers = (userId: string | null) => {
   const {
@@ -22,15 +21,13 @@ export const useDetailedAnswers = (userId: string | null) => {
 
   // Clear all answers for user from Supabase
   const clearAllAnswers = async () => {
-    if (!userId) return;
-    
     try {
       await Promise.all([
         clearMathAnswers(),
         clearSpellingAnswers()
       ]);
       
-      console.log("useDetailedAnswers - vymazány všechny detailní odpovědi z databáze pro uživatele:", userId);
+      console.log("useDetailedAnswers - vymazány všechny detailní odpovědi z databáze");
     } catch (error) {
       console.error("Error clearing answers:", error);
     }
