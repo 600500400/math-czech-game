@@ -96,7 +96,7 @@ export const useDetailedAnswers = (userId: string | null) => {
       if (answers.length > 0) {
         const dbAnswers = answers.map(answer => ({
           user_id: userId,
-          problem: answer.problem,
+          problem: answer.problem as any, // Cast to any for Json compatibility
           user_answer: answer.userAnswer,
           correct_answer: answer.correctAnswer,
           is_correct: answer.isCorrect,
@@ -169,7 +169,7 @@ export const useDetailedAnswers = (userId: string | null) => {
         .from('math_answers')
         .insert({
           user_id: userId,
-          problem: answer.problem,
+          problem: answer.problem as any, // Cast to any for Json compatibility
           user_answer: answer.userAnswer,
           correct_answer: answer.correctAnswer,
           is_correct: answer.isCorrect,

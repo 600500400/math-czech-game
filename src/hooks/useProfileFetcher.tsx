@@ -32,7 +32,19 @@ export const useProfileFetcher = () => {
         throw error;
       }
       
-      return data as UserProfile || null;
+      // Transform database profile to UserProfile type
+      if (data) {
+        const profile: UserProfile = {
+          id: data.id,
+          username: data.full_name || undefined,
+          full_name: data.full_name || undefined,
+          created_at: data.created_at,
+          updated_at: data.updated_at || undefined
+        };
+        return profile;
+      }
+      
+      return null;
       
     } catch (error: any) {
       console.error("Error fetching profile:", error);
