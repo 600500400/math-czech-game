@@ -9,117 +9,16 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      math_statistics: {
-        Row: {
-          correct_answers: number
-          created_at: string
-          difficulty_level: Json
-          id: string
-          operation: string
-          user_id: string
-          wrong_answers: number
-        }
-        Insert: {
-          correct_answers?: number
-          created_at?: string
-          difficulty_level: Json
-          id?: string
-          operation: string
-          user_id: string
-          wrong_answers?: number
-        }
-        Update: {
-          correct_answers?: number
-          created_at?: string
-          difficulty_level?: Json
-          id?: string
-          operation?: string
-          user_id?: string
-          wrong_answers?: number
-        }
-        Relationships: []
-      }
-      parent_child: {
-        Row: {
-          child_id: string
-          created_at: string
-          id: string
-          parent_id: string
-        }
-        Insert: {
-          child_id: string
-          created_at?: string
-          id?: string
-          parent_id: string
-        }
-        Update: {
-          child_id?: string
-          created_at?: string
-          id?: string
-          parent_id?: string
-        }
-        Relationships: []
-      }
-      profiles: {
-        Row: {
-          created_at: string
-          id: string
-          role: Database["public"]["Enums"]["user_role"]
-          username: string
-        }
-        Insert: {
-          created_at?: string
-          id: string
-          role?: Database["public"]["Enums"]["user_role"]
-          username: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          role?: Database["public"]["Enums"]["user_role"]
-          username?: string
-        }
-        Relationships: []
-      }
-      spelling_statistics: {
-        Row: {
-          correct_answers: number
-          created_at: string
-          id: string
-          user_id: string
-          word_group: string
-          wrong_answers: number
-        }
-        Insert: {
-          correct_answers?: number
-          created_at?: string
-          id?: string
-          user_id: string
-          word_group: string
-          wrong_answers?: number
-        }
-        Update: {
-          correct_answers?: number
-          created_at?: string
-          id?: string
-          user_id?: string
-          word_group?: string
-          wrong_answers?: number
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      get_user_role: {
-        Args: Record<PropertyKey, never> | { user_id: string }
-        Returns: Database["public"]["Enums"]["user_role"]
-      }
+      [_ in never]: never
     }
     Enums: {
-      user_role: "parent" | "child" | "teacher"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -234,8 +133,6 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {
-      user_role: ["parent", "child", "teacher"],
-    },
+    Enums: {},
   },
 } as const
