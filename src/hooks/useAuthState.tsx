@@ -30,12 +30,16 @@ export const useAuthState = () => {
             id: session.user.id,
             username: session.user.user_metadata?.username || session.user.email?.split('@')[0] || 'User',
             role: session.user.user_metadata?.role || 'child',
-            email: session.user.email,
             created_at: session.user.created_at,
           };
 
           setAuthState({
-            user: session.user,
+            user: {
+              id: session.user.id,
+              email: session.user.email,
+              username: session.user.user_metadata?.username || session.user.email?.split('@')[0] || 'User',
+              created_at: session.user.created_at
+            },
             profile,
             isLoading: false,
             isAuthenticated: true,
@@ -51,8 +55,11 @@ export const useAuthState = () => {
               console.log("Using local user:", localUser.id);
               
               setAuthState({
-                user: { id: localUser.id } as any,
-                profile: localUser as UserProfile,
+                user: { id: localUser.id, username: localUser.username },
+                profile: {
+                  ...localUser,
+                  created_at: new Date().toISOString() // Add required created_at
+                } as UserProfile,
                 isLoading: false,
                 isAuthenticated: true,
                 error: null
@@ -85,12 +92,16 @@ export const useAuthState = () => {
           id: session.user.id,
           username: session.user.user_metadata?.username || session.user.email?.split('@')[0] || 'User',
           role: session.user.user_metadata?.role || 'child',
-          email: session.user.email,
           created_at: session.user.created_at,
         };
 
         setAuthState({
-          user: session.user,
+          user: {
+            id: session.user.id,
+            email: session.user.email,
+            username: session.user.user_metadata?.username || session.user.email?.split('@')[0] || 'User',
+            created_at: session.user.created_at
+          },
           profile,
           isLoading: false,
           isAuthenticated: true,

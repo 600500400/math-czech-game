@@ -1,10 +1,10 @@
 
 export interface User {
   id: string;
-  email: string;
-  username: string;
-  role: 'parent' | 'child' | 'teacher';
-  created_at: string;
+  email?: string; // Made optional since Supabase user might not always have email
+  username?: string; // Made optional since this might come from metadata
+  role?: 'parent' | 'child' | 'teacher'; // Made optional
+  created_at?: string; // Made optional
 }
 
 export interface AuthState {
@@ -42,7 +42,7 @@ export interface UserProfile {
   username?: string; // Made optional since database has full_name instead
   full_name?: string; // Added to match database schema
   role?: 'parent' | 'child' | 'teacher'; // Made optional since not in database
-  created_at: string;
+  created_at: string; // Keep required for profile
   updated_at?: string; // Added to match database schema
 }
 

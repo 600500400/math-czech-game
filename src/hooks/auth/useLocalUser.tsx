@@ -41,11 +41,12 @@ export const useLocalUser = (setAuthState: React.Dispatch<React.SetStateAction<A
         localStorage.setItem('localUser', JSON.stringify(user));
         
         setAuthState({
-          user: { id: user.id } as any,
+          user: { id: user.id, username: user.username } as any,
           profile: {
             id: user.id,
             username: user.username,
             role: user.role as any,
+            created_at: new Date().toISOString(), // Add required created_at
           },
           isLoading: false,
           isAuthenticated: true,
@@ -63,11 +64,12 @@ export const useLocalUser = (setAuthState: React.Dispatch<React.SetStateAction<A
       localStorage.setItem('localUser', JSON.stringify(user));
       
       setAuthState({
-        user: { id: user.id } as any,
+        user: { id: user.id, username: user.username } as any,
         profile: {
           id: user.id,
           username: user.username,
           role: user.role as any,
+          created_at: new Date().toISOString(), // Add required created_at
         },
         isLoading: false,
         isAuthenticated: true,
