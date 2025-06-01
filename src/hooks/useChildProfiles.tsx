@@ -23,28 +23,11 @@ export const useChildProfiles = (parentId: string | null) => {
         setIsLoading(true);
         setError(null);
         
-        // Fetch child IDs linked to parent
-        const { data: childLinks, error: linkError } = await supabase
-          .from("parent_child")
-          .select("child_id")
-          .eq("parent_id", parentId);
+        // Since there are no tables yet, we'll return empty array
+        // This will be updated once the parent_child table is created
+        console.log("Child profiles fetch skipped - no tables exist yet");
+        setChildren([]);
         
-        if (linkError) {
-          console.error("Error fetching child links:", linkError);
-          setError(linkError.message);
-          return;
-        }
-        
-        // Fetch each child's profile
-        const childProfiles = [];
-        for (const link of childLinks) {
-          const profile = await fetchUserProfile(link.child_id);
-          if (profile) {
-            childProfiles.push(profile);
-          }
-        }
-        
-        setChildren(childProfiles);
       } catch (error: any) {
         console.error("Error fetching children:", error);
         setError(error.message || "Failed to fetch children");

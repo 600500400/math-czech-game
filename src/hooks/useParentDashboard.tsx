@@ -17,20 +17,20 @@ export function useParentDashboard(userId: string | undefined) {
   
   // Calculate summary statistics for selected child
   const childMathTotal = childMathStats.reduce(
-    (acc, stat) => {
-      acc.correct += stat.correct_answers;
-      acc.wrong += stat.wrong_answers;
-      acc.total += stat.correct_answers + stat.wrong_answers;
+    (acc, stat: any) => {
+      acc.correct += stat.correct_answers || 0;
+      acc.wrong += stat.wrong_answers || 0;
+      acc.total += (stat.correct_answers || 0) + (stat.wrong_answers || 0);
       return acc;
     },
     { correct: 0, wrong: 0, total: 0 } as StatTotals
   );
   
   const childSpellingTotal = childSpellingStats.reduce(
-    (acc, stat) => {
-      acc.correct += stat.correct_answers;
-      acc.wrong += stat.wrong_answers;
-      acc.total += stat.correct_answers + stat.wrong_answers;
+    (acc, stat: any) => {
+      acc.correct += stat.correct_answers || 0;
+      acc.wrong += stat.wrong_answers || 0;
+      acc.total += (stat.correct_answers || 0) + (stat.wrong_answers || 0);
       return acc;
     },
     { correct: 0, wrong: 0, total: 0 } as StatTotals
@@ -50,30 +50,11 @@ export function useParentDashboard(userId: string | undefined) {
       if (!userId) return;
       
       try {
-        // First get child IDs from parent_child table
-        const { data: childRelations, error: relationsError } = await supabase
-          .from("parent_child")
-          .select("child_id")
-          .eq("parent_id", userId);
-          
-        if (relationsError) throw relationsError;
+        // Since there are no tables yet, we'll return empty array
+        // This will be updated once the parent_child and profiles tables are created
+        console.log("Parent dashboard fetch skipped - no tables exist yet");
+        setChildren([]);
         
-        if (childRelations && childRelations.length > 0) {
-          const childIds = childRelations.map(relation => relation.child_id);
-          
-          // Then get child profiles
-          const { data: childProfiles, error: profilesError } = await supabase
-            .from("profiles")
-            .select("*")
-            .in("id", childIds);
-            
-          if (profilesError) throw profilesError;
-          
-          setChildren(childProfiles as UserProfile[]);
-          if (childProfiles && childProfiles.length > 0) {
-            setSelectedChild(childProfiles[0].id);
-          }
-        }
       } catch (error) {
         console.error("Error fetching children:", error);
       }
@@ -88,34 +69,12 @@ export function useParentDashboard(userId: string | undefined) {
       if (!selectedChild) return;
       
       try {
-        // Load math statistics
-        const { data: mathData, error: mathError } = await supabase
-          .from("math_statistics")
-          .select("*")
-          .eq("user_id", selectedChild)
-          .order("created_at", { ascending: false });
-          
-        if (mathError) throw mathError;
+        // Since there are no tables yet, we'll return empty arrays
+        // This will be updated once the statistics tables are created
+        console.log("Child statistics fetch skipped - no tables exist yet");
+        setChildMathStats([]);
+        setChildSpellingStats([]);
         
-        // Load spelling statistics
-        const { data: spellingData, error: spellingError } = await supabase
-          .from("spelling_statistics")
-          .select("*")
-          .eq("user_id", selectedChild)
-          .order("created_at", { ascending: false });
-          
-        if (spellingError) throw spellingError;
-        
-        // Format JSON data for math
-        const formattedMathStats = mathData.map(item => ({
-          ...item,
-          difficulty_level: typeof item.difficulty_level === 'string'
-            ? JSON.parse(item.difficulty_level)
-            : item.difficulty_level
-        }));
-        
-        setChildMathStats(formattedMathStats);
-        setChildSpellingStats(spellingData);
       } catch (error) {
         console.error("Error fetching child statistics:", error);
       }

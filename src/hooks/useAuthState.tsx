@@ -90,18 +90,10 @@ export const useAuthState = () => {
 
   const fetchUserProfile = async (userId: string) => {
     try {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", userId)
-        .single();
-
-      if (error) {
-        console.error("Error fetching user profile:", error);
-        return null;
-      }
-
-      return data as UserProfile;
+      // Since there are no tables yet, we'll return null for now
+      // This will be updated once the profiles table is created
+      console.log("Profile fetch skipped - no tables exist yet");
+      return null;
     } catch (error) {
       console.error("Unexpected error fetching profile:", error);
       return null;

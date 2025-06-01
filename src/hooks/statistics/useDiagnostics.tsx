@@ -17,15 +17,8 @@ export const useDiagnostics = (
       if (result.success) {
         toast.success(`Přímé připojení k Supabase úspěšné (${result.elapsed}ms)`);
         
-        // Zkusíme načíst profily
-        const { data, error } = await supabase.from('profiles').select('*').limit(5);
-        
-        if (error) {
-          toast.error(`Chyba při načítání profilů: ${error.message}`);
-        } else {
-          toast.success(`Načteno ${data?.length || 0} profilů z databáze`);
-          console.log("Profily:", data);
-        }
+        // Since there are no tables yet, we'll skip the profiles query
+        toast.info("Database je připravena, ale zatím neobsahuje tabulky");
         
       } else {
         toast.error(`Problém s připojením k Supabase: ${result.error?.message || 'Neznámá chyba'}`);
