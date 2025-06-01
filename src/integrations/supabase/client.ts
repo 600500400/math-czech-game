@@ -16,13 +16,12 @@ export const checkSupabaseConnection = async () => {
   const startTime = Date.now();
   
   try {
-    // Try a simple query to check if the connection works
-    // Since there are no tables yet, we'll just test the connection with a simple query
-    const { error } = await supabase.rpc('now');
+    // Test connection by trying to get the session
+    const { data, error } = await supabase.auth.getSession();
     const elapsed = Date.now() - startTime;
     
-    if (error && error.message?.includes('function now() does not exist')) {
-      // This means we connected but there's no function, which is expected
+    // If we can get a session response (even if user is not logged in), connection is working
+    if (!error) {
       return {
         success: true,
         elapsed,
@@ -30,16 +29,9 @@ export const checkSupabaseConnection = async () => {
       };
     }
     
-    if (error) {
-      return {
-        success: false,
-        error,
-        elapsed
-      };
-    }
-    
     return {
-      success: true,
+      success: false,
+      error,
       elapsed
     };
   } catch (error) {
