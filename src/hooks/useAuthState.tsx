@@ -15,75 +15,92 @@ export const useAuthState = () => {
 
   // Initial auth state setup
   useEffect(() => {
-    // Check for local user first
-    const localUserStr = localStorage.getItem('localUser');
-    
-    if (localUserStr) {
-      try {
-        const localUser = JSON.parse(localUserStr);
-        setAuthState({
-          user: { id: localUser.id } as any,
-          profile: localUser as UserProfile,
-          isLoading: false,
-          isAuthenticated: true,
-          error: null
-        });
-        return;
-      } catch (e) {
-        console.error("Error parsing local user:", e);
-        localStorage.removeItem('localUser');
-      }
-    }
-    
-    // If no local user, check Supabase session
+    let mounted = true;
+
+    // Set up auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        // Update state synchronously
-        setAuthState(prev => ({
-          ...prev,
-          user: session?.user ? { id: session.user.id } as any : null,
-          isAuthenticated: !!session?.user,
-        }));
+      async (event, session) => {
+        if (!mounted) return;
+
+        console.log("Auth state changed:", event, session?.user?.id);
 
         if (session?.user) {
-          // Defer profile loading to prevent deadlocks
-          setTimeout(() => {
-            fetchUserProfile(session.user.id).then(profile => {
-              setAuthState(prev => ({
-                ...prev,
-                profile,
-                isLoading: false,
-              }));
-            });
-          }, 0);
-        }
-      }
-    );
+          // User is authenticated with Supabase
+          const profile: UserProfile = {
+            id: session.user.id,
+            username: session.user.user_metadata?.username || session.user.email?.split('@')[0] || 'User',
+            role: session.user.user_metadata?.role || 'child',
+            email: session.user.email,
+            created_at: session.user.created_at,
+          };
 
-    // Fetch initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        fetchUserProfile(session.user.id).then(profile => {
           setAuthState({
-            user: { id: session.user.id } as any,
+            user: session.user,
             profile,
             isLoading: false,
             isAuthenticated: true,
             error: null,
           });
-        });
-      } else {
+        } else {
+          // Check for local user as fallback
+          const localUserStr = localStorage.getItem('localUser');
+          
+          if (localUserStr) {
+            try {
+              const localUser = JSON.parse(localUserStr);
+              console.log("Using local user:", localUser.id);
+              
+              setAuthState({
+                user: { id: localUser.id } as any,
+                profile: localUser as UserProfile,
+                isLoading: false,
+                isAuthenticated: true,
+                error: null
+              });
+              return;
+            } catch (e) {
+              console.error("Error parsing local user:", e);
+              localStorage.removeItem('localUser');
+            }
+          }
+
+          // No user at all
+          setAuthState({
+            user: null,
+            profile: null,
+            isLoading: false,
+            isAuthenticated: false,
+            error: null,
+          });
+        }
+      }
+    );
+
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!mounted) return;
+
+      if (session?.user) {
+        const profile: UserProfile = {
+          id: session.user.id,
+          username: session.user.user_metadata?.username || session.user.email?.split('@')[0] || 'User',
+          role: session.user.user_metadata?.role || 'child',
+          email: session.user.email,
+          created_at: session.user.created_at,
+        };
+
         setAuthState({
-          user: null,
-          profile: null,
+          user: session.user,
+          profile,
           isLoading: false,
-          isAuthenticated: false,
+          isAuthenticated: true,
           error: null,
         });
       }
     });
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
   }, []);
