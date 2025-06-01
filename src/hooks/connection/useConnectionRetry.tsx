@@ -119,7 +119,8 @@ export const useConnectionRetry = (
       setIsRefreshing(false);
       
       if (result.success) {
-        toast.success(`Připojení k databázi funkční (${result.elapsed}ms)`);
+        const elapsed = 'elapsed' in result ? result.elapsed : 0;
+        toast.success(`Připojení k databázi funkční (${elapsed}ms)`);
         
         // Pokud jsme v lokálním režimu, zkontrolujeme znovu
         const localMode = await checkLocalUserMode();
@@ -131,9 +132,9 @@ export const useConnectionRetry = (
           // Reload stránky pro načtení aktuálních dat z databáze
           window.location.reload();
         }
-      } else if (result.offline) {
+      } else if ('offline' in result && result.offline) {
         toast.error("Internetové připojení není dostupné. Používám lokální režim.");
-      } else if (result.timeout) {
+      } else if ('timeout' in result && result.timeout) {
         toast.error("Vypršel čas pro připojení k databázi. Používám lokální režim.");
       } else {
         toast.error("Problém s připojením k databázi. Používám lokální úložiště.");

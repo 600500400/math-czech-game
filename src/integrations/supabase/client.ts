@@ -17,11 +17,12 @@ export const checkSupabaseConnection = async () => {
   
   try {
     // Try a simple query to check if the connection works
-    const { error } = await supabase.from('profiles').select('count').limit(1);
+    // Since there are no tables yet, we'll just test the connection with a simple query
+    const { error } = await supabase.rpc('now');
     const elapsed = Date.now() - startTime;
     
-    if (error && error.code === 'PGRST116') {
-      // Table doesn't exist, but connection is working
+    if (error && error.message?.includes('function now() does not exist')) {
+      // This means we connected but there's no function, which is expected
       return {
         success: true,
         elapsed,
