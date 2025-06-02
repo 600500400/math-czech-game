@@ -136,7 +136,7 @@
 }
 
 .button-hover-glow {
-  @apply transition-all duration-300 ease-in-out hover:shadow-lg hover:shadow-current/25 hover:-translate-y-1;
+  @apply transition-all duration-300 ease-in-out hover:shadow-lg hover:shadow-gray-400/25 hover:-translate-y-1;
 }
 
 /* Smooth scrolling */
