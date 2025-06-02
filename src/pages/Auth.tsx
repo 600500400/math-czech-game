@@ -160,7 +160,7 @@ const Auth = () => {
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  placeholder={t('auth.namePlaceholder')}
+                  placeholder="např. Gábi, Míša, Áďa..."
                   className={`text-base ${errors.username ? 'border-red-500' : ''}`}
                 />
                 {errors.username && (
