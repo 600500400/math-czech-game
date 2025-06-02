@@ -41,3 +41,6 @@ const ModernHeader = () => {
       </div>
     </header>
   );
+};
+
+export default ModernHeader;
