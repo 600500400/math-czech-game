@@ -7,7 +7,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from 'uuid';
 import AppFooter from "@/components/layout/AppFooter";
@@ -247,18 +246,6 @@ const Auth = () => {
             >
               {isSignUp ? t('auth.switchToSignIn') : t('auth.switchToSignUp')}
             </Button>
-          </div>
-          
-          {/* Social login divider */}
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <Separator />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-gray-500">
-                {t('auth.orContinueWith')}
-              </span>
-            </div>
           </div>
           
           {/* Social auth buttons */}
