@@ -27,7 +27,7 @@ const ModernHeader = () => {
                 Procvička
               </h1>
               <p className="text-xs text-gray-500 -mt-1">
-                {t('common.loading')} {/* This will be updated to proper subtitle */}
+                {t('auth.title')}
               </p>
             </div>
           </div>

@@ -70,5 +70,22 @@
     "spelling": "Pravopis",
     "startGame": "Začít hru",
     "difficulty": "Obtížnost"
+  },
+  "dashboard": {
+    "welcomeBack": "Vítej zpět",
+    "subtitle": "Připrav se na další výzvu! Procvičuj matematiku a pravopis zábavnou formou.",
+    "totalGames": "Celkem her",
+    "successRate": "Úspěšnost",
+    "correctAnswers": "Správné odpovědi",
+    "yourLevel": "Tvoje úroveň",
+    "progressToNextLevel": "Pokrok k dalšímu levelu",
+    "correctAnswersToNextLevel": "správných odpovědí do dalšího levelu",
+    "mathTitle": "Matematika",
+    "mathDescription": "Procvičuj sčítání, odčítání, násobení a dělení",
+    "spellingTitle": "Pravopis",
+    "spellingDescription": "Zlepšuj svůj pravopis s interaktivními cvičeními",
+    "startPracticing": "Začít procvičovat",
+    "motivationalQuote": "Každá správná odpověď tě posouvá blíže k tvému cíli!",
+    "keepLearning": "Pokračuj v učení a uvidíš pokrok! 🚀"
   }
 }

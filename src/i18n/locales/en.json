@@ -70,5 +70,22 @@
     "spelling": "Spelling",
     "startGame": "Start game",
     "difficulty": "Difficulty"
+  },
+  "dashboard": {
+    "welcomeBack": "Welcome back",
+    "subtitle": "Get ready for your next challenge! Practice math and spelling in a fun way.",
+    "totalGames": "Total games",
+    "successRate": "Success rate",
+    "correctAnswers": "Correct answers",
+    "yourLevel": "Your level",
+    "progressToNextLevel": "Progress to next level",
+    "correctAnswersToNextLevel": "correct answers to next level",
+    "mathTitle": "Math",
+    "mathDescription": "Practice addition, subtraction, multiplication and division",
+    "spellingTitle": "Spelling",
+    "spellingDescription": "Improve your spelling with interactive exercises",
+    "startPracticing": "Start practicing",
+    "motivationalQuote": "Every correct answer brings you closer to your goal!",
+    "keepLearning": "Keep learning and you'll see progress! 🚀"
   }
 }

@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useStatistics } from "@/hooks/useStatistics";
+import { useLanguage } from "@/hooks/useLanguage";
 import { Calculator, PenTool, Target, TrendingUp, Star, Trophy } from "lucide-react";
 
 interface WelcomeDashboardProps {
@@ -12,8 +13,9 @@ interface WelcomeDashboardProps {
 const WelcomeDashboard = ({ onNavigateToTab }: WelcomeDashboardProps) => {
   const { authState } = useAuth();
   const { mathStats, spellingStats } = useStatistics(authState.user?.id || null);
+  const { t } = useLanguage();
 
-  const userName = authState.profile?.username || "Uživatel";
+  const userName = authState.profile?.username || t('user.user');
   
   // Výpočet základních statistik
   const totalGames = mathStats.length + spellingStats.length;
@@ -42,14 +44,14 @@ const WelcomeDashboard = ({ onNavigateToTab }: WelcomeDashboardProps) => {
       <div className="text-center space-y-4 py-8">
         <div className="relative inline-block">
           <h1 className="text-4xl md:text-5xl font-heading font-bold gradient-text">
-            Vítej zpět, {userName}! 👋
+            {t('dashboard.welcomeBack')}, {userName}! 👋
           </h1>
           <div className="absolute -top-2 -right-2">
             <Star className="w-8 h-8 text-yellow-400 animate-pulse" />
           </div>
         </div>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          Připrav se na další výzvu! Procvičuj matematiku a pravopis zábavnou formou.
+          {t('dashboard.subtitle')}
         </p>
       </div>
 
@@ -59,7 +61,7 @@ const WelcomeDashboard = ({ onNavigateToTab }: WelcomeDashboardProps) => {
           <CardContent className="p-6 text-center">
             <Trophy className="w-8 h-8 text-brand-500 mx-auto mb-2" />
             <div className="text-2xl font-bold text-gray-900">{totalGames}</div>
-            <div className="text-sm text-gray-600">Celkem her</div>
+            <div className="text-sm text-gray-600">{t('dashboard.totalGames')}</div>
           </CardContent>
         </Card>
         
@@ -67,7 +69,7 @@ const WelcomeDashboard = ({ onNavigateToTab }: WelcomeDashboardProps) => {
           <CardContent className="p-6 text-center">
             <Target className="w-8 h-8 text-success-500 mx-auto mb-2" />
             <div className="text-2xl font-bold text-gray-900">{successRate}%</div>
-            <div className="text-sm text-gray-600">Úspěšnost</div>
+            <div className="text-sm text-gray-600">{t('dashboard.successRate')}</div>
           </CardContent>
         </Card>
         
@@ -75,7 +77,7 @@ const WelcomeDashboard = ({ onNavigateToTab }: WelcomeDashboardProps) => {
           <CardContent className="p-6 text-center">
             <TrendingUp className="w-8 h-8 text-brand-500 mx-auto mb-2" />
             <div className="text-2xl font-bold text-gray-900">{totalCorrect}</div>
-            <div className="text-sm text-gray-600">Správné odpovědi</div>
+            <div className="text-sm text-gray-600">{t('dashboard.correctAnswers')}</div>
           </CardContent>
         </Card>
         
@@ -83,7 +85,7 @@ const WelcomeDashboard = ({ onNavigateToTab }: WelcomeDashboardProps) => {
           <CardContent className="p-6 text-center">
             <Star className="w-8 h-8 text-yellow-500 mx-auto mb-2" />
             <div className="text-2xl font-bold text-gray-900">Level {level}</div>
-            <div className="text-sm text-gray-600">Tvoje úroveň</div>
+            <div className="text-sm text-gray-600">{t('dashboard.yourLevel')}</div>
           </CardContent>
         </Card>
       </div>
@@ -93,7 +95,7 @@ const WelcomeDashboard = ({ onNavigateToTab }: WelcomeDashboardProps) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Star className="w-5 h-5 text-yellow-500" />
-            Pokrok k dalšímu levelu
+            {t('dashboard.progressToNextLevel')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -109,7 +111,7 @@ const WelcomeDashboard = ({ onNavigateToTab }: WelcomeDashboardProps) => {
               />
             </div>
             <p className="text-sm text-gray-600 text-center">
-              {50 - (totalCorrect % 50)} správných odpovědí do dalšího levelu
+              {50 - (totalCorrect % 50)} {t('dashboard.correctAnswersToNextLevel')}
             </p>
           </div>
         </CardContent>
@@ -123,10 +125,10 @@ const WelcomeDashboard = ({ onNavigateToTab }: WelcomeDashboardProps) => {
             <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300">
               <Calculator className="w-8 h-8 text-white" />
             </div>
-            <h3 className="text-xl font-heading font-semibold">Matematika</h3>
-            <p className="text-gray-600">Procvičuj sčítání, odčítání, násobení a dělení</p>
+            <h3 className="text-xl font-heading font-semibold">{t('dashboard.mathTitle')}</h3>
+            <p className="text-gray-600">{t('dashboard.mathDescription')}</p>
             <Button className="bg-gradient-primary hover:scale-105 transition-all duration-300 shadow-lg">
-              Začít procvičovat
+              {t('dashboard.startPracticing')}
             </Button>
           </CardContent>
         </Card>
@@ -137,10 +139,10 @@ const WelcomeDashboard = ({ onNavigateToTab }: WelcomeDashboardProps) => {
             <div className="w-16 h-16 bg-gradient-success rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300">
               <PenTool className="w-8 h-8 text-white" />
             </div>
-            <h3 className="text-xl font-heading font-semibold">Pravopis</h3>
-            <p className="text-gray-600">Zlepšuj svůj pravopis s interaktivními cvičeními</p>
+            <h3 className="text-xl font-heading font-semibold">{t('dashboard.spellingTitle')}</h3>
+            <p className="text-gray-600">{t('dashboard.spellingDescription')}</p>
             <Button className="bg-gradient-success hover:scale-105 transition-all duration-300 shadow-lg">
-              Začít procvičovat
+              {t('dashboard.startPracticing')}
             </Button>
           </CardContent>
         </Card>
@@ -151,9 +153,9 @@ const WelcomeDashboard = ({ onNavigateToTab }: WelcomeDashboardProps) => {
         <CardContent className="p-6 text-center">
           <div className="max-w-2xl mx-auto">
             <p className="text-lg italic text-gray-700 mb-2">
-              "Každá správná odpověď tě posouvá blíže k tvému cíli!"
+              "{t('dashboard.motivationalQuote')}"
             </p>
-            <p className="text-sm text-gray-500">Pokračuj v učení a uvidíš pokrok! 🚀</p>
+            <p className="text-sm text-gray-500">{t('dashboard.keepLearning')}</p>
           </div>
         </CardContent>
       </Card>
