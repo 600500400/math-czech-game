@@ -1,6 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { BarChart2, Gamepad2, Home } from "lucide-react";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface AppNavigationProps {
   activeTab: "dashboard" | "practice" | "statistics";
@@ -8,6 +9,8 @@ interface AppNavigationProps {
 }
 
 const AppNavigation = ({ activeTab, setActiveTab }: AppNavigationProps) => {
+  const { t } = useLanguage();
+
   return (
     <div className="w-full mb-8">
       <nav className="flex gap-2 p-1 bg-white/90 backdrop-blur-md rounded-2xl border border-gray-200/50 shadow-lg">
@@ -21,8 +24,8 @@ const AppNavigation = ({ activeTab, setActiveTab }: AppNavigationProps) => {
           onClick={() => setActiveTab("dashboard")}
         >
           <Home className="mr-1 sm:mr-2 h-4 w-4" /> 
-          <span className="hidden xs:inline">Dashboard</span>
-          <span className="xs:hidden">Home</span>
+          <span className="hidden xs:inline">{t('navigation.dashboard')}</span>
+          <span className="xs:hidden">{t('navigation.home')}</span>
         </Button>
         
         <Button 
@@ -35,8 +38,8 @@ const AppNavigation = ({ activeTab, setActiveTab }: AppNavigationProps) => {
           onClick={() => setActiveTab("practice")}
         >
           <Gamepad2 className="mr-1 sm:mr-2 h-4 w-4" /> 
-          <span className="hidden xs:inline">Procvičování</span>
-          <span className="xs:hidden">Hra</span>
+          <span className="hidden xs:inline">{t('navigation.practice')}</span>
+          <span className="xs:hidden">{t('navigation.game')}</span>
         </Button>
         
         <Button 
@@ -49,8 +52,8 @@ const AppNavigation = ({ activeTab, setActiveTab }: AppNavigationProps) => {
           onClick={() => setActiveTab("statistics")}
         >
           <BarChart2 className="mr-1 sm:mr-2 h-4 w-4" /> 
-          <span className="hidden xs:inline">Statistiky</span>
-          <span className="xs:hidden">Stats</span>
+          <span className="hidden xs:inline">{t('navigation.statistics')}</span>
+          <span className="xs:hidden">{t('navigation.stats')}</span>
         </Button>
       </nav>
     </div>

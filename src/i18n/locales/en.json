@@ -1,0 +1,74 @@
+
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "auth": {
+    "title": "Practice App",
+    "subtitle": "Sign in or select a demo user",
+    "demoUsers": "Demo users",
+    "realAuth": "Real authentication",
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "email": "Email",
+    "password": "Password",
+    "username": "Username",
+    "signingIn": "Signing in...",
+    "registering": "Registering...",
+    "continueAsDemo": "Continue as demo",
+    "signInWithGoogle": "Sign in with Google",
+    "signInWithFacebook": "Sign in with Facebook",
+    "signInWithApple": "Sign in with Apple",
+    "orContinueWith": "or continue with",
+    "footer": "Select a demo user or register to save statistics to the cloud."
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "practice": "Practice",
+    "statistics": "Statistics",
+    "home": "Home",
+    "game": "Game",
+    "stats": "Stats"
+  },
+  "user": {
+    "parent": "Parent",
+    "child": "Child",
+    "teacher": "Teacher",
+    "user": "User",
+    "selectUser": "Select user",
+    "changeUser": "Change user",
+    "parentDashboard": "Parent dashboard"
+  },
+  "feedback": {
+    "title": "Feedback",
+    "description": "Help us improve the app",
+    "category": "Category",
+    "bug": "Bug",
+    "feature": "Feature request",
+    "general": "General",
+    "message": "Your message",
+    "messagePlaceholder": "Describe your feedback...",
+    "send": "Send",
+    "sending": "Sending...",
+    "thankYou": "Thank you for your feedback!",
+    "error": "Error sending feedback"
+  },
+  "practice": {
+    "math": "Math",
+    "spelling": "Spelling",
+    "startGame": "Start game",
+    "difficulty": "Difficulty"
+  }
+}

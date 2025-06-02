@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useLanguage } from "@/hooks/useLanguage";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -10,6 +11,8 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import AppFooter from "@/components/layout/AppFooter";
+import SocialAuthButtons from "@/components/auth/SocialAuthButtons";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 // Předem definovaní uživatelé s UUID formátem ID
 const DEFAULT_USERS = [
@@ -21,6 +24,7 @@ const DEFAULT_USERS = [
 
 const Auth = () => {
   const { authState, setLocalUser, signIn, signUp } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [initializing, setInitializing] = useState(true);
@@ -99,7 +103,7 @@ const Auth = () => {
     setAuthLoading(true);
     try {
       await signUp(email, password, username);
-      toast.success("Registrace úspěšná! Nyní se můžete přihlásit.");
+      toast.success(t('auth.registering'));
     } catch (error) {
       console.error("Sign up failed:", error);
     } finally {
@@ -109,19 +113,24 @@ const Auth = () => {
 
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-gray-50 p-4">
+      {/* Language switcher in top right */}
+      <div className="absolute top-4 right-4">
+        <LanguageSwitcher />
+      </div>
+      
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Procvička App</CardTitle>
+          <CardTitle className="text-2xl font-bold text-center">{t('auth.title')}</CardTitle>
           <CardDescription className="text-center">
-            Přihlaste se nebo si vyberte demo uživatele
+            {t('auth.subtitle')}
           </CardDescription>
         </CardHeader>
         
         <CardContent>
           <Tabs defaultValue="demo" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="demo">Demo uživatelé</TabsTrigger>
-              <TabsTrigger value="real">Skutečné přihlášení</TabsTrigger>
+              <TabsTrigger value="demo">{t('auth.demoUsers')}</TabsTrigger>
+              <TabsTrigger value="real">{t('auth.realAuth')}</TabsTrigger>
             </TabsList>
             
             <TabsContent value="demo" className="space-y-4">
@@ -143,21 +152,23 @@ const Auth = () => {
                 className="w-full bg-orange-500 hover:bg-orange-600" 
                 disabled={authState.isLoading || !selectedUser || initializing}
               >
-                {authState.isLoading ? "Přihlašování..." : "Pokračovat jako demo"}
+                {authState.isLoading ? t('auth.signingIn') : t('auth.continueAsDemo')}
               </Button>
             </TabsContent>
             
             <TabsContent value="real" className="space-y-4">
+              <SocialAuthButtons />
+              
               <Tabs defaultValue="signin" className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="signin">Přihlásit se</TabsTrigger>
-                  <TabsTrigger value="signup">Registrovat se</TabsTrigger>
+                  <TabsTrigger value="signin">{t('auth.signIn')}</TabsTrigger>
+                  <TabsTrigger value="signup">{t('auth.signUp')}</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="signin">
                   <form onSubmit={handleRealSignIn} className="space-y-4">
                     <div>
-                      <Label htmlFor="signin-email">Email</Label>
+                      <Label htmlFor="signin-email">{t('auth.email')}</Label>
                       <Input
                         id="signin-email"
                         type="email"
@@ -167,7 +178,7 @@ const Auth = () => {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="signin-password">Heslo</Label>
+                      <Label htmlFor="signin-password">{t('auth.password')}</Label>
                       <Input
                         id="signin-password"
                         type="password"
@@ -181,7 +192,7 @@ const Auth = () => {
                       className="w-full bg-blue-500 hover:bg-blue-600"
                       disabled={authLoading}
                     >
-                      {authLoading ? "Přihlašování..." : "Přihlásit se"}
+                      {authLoading ? t('auth.signingIn') : t('auth.signIn')}
                     </Button>
                   </form>
                 </TabsContent>
@@ -189,7 +200,7 @@ const Auth = () => {
                 <TabsContent value="signup">
                   <form onSubmit={handleRealSignUp} className="space-y-4">
                     <div>
-                      <Label htmlFor="signup-username">Uživatelské jméno</Label>
+                      <Label htmlFor="signup-username">{t('auth.username')}</Label>
                       <Input
                         id="signup-username"
                         type="text"
@@ -199,7 +210,7 @@ const Auth = () => {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="signup-email">Email</Label>
+                      <Label htmlFor="signup-email">{t('auth.email')}</Label>
                       <Input
                         id="signup-email"
                         type="email"
@@ -209,7 +220,7 @@ const Auth = () => {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="signup-password">Heslo</Label>
+                      <Label htmlFor="signup-password">{t('auth.password')}</Label>
                       <Input
                         id="signup-password"
                         type="password"
@@ -224,7 +235,7 @@ const Auth = () => {
                       className="w-full bg-green-500 hover:bg-green-600"
                       disabled={authLoading}
                     >
-                      {authLoading ? "Registruji..." : "Registrovat se"}
+                      {authLoading ? t('auth.registering') : t('auth.signUp')}
                     </Button>
                   </form>
                 </TabsContent>
@@ -235,7 +246,7 @@ const Auth = () => {
         
         <CardFooter>
           <p className="text-xs text-center w-full text-gray-500">
-            Vyberte si demo uživatele nebo se zaregistrujte pro ukládání statistik do cloudu.
+            {t('auth.footer')}
           </p>
         </CardFooter>
       </Card>

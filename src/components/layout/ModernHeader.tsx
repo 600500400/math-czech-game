@@ -3,9 +3,12 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { BookOpen, Sparkles } from "lucide-react";
 import UserMenu from "@/components/UserMenu";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const ModernHeader = () => {
   const { authState } = useAuth();
+  const { t } = useLanguage();
 
   return (
     <header className="w-full bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-50">
@@ -23,23 +26,18 @@ const ModernHeader = () => {
               <h1 className="text-xl font-heading font-bold gradient-text">
                 Procvička
               </h1>
-              <p className="text-xs text-gray-500 -mt-1">Moderní vzdělávání</p>
+              <p className="text-xs text-gray-500 -mt-1">
+                {t('common.loading')} {/* This will be updated to proper subtitle */}
+              </p>
             </div>
           </div>
 
-          {/* Navigation - Desktop */}
-          <nav className="hidden md:flex items-center space-x-6">
-            {/* Removed navigation buttons */}
-          </nav>
-
-          {/* User Menu */}
-          <div className="flex items-center">
+          {/* User Menu and Language Switcher */}
+          <div className="flex items-center gap-2">
+            <LanguageSwitcher />
             <UserMenu />
           </div>
         </div>
       </div>
     </header>
   );
-};
-
-export default ModernHeader;

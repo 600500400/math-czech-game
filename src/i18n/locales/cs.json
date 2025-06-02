@@ -1,0 +1,74 @@
+
+{
+  "common": {
+    "loading": "Načítání...",
+    "error": "Chyba",
+    "success": "Úspěch",
+    "cancel": "Zrušit",
+    "save": "Uložit",
+    "delete": "Smazat",
+    "edit": "Upravit",
+    "close": "Zavřít",
+    "back": "Zpět",
+    "next": "Další",
+    "previous": "Předchozí",
+    "yes": "Ano",
+    "no": "Ne"
+  },
+  "auth": {
+    "title": "Procvička App",
+    "subtitle": "Přihlaste se nebo si vyberte demo uživatele",
+    "demoUsers": "Demo uživatelé",
+    "realAuth": "Skutečné přihlášení",
+    "signIn": "Přihlásit se",
+    "signUp": "Registrovat se",
+    "email": "Email",
+    "password": "Heslo",
+    "username": "Uživatelské jméno",
+    "signingIn": "Přihlašování...",
+    "registering": "Registruji...",
+    "continueAsDemo": "Pokračovat jako demo",
+    "signInWithGoogle": "Přihlásit se přes Google",
+    "signInWithFacebook": "Přihlásit se přes Facebook",
+    "signInWithApple": "Přihlásit se přes Apple",
+    "orContinueWith": "nebo pokračovat s",
+    "footer": "Vyberte si demo uživatele nebo se zaregistrujte pro ukládání statistik do cloudu."
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "practice": "Procvičování",
+    "statistics": "Statistiky",
+    "home": "Home",
+    "game": "Hra",
+    "stats": "Stats"
+  },
+  "user": {
+    "parent": "Rodič",
+    "child": "Dítě",
+    "teacher": "Učitel",
+    "user": "Uživatel",
+    "selectUser": "Vybrat uživatele",
+    "changeUser": "Změnit uživatele",
+    "parentDashboard": "Dashboard rodiče"
+  },
+  "feedback": {
+    "title": "Zpětná vazba",
+    "description": "Pomozte nám vylepšit aplikaci",
+    "category": "Kategorie",
+    "bug": "Chyba",
+    "feature": "Nová funkce",
+    "general": "Obecné",
+    "message": "Vaše zpráva",
+    "messagePlaceholder": "Popište svou zpětnou vazbu...",
+    "send": "Odeslat",
+    "sending": "Odesílání...",
+    "thankYou": "Děkujeme za zpětnou vazbu!",
+    "error": "Chyba při odesílání zpětné vazby"
+  },
+  "practice": {
+    "math": "Matematika",
+    "spelling": "Pravopis",
+    "startGame": "Začít hru",
+    "difficulty": "Obtížnost"
+  }
+}

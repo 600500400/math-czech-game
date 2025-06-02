@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useLanguage } from '@/hooks/useLanguage';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,10 +13,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { UserIcon, LogOut, ChartBarIcon, Settings } from 'lucide-react';
+import { UserIcon, LogOut, ChartBarIcon } from 'lucide-react';
 
 const UserMenu = () => {
   const { authState, signOut } = useAuth();
+  const { t } = useLanguage();
   const [open, setOpen] = useState(false);
 
   // Zkratka jména pro avatar
@@ -32,10 +34,10 @@ const UserMenu = () => {
   // Překlad role
   const getRoleName = () => {
     switch (authState.profile?.role) {
-      case 'parent': return 'Rodič';
-      case 'child': return 'Dítě';
-      case 'teacher': return 'Učitel';
-      default: return 'Uživatel';
+      case 'parent': return t('user.parent');
+      case 'child': return t('user.child');
+      case 'teacher': return t('user.teacher');
+      default: return t('user.user');
     }
   };
 
@@ -44,7 +46,7 @@ const UserMenu = () => {
       <Link to="/auth">
         <Button variant="outline" size="sm">
           <UserIcon className="mr-2 h-4 w-4" />
-          Vybrat uživatele
+          {t('user.selectUser')}
         </Button>
       </Link>
     );
@@ -74,14 +76,14 @@ const UserMenu = () => {
           <DropdownMenuItem asChild>
             <Link to="/parent-dashboard" className="flex items-center cursor-pointer" onClick={() => setOpen(false)}>
               <ChartBarIcon className="mr-2 h-4 w-4" />
-              <span>Dashboard rodiče</span>
+              <span>{t('user.parentDashboard')}</span>
             </Link>
           </DropdownMenuItem>
         )}
         <DropdownMenuSeparator />
         <DropdownMenuItem className="flex items-center cursor-pointer" onClick={() => signOut()}>
           <LogOut className="mr-2 h-4 w-4" />
-          <span>Změnit uživatele</span>
+          <span>{t('user.changeUser')}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
