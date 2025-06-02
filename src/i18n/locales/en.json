@@ -105,6 +105,17 @@
     "correct": "Correct",
     "wrong": "Wrong",
     "success": "Success",
-    "accuracy": "Accuracy"
+    "accuracy": "Accuracy",
+    "detailedStatistics": "Detailed statistics",
+    "reset": "Reset",
+    "confirmDelete": "Do you really want to delete all statistics?",
+    "deleteConfirmation": "This action is irreversible. All your statistics will be permanently deleted.",
+    "cancel": "Cancel",
+    "yesDelete": "Yes, delete",
+    "statisticsDeleted": "Statistics have been successfully deleted",
+    "deleteFailed": "Failed to delete statistics",
+    "noAssignedChildren": "You don't have any assigned children yet",
+    "connectAccountsFirst": "To view statistics, you need to first connect your account with your children's accounts",
+    "backToHome": "Back to home page"
   }
 }

@@ -12,8 +12,10 @@ import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const StatisticsViewer = () => {
+  const { t } = useLanguage();
   const { authState } = useAuth();
   const {
     mathStats,
@@ -40,10 +42,10 @@ const StatisticsViewer = () => {
       const success = resetUserStatistics(currentUserId);
       if (success) {
         clearAllAnswers(); // Also clear detailed answers
-        toast.success("Statistiky byly úspěšně vymazány");
+        toast.success(t('statistics.statisticsDeleted'));
         forceRefreshAllStatistics();
       } else {
-        toast.error("Nepodařilo se vymazat statistiky");
+        toast.error(t('statistics.deleteFailed'));
       }
       setShowDeleteDialog(false);
     }
@@ -58,26 +60,26 @@ const StatisticsViewer = () => {
   return (
     <Card className="w-full max-w-6xl mx-auto">
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-xl">Podrobné statistiky</CardTitle>
+        <CardTitle className="text-xl">{t('statistics.detailedStatistics')}</CardTitle>
         <div className="flex items-center gap-2">
           <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
             <AlertDialogTrigger asChild>
               <Button variant="destructive" size="sm" className="bg-red-500 hover:bg-red-400 text-sm font-normal">
                 <Trash2 className="h-4 w-4 mr-1" />
-                Resetovat
+                {t('statistics.reset')}
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Opravdu chcete smazat všechny statistiky?</AlertDialogTitle>
+                <AlertDialogTitle>{t('statistics.confirmDelete')}</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Tato akce je nevratná. Všechny vaše statistiky budou trvale vymazány.
+                  {t('statistics.deleteConfirmation')}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Zrušit</AlertDialogCancel>
+                <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
                 <AlertDialogAction onClick={handleResetStatistics}>
-                  Ano, smazat
+                  {t('statistics.yesDelete')}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>

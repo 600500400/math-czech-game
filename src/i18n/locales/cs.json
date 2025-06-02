@@ -100,11 +100,22 @@
   "statistics": {
     "title": "Statistiky",
     "noData": "Zatím nemáte žádné statistiky. Zahrajte si hru!",
-    "warning": "Všechny statistiky jsou uložány lokálně v zařízení.",
+    "warning": "Všechny statistiky jsou ukládány lokálně v zařízení.",
     "total": "Celkem",
     "correct": "Správně",
     "wrong": "Špatně",
     "success": "Úspěch",
-    "accuracy": "Úspěšnost"
+    "accuracy": "Úspěšnost",
+    "detailedStatistics": "Podrobné statistiky",
+    "reset": "Resetovat",
+    "confirmDelete": "Opravdu chcete smazat všechny statistiky?",
+    "deleteConfirmation": "Tato akce je nevratná. Všechny vaše statistiky budou trvale vymazány.",
+    "cancel": "Zrušit",
+    "yesDelete": "Ano, smazat",
+    "statisticsDeleted": "Statistiky byly úspěšně vymazány",
+    "deleteFailed": "Nepodařilo se vymazat statistiky",
+    "noAssignedChildren": "Zatím nemáte přiřazené žádné děti",
+    "connectAccountsFirst": "Pro zobrazení statistik je potřeba nejprve propojit váš účet s účty vašich dětí",
+    "backToHome": "Zpět na hlavní stránku"
   }
 }
