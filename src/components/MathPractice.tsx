@@ -6,8 +6,11 @@ import CustomGameControls from "./math/CustomGameControls";
 import DifficultyDialog from "./math/DifficultyDialog";
 import ProblemDialog from "./math/ProblemDialog";
 import StatisticsDialog from "./math/StatisticsDialog";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const MathPractice = () => {
+  const { t } = useLanguage();
+  
   const {
     correctAnswers,
     wrongAnswers,
@@ -55,7 +58,9 @@ const MathPractice = () => {
       )}
       {showConfetti && <ConfettiExplosion particleCount={30} />}
       
-      <h1 className="text-3xl font-bold text-center text-orange-500">Procvičování matematiky</h1>
+      <h1 className="text-3xl font-bold text-center text-orange-500">
+        {t('practice.practiceMath')}
+      </h1>
       
       {/* Custom Game Controls without counters */}
       <CustomGameControls 

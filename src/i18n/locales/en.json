@@ -69,7 +69,16 @@
     "math": "Math",
     "spelling": "Spelling",
     "startGame": "Start game",
-    "difficulty": "Difficulty"
+    "difficulty": "Difficulty",
+    "spellingWords": "Spelling words",
+    "mathematics": "Mathematics",
+    "practiceSpelling": "Practice spelling words",
+    "practiceMath": "Practice mathematics",
+    "total": "Total",
+    "correct": "Correct",
+    "wrong": "Wrong",
+    "startMath": "Start Math",
+    "selectWordGroup": "Select word group"
   },
   "dashboard": {
     "welcomeBack": "Welcome back",
@@ -87,5 +96,15 @@
     "startPracticing": "Start practicing",
     "motivationalQuote": "Every correct answer brings you closer to your goal!",
     "keepLearning": "Keep learning and you'll see progress! 🚀"
+  },
+  "statistics": {
+    "title": "Statistics",
+    "noData": "You don't have any statistics yet. Start playing!",
+    "warning": "All statistics are stored locally on the device.",
+    "total": "Total",
+    "correct": "Correct",
+    "wrong": "Wrong",
+    "success": "Success",
+    "accuracy": "Accuracy"
   }
 }

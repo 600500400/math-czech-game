@@ -69,7 +69,16 @@
     "math": "Matematika",
     "spelling": "Pravopis",
     "startGame": "Začít hru",
-    "difficulty": "Obtížnost"
+    "difficulty": "Obtížnost",
+    "spellingWords": "Vyjmenovaná slova",
+    "mathematics": "Matematika",
+    "practiceSpelling": "Procvičování vyjmenovaných slov",
+    "practiceMath": "Procvičování matematiky",
+    "total": "Celkem",
+    "correct": "Správně",
+    "wrong": "Špatně",
+    "startMath": "Spustit hru",
+    "selectWordGroup": "Vybrat skupinu slov"
   },
   "dashboard": {
     "welcomeBack": "Vítej zpět",
@@ -87,5 +96,15 @@
     "startPracticing": "Začít procvičovat",
     "motivationalQuote": "Každá správná odpověď tě posouvá blíže k tvému cíli!",
     "keepLearning": "Pokračuj v učení a uvidíš pokrok! 🚀"
+  },
+  "statistics": {
+    "title": "Statistiky",
+    "noData": "Zatím nemáte žádné statistiky. Zahrajte si hru!",
+    "warning": "Všechny statistiky jsou uložány lokálně v zařízení.",
+    "total": "Celkem",
+    "correct": "Správně",
+    "wrong": "Špatně",
+    "success": "Úspěch",
+    "accuracy": "Úspěšnost"
   }
 }

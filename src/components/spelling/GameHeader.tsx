@@ -1,5 +1,6 @@
 
 import { Badge } from "@/components/ui/badge";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface GameHeaderProps {
   problemCount: number;
@@ -12,21 +13,25 @@ export const GameHeader = ({
   correctAnswers, 
   wrongAnswers 
 }: GameHeaderProps) => {
+  const { t } = useLanguage();
+  
   return (
     <>
-      <h1 className="text-3xl font-bold text-center text-orange-500">Procvičování vyjmenovaných slov</h1>
+      <h1 className="text-3xl font-bold text-center text-orange-500">
+        {t('practice.practiceSpelling')}
+      </h1>
       
       <div className="flex justify-between items-center">
         <p className="text-blue-500 font-medium">
-          Počet slov: <Badge variant="outline">{problemCount}</Badge>
+          {t('practice.total')}: <Badge variant="outline">{problemCount}</Badge>
         </p>
         <div className="flex gap-2 items-center">
           <p className="text-green-500 font-medium">
-            Správně: <Badge variant="outline">{correctAnswers}</Badge>
+            {t('practice.correct')}: <Badge variant="outline">{correctAnswers}</Badge>
           </p>
           {wrongAnswers > 0 && (
             <p className="text-red-500 font-medium">
-              Špatně: <Badge variant="outline">{wrongAnswers}</Badge>
+              {t('practice.wrong')}: <Badge variant="outline">{wrongAnswers}</Badge>
             </p>
           )}
         </div>

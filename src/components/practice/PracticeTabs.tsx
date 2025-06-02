@@ -4,6 +4,7 @@ import MathPractice from "../MathPractice";
 import SpellingPractice from "../SpellingPractice";
 import { useAuth } from "@/hooks/useAuth";
 import { useStatistics } from "@/hooks/useStatistics";
+import { useLanguage } from "@/hooks/useLanguage";
 import { Badge } from "@/components/ui/badge";
 import { FileText, Calculator } from "lucide-react";
 
@@ -12,6 +13,8 @@ interface PracticeTabsProps {
 }
 
 const PracticeTabs = ({ defaultTab = "spelling" }: PracticeTabsProps) => {
+  const { t } = useLanguage();
+  
   // Get user ID for statistics
   const { authState } = useAuth();
   const userId = authState.user?.id || null;
@@ -44,8 +47,8 @@ const PracticeTabs = ({ defaultTab = "spelling" }: PracticeTabsProps) => {
         >
           <FileText className="mr-1 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" />
           <span className="text-xs sm:text-sm md:text-base">
-            <span className="hidden sm:inline">Vyjmenovaná slova</span>
-            <span className="sm:hidden">Pravopis</span>
+            <span className="hidden sm:inline">{t('practice.spellingWords')}</span>
+            <span className="sm:hidden">{t('practice.spelling')}</span>
           </span>
         </TabsTrigger>
         <TabsTrigger 
@@ -53,21 +56,21 @@ const PracticeTabs = ({ defaultTab = "spelling" }: PracticeTabsProps) => {
           className="text-base py-4 data-[state=active]:bg-blue-100 data-[state=active]:text-blue-800 data-[state=active]:shadow-sm data-[state=inactive]:bg-gray-50"
         >
           <Calculator className="mr-1 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-          <span className="text-xs sm:text-sm md:text-base">Matematika</span>
+          <span className="text-xs sm:text-sm md:text-base">{t('practice.mathematics')}</span>
         </TabsTrigger>
       </TabsList>
       
       <TabsContent value="spelling">
         <div className="flex justify-between items-center mb-4">
           <p className="text-blue-500 font-medium">
-            Celkem: <Badge variant="outline">{totalSpellingProblems || 0}</Badge>
+            {t('practice.total')}: <Badge variant="outline">{totalSpellingProblems || 0}</Badge>
           </p>
           <div className="flex gap-2 items-center">
             <p className="text-green-500 font-medium">
-              Správně: <Badge variant="outline">{totalSpellingCorrect || 0}</Badge>
+              {t('practice.correct')}: <Badge variant="outline">{totalSpellingCorrect || 0}</Badge>
             </p>
             <p className="text-red-500 font-medium">
-              Špatně: <Badge variant="outline">{totalSpellingWrong || 0}</Badge>
+              {t('practice.wrong')}: <Badge variant="outline">{totalSpellingWrong || 0}</Badge>
             </p>
           </div>
         </div>
@@ -77,14 +80,14 @@ const PracticeTabs = ({ defaultTab = "spelling" }: PracticeTabsProps) => {
       <TabsContent value="math">
         <div className="flex justify-between items-center mb-4">
           <p className="text-blue-500 font-medium">
-            Celkem: <Badge variant="outline">{totalMathProblems || 0}</Badge>
+            {t('practice.total')}: <Badge variant="outline">{totalMathProblems || 0}</Badge>
           </p>
           <div className="flex gap-2 items-center">
             <p className="text-green-500 font-medium">
-              Správně: <Badge variant="outline">{totalMathCorrect || 0}</Badge>
+              {t('practice.correct')}: <Badge variant="outline">{totalMathCorrect || 0}</Badge>
             </p>
             <p className="text-red-500 font-medium">
-              Špatně: <Badge variant="outline">{totalMathWrong || 0}</Badge>
+              {t('practice.wrong')}: <Badge variant="outline">{totalMathWrong || 0}</Badge>
             </p>
           </div>
         </div>
