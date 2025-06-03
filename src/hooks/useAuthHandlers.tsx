@@ -16,12 +16,29 @@ export const useAuthHandlers = () => {
   const handleSignIn = async (email: string, password: string) => {
     setAuthLoading(true);
     try {
+      console.log("Zahajuji přihlášení pro email:", email);
+      
       await signIn(email, password);
       toast.success(t('auth.loginSuccess'));
-      navigate("/");
+      
+      // Počkáme chvilku na aktualizaci stavu
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
+      
     } catch (error: any) {
-      console.error("Sign in failed:", error);
-      toast.error(error.message || "Chyba při přihlášení");
+      console.error("Přihlášení selhalo:", error);
+      
+      // Specifické chybové zprávy
+      if (error.message.includes('Invalid login credentials')) {
+        toast.error("Neplatný email nebo heslo");
+      } else if (error.message.includes('Email not confirmed')) {
+        toast.error("Email ještě nebyl potvrzen. Zkontrolujte svou emailovou schránku.");
+      } else if (error.message.includes('Too many requests')) {
+        toast.error("Příliš mnoho pokusů o přihlášení. Zkuste to později.");
+      } else {
+        toast.error(`Chyba při přihlášení: ${error.message || "Neznámá chyba"}`);
+      }
     } finally {
       setAuthLoading(false);
     }
@@ -30,6 +47,8 @@ export const useAuthHandlers = () => {
   const handleSignUp = async (email: string, password: string, username: string, role: string = "child") => {
     setAuthLoading(true);
     try {
+      console.log("Zahajuji registraci pro email:", email, "s rolí:", role);
+      
       // Sign up with role in metadata
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -43,23 +62,43 @@ export const useAuthHandlers = () => {
         }
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error("Registrace selhala:", error);
+        throw error;
+      }
       
       if (data.user) {
-        toast.success("Registrace úspěšná! Zkontrolujte email pro potvrzení.");
-        // Auto sign in after successful signup
-        setTimeout(async () => {
-          try {
-            await signIn(email, password);
-            navigate("/");
-          } catch (error) {
-            console.error("Auto sign in failed:", error);
-          }
-        }, 2000);
+        console.log("Registrace úspěšná pro uživatele:", data.user.id);
+        
+        if (data.user.email_confirmed_at) {
+          toast.success("Registrace úspěšná! Přihlašuji...");
+          // Auto sign in if email is already confirmed
+          setTimeout(async () => {
+            try {
+              await signIn(email, password);
+              navigate("/");
+            } catch (error) {
+              console.error("Auto přihlášení selhalo:", error);
+              toast.error("Registrace úspěšná, ale auto-přihlášení selhalo. Přihlaste se ručně.");
+            }
+          }, 2000);
+        } else {
+          toast.success("Registrace úspěšná! Zkontrolujte email pro potvrzení.");
+        }
       }
     } catch (error: any) {
-      console.error("Sign up failed:", error);
-      toast.error(error.message || "Chyba při registraci");
+      console.error("Registrace selhala:", error);
+      
+      // Specifické chybové zprávy
+      if (error.message.includes('User already registered')) {
+        toast.error("Uživatel s tímto emailem už existuje");
+      } else if (error.message.includes('Password should be at least')) {
+        toast.error("Heslo musí mít alespoň 6 znaků");
+      } else if (error.message.includes('Invalid email')) {
+        toast.error("Neplatný formát emailu");
+      } else {
+        toast.error(`Chyba při registraci: ${error.message || "Neznámá chyba"}`);
+      }
     } finally {
       setAuthLoading(false);
     }
@@ -71,6 +110,8 @@ export const useAuthHandlers = () => {
       username: t('user.guest'),
       role: "child"
     };
+    
+    console.log("Vytváření guest uživatele:", guestUser);
     
     await setLocalUser(guestUser);
     toast.success(t('auth.guestWelcome'));

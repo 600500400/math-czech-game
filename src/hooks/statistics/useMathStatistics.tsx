@@ -3,11 +3,17 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { MathStatistics } from "@/types/authTypes";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useGuestStatistics } from "./useGuestStatistics";
 
 export const useMathStatistics = (userId: string | null) => {
   const queryClient = useQueryClient();
+  const { 
+    isGuestMode, 
+    saveMathStatsToLocal, 
+    loadMathStatsFromLocal 
+  } = useGuestStatistics(userId);
 
-  // Save math statistics to Supabase
+  // Save math statistics
   const saveMathStatistics = useMutation({
     mutationFn: async ({
       correctAnswers,
@@ -22,7 +28,19 @@ export const useMathStatistics = (userId: string | null) => {
       difficultyLevel: any;
       gameDuration?: number;
     }) => {
-      // Get current authenticated user
+      // Pokud je guest režim, uložíme lokálně
+      if (isGuestMode) {
+        saveMathStatsToLocal({
+          correctAnswers,
+          wrongAnswers,
+          operation,
+          difficultyLevel,
+          gameDuration
+        });
+        return { success: true };
+      }
+
+      // Jinak uložíme do Supabase
       const { data: { user }, error: authError } = await supabase.auth.getUser();
       
       if (authError || !user) {
@@ -34,7 +52,7 @@ export const useMathStatistics = (userId: string | null) => {
       const { data, error } = await supabase
         .from('math_statistics')
         .insert({
-          user_id: user.id, // Use authenticated user ID
+          user_id: user.id,
           correct_answers: correctAnswers,
           wrong_answers: wrongAnswers,
           operation: operation,
@@ -53,7 +71,6 @@ export const useMathStatistics = (userId: string | null) => {
       return data;
     },
     onSuccess: () => {
-      // Invalidate queries to refresh the data
       queryClient.invalidateQueries({ queryKey: ["mathStatistics"] });
       toast.success("Statistiky matematiky uloženy");
     },
@@ -63,11 +80,17 @@ export const useMathStatistics = (userId: string | null) => {
     },
   });
 
-  // Load math statistics from Supabase
+  // Load math statistics
   const { data: mathStats, isLoading: mathStatsLoading, refetch } = useQuery({
-    queryKey: ["mathStatistics", userId],
+    queryKey: ["mathStatistics", userId, isGuestMode],
     queryFn: async (): Promise<MathStatistics[]> => {
-      // Get current authenticated user
+      // Pokud je guest režim, načteme z localStorage
+      if (isGuestMode) {
+        console.log("Načítání guest math statistik z localStorage pro uživatele:", userId);
+        return loadMathStatsFromLocal();
+      }
+
+      // Jinak načteme z Supabase
       const { data: { user }, error: authError } = await supabase.auth.getUser();
       
       if (authError || !user) {
@@ -91,8 +114,8 @@ export const useMathStatistics = (userId: string | null) => {
       console.log("Načtené statistiky matematiky z databáze:", data);
       return data || [];
     },
-    enabled: true, // Always enabled, auth check is inside the function
-    staleTime: 30000, // Consider data fresh for 30 seconds
+    enabled: true,
+    staleTime: 30000,
   });
 
   return {

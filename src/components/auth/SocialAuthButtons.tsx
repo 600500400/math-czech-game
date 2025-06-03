@@ -9,17 +9,37 @@ const SocialAuthButtons = () => {
 
   const handleSocialAuth = async (provider: 'google' | 'facebook' | 'apple') => {
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
+      console.log(`Attempting ${provider} authentication...`);
+      
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
           redirectTo: `${window.location.origin}/`
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error(`${provider} auth error:`, error);
+        
+        // Specifické chybové zprávy
+        if (error.message.includes('Invalid login credentials')) {
+          toast.error(`Neplatné přihlašovací údaje pro ${provider}`);
+        } else if (error.message.includes('Email not confirmed')) {
+          toast.error('Email ještě nebyl potvrzen. Zkontrolujte svou emailovou schránku.');
+        } else if (error.message.includes('Provider not enabled')) {
+          toast.error(`${provider} přihlášení není povoleno. Kontaktujte administrátora.`);
+        } else {
+          toast.error(`Chyba při přihlášení přes ${provider}: ${error.message}`);
+        }
+        return;
+      }
+
+      console.log(`${provider} auth successful:`, data);
+      toast.success(`Přihlašování přes ${provider} probíhá...`);
+      
     } catch (error: any) {
-      console.error(`${provider} auth error:`, error);
-      toast.error(error.message || `Chyba při přihlášení přes ${provider}`);
+      console.error(`Unexpected ${provider} auth error:`, error);
+      toast.error(`Neočekávaná chyba při přihlášení přes ${provider}: ${error.message || 'Neznámá chyba'}`);
     }
   };
 
@@ -84,6 +104,12 @@ const SocialAuthButtons = () => {
           </svg>
           {t('auth.signInWithApple')}
         </Button>
+      </div>
+
+      <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+        <p className="text-xs text-yellow-800">
+          <strong>Poznámka:</strong> Pro funkčnost sociálního přihlášení je nutné nastavit OAuth providery v Supabase Dashboard.
+        </p>
       </div>
     </div>
   );

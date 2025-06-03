@@ -3,11 +3,17 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { SpellingStatistics } from "@/types/authTypes";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useGuestStatistics } from "./useGuestStatistics";
 
 export const useSpellingStatistics = (userId: string | null) => {
   const queryClient = useQueryClient();
+  const { 
+    isGuestMode, 
+    saveSpellingStatsToLocal, 
+    loadSpellingStatsFromLocal 
+  } = useGuestStatistics(userId);
 
-  // Save spelling statistics to Supabase
+  // Save spelling statistics
   const saveSpellingStatistics = useMutation({
     mutationFn: async ({
       correctAnswers,
@@ -22,7 +28,19 @@ export const useSpellingStatistics = (userId: string | null) => {
       gameDuration?: number;
       difficulty?: any;
     }) => {
-      // Get current authenticated user
+      // Pokud je guest režim, uložíme lokálně
+      if (isGuestMode) {
+        saveSpellingStatsToLocal({
+          correctAnswers,
+          wrongAnswers,
+          wordGroup,
+          gameDuration,
+          difficulty
+        });
+        return { success: true };
+      }
+
+      // Jinak uložíme do Supabase
       const { data: { user }, error: authError } = await supabase.auth.getUser();
       
       if (authError || !user) {
@@ -34,7 +52,7 @@ export const useSpellingStatistics = (userId: string | null) => {
       const { data, error } = await supabase
         .from('spelling_statistics')
         .insert({
-          user_id: user.id, // Use authenticated user ID
+          user_id: user.id,
           correct_answers: correctAnswers,
           wrong_answers: wrongAnswers,
           word_group: wordGroup,
@@ -53,7 +71,6 @@ export const useSpellingStatistics = (userId: string | null) => {
       return data;
     },
     onSuccess: () => {
-      // Invalidate queries to refresh the data
       queryClient.invalidateQueries({ queryKey: ["spellingStatistics"] });
       toast.success("Statistiky pravopisu uloženy");
     },
@@ -63,11 +80,17 @@ export const useSpellingStatistics = (userId: string | null) => {
     },
   });
 
-  // Load spelling statistics from Supabase
+  // Load spelling statistics
   const { data: spellingStats, isLoading: spellingStatsLoading, refetch } = useQuery({
-    queryKey: ["spellingStatistics", userId],
+    queryKey: ["spellingStatistics", userId, isGuestMode],
     queryFn: async (): Promise<SpellingStatistics[]> => {
-      // Get current authenticated user
+      // Pokud je guest režim, načteme z localStorage
+      if (isGuestMode) {
+        console.log("Načítání guest spelling statistik z localStorage pro uživatele:", userId);
+        return loadSpellingStatsFromLocal();
+      }
+
+      // Jinak načteme z Supabase
       const { data: { user }, error: authError } = await supabase.auth.getUser();
       
       if (authError || !user) {
@@ -91,8 +114,8 @@ export const useSpellingStatistics = (userId: string | null) => {
       console.log("Načtené statistiky pravopisu z databáze:", data);
       return data || [];
     },
-    enabled: true, // Always enabled, auth check is inside the function
-    staleTime: 30000, // Consider data fresh for 30 seconds
+    enabled: true,
+    staleTime: 30000,
   });
 
   return {
