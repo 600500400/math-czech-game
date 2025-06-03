@@ -13,7 +13,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { UserIcon, LogOut, ChartBarIcon, Crown } from 'lucide-react';
+import { UserIcon, LogOut, ChartBarIcon, Crown, RefreshCw } from 'lucide-react';
+import { AuthRefreshButton } from '@/components/auth/AuthRefreshButton';
 
 const UserMenu = () => {
   const { authState, signOut } = useAuth();
@@ -74,12 +75,15 @@ const UserMenu = () => {
 
   if (!authState.isAuthenticated) {
     return (
-      <Link to="/auth">
-        <Button variant="outline" size="sm" className="bg-white border-gray-200 hover:bg-gray-50">
-          <UserIcon className="mr-2 h-4 w-4" />
-          {t('user.selectUser')}
-        </Button>
-      </Link>
+      <div className="flex items-center gap-2">
+        <AuthRefreshButton />
+        <Link to="/auth">
+          <Button variant="outline" size="sm" className="bg-white border-gray-200 hover:bg-gray-50">
+            <UserIcon className="mr-2 h-4 w-4" />
+            {t('user.selectUser')}
+          </Button>
+        </Link>
+      </div>
     );
   }
 
@@ -87,64 +91,67 @@ const UserMenu = () => {
   const RoleIcon = roleInfo.icon;
 
   return (
-    <DropdownMenu open={open} onOpenChange={setOpen}>
-      <DropdownMenuTrigger asChild>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className={`flex items-center gap-2 px-3 ${
-            isGuest 
-              ? 'bg-orange-50 border-orange-200 hover:bg-orange-100' 
-              : 'bg-white border-gray-200 hover:bg-gray-50'
-          }`}
-        >
-          <Avatar className="h-6 w-6">
-            <AvatarFallback className={`text-xs font-medium ${
-              isGuest ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700'
-            }`}>
-              {getNameInitials()}
-            </AvatarFallback>
-          </Avatar>
-          <span className="hidden sm:inline font-medium">
-            {getDisplayName()}
-          </span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel>
-          <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">
+    <div className="flex items-center gap-2">
+      <AuthRefreshButton />
+      <DropdownMenu open={open} onOpenChange={setOpen}>
+        <DropdownMenuTrigger asChild>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className={`flex items-center gap-2 px-3 ${
+              isGuest 
+                ? 'bg-orange-50 border-orange-200 hover:bg-orange-100' 
+                : 'bg-white border-gray-200 hover:bg-gray-50'
+            }`}
+          >
+            <Avatar className="h-6 w-6">
+              <AvatarFallback className={`text-xs font-medium ${
+                isGuest ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700'
+              }`}>
+                {getNameInitials()}
+              </AvatarFallback>
+            </Avatar>
+            <span className="hidden sm:inline font-medium">
               {getDisplayName()}
-            </p>
-            <div className="flex items-center gap-1">
-              <RoleIcon className="h-3 w-3 text-muted-foreground" />
-              <p className="text-xs leading-none text-muted-foreground">
-                {roleInfo.name}
+            </span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuLabel>
+            <div className="flex flex-col space-y-1">
+              <p className="text-sm font-medium leading-none">
+                {getDisplayName()}
               </p>
-              {isGuest && (
-                <span className="text-xs bg-orange-100 text-orange-700 px-1 py-0.5 rounded">
-                  Lokální
-                </span>
-              )}
+              <div className="flex items-center gap-1">
+                <RoleIcon className="h-3 w-3 text-muted-foreground" />
+                <p className="text-xs leading-none text-muted-foreground">
+                  {roleInfo.name}
+                </p>
+                {isGuest && (
+                  <span className="text-xs bg-orange-100 text-orange-700 px-1 py-0.5 rounded">
+                    Lokální
+                  </span>
+                )}
+              </div>
             </div>
-          </div>
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        {authState.profile?.role === 'parent' && (
-          <DropdownMenuItem asChild>
-            <Link to="/parent-dashboard" className="flex items-center cursor-pointer" onClick={() => setOpen(false)}>
-              <ChartBarIcon className="mr-2 h-4 w-4" />
-              <span>{t('user.parentDashboard')}</span>
-            </Link>
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {authState.profile?.role === 'parent' && (
+            <DropdownMenuItem asChild>
+              <Link to="/parent-dashboard" className="flex items-center cursor-pointer" onClick={() => setOpen(false)}>
+                <ChartBarIcon className="mr-2 h-4 w-4" />
+                <span>{t('user.parentDashboard')}</span>
+              </Link>
+            </DropdownMenuItem>
+          )}
+          <DropdownMenuSeparator />
+          <DropdownMenuItem className="flex items-center cursor-pointer" onClick={() => signOut()}>
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>{t('user.changeUser')}</span>
           </DropdownMenuItem>
-        )}
-        <DropdownMenuSeparator />
-        <DropdownMenuItem className="flex items-center cursor-pointer" onClick={() => signOut()}>
-          <LogOut className="mr-2 h-4 w-4" />
-          <span>{t('user.changeUser')}</span>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 };
 
