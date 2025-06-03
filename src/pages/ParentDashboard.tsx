@@ -29,7 +29,8 @@ const ParentDashboard = () => {
     childMathTotal,
     childSpellingTotal,
     mathAccuracy,
-    spellingAccuracy
+    spellingAccuracy,
+    loading
   } = useParentDashboard(userId);
 
   const [filters, setFilters] = useState<FilterState>({
@@ -56,17 +57,23 @@ const ParentDashboard = () => {
       const statsMap: { [childId: string]: { mathStats: any[], spellingStats: any[] } } = {};
       
       children.forEach(child => {
-        // In a real app, you'd fetch stats for each child here
-        // For now, using sample data
-        statsMap[child.id] = {
-          mathStats: [],
-          spellingStats: []
-        };
+        if (child.id === selectedChild) {
+          statsMap[child.id] = {
+            mathStats: childMathStats,
+            spellingStats: childSpellingStats
+          };
+        } else {
+          // For now, use empty data for other children
+          statsMap[child.id] = {
+            mathStats: [],
+            spellingStats: []
+          };
+        }
       });
       
       setAllChildrenStats(statsMap);
     }
-  }, [children]);
+  }, [children, selectedChild, childMathStats, childSpellingStats]);
 
   // Filter statistics based on current filters
   const getFilteredStats = (stats: any[], type: 'math' | 'spelling') => {
@@ -117,6 +124,29 @@ const ParentDashboard = () => {
 
   const selectedChildName = children.find(child => child.id === selectedChild)?.username || '';
 
+  // Function to refresh children list
+  const handleChildCreated = () => {
+    // Trigger re-fetch by refreshing the page or implementing refresh logic
+    window.location.reload();
+  };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto p-4 max-w-7xl">
+        <DashboardHeader 
+          title="Rodičovský dashboard"
+          description="Načítám data..." 
+          onSignOut={signOut}
+        />
+        <Card>
+          <CardContent className="p-6">
+            <p className="text-center text-muted-foreground">Načítám dashboard...</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto p-4 max-w-7xl">
       <DashboardHeader 
@@ -125,15 +155,17 @@ const ParentDashboard = () => {
         onSignOut={signOut}
       />
       
-      {children.length > 0 ? (
-        <div className="space-y-8">
-          {/* Child Selection Component */}
-          <ChildSelection 
-            children={children} 
-            selectedChild={selectedChild}
-            setSelectedChild={setSelectedChild}
-          />
+      <div className="space-y-8">
+        {/* Child Selection Component */}
+        <ChildSelection 
+          children={children} 
+          selectedChild={selectedChild}
+          setSelectedChild={setSelectedChild}
+          onChildCreated={handleChildCreated}
+          loading={loading}
+        />
 
+        {children.length > 0 ? (
           <Tabs defaultValue="overview" className="space-y-6">
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="overview">Přehled</TabsTrigger>
@@ -228,10 +260,10 @@ const ParentDashboard = () => {
               )}
             </TabsContent>
           </Tabs>
-        </div>
-      ) : (
-        <EmptyDashboard />
-      )}
+        ) : (
+          <EmptyDashboard />
+        )}
+      </div>
     </div>
   );
 };

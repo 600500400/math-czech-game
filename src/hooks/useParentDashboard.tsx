@@ -14,6 +14,7 @@ export function useParentDashboard(userId: string | undefined) {
   const [selectedChild, setSelectedChild] = useState<string | null>(null);
   const [childMathStats, setChildMathStats] = useState([]);
   const [childSpellingStats, setChildSpellingStats] = useState([]);
+  const [loading, setLoading] = useState(true);
   
   // Calculate summary statistics for selected child
   const childMathTotal = childMathStats.reduce(
@@ -47,10 +48,13 @@ export function useParentDashboard(userId: string | undefined) {
   // Load children for the parent
   useEffect(() => {
     const fetchChildren = async () => {
-      if (!userId) return;
+      if (!userId) {
+        setLoading(false);
+        return;
+      }
       
       try {
-        console.log("Fetching children for parent:", userId);
+        console.log("Načítám děti pro rodiče:", userId);
         
         // Get child IDs from parent_child relationships
         const { data: relationships, error: relError } = await supabase
@@ -59,13 +63,15 @@ export function useParentDashboard(userId: string | undefined) {
           .eq('parent_id', userId);
         
         if (relError) {
-          console.error("Error fetching parent-child relationships:", relError);
+          console.error("Chyba při načítání vztahů rodič-dítě:", relError);
+          setLoading(false);
           return;
         }
         
         if (!relationships || relationships.length === 0) {
-          console.log("No children found for parent");
+          console.log("Žádné děti nenalezeny pro rodiče");
           setChildren([]);
+          setLoading(false);
           return;
         }
         
@@ -77,7 +83,8 @@ export function useParentDashboard(userId: string | undefined) {
           .in('id', childIds);
         
         if (profileError) {
-          console.error("Error fetching child profiles:", profileError);
+          console.error("Chyba při načítání profilů dětí:", profileError);
+          setLoading(false);
           return;
         }
         
@@ -90,11 +97,18 @@ export function useParentDashboard(userId: string | undefined) {
           updated_at: profile.updated_at
         }));
         
-        console.log("Fetched children:", transformedChildren);
+        console.log("Načtené děti:", transformedChildren);
         setChildren(transformedChildren);
         
+        // Automatically select first child if available
+        if (transformedChildren.length > 0 && !selectedChild) {
+          setSelectedChild(transformedChildren[0].id);
+        }
+        
       } catch (error) {
-        console.error("Error fetching children:", error);
+        console.error("Chyba při načítání dětí:", error);
+      } finally {
+        setLoading(false);
       }
     };
     
@@ -111,7 +125,7 @@ export function useParentDashboard(userId: string | undefined) {
       }
       
       try {
-        console.log("Fetching statistics for child:", selectedChild);
+        console.log("Načítám statistiky pro dítě:", selectedChild);
         
         // Fetch math statistics
         const { data: mathData, error: mathError } = await supabase
@@ -121,7 +135,7 @@ export function useParentDashboard(userId: string | undefined) {
           .order('created_at', { ascending: false });
 
         if (mathError) {
-          console.error("Error fetching math statistics:", mathError);
+          console.error("Chyba při načítání matematických statistik:", mathError);
         }
 
         // Fetch spelling statistics
@@ -132,17 +146,17 @@ export function useParentDashboard(userId: string | undefined) {
           .order('created_at', { ascending: false });
 
         if (spellingError) {
-          console.error("Error fetching spelling statistics:", spellingError);
+          console.error("Chyba při načítání statistik pravopisu:", spellingError);
         }
 
-        console.log("Math stats:", mathData || []);
-        console.log("Spelling stats:", spellingData || []);
+        console.log("Matematické statistiky:", mathData || []);
+        console.log("Statistiky pravopisu:", spellingData || []);
         
         setChildMathStats(mathData || []);
         setChildSpellingStats(spellingData || []);
         
       } catch (error) {
-        console.error("Error fetching child statistics:", error);
+        console.error("Chyba při načítání statistik dítěte:", error);
       }
     };
     
@@ -158,6 +172,7 @@ export function useParentDashboard(userId: string | undefined) {
     childMathTotal,
     childSpellingTotal,
     mathAccuracy,
-    spellingAccuracy
+    spellingAccuracy,
+    loading
   };
 }
