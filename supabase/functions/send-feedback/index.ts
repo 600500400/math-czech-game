@@ -60,6 +60,26 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("Failed to save feedback");
     }
 
+    // Check if RESEND_API_KEY is configured
+    const resendApiKey = Deno.env.get("RESEND_API_KEY");
+    if (!resendApiKey) {
+      console.error("RESEND_API_KEY not configured");
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          id: feedbackData.id,
+          warning: "Feedback saved but email not sent - RESEND_API_KEY not configured"
+        }), 
+        {
+          status: 200,
+          headers: {
+            "Content-Type": "application/json",
+            ...corsHeaders,
+          },
+        }
+      );
+    }
+
     // Send email notification
     const categoryMap: Record<string, string> = {
       bug: "🐛 Bug Report",
@@ -89,29 +109,50 @@ const handler = async (req: Request): Promise<Response> => {
       </p>
     `;
 
-    const emailResponse = await resend.emails.send({
-      from: "Learning App <onboarding@resend.dev>",
-      to: ["admin@yourdomain.com"], // Replace with your admin email
-      subject: emailSubject,
-      html: emailHtml,
-    });
+    try {
+      const emailResponse = await resend.emails.send({
+        from: "Learning App <onboarding@resend.dev>",
+        to: ["kamelpost@gmail.com"], // Změněno na vaši skutečnou email adresu
+        subject: emailSubject,
+        html: emailHtml,
+      });
 
-    console.log("Feedback saved and email sent:", feedbackData.id);
+      console.log("Feedback saved and email sent:", feedbackData.id, "Email ID:", emailResponse.data?.id);
 
-    return new Response(
-      JSON.stringify({ 
-        success: true, 
-        id: feedbackData.id,
-        emailId: emailResponse.data?.id 
-      }), 
-      {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-          ...corsHeaders,
-        },
-      }
-    );
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          id: feedbackData.id,
+          emailId: emailResponse.data?.id 
+        }), 
+        {
+          status: 200,
+          headers: {
+            "Content-Type": "application/json",
+            ...corsHeaders,
+          },
+        }
+      );
+    } catch (emailError: any) {
+      console.error("Email sending error:", emailError);
+      
+      // Return success for database save but note email failure
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          id: feedbackData.id,
+          warning: "Feedback saved but email failed to send",
+          emailError: emailError.message
+        }), 
+        {
+          status: 200,
+          headers: {
+            "Content-Type": "application/json",
+            ...corsHeaders,
+          },
+        }
+      );
+    }
   } catch (error: any) {
     console.error("Error in send-feedback function:", error);
     return new Response(
