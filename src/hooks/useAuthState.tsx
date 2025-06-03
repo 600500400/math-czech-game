@@ -32,7 +32,7 @@ export const useAuthState = () => {
           id: data.id,
           username: data.full_name || undefined,
           full_name: data.full_name || undefined,
-          role: data.role || 'child',
+          role: (data.role as 'parent' | 'child' | 'teacher') || 'child',
           created_at: data.created_at,
           updated_at: data.updated_at || undefined
         };

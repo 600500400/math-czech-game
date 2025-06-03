@@ -15,7 +15,6 @@ const Auth = () => {
   const { authState } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const [isSignUp, setIsSignUp] = useState(false);
   
   const {
     handleSignIn,
@@ -29,23 +28,6 @@ const Auth = () => {
     navigate("/");
     return null;
   }
-
-  const handleFormSubmit = async (data: {
-    email: string;
-    password: string;
-    username?: string;
-    confirmPassword?: string;
-  }) => {
-    if (isSignUp && data.username) {
-      await handleSignUp(data.email, data.password, data.username);
-    } else {
-      await handleSignIn(data.email, data.password);
-    }
-  };
-
-  const toggleMode = () => {
-    setIsSignUp(!isSignUp);
-  };
 
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
@@ -63,12 +45,7 @@ const Auth = () => {
         </CardHeader>
         
         <CardContent className="space-y-6">
-          <AuthForm
-            isSignUp={isSignUp}
-            onSubmit={handleFormSubmit}
-            authLoading={authLoading}
-            onToggleMode={toggleMode}
-          />
+          <AuthForm />
           
           <SocialAuthButtons />
           
