@@ -50,10 +50,48 @@ export function useParentDashboard(userId: string | undefined) {
       if (!userId) return;
       
       try {
-        // Since there are no tables yet, we'll return empty array
-        // This will be updated once the parent_child and profiles tables are created
-        console.log("Parent dashboard fetch skipped - no tables exist yet");
-        setChildren([]);
+        console.log("Fetching children for parent:", userId);
+        
+        // Get child IDs from parent_child relationships
+        const { data: relationships, error: relError } = await supabase
+          .from('parent_child')
+          .select('child_id')
+          .eq('parent_id', userId);
+        
+        if (relError) {
+          console.error("Error fetching parent-child relationships:", relError);
+          return;
+        }
+        
+        if (!relationships || relationships.length === 0) {
+          console.log("No children found for parent");
+          setChildren([]);
+          return;
+        }
+        
+        // Get child profiles
+        const childIds = relationships.map(rel => rel.child_id);
+        const { data: childProfiles, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .in('id', childIds);
+        
+        if (profileError) {
+          console.error("Error fetching child profiles:", profileError);
+          return;
+        }
+        
+        const transformedChildren = (childProfiles || []).map(profile => ({
+          id: profile.id,
+          username: profile.full_name || 'Dítě',
+          full_name: profile.full_name,
+          role: profile.role as 'child',
+          created_at: profile.created_at,
+          updated_at: profile.updated_at
+        }));
+        
+        console.log("Fetched children:", transformedChildren);
+        setChildren(transformedChildren);
         
       } catch (error) {
         console.error("Error fetching children:", error);
@@ -66,14 +104,42 @@ export function useParentDashboard(userId: string | undefined) {
   // Load statistics for the selected child
   useEffect(() => {
     const fetchChildStats = async () => {
-      if (!selectedChild) return;
-      
-      try {
-        // Since there are no tables yet, we'll return empty arrays
-        // This will be updated once the statistics tables are created
-        console.log("Child statistics fetch skipped - no tables exist yet");
+      if (!selectedChild) {
         setChildMathStats([]);
         setChildSpellingStats([]);
+        return;
+      }
+      
+      try {
+        console.log("Fetching statistics for child:", selectedChild);
+        
+        // Fetch math statistics
+        const { data: mathData, error: mathError } = await supabase
+          .from('math_statistics')
+          .select('*')
+          .eq('user_id', selectedChild)
+          .order('created_at', { ascending: false });
+
+        if (mathError) {
+          console.error("Error fetching math statistics:", mathError);
+        }
+
+        // Fetch spelling statistics
+        const { data: spellingData, error: spellingError } = await supabase
+          .from('spelling_statistics')
+          .select('*')
+          .eq('user_id', selectedChild)
+          .order('created_at', { ascending: false });
+
+        if (spellingError) {
+          console.error("Error fetching spelling statistics:", spellingError);
+        }
+
+        console.log("Math stats:", mathData || []);
+        console.log("Spelling stats:", spellingData || []);
+        
+        setChildMathStats(mathData || []);
+        setChildSpellingStats(spellingData || []);
         
       } catch (error) {
         console.error("Error fetching child statistics:", error);

@@ -13,6 +13,38 @@ export const useAuthState = () => {
     error: null,
   });
 
+  // Fetch user profile from database
+  const fetchUserProfile = async (userId: string): Promise<UserProfile | null> => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+      
+      if (error && error.code !== 'PGRST116') {
+        console.error("Error fetching profile:", error);
+        return null;
+      }
+      
+      if (data) {
+        return {
+          id: data.id,
+          username: data.full_name || undefined,
+          full_name: data.full_name || undefined,
+          role: data.role || 'child',
+          created_at: data.created_at,
+          updated_at: data.updated_at || undefined
+        };
+      }
+      
+      return null;
+    } catch (error) {
+      console.error("Unexpected error fetching profile:", error);
+      return null;
+    }
+  };
+
   // Initial auth state setup
   useEffect(() => {
     let mounted = true;
@@ -25,19 +57,14 @@ export const useAuthState = () => {
         console.log("Auth state changed:", event, session?.user?.id);
 
         if (session?.user) {
-          // User is authenticated with Supabase
-          const profile: UserProfile = {
-            id: session.user.id,
-            username: session.user.user_metadata?.username || session.user.email?.split('@')[0] || 'User',
-            role: session.user.user_metadata?.role || 'child',
-            created_at: session.user.created_at,
-          };
-
+          // User is authenticated with Supabase - fetch their profile
+          const profile = await fetchUserProfile(session.user.id);
+          
           setAuthState({
             user: {
               id: session.user.id,
               email: session.user.email,
-              username: session.user.user_metadata?.username || session.user.email?.split('@')[0] || 'User',
+              username: profile?.username || session.user.email?.split('@')[0] || 'User',
               created_at: session.user.created_at
             },
             profile,
@@ -58,7 +85,7 @@ export const useAuthState = () => {
                 user: { id: localUser.id, username: localUser.username },
                 profile: {
                   ...localUser,
-                  created_at: new Date().toISOString() // Add required created_at
+                  created_at: new Date().toISOString()
                 } as UserProfile,
                 isLoading: false,
                 isAuthenticated: true,
@@ -84,22 +111,17 @@ export const useAuthState = () => {
     );
 
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!mounted) return;
 
       if (session?.user) {
-        const profile: UserProfile = {
-          id: session.user.id,
-          username: session.user.user_metadata?.username || session.user.email?.split('@')[0] || 'User',
-          role: session.user.user_metadata?.role || 'child',
-          created_at: session.user.created_at,
-        };
-
+        const profile = await fetchUserProfile(session.user.id);
+        
         setAuthState({
           user: {
             id: session.user.id,
             email: session.user.email,
-            username: session.user.user_metadata?.username || session.user.email?.split('@')[0] || 'User',
+            username: profile?.username || session.user.email?.split('@')[0] || 'User',
             created_at: session.user.created_at
           },
           profile,
@@ -115,18 +137,6 @@ export const useAuthState = () => {
       subscription.unsubscribe();
     };
   }, []);
-
-  const fetchUserProfile = async (userId: string) => {
-    try {
-      // Since there are no tables yet, we'll return null for now
-      // This will be updated once the profiles table is created
-      console.log("Profile fetch skipped - no tables exist yet");
-      return null;
-    } catch (error) {
-      console.error("Unexpected error fetching profile:", error);
-      return null;
-    }
-  };
 
   return { authState, setAuthState };
 };

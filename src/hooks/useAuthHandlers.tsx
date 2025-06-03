@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/hooks/useLanguage";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from 'uuid';
+import { supabase } from "@/integrations/supabase/client";
 
 export const useAuthHandlers = () => {
   const { signIn, signUp, setLocalUser } = useAuth();
@@ -26,21 +27,36 @@ export const useAuthHandlers = () => {
     }
   };
 
-  const handleSignUp = async (email: string, password: string, username: string) => {
+  const handleSignUp = async (email: string, password: string, username: string, role: string = "child") => {
     setAuthLoading(true);
     try {
-      await signUp(email, password, username);
-      toast.success(t('auth.registrationSuccess'));
-      // After successful signup, automatically sign in
-      setTimeout(async () => {
-        try {
-          await signIn(email, password);
-          navigate("/");
-        } catch (error) {
-          console.error("Auto sign in failed:", error);
-          toast.success("Registrace úspěšná! Nyní se můžete přihlásit.");
+      // Sign up with role in metadata
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: username,
+            role: role
+          },
+          emailRedirectTo: `${window.location.origin}/`
         }
-      }, 1000);
+      });
+      
+      if (error) throw error;
+      
+      if (data.user) {
+        toast.success("Registrace úspěšná! Zkontrolujte email pro potvrzení.");
+        // Auto sign in after successful signup
+        setTimeout(async () => {
+          try {
+            await signIn(email, password);
+            navigate("/");
+          } catch (error) {
+            console.error("Auto sign in failed:", error);
+          }
+        }, 2000);
+      }
     } catch (error: any) {
       console.error("Sign up failed:", error);
       toast.error(error.message || "Chyba při registraci");
