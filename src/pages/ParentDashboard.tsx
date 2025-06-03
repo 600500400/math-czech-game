@@ -8,6 +8,7 @@ import { ChildSelection } from "@/components/dashboard/ChildSelection";
 import { SummaryStatistics } from "@/components/dashboard/SummaryStatistics";
 import { ActivityHistory } from "@/components/dashboard/ActivityHistory";
 import { EmptyDashboard } from "@/components/dashboard/EmptyDashboard";
+import { WelcomeWizard } from "@/components/dashboard/WelcomeWizard";
 import { AdvancedCharts } from "@/components/dashboard/AdvancedCharts";
 import { ExportControls } from "@/components/dashboard/ExportControls";
 import { ChildComparison } from "@/components/dashboard/ChildComparison";
@@ -41,15 +42,29 @@ const ParentDashboard = () => {
     endDate: undefined
   });
 
+  // Welcome wizard state
+  const [showWelcomeWizard, setShowWelcomeWizard] = useState(false);
+
   // For child comparison - simulate getting stats for all children
   const [allChildrenStats, setAllChildrenStats] = useState<{ [childId: string]: { mathStats: any[], spellingStats: any[] } }>({});
-  
+
   // Check if the logged-in user is a parent
   useEffect(() => {
     if (authState.profile && authState.profile.role !== "parent") {
       navigate("/");
     }
   }, [authState.profile, navigate]);
+
+  // Check if this is a new parent (no children) and show welcome wizard
+  useEffect(() => {
+    if (!loading && children.length === 0 && authState.user?.id) {
+      // Check if they've dismissed the wizard before
+      const hasSeenWizard = localStorage.getItem(`welcome-wizard-${authState.user.id}`);
+      if (!hasSeenWizard) {
+        setShowWelcomeWizard(true);
+      }
+    }
+  }, [loading, children.length, authState.user?.id]);
 
   // Load stats for all children for comparison
   useEffect(() => {
@@ -126,8 +141,14 @@ const ParentDashboard = () => {
 
   // Function to refresh children list
   const handleChildCreated = () => {
-    // Trigger re-fetch by refreshing the page or implementing refresh logic
     window.location.reload();
+  };
+
+  const handleDismissWizard = () => {
+    if (authState.user?.id) {
+      localStorage.setItem(`welcome-wizard-${authState.user.id}`, 'true');
+    }
+    setShowWelcomeWizard(false);
   };
 
   if (loading) {
@@ -140,7 +161,10 @@ const ParentDashboard = () => {
         />
         <Card>
           <CardContent className="p-6">
-            <p className="text-center text-muted-foreground">Načítám dashboard...</p>
+            <div className="flex items-center gap-3">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+              <p className="text-center text-muted-foreground">Načítám dashboard...</p>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -261,9 +285,18 @@ const ParentDashboard = () => {
             </TabsContent>
           </Tabs>
         ) : (
-          <EmptyDashboard />
+          <EmptyDashboard onChildCreated={handleChildCreated} />
         )}
       </div>
+
+      {/* Welcome Wizard */}
+      {showWelcomeWizard && authState.user?.id && (
+        <WelcomeWizard
+          parentId={authState.user.id}
+          onChildCreated={handleChildCreated}
+          onDismiss={handleDismissWizard}
+        />
+      )}
     </div>
   );
 };
