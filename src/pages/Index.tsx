@@ -8,14 +8,32 @@ const Index = () => {
   const { authState } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect to parent dashboard if user is a parent
+  // Přesměrování podle stavu autentizace
   useEffect(() => {
-    if (authState.isAuthenticated && authState.profile?.role === 'parent') {
+    if (!authState.isAuthenticated && !authState.isLoading) {
+      // Pokud uživatel není přihlášen, přesměruj na výběr identity
+      navigate('/select-user');
+    } else if (authState.isAuthenticated && authState.profile?.role === 'parent') {
+      // Pokud je přihlášený rodič, přesměruj na dashboard
       navigate('/parent-dashboard');
     }
-  }, [authState.isAuthenticated, authState.profile?.role, navigate]);
+  }, [authState.isAuthenticated, authState.isLoading, authState.profile?.role, navigate]);
 
-  return <HomePage />;
+  // Pokud je uživatel přihlášen jako dítě, zobraz domovskou stránku
+  if (authState.isAuthenticated && authState.profile?.role === 'child') {
+    return <HomePage />;
+  }
+
+  // Během načítání zobraz loading
+  if (authState.isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  return null;
 };
 
 export default Index;

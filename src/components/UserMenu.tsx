@@ -14,18 +14,13 @@ import {
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { UserIcon, LogOut, ChartBarIcon, Crown, RefreshCw } from 'lucide-react';
-import { AuthRefreshButton } from '@/components/auth/AuthRefreshButton';
 
 const UserMenu = () => {
   const { authState, signOut } = useAuth();
   const { t } = useLanguage();
   const [open, setOpen] = useState(false);
 
-  // Check if user is a guest
-  const isGuest = authState.profile?.username === t('user.guest') || 
-                 localStorage.getItem('localUser') !== null;
-
-  // Get display name with better fallback
+  // Get display name
   const getDisplayName = () => {
     if (authState.profile?.username) {
       return authState.profile.username;
@@ -33,21 +28,14 @@ const UserMenu = () => {
     if (authState.user?.username) {
       return authState.user.username;
     }
-    if (authState.user?.email) {
-      return authState.user.email.split('@')[0];
-    }
-    return t('user.guest');
+    return 'Uživatel';
   };
 
-  // Avatar initials with better handling
+  // Avatar initials
   const getNameInitials = () => {
     const name = getDisplayName();
-    if (!name || name === t('user.guest')) return '👤';
     
-    // Handle Czech characters properly
-    const cleanName = name.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    
-    return cleanName
+    return name
       .split(' ')
       .map(n => n[0])
       .join('')
@@ -60,30 +48,22 @@ const UserMenu = () => {
     const role = authState.profile?.role;
     switch (role) {
       case 'parent': 
-        return { name: t('user.parent'), icon: Crown };
+        return { name: 'Rodič', icon: Crown };
       case 'child': 
-        return { name: t('user.child'), icon: UserIcon };
-      case 'teacher': 
-        return { name: t('user.teacher'), icon: ChartBarIcon };
+        return { name: 'Dítě', icon: UserIcon };
       default: 
-        return { 
-          name: isGuest ? t('user.guest') : t('user.user'), 
-          icon: UserIcon 
-        };
+        return { name: 'Uživatel', icon: UserIcon };
     }
   };
 
   if (!authState.isAuthenticated) {
     return (
-      <div className="flex items-center gap-2">
-        <AuthRefreshButton />
-        <Link to="/auth">
-          <Button variant="outline" size="sm" className="bg-white border-gray-200 hover:bg-gray-50">
-            <UserIcon className="mr-2 h-4 w-4" />
-            {t('user.selectUser')}
-          </Button>
-        </Link>
-      </div>
+      <Link to="/select-user">
+        <Button variant="outline" size="sm" className="bg-white border-gray-200 hover:bg-gray-50">
+          <UserIcon className="mr-2 h-4 w-4" />
+          Vybrat uživatele
+        </Button>
+      </Link>
     );
   }
 
@@ -91,67 +71,53 @@ const UserMenu = () => {
   const RoleIcon = roleInfo.icon;
 
   return (
-    <div className="flex items-center gap-2">
-      <AuthRefreshButton />
-      <DropdownMenu open={open} onOpenChange={setOpen}>
-        <DropdownMenuTrigger asChild>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className={`flex items-center gap-2 px-3 ${
-              isGuest 
-                ? 'bg-orange-50 border-orange-200 hover:bg-orange-100' 
-                : 'bg-white border-gray-200 hover:bg-gray-50'
-            }`}
-          >
-            <Avatar className="h-6 w-6">
-              <AvatarFallback className={`text-xs font-medium ${
-                isGuest ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700'
-              }`}>
-                {getNameInitials()}
-              </AvatarFallback>
-            </Avatar>
-            <span className="hidden sm:inline font-medium">
+    <DropdownMenu open={open} onOpenChange={setOpen}>
+      <DropdownMenuTrigger asChild>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="flex items-center gap-2 px-3 bg-white border-gray-200 hover:bg-gray-50"
+        >
+          <Avatar className="h-6 w-6">
+            <AvatarFallback className="text-xs font-medium bg-blue-100 text-blue-700">
+              {getNameInitials()}
+            </AvatarFallback>
+          </Avatar>
+          <span className="hidden sm:inline font-medium">
+            {getDisplayName()}
+          </span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuLabel>
+          <div className="flex flex-col space-y-1">
+            <p className="text-sm font-medium leading-none">
               {getDisplayName()}
-            </span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuLabel>
-            <div className="flex flex-col space-y-1">
-              <p className="text-sm font-medium leading-none">
-                {getDisplayName()}
+            </p>
+            <div className="flex items-center gap-1">
+              <RoleIcon className="h-3 w-3 text-muted-foreground" />
+              <p className="text-xs leading-none text-muted-foreground">
+                {roleInfo.name}
               </p>
-              <div className="flex items-center gap-1">
-                <RoleIcon className="h-3 w-3 text-muted-foreground" />
-                <p className="text-xs leading-none text-muted-foreground">
-                  {roleInfo.name}
-                </p>
-                {isGuest && (
-                  <span className="text-xs bg-orange-100 text-orange-700 px-1 py-0.5 rounded">
-                    Lokální
-                  </span>
-                )}
-              </div>
             </div>
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          {authState.profile?.role === 'parent' && (
-            <DropdownMenuItem asChild>
-              <Link to="/parent-dashboard" className="flex items-center cursor-pointer" onClick={() => setOpen(false)}>
-                <ChartBarIcon className="mr-2 h-4 w-4" />
-                <span>{t('user.parentDashboard')}</span>
-              </Link>
-            </DropdownMenuItem>
-          )}
-          <DropdownMenuSeparator />
-          <DropdownMenuItem className="flex items-center cursor-pointer" onClick={() => signOut()}>
-            <LogOut className="mr-2 h-4 w-4" />
-            <span>{t('user.changeUser')}</span>
+          </div>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        {authState.profile?.role === 'parent' && (
+          <DropdownMenuItem asChild>
+            <Link to="/parent-dashboard" className="flex items-center cursor-pointer" onClick={() => setOpen(false)}>
+              <ChartBarIcon className="mr-2 h-4 w-4" />
+              <span>Rodičovský dashboard</span>
+            </Link>
           </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+        )}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem className="flex items-center cursor-pointer" onClick={() => signOut()}>
+          <LogOut className="mr-2 h-4 w-4" />
+          <span>Změnit uživatele</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 
