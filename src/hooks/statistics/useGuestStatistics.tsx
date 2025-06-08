@@ -3,16 +3,16 @@ import { useState, useEffect } from "react";
 import { MathStatistics, SpellingStatistics } from "@/types/authTypes";
 
 export const useGuestStatistics = (userId: string | null) => {
-  // Změníme výchozí hodnotu na false - už nebudeme používat guest mode pro lokální uživatele
+  // Všichni uživatelé nyní používají databázi - guest mode již nepotřebujeme
   const [isGuestMode, setIsGuestMode] = useState(false);
 
   useEffect(() => {
-    // Pro lokální uživatele už nepoužíváme guest mode - všechno jde do databáze
+    // Všichni uživatelé používají databázi
     setIsGuestMode(false);
-    console.log(`useGuestStatistics - Všichni uživatelé včetně ${userId} používají databázi`);
+    console.log(`useGuestStatistics - Uživatel ${userId} používá databázi`);
   }, [userId]);
 
-  // Funkce pro ukládání math statistik do localStorage (backup - jen pro případ offline)
+  // Funkce pro ukládání math statistik do localStorage (pouze jako záloha pro offline režim)
   const saveMathStatsToLocal = (stats: {
     correctAnswers: number;
     wrongAnswers: number;
@@ -22,7 +22,7 @@ export const useGuestStatistics = (userId: string | null) => {
   }) => {
     if (!userId) return;
     
-    const storageKey = `mathStats_${userId}`;
+    const storageKey = `mathStats_backup_${userId}`;
     const existing = localStorage.getItem(storageKey);
     let allStats = [];
     
@@ -46,10 +46,10 @@ export const useGuestStatistics = (userId: string | null) => {
     allStats.push(newStat);
     localStorage.setItem(storageKey, JSON.stringify(allStats));
     
-    console.log(`Math statistiky uloženy lokálně jako backup pro uživatele ${userId}:`, newStat);
+    console.log(`Math statistiky uloženy lokálně jako záloha pro ${userId}:`, newStat);
   };
 
-  // Funkce pro ukládání spelling statistik do localStorage (backup - jen pro případ offline)
+  // Funkce pro ukládání spelling statistik do localStorage (pouze jako záloha pro offline režim)
   const saveSpellingStatsToLocal = (stats: {
     correctAnswers: number;
     wrongAnswers: number;
@@ -59,7 +59,7 @@ export const useGuestStatistics = (userId: string | null) => {
   }) => {
     if (!userId) return;
     
-    const storageKey = `spellingStats_${userId}`;
+    const storageKey = `spellingStats_backup_${userId}`;
     const existing = localStorage.getItem(storageKey);
     let allStats = [];
     
@@ -83,19 +83,19 @@ export const useGuestStatistics = (userId: string | null) => {
     allStats.push(newStat);
     localStorage.setItem(storageKey, JSON.stringify(allStats));
     
-    console.log(`Spelling statistiky uloženy lokálně jako backup pro uživatele ${userId}:`, newStat);
+    console.log(`Spelling statistiky uloženy lokálně jako záloha pro ${userId}:`, newStat);
   };
 
-  // Funkce pro načtení math statistik z localStorage (backup)
+  // Funkce pro načtení math statistik z localStorage (záloha)
   const loadMathStatsFromLocal = (): MathStatistics[] => {
     if (!userId) return [];
     
-    const storageKey = `mathStats_${userId}`;
+    const storageKey = `mathStats_backup_${userId}`;
     const existing = localStorage.getItem(storageKey);
     
     try {
       const stats = existing ? JSON.parse(existing) : [];
-      console.log(`Načítám backup math statistiky pro ${userId}:`, stats);
+      console.log(`Načítám záložní math statistiky pro ${userId}:`, stats);
       return stats;
     } catch (e) {
       console.error("Chyba při načítání lokálních math statistik:", e);
@@ -103,16 +103,16 @@ export const useGuestStatistics = (userId: string | null) => {
     }
   };
 
-  // Funkce pro načtení spelling statistik z localStorage (backup)
+  // Funkce pro načtení spelling statistik z localStorage (záloha)
   const loadSpellingStatsFromLocal = (): SpellingStatistics[] => {
     if (!userId) return [];
     
-    const storageKey = `spellingStats_${userId}`;
+    const storageKey = `spellingStats_backup_${userId}`;
     const existing = localStorage.getItem(storageKey);
     
     try {
       const stats = existing ? JSON.parse(existing) : [];
-      console.log(`Načítám backup spelling statistiky pro ${userId}:`, stats);
+      console.log(`Načítám záložní spelling statistiky pro ${userId}:`, stats);
       return stats;
     } catch (e) {
       console.error("Chyba při načítání lokálních spelling statistik:", e);

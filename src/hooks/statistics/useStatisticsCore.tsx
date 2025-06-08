@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const useStatisticsCore = (userId: string | null) => {
-  const [isLocalMode, setIsLocalMode] = useState<boolean | null>(false); // Všichni uživatelé nyní používají databázi
+  const [isLocalMode, setIsLocalMode] = useState<boolean | null>(false); // Všichni používají databázi
   const [dbStatus, setDbStatus] = useState<"checking" | "connected" | "disconnected">("checking");
   
   // Efekt pro automatickou kontrolu režimu
@@ -38,14 +38,13 @@ export const useStatisticsCore = (userId: string | null) => {
 
   // Check if user is in local mode (nyní vždy false)
   const checkLocalUserMode = async () => {
-    // Všichni uživatelé nyní používají databázi
-    return false;
+    return false; // Všichni používají databázi
   };
 
-  // Get a unique key for storing statistics for a specific user (backup pro offline)
+  // Get a unique key for storing statistics for a specific user (pouze pro zálohu)
   const getLocalStorageKey = (baseKey: string) => {
-    const storageKey = userId ? `${baseKey}_${userId}` : baseKey;
-    console.log(`Generovaný storage klíč pro backup: ${storageKey} pro uživatele ${userId || 'anonym'}`);
+    const storageKey = userId ? `${baseKey}_backup_${userId}` : baseKey;
+    console.log(`Generovaný storage klíč pro zálohu: ${storageKey} pro uživatele ${userId || 'anonym'}`);
     return storageKey;
   };
 
@@ -60,7 +59,7 @@ export const useStatisticsCore = (userId: string | null) => {
       const { data: mathData, error: mathError } = await supabase
         .from('math_statistics')
         .select('*')
-        .eq('user_id', childId)
+        .eq('user_id', childId) // Nyní jako text
         .order('created_at', { ascending: false });
 
       if (mathError) {
@@ -71,7 +70,7 @@ export const useStatisticsCore = (userId: string | null) => {
       const { data: spellingData, error: spellingError } = await supabase
         .from('spelling_statistics')
         .select('*')
-        .eq('user_id', childId)
+        .eq('user_id', childId) // Nyní jako text
         .order('created_at', { ascending: false });
 
       if (spellingError) {
@@ -123,11 +122,11 @@ export const useStatisticsCore = (userId: string | null) => {
     }
   };
 
-  // Funkce pro výpis všech lokálních klíčů (backup function)
+  // Funkce pro výpis všech lokálních klíčů (pro zálohu)
   const listAllLocalStatistics = () => {
     const stats = {};
     Object.keys(localStorage).forEach(key => {
-      if (key.includes('Stats_')) {
+      if (key.includes('Stats_backup_')) {
         try {
           stats[key] = JSON.parse(localStorage.getItem(key) || '[]');
         } catch (e) {
@@ -135,7 +134,7 @@ export const useStatisticsCore = (userId: string | null) => {
         }
       }
     });
-    console.log("Všechny lokální statistiky (backup):", stats);
+    console.log("Všechny lokální záložní statistiky:", stats);
     return stats;
   };
 
@@ -145,7 +144,7 @@ export const useStatisticsCore = (userId: string | null) => {
     getChildStatistics,
     resetUserStatistics,
     listAllLocalStatistics,
-    isLocalMode,
+    isLocalMode, // Vždy false
     dbStatus
   };
 };

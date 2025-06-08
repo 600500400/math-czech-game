@@ -22,7 +22,7 @@ export const useSpellingAnswers = (userId: string | null) => {
       const { data, error } = await supabase
         .from('spelling_answers')
         .select('*')
-        .eq('user_id', userId)
+        .eq('user_id', userId) // Nyní jako text
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -64,7 +64,7 @@ export const useSpellingAnswers = (userId: string | null) => {
 
       if (answers.length > 0) {
         const dbAnswers = answers.map(answer => ({
-          user_id: userId,
+          user_id: userId, // Nyní jako text
           word: answer.word,
           position: answer.position,
           user_answer: answer.userAnswer,
@@ -102,7 +102,7 @@ export const useSpellingAnswers = (userId: string | null) => {
       const { error } = await supabase
         .from('spelling_answers')
         .insert({
-          user_id: userId,
+          user_id: userId, // Nyní jako text
           word: answer.word,
           position: answer.position,
           user_answer: answer.userAnswer,

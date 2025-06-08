@@ -22,7 +22,7 @@ export const useMathAnswers = (userId: string | null) => {
       const { data, error } = await supabase
         .from('math_answers')
         .select('*')
-        .eq('user_id', userId)
+        .eq('user_id', userId) // Nyní jako text
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -62,8 +62,8 @@ export const useMathAnswers = (userId: string | null) => {
 
       if (answers.length > 0) {
         const dbAnswers = answers.map(answer => ({
-          user_id: userId,
-          problem: answer.problem as any, // Cast to any for Json compatibility
+          user_id: userId, // Nyní jako text
+          problem: answer.problem as any,
           user_answer: answer.userAnswer,
           correct_answer: answer.correctAnswer,
           is_correct: answer.isCorrect,
@@ -98,8 +98,8 @@ export const useMathAnswers = (userId: string | null) => {
       const { error } = await supabase
         .from('math_answers')
         .insert({
-          user_id: userId,
-          problem: answer.problem as any, // Cast to any for Json compatibility
+          user_id: userId, // Nyní jako text
+          problem: answer.problem as any,
           user_answer: answer.userAnswer,
           correct_answer: answer.correctAnswer,
           is_correct: answer.isCorrect,

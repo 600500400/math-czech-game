@@ -3,16 +3,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { MathStatistics } from "@/types/authTypes";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { useGuestStatistics } from "./useGuestStatistics";
 
 export const useMathStatistics = (userId: string | null) => {
   const queryClient = useQueryClient();
-  const { 
-    isGuestMode, 
-    saveMathStatsToLocal 
-  } = useGuestStatistics(userId);
 
-  // Save math statistics - nyní vždy do Supabase
+  // Save math statistics - přímo do Supabase databáze
   const saveMathStatistics = useMutation({
     mutationFn: async ({
       correctAnswers,
@@ -33,11 +28,10 @@ export const useMathStatistics = (userId: string | null) => {
 
       console.log("Ukládání statistik matematiky do databáze pro uživatele:", userId);
       
-      // Uložíme přímo do Supabase s userId (bez kontroly autentifikace)
       const { data, error } = await supabase
         .from('math_statistics')
         .insert({
-          user_id: userId,
+          user_id: userId, // Nyní jako text
           correct_answers: correctAnswers,
           wrong_answers: wrongAnswers,
           operation: operation,
@@ -49,14 +43,6 @@ export const useMathStatistics = (userId: string | null) => {
 
       if (error) {
         console.error("Chyba při ukládání do databáze:", error);
-        // Uložíme jako backup lokálně
-        saveMathStatsToLocal({
-          correctAnswers,
-          wrongAnswers,
-          operation,
-          difficultyLevel,
-          gameDuration
-        });
         throw error;
       }
 
@@ -73,7 +59,7 @@ export const useMathStatistics = (userId: string | null) => {
     },
   });
 
-  // Load math statistics - nyní vždy z Supabase
+  // Load math statistics - z Supabase databáze
   const { data: mathStats, isLoading: mathStatsLoading, refetch } = useQuery({
     queryKey: ["mathStatistics", userId],
     queryFn: async (): Promise<MathStatistics[]> => {

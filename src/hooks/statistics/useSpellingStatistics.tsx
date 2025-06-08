@@ -3,16 +3,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { SpellingStatistics } from "@/types/authTypes";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { useGuestStatistics } from "./useGuestStatistics";
 
 export const useSpellingStatistics = (userId: string | null) => {
   const queryClient = useQueryClient();
-  const { 
-    isGuestMode, 
-    saveSpellingStatsToLocal 
-  } = useGuestStatistics(userId);
 
-  // Save spelling statistics - nyní vždy do Supabase
+  // Save spelling statistics - přímo do Supabase databáze
   const saveSpellingStatistics = useMutation({
     mutationFn: async ({
       correctAnswers,
@@ -33,11 +28,10 @@ export const useSpellingStatistics = (userId: string | null) => {
 
       console.log("Ukládání statistik pravopisu do databáze pro uživatele:", userId);
       
-      // Uložíme přímo do Supabase s userId (bez kontroly autentifikace)
       const { data, error } = await supabase
         .from('spelling_statistics')
         .insert({
-          user_id: userId,
+          user_id: userId, // Nyní jako text
           correct_answers: correctAnswers,
           wrong_answers: wrongAnswers,
           word_group: wordGroup,
@@ -49,14 +43,6 @@ export const useSpellingStatistics = (userId: string | null) => {
 
       if (error) {
         console.error("Chyba při ukládání do databáze:", error);
-        // Uložíme jako backup lokálně
-        saveSpellingStatsToLocal({
-          correctAnswers,
-          wrongAnswers,
-          wordGroup,
-          gameDuration,
-          difficulty
-        });
         throw error;
       }
 
@@ -73,7 +59,7 @@ export const useSpellingStatistics = (userId: string | null) => {
     },
   });
 
-  // Load spelling statistics - nyní vždy z Supabase
+  // Load spelling statistics - z Supabase databáze
   const { data: spellingStats, isLoading: spellingStatsLoading, refetch } = useQuery({
     queryKey: ["spellingStatistics", userId],
     queryFn: async (): Promise<SpellingStatistics[]> => {
