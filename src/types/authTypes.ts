@@ -17,7 +17,7 @@ export interface AuthState {
 
 export interface MathStatistics {
   id: string;
-  user_id: string;
+  user_id: string; // Changed from uuid to string/text
   operation: string;
   correct_answers: number;
   wrong_answers: number;
@@ -28,7 +28,7 @@ export interface MathStatistics {
 
 export interface SpellingStatistics {
   id: string;
-  user_id: string;
+  user_id: string; // Changed from uuid to string/text
   word_group: string;
   correct_answers: number;
   wrong_answers: number;

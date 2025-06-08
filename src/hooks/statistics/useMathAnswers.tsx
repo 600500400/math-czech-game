@@ -22,7 +22,7 @@ export const useMathAnswers = (userId: string | null) => {
       const { data, error } = await supabase
         .from('math_answers')
         .select('*')
-        .eq('user_id', userId) // Nyní jako text
+        .eq('user_id', userId) // Nyní jako text - podporuje jak běžné uživatele tak lokální jako "gabi"
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -62,7 +62,7 @@ export const useMathAnswers = (userId: string | null) => {
 
       if (answers.length > 0) {
         const dbAnswers = answers.map(answer => ({
-          user_id: userId, // Nyní jako text
+          user_id: userId, // Nyní jako text - podporuje jak běžné uživatele tak lokální jako "gabi"
           problem: answer.problem as any,
           user_answer: answer.userAnswer,
           correct_answer: answer.correctAnswer,
@@ -98,7 +98,7 @@ export const useMathAnswers = (userId: string | null) => {
       const { error } = await supabase
         .from('math_answers')
         .insert({
-          user_id: userId, // Nyní jako text
+          user_id: userId, // Nyní jako text - podporuje jak běžné uživatele tak lokální jako "gabi"
           problem: answer.problem as any,
           user_answer: answer.userAnswer,
           correct_answer: answer.correctAnswer,

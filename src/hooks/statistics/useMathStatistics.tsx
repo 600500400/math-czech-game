@@ -31,7 +31,7 @@ export const useMathStatistics = (userId: string | null) => {
       const { data, error } = await supabase
         .from('math_statistics')
         .insert({
-          user_id: userId, // Nyní jako text
+          user_id: userId, // Nyní jako text - podporuje jak běžné uživatele tak lokální jako "gabi"
           correct_answers: correctAnswers,
           wrong_answers: wrongAnswers,
           operation: operation,

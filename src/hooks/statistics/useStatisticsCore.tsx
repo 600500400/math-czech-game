@@ -59,7 +59,7 @@ export const useStatisticsCore = (userId: string | null) => {
       const { data: mathData, error: mathError } = await supabase
         .from('math_statistics')
         .select('*')
-        .eq('user_id', childId) // Nyní jako text
+        .eq('user_id', childId) // Nyní jako text - podporuje jak běžné uživatele tak lokální jako "gabi"
         .order('created_at', { ascending: false });
 
       if (mathError) {
@@ -70,7 +70,7 @@ export const useStatisticsCore = (userId: string | null) => {
       const { data: spellingData, error: spellingError } = await supabase
         .from('spelling_statistics')
         .select('*')
-        .eq('user_id', childId) // Nyní jako text
+        .eq('user_id', childId) // Nyní jako text - podporuje jak běžné uživatele tak lokální jako "gabi"
         .order('created_at', { ascending: false });
 
       if (spellingError) {

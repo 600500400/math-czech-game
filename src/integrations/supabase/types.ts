@@ -124,22 +124,7 @@ export type Database = {
           id?: string
           parent_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "parent_child_child_id_fkey"
-            columns: ["child_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "parent_child_parent_id_fkey"
-            columns: ["parent_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       profiles: {
         Row: {
