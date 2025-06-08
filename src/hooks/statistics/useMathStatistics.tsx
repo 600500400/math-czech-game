@@ -9,11 +9,10 @@ export const useMathStatistics = (userId: string | null) => {
   const queryClient = useQueryClient();
   const { 
     isGuestMode, 
-    saveMathStatsToLocal, 
-    loadMathStatsFromLocal 
+    saveMathStatsToLocal 
   } = useGuestStatistics(userId);
 
-  // Save math statistics
+  // Save math statistics - nyní vždy do Supabase
   const saveMathStatistics = useMutation({
     mutationFn: async ({
       correctAnswers,
@@ -28,31 +27,17 @@ export const useMathStatistics = (userId: string | null) => {
       difficultyLevel: any;
       gameDuration?: number;
     }) => {
-      // Pokud je guest režim, uložíme lokálně
-      if (isGuestMode) {
-        saveMathStatsToLocal({
-          correctAnswers,
-          wrongAnswers,
-          operation,
-          difficultyLevel,
-          gameDuration
-        });
-        return { success: true };
+      if (!userId) {
+        throw new Error("Uživatel není nastaven - nelze uložit statistiky");
       }
 
-      // Jinak uložíme do Supabase
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      console.log("Ukládání statistik matematiky do databáze pro uživatele:", userId);
       
-      if (authError || !user) {
-        throw new Error("Uživatel není přihlášen - nelze uložit statistiky");
-      }
-
-      console.log("Ukládání statistik matematiky do databáze pro autentifikovaného uživatele:", user.id);
-      
+      // Uložíme přímo do Supabase s userId (bez kontroly autentifikace)
       const { data, error } = await supabase
         .from('math_statistics')
         .insert({
-          user_id: user.id,
+          user_id: userId,
           correct_answers: correctAnswers,
           wrong_answers: wrongAnswers,
           operation: operation,
@@ -64,6 +49,14 @@ export const useMathStatistics = (userId: string | null) => {
 
       if (error) {
         console.error("Chyba při ukládání do databáze:", error);
+        // Uložíme jako backup lokálně
+        saveMathStatsToLocal({
+          correctAnswers,
+          wrongAnswers,
+          operation,
+          difficultyLevel,
+          gameDuration
+        });
         throw error;
       }
 
@@ -80,30 +73,21 @@ export const useMathStatistics = (userId: string | null) => {
     },
   });
 
-  // Load math statistics
+  // Load math statistics - nyní vždy z Supabase
   const { data: mathStats, isLoading: mathStatsLoading, refetch } = useQuery({
-    queryKey: ["mathStatistics", userId, isGuestMode],
+    queryKey: ["mathStatistics", userId],
     queryFn: async (): Promise<MathStatistics[]> => {
-      // Pokud je guest režim, načteme z localStorage
-      if (isGuestMode) {
-        console.log("Načítání guest math statistik z localStorage pro uživatele:", userId);
-        return loadMathStatsFromLocal();
-      }
-
-      // Jinak načteme z Supabase
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      
-      if (authError || !user) {
-        console.log("Uživatel není přihlášen - vracím prázdné statistiky");
+      if (!userId) {
+        console.log("Žádný userId - vracím prázdné statistiky");
         return [];
       }
       
-      console.log("Načítání statistik matematiky z databáze pro uživatele:", user.id);
+      console.log("Načítání statistik matematiky z databáze pro uživatele:", userId);
       
       const { data, error } = await supabase
         .from('math_statistics')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -114,7 +98,7 @@ export const useMathStatistics = (userId: string | null) => {
       console.log("Načtené statistiky matematiky z databáze:", data);
       return data || [];
     },
-    enabled: true,
+    enabled: !!userId,
     staleTime: 30000,
   });
 

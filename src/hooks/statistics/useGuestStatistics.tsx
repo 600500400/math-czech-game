@@ -3,27 +3,16 @@ import { useState, useEffect } from "react";
 import { MathStatistics, SpellingStatistics } from "@/types/authTypes";
 
 export const useGuestStatistics = (userId: string | null) => {
+  // Změníme výchozí hodnotu na false - už nebudeme používat guest mode pro lokální uživatele
   const [isGuestMode, setIsGuestMode] = useState(false);
 
   useEffect(() => {
-    // Zkontrolujeme jestli je uživatel lokální (všechny naše identity: gabi, misa, ada, host, rodic)
-    const localUser = localStorage.getItem('localUser');
-    if (localUser && userId) {
-      try {
-        const user = JSON.parse(localUser);
-        // Všechny naše přednastavené identity jsou považovány za guest mode
-        const guestIds = ['gabi', 'misa', 'ada', 'host', 'rodic'];
-        setIsGuestMode(guestIds.includes(user.id) && user.id === userId);
-        console.log(`useGuestStatistics - Uživatel ${userId} je v guest režimu:`, guestIds.includes(user.id) && user.id === userId);
-      } catch (e) {
-        setIsGuestMode(false);
-      }
-    } else {
-      setIsGuestMode(false);
-    }
+    // Pro lokální uživatele už nepoužíváme guest mode - všechno jde do databáze
+    setIsGuestMode(false);
+    console.log(`useGuestStatistics - Všichni uživatelé včetně ${userId} používají databázi`);
   }, [userId]);
 
-  // Funkce pro ukládání math statistik do localStorage
+  // Funkce pro ukládání math statistik do localStorage (backup - jen pro případ offline)
   const saveMathStatsToLocal = (stats: {
     correctAnswers: number;
     wrongAnswers: number;
@@ -57,10 +46,10 @@ export const useGuestStatistics = (userId: string | null) => {
     allStats.push(newStat);
     localStorage.setItem(storageKey, JSON.stringify(allStats));
     
-    console.log(`Guest math statistiky uloženy lokálně pro uživatele ${userId}:`, newStat);
+    console.log(`Math statistiky uloženy lokálně jako backup pro uživatele ${userId}:`, newStat);
   };
 
-  // Funkce pro ukládání spelling statistik do localStorage
+  // Funkce pro ukládání spelling statistik do localStorage (backup - jen pro případ offline)
   const saveSpellingStatsToLocal = (stats: {
     correctAnswers: number;
     wrongAnswers: number;
@@ -94,10 +83,10 @@ export const useGuestStatistics = (userId: string | null) => {
     allStats.push(newStat);
     localStorage.setItem(storageKey, JSON.stringify(allStats));
     
-    console.log(`Guest spelling statistiky uloženy lokálně pro uživatele ${userId}:`, newStat);
+    console.log(`Spelling statistiky uloženy lokálně jako backup pro uživatele ${userId}:`, newStat);
   };
 
-  // Funkce pro načtení math statistik z localStorage
+  // Funkce pro načtení math statistik z localStorage (backup)
   const loadMathStatsFromLocal = (): MathStatistics[] => {
     if (!userId) return [];
     
@@ -106,7 +95,7 @@ export const useGuestStatistics = (userId: string | null) => {
     
     try {
       const stats = existing ? JSON.parse(existing) : [];
-      console.log(`useGuestStatistics - načítám math statistiky pro ${userId}:`, stats);
+      console.log(`Načítám backup math statistiky pro ${userId}:`, stats);
       return stats;
     } catch (e) {
       console.error("Chyba při načítání lokálních math statistik:", e);
@@ -114,7 +103,7 @@ export const useGuestStatistics = (userId: string | null) => {
     }
   };
 
-  // Funkce pro načtení spelling statistik z localStorage
+  // Funkce pro načtení spelling statistik z localStorage (backup)
   const loadSpellingStatsFromLocal = (): SpellingStatistics[] => {
     if (!userId) return [];
     
@@ -123,7 +112,7 @@ export const useGuestStatistics = (userId: string | null) => {
     
     try {
       const stats = existing ? JSON.parse(existing) : [];
-      console.log(`useGuestStatistics - načítám spelling statistiky pro ${userId}:`, stats);
+      console.log(`Načítám backup spelling statistiky pro ${userId}:`, stats);
       return stats;
     } catch (e) {
       console.error("Chyba při načítání lokálních spelling statistik:", e);
@@ -132,7 +121,7 @@ export const useGuestStatistics = (userId: string | null) => {
   };
 
   return {
-    isGuestMode,
+    isGuestMode, // Vždy false - všichni používají databázi
     saveMathStatsToLocal,
     saveSpellingStatsToLocal,
     loadMathStatsFromLocal,

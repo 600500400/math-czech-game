@@ -3,19 +3,14 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const useStatisticsCore = (userId: string | null) => {
-  const [isLocalMode, setIsLocalMode] = useState<boolean | null>(false); // Změněno na false, protože nyní používáme databázi
+  const [isLocalMode, setIsLocalMode] = useState<boolean | null>(false); // Všichni uživatelé nyní používají databázi
   const [dbStatus, setDbStatus] = useState<"checking" | "connected" | "disconnected">("checking");
   
   // Efekt pro automatickou kontrolu režimu
   useEffect(() => {
-    const checkMode = async () => {
-      const mode = await checkLocalUserMode();
-      setIsLocalMode(mode);
-    };
-    
-    if (userId) {
-      checkMode();
-    }
+    // Všichni uživatelé nyní používají databázi
+    setIsLocalMode(false);
+    console.log(`useStatisticsCore - Uživatel ${userId} používá databázi`);
   }, [userId]);
   
   // Efekt pro kontrolu připojení databáze
@@ -41,23 +36,16 @@ export const useStatisticsCore = (userId: string | null) => {
     checkDb();
   }, []);
 
-  // Check if user is in local mode (fallback when database is not available)
+  // Check if user is in local mode (nyní vždy false)
   const checkLocalUserMode = async () => {
-    try {
-      // Try to connect to database
-      const { error } = await supabase.from('profiles').select('count', { count: 'exact', head: true });
-      // If no error, we can use database mode
-      return error ? true : false;
-    } catch {
-      // If connection fails, use local mode
-      return true;
-    }
+    // Všichni uživatelé nyní používají databázi
+    return false;
   };
 
-  // Get a unique key for storing statistics for a specific user (backup for local mode)
+  // Get a unique key for storing statistics for a specific user (backup pro offline)
   const getLocalStorageKey = (baseKey: string) => {
     const storageKey = userId ? `${baseKey}_${userId}` : baseKey;
-    console.log(`Generovaný storage klíč: ${storageKey} pro uživatele ${userId || 'anonym'}`);
+    console.log(`Generovaný storage klíč pro backup: ${storageKey} pro uživatele ${userId || 'anonym'}`);
     return storageKey;
   };
 
@@ -66,7 +54,7 @@ export const useStatisticsCore = (userId: string | null) => {
     if (!childId) return { mathStats: [], spellingStats: [] };
     
     try {
-      console.log("Fetching statistics for child ID from database:", childId);
+      console.log("Načítání statistik pro dítě z databáze:", childId);
       
       // Fetch math statistics
       const { data: mathData, error: mathError } = await supabase
@@ -135,7 +123,7 @@ export const useStatisticsCore = (userId: string | null) => {
     }
   };
 
-  // Nová funkce pro výpis všech lokálních klíčů (backup function)
+  // Funkce pro výpis všech lokálních klíčů (backup function)
   const listAllLocalStatistics = () => {
     const stats = {};
     Object.keys(localStorage).forEach(key => {

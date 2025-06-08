@@ -9,23 +9,20 @@ export const useSpellingAnswers = (userId: string | null) => {
   // Load spelling answers from Supabase when component mounts
   useEffect(() => {
     loadSpellingAnswers();
-  }, []);
+  }, [userId]);
 
   // Load spelling answers from Supabase
   const loadSpellingAnswers = async () => {
     try {
-      // Get current authenticated user
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      
-      if (authError || !user) {
-        console.log("Uživatel není přihlášen - nelze načíst pravopisné odpovědi");
+      if (!userId) {
+        console.log("Žádný userId - nelze načíst pravopisné odpovědi");
         return;
       }
       
       const { data, error } = await supabase
         .from('spelling_answers')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -54,11 +51,8 @@ export const useSpellingAnswers = (userId: string | null) => {
   // Save spelling answers to Supabase
   const saveSpellingAnswers = async (answers: SpellingAnswer[]) => {
     try {
-      // Get current authenticated user
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      
-      if (authError || !user) {
-        console.error("Uživatel není přihlášen - nelze uložit pravopisné odpovědi");
+      if (!userId) {
+        console.error("Žádný userId - nelze uložit pravopisné odpovědi");
         return;
       }
       
@@ -66,11 +60,11 @@ export const useSpellingAnswers = (userId: string | null) => {
       await supabase
         .from('spelling_answers')
         .delete()
-        .eq('user_id', user.id);
+        .eq('user_id', userId);
 
       if (answers.length > 0) {
         const dbAnswers = answers.map(answer => ({
-          user_id: user.id,
+          user_id: userId,
           word: answer.word,
           position: answer.position,
           user_answer: answer.userAnswer,
@@ -100,18 +94,15 @@ export const useSpellingAnswers = (userId: string | null) => {
   // Add single spelling answer to Supabase
   const addSpellingAnswer = async (answer: SpellingAnswer) => {
     try {
-      // Get current authenticated user
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      
-      if (authError || !user) {
-        console.error("Uživatel není přihlášen - nelze přidat pravopisnou odpověď");
+      if (!userId) {
+        console.error("Žádný userId - nelze přidat pravopisnou odpověď");
         return;
       }
       
       const { error } = await supabase
         .from('spelling_answers')
         .insert({
-          user_id: user.id,
+          user_id: userId,
           word: answer.word,
           position: answer.position,
           user_answer: answer.userAnswer,
@@ -136,22 +127,19 @@ export const useSpellingAnswers = (userId: string | null) => {
   // Clear spelling answers for user from Supabase
   const clearSpellingAnswers = async () => {
     try {
-      // Get current authenticated user
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      
-      if (authError || !user) {
-        console.error("Uživatel není přihlášen - nelze vymazat pravopisné odpovědi");
+      if (!userId) {
+        console.error("Žádný userId - nelze vymazat pravopisné odpovědi");
         return;
       }
       
       await supabase
         .from('spelling_answers')
         .delete()
-        .eq('user_id', user.id);
+        .eq('user_id', userId);
 
       setSpellingAnswers([]);
       
-      console.log("useSpellingAnswers - vymazány pravopisné odpovědi z databáze pro uživatele:", user.id);
+      console.log("useSpellingAnswers - vymazány pravopisné odpovědi z databáze pro uživatele:", userId);
     } catch (error) {
       console.error("Error clearing spelling answers:", error);
     }

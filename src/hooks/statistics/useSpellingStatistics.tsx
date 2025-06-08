@@ -9,11 +9,10 @@ export const useSpellingStatistics = (userId: string | null) => {
   const queryClient = useQueryClient();
   const { 
     isGuestMode, 
-    saveSpellingStatsToLocal, 
-    loadSpellingStatsFromLocal 
+    saveSpellingStatsToLocal 
   } = useGuestStatistics(userId);
 
-  // Save spelling statistics
+  // Save spelling statistics - nyní vždy do Supabase
   const saveSpellingStatistics = useMutation({
     mutationFn: async ({
       correctAnswers,
@@ -28,31 +27,17 @@ export const useSpellingStatistics = (userId: string | null) => {
       gameDuration?: number;
       difficulty?: any;
     }) => {
-      // Pokud je guest režim, uložíme lokálně
-      if (isGuestMode) {
-        saveSpellingStatsToLocal({
-          correctAnswers,
-          wrongAnswers,
-          wordGroup,
-          gameDuration,
-          difficulty
-        });
-        return { success: true };
+      if (!userId) {
+        throw new Error("Uživatel není nastaven - nelze uložit statistiky");
       }
 
-      // Jinak uložíme do Supabase
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      console.log("Ukládání statistik pravopisu do databáze pro uživatele:", userId);
       
-      if (authError || !user) {
-        throw new Error("Uživatel není přihlášen - nelze uložit statistiky");
-      }
-
-      console.log("Ukládání statistik pravopisu do databáze pro autentifikovaného uživatele:", user.id);
-      
+      // Uložíme přímo do Supabase s userId (bez kontroly autentifikace)
       const { data, error } = await supabase
         .from('spelling_statistics')
         .insert({
-          user_id: user.id,
+          user_id: userId,
           correct_answers: correctAnswers,
           wrong_answers: wrongAnswers,
           word_group: wordGroup,
@@ -64,6 +49,14 @@ export const useSpellingStatistics = (userId: string | null) => {
 
       if (error) {
         console.error("Chyba při ukládání do databáze:", error);
+        // Uložíme jako backup lokálně
+        saveSpellingStatsToLocal({
+          correctAnswers,
+          wrongAnswers,
+          wordGroup,
+          gameDuration,
+          difficulty
+        });
         throw error;
       }
 
@@ -80,30 +73,21 @@ export const useSpellingStatistics = (userId: string | null) => {
     },
   });
 
-  // Load spelling statistics
+  // Load spelling statistics - nyní vždy z Supabase
   const { data: spellingStats, isLoading: spellingStatsLoading, refetch } = useQuery({
-    queryKey: ["spellingStatistics", userId, isGuestMode],
+    queryKey: ["spellingStatistics", userId],
     queryFn: async (): Promise<SpellingStatistics[]> => {
-      // Pokud je guest režim, načteme z localStorage
-      if (isGuestMode) {
-        console.log("Načítání guest spelling statistik z localStorage pro uživatele:", userId);
-        return loadSpellingStatsFromLocal();
-      }
-
-      // Jinak načteme z Supabase
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      
-      if (authError || !user) {
-        console.log("Uživatel není přihlášen - vracím prázdné statistiky");
+      if (!userId) {
+        console.log("Žádný userId - vracím prázdné statistiky");
         return [];
       }
       
-      console.log("Načítání statistik pravopisu z databáze pro uživatele:", user.id);
+      console.log("Načítání statistik pravopisu z databáze pro uživatele:", userId);
       
       const { data, error } = await supabase
         .from('spelling_statistics')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -114,7 +98,7 @@ export const useSpellingStatistics = (userId: string | null) => {
       console.log("Načtené statistiky pravopisu z databáze:", data);
       return data || [];
     },
-    enabled: true,
+    enabled: !!userId,
     staleTime: 30000,
   });
 

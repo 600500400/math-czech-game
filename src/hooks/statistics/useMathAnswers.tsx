@@ -9,23 +9,20 @@ export const useMathAnswers = (userId: string | null) => {
   // Load math answers from Supabase when component mounts
   useEffect(() => {
     loadMathAnswers();
-  }, []);
+  }, [userId]);
 
   // Load math answers from Supabase
   const loadMathAnswers = async () => {
     try {
-      // Get current authenticated user
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      
-      if (authError || !user) {
-        console.log("Uživatel není přihlášen - nelze načíst matematické odpovědi");
+      if (!userId) {
+        console.log("Žádný userId - nelze načíst matematické odpovědi");
         return;
       }
       
       const { data, error } = await supabase
         .from('math_answers')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -52,11 +49,8 @@ export const useMathAnswers = (userId: string | null) => {
   // Save math answers to Supabase
   const saveMathAnswers = async (answers: MathAnswer[]) => {
     try {
-      // Get current authenticated user
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      
-      if (authError || !user) {
-        console.error("Uživatel není přihlášen - nelze uložit matematické odpovědi");
+      if (!userId) {
+        console.error("Žádný userId - nelze uložit matematické odpovědi");
         return;
       }
       
@@ -64,11 +58,11 @@ export const useMathAnswers = (userId: string | null) => {
       await supabase
         .from('math_answers')
         .delete()
-        .eq('user_id', user.id);
+        .eq('user_id', userId);
 
       if (answers.length > 0) {
         const dbAnswers = answers.map(answer => ({
-          user_id: user.id,
+          user_id: userId,
           problem: answer.problem as any, // Cast to any for Json compatibility
           user_answer: answer.userAnswer,
           correct_answer: answer.correctAnswer,
@@ -96,18 +90,15 @@ export const useMathAnswers = (userId: string | null) => {
   // Add single math answer to Supabase
   const addMathAnswer = async (answer: MathAnswer) => {
     try {
-      // Get current authenticated user
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      
-      if (authError || !user) {
-        console.error("Uživatel není přihlášen - nelze přidat matematickou odpověď");
+      if (!userId) {
+        console.error("Žádný userId - nelze přidat matematickou odpověď");
         return;
       }
       
       const { error } = await supabase
         .from('math_answers')
         .insert({
-          user_id: user.id,
+          user_id: userId,
           problem: answer.problem as any, // Cast to any for Json compatibility
           user_answer: answer.userAnswer,
           correct_answer: answer.correctAnswer,
@@ -130,22 +121,19 @@ export const useMathAnswers = (userId: string | null) => {
   // Clear math answers for user from Supabase
   const clearMathAnswers = async () => {
     try {
-      // Get current authenticated user
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      
-      if (authError || !user) {
-        console.error("Uživatel není přihlášen - nelze vymazat matematické odpovědi");
+      if (!userId) {
+        console.error("Žádný userId - nelze vymazat matematické odpovědi");
         return;
       }
       
       await supabase
         .from('math_answers')
         .delete()
-        .eq('user_id', user.id);
+        .eq('user_id', userId);
 
       setMathAnswers([]);
       
-      console.log("useMathAnswers - vymazány matematické odpovědi z databáze pro uživatele:", user.id);
+      console.log("useMathAnswers - vymazány matematické odpovědi z databáze pro uživatele:", userId);
     } catch (error) {
       console.error("Error clearing math answers:", error);
     }
