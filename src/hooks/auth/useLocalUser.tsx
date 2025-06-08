@@ -23,16 +23,18 @@ export const useLocalUser = (setAuthState: React.Dispatch<React.SetStateAction<A
         error: null
       });
       
-      // Initialize empty statistics for new guest user
+      // Initialize empty statistics for new guest user if they don't exist
       const mathStatsKey = `mathStats_${user.id}`;
       const spellingStatsKey = `spellingStats_${user.id}`;
       
       if (!localStorage.getItem(mathStatsKey)) {
         localStorage.setItem(mathStatsKey, JSON.stringify([]));
+        console.log(`Inicializovány prázdné math statistiky pro ${user.id}`);
       }
       
       if (!localStorage.getItem(spellingStatsKey)) {
         localStorage.setItem(spellingStatsKey, JSON.stringify([]));
+        console.log(`Inicializovány prázdné spelling statistiky pro ${user.id}`);
       }
       
       console.log(`Local guest user ${user.username} set up successfully`);

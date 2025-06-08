@@ -6,12 +6,15 @@ export const useGuestStatistics = (userId: string | null) => {
   const [isGuestMode, setIsGuestMode] = useState(false);
 
   useEffect(() => {
-    // Zkontrolujeme jestli je uživatel guest (lokální uživatel)
+    // Zkontrolujeme jestli je uživatel lokální (všechny naše identity: gabi, misa, ada, host, rodic)
     const localUser = localStorage.getItem('localUser');
     if (localUser && userId) {
       try {
         const user = JSON.parse(localUser);
-        setIsGuestMode(user.id === userId);
+        // Všechny naše přednastavené identity jsou považovány za guest mode
+        const guestIds = ['gabi', 'misa', 'ada', 'host', 'rodic'];
+        setIsGuestMode(guestIds.includes(user.id) && user.id === userId);
+        console.log(`useGuestStatistics - Uživatel ${userId} je v guest režimu:`, guestIds.includes(user.id) && user.id === userId);
       } catch (e) {
         setIsGuestMode(false);
       }
@@ -102,7 +105,9 @@ export const useGuestStatistics = (userId: string | null) => {
     const existing = localStorage.getItem(storageKey);
     
     try {
-      return existing ? JSON.parse(existing) : [];
+      const stats = existing ? JSON.parse(existing) : [];
+      console.log(`useGuestStatistics - načítám math statistiky pro ${userId}:`, stats);
+      return stats;
     } catch (e) {
       console.error("Chyba při načítání lokálních math statistik:", e);
       return [];
@@ -117,7 +122,9 @@ export const useGuestStatistics = (userId: string | null) => {
     const existing = localStorage.getItem(storageKey);
     
     try {
-      return existing ? JSON.parse(existing) : [];
+      const stats = existing ? JSON.parse(existing) : [];
+      console.log(`useGuestStatistics - načítám spelling statistiky pro ${userId}:`, stats);
+      return stats;
     } catch (e) {
       console.error("Chyba při načítání lokálních spelling statistik:", e);
       return [];
