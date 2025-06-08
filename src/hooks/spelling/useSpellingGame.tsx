@@ -52,7 +52,7 @@ export const useSpellingGame = () => {
     showProblem: gameUI.showProblem,
     setShowGroupDialog: groupSelection.setShowGroupDialog,
     setShowStatsDialog: gameStats.setShowStatsDialog,
-    generateNewProblem: wordProblem.generateNewProblem,
+    generateNewProblem: wordProblem.generateNewWord,
     incrementProblemCount: gameUI.incrementProblemCount,
     setCorrectAnswers: gameStats.setCorrectAnswers,
     setWrongAnswers: gameStats.setWrongAnswers,
