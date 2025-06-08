@@ -81,7 +81,7 @@ export const useUserTheme = (userId: string | null) => {
     '--user-primary': theme.primaryColor,
     '--user-secondary': theme.secondaryColor,
     '--user-accent': theme.accentColor,
-  }), [theme]);
+  } as React.CSSProperties), [theme]);
 
   return {
     theme,

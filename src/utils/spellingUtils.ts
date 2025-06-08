@@ -1,6 +1,78 @@
 
 import { SpellingGroup } from "@/types/spellingTypes";
 import { removeDiacritics } from "@/lib/utils";
+import { spellingGroups } from "@/data/spellingData";
+
+// Helper function to get words from selected groups
+export function getWordsFromGroups(selectedGroups: string[]) {
+  console.log("📚 getWordsFromGroups: Získávám slova ze skupin:", selectedGroups);
+  
+  const allWords: Array<{word: string, group: string, isPhrase?: boolean}> = [];
+  
+  spellingGroups.forEach(group => {
+    if (selectedGroups.includes(group.name)) {
+      // Add regular words
+      group.words.forEach(wordObj => {
+        allWords.push({
+          word: wordObj.word,
+          group: group.name,
+          isPhrase: false
+        });
+      });
+      
+      // Add phrases if available
+      if (group.phrases) {
+        group.phrases.forEach(phrase => {
+          allWords.push({
+            word: phrase,
+            group: group.name,
+            isPhrase: true
+          });
+        });
+      }
+    }
+  });
+  
+  console.log("📚 getWordsFromGroups: Nalezeno slov:", allWords.length);
+  return allWords;
+}
+
+// Helper function to create displayed word with missing letters
+export function createDisplayedWord(word: string) {
+  console.log("🔤 createDisplayedWord: Zpracovávám slovo:", word);
+  
+  const positions: number[] = [];
+  const letters: string[] = [];
+  
+  // Find all i/y positions
+  for (let i = 0; i < word.length; i++) {
+    const char = word[i].toLowerCase();
+    if (char === 'i' || char === 'y' || char === 'í' || char === 'ý') {
+      positions.push(i);
+      letters.push(char);
+    }
+  }
+  
+  // Create display word with underscores
+  let displayWord = '';
+  for (let i = 0; i < word.length; i++) {
+    if (positions.includes(i)) {
+      displayWord += '_';
+    } else {
+      displayWord += word[i];
+    }
+  }
+  
+  console.log("🔤 createDisplayedWord: Zobrazené slovo:", displayWord);
+  console.log("🔤 createDisplayedWord: Pozice:", positions);
+  console.log("🔤 createDisplayedWord: Písmena:", letters);
+  
+  return {
+    displayWord,
+    positions,
+    letters
+  };
+}
 
 // Funkce pro generování problému
 export function generateSpellingProblem(selectedGroups: string[], spellingGroups: SpellingGroup[]) {

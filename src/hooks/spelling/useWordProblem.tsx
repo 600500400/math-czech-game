@@ -3,14 +3,25 @@ import { useState, useCallback } from "react";
 import { SpellingAnswer } from "@/types/spellingTypes";
 import { getWordsFromGroups, createDisplayedWord } from "@/utils/spellingUtils";
 
-export const useWordProblem = (
-  selectedGroups: string[],
-  addAnswer: (answer: SpellingAnswer) => void,
-  correctAnswers: number,
-  wrongAnswers: number,
-  problemCount: number,
-  endGame: () => void
-) => {
+interface UseWordProblemProps {
+  selectedGroups: string[];
+  onCorrectAnswer: () => void;
+  onWrongAnswer: () => void;
+  showAnimation: boolean;
+  setLastAnswerCorrect: (value: boolean | null) => void;
+  setShowAnimation: (value: boolean) => void;
+  addAnswer: (answer: SpellingAnswer) => void;
+}
+
+export const useWordProblem = ({
+  selectedGroups,
+  onCorrectAnswer,
+  onWrongAnswer,
+  showAnimation,
+  setLastAnswerCorrect,
+  setShowAnimation,
+  addAnswer
+}: UseWordProblemProps) => {
   const [currentWord, setCurrentWord] = useState("");
   const [displayedWord, setDisplayedWord] = useState("");
   const [wordGroup, setWordGroup] = useState("");
@@ -23,7 +34,6 @@ export const useWordProblem = (
     console.log("Generuji nové slovo...");
     if (selectedGroups.length === 0) {
       console.warn("Žádné skupiny nevybrány");
-      endGame();
       return;
     }
 
@@ -31,7 +41,6 @@ export const useWordProblem = (
       const allWords = getWordsFromGroups(selectedGroups);
       if (allWords.length === 0) {
         console.warn("Žádná slova k dispozici");
-        endGame();
         return;
       }
 
@@ -56,9 +65,8 @@ export const useWordProblem = (
       });
     } catch (error) {
       console.error("Chyba při generování nového slova:", error);
-      endGame();
     }
-  }, [selectedGroups, endGame]);
+  }, [selectedGroups]);
 
   const handleAnswer = useCallback((letter: "i" | "y") => {
     if (currentPosition >= missingPositions.length) {
@@ -85,22 +93,30 @@ export const useWordProblem = (
 
     addAnswer(answer);
 
+    // Update statistics
+    if (isCorrect) {
+      onCorrectAnswer();
+    } else {
+      onWrongAnswer();
+    }
+
+    // Show animation
+    setLastAnswerCorrect(isCorrect);
+    setShowAnimation(true);
+
+    // Hide animation after delay
+    setTimeout(() => {
+      setShowAnimation(false);
+    }, 2000);
+
     // Posunout na další pozici nebo další slovo
     const nextPosition = currentPosition + 1;
     
     if (nextPosition >= missingPositions.length) {
-      // Hotovo s tímto slovem - zkontrolovat, zda pokračovat
+      // Hotovo s tímto slovem - generovat nové
       setTimeout(() => {
-        const totalAnswers = correctAnswers + wrongAnswers + 1; // +1 pro aktuální odpověď
-        
-        if (totalAnswers >= problemCount) {
-          console.log("Hra končí - dosaženo maximálního počtu odpovědí:", totalAnswers, "z", problemCount);
-          endGame();
-        } else {
-          console.log("Generuji nové slovo - aktuální počet:", totalAnswers, "z", problemCount);
-          generateNewWord();
-        }
-      }, 1500); // Krátká pauza pro animaci
+        generateNewWord();
+      }, 1500);
     } else {
       // Pokračovat na další pozici ve stejném slově
       setCurrentPosition(nextPosition);
@@ -113,12 +129,15 @@ export const useWordProblem = (
     currentWord,
     wordGroup,
     addAnswer,
-    correctAnswers,
-    wrongAnswers,
-    problemCount,
-    endGame,
+    onCorrectAnswer,
+    onWrongAnswer,
+    setLastAnswerCorrect,
+    setShowAnimation,
     generateNewWord
   ]);
+
+  const handleAnswerI = useCallback(() => handleAnswer("i"), [handleAnswer]);
+  const handleAnswerY = useCallback(() => handleAnswer("y"), [handleAnswer]);
 
   return {
     currentWord,
@@ -129,6 +148,8 @@ export const useWordProblem = (
     missingPositions,
     currentPosition,
     generateNewWord,
-    handleAnswer
+    handleAnswer,
+    handleAnswerI,
+    handleAnswerY
   };
 };
