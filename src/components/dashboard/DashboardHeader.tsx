@@ -1,7 +1,6 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
 
 interface DashboardHeaderProps {
   title: string;
@@ -14,19 +13,14 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   description, 
   onSignOut 
 }) => {
-  const navigate = useNavigate();
-  
   return (
-    <div className="flex justify-between items-center mb-6">
+    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
       <div>
-        <h1 className="text-3xl font-bold">{title}</h1>
-        <p className="text-gray-600">{description}</p>
+        <h1 className="text-2xl sm:text-3xl font-bold gradient-text">{title}</h1>
+        <p className="text-gray-600 text-sm sm:text-base">{description}</p>
       </div>
-      <div className="flex gap-2">
-        <Button onClick={() => navigate("/")} variant="outline">
-          Zpět na aplikaci
-        </Button>
-        <Button onClick={onSignOut} variant="destructive">
+      <div className="flex justify-end">
+        <Button onClick={onSignOut} variant="outline" size="sm">
           Změnit uživatele
         </Button>
       </div>

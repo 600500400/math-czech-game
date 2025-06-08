@@ -3,16 +3,15 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useParentDashboard } from "@/hooks/useParentDashboard";
-import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { ChildSelection } from "@/components/dashboard/ChildSelection";
 import { EmptyDashboard } from "@/components/dashboard/EmptyDashboard";
 import { DashboardTabs } from "@/components/dashboard/DashboardTabs";
-import { DashboardWizardManager } from "@/components/dashboard/DashboardWizardManager";
 import { useDashboardFilters } from "@/components/dashboard/DashboardFilters";
 import { Card, CardContent } from "@/components/ui/card";
+import ModernHeader from "@/components/layout/ModernHeader";
 
 const ParentDashboard = () => {
-  const { authState, signOut } = useAuth();
+  const { authState } = useAuth();
   const navigate = useNavigate();
   const userId = authState.user?.id;
   
@@ -58,73 +57,68 @@ const ParentDashboard = () => {
   const filteredMathStats = getFilteredStats(childMathStats, 'math');
   const filteredSpellingStats = getFilteredStats(childSpellingStats, 'spelling');
 
-  // Function to refresh children list
-  const handleChildCreated = () => {
-    window.location.reload();
-  };
-
   if (loading) {
     return (
-      <div className="container mx-auto p-4 max-w-7xl">
-        <DashboardHeader 
-          title="Rodičovský dashboard"
-          description="Načítám data..." 
-          onSignOut={signOut}
-        />
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
-              <p className="text-center text-muted-foreground">Načítám dashboard...</p>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+        <ModernHeader />
+        <div className="container mx-auto p-4 max-w-7xl">
+          <div className="mb-6">
+            <h1 className="text-2xl sm:text-3xl font-bold gradient-text mb-2">Rodičovský dashboard</h1>
+            <p className="text-gray-600">Načítám data...</p>
+          </div>
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center gap-3">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                <p className="text-center text-muted-foreground">Načítám dashboard...</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto p-4 max-w-7xl">
-      <DashboardHeader 
-        title="Rodičovský dashboard"
-        description="Pokročilý přehled výsledků vašich dětí v aplikaci Procvička" 
-        onSignOut={signOut}
-      />
-      
-      <div className="space-y-8">
-        <ChildSelection 
-          children={children} 
-          selectedChild={selectedChild}
-          setSelectedChild={setSelectedChild}
-          onChildCreated={handleChildCreated}
-          loading={loading}
-        />
-
-        {children.length > 0 ? (
-          <DashboardTabs
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      <ModernHeader />
+      <div className="container mx-auto p-4 max-w-7xl">
+        <div className="mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold gradient-text mb-2">
+            Rodičovský dashboard
+          </h1>
+          <p className="text-gray-600 text-sm sm:text-base">
+            Pokročilý přehled výsledků vašich dětí v aplikaci Procvička
+          </p>
+        </div>
+        
+        <div className="space-y-6">
+          <ChildSelection 
+            children={children} 
             selectedChild={selectedChild}
-            children={children}
-            childMathTotal={childMathTotal}
-            childSpellingTotal={childSpellingTotal}
-            mathAccuracy={mathAccuracy}
-            spellingAccuracy={spellingAccuracy}
-            filteredMathStats={filteredMathStats}
-            filteredSpellingStats={filteredSpellingStats}
-            allChildrenStats={allChildrenStats}
-            filters={filters}
-            onFilterChange={setFilters}
+            setSelectedChild={setSelectedChild}
+            loading={loading}
           />
-        ) : (
-          <EmptyDashboard onChildCreated={handleChildCreated} />
-        )}
-      </div>
 
-      <DashboardWizardManager
-        loading={loading}
-        children={children}
-        userId={userId}
-        onChildCreated={handleChildCreated}
-      />
+          {children.length > 0 ? (
+            <DashboardTabs
+              selectedChild={selectedChild}
+              children={children}
+              childMathTotal={childMathTotal}
+              childSpellingTotal={childSpellingTotal}
+              mathAccuracy={mathAccuracy}
+              spellingAccuracy={spellingAccuracy}
+              filteredMathStats={filteredMathStats}
+              filteredSpellingStats={filteredSpellingStats}
+              allChildrenStats={allChildrenStats}
+              filters={filters}
+              onFilterChange={setFilters}
+            />
+          ) : (
+            <EmptyDashboard />
+          )}
+        </div>
+      </div>
     </div>
   );
 };
