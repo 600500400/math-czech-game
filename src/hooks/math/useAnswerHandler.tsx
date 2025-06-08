@@ -56,6 +56,9 @@ export function useAnswerHandler({
     // Add to answers array
     addAnswer(answerRecord);
     
+    const newCorrectAnswers = isCorrect ? correctAnswers + 1 : correctAnswers;
+    const newWrongAnswers = isCorrect ? wrongAnswers : wrongAnswers + 1;
+    
     if (isCorrect) {
       setCorrectAnswers(prev => prev + 1);
       setLastAnswerCorrect(true);
@@ -76,11 +79,23 @@ export function useAnswerHandler({
     
     // Posuneme se na další příklad nebo ukončíme hru
     setTimeout(() => {
-      if (correctAnswers + wrongAnswers + 1 >= problemCount) {
+      const totalAnswers = newCorrectAnswers + newWrongAnswers;
+      
+      if (totalAnswers >= problemCount) {
+        console.log("Hra končí - dosaženo maximálního počtu příkladů:", totalAnswers, "z", problemCount);
         endGame();
       } else {
-        setCurrentProblem(generateProblem());
-        setUserAnswer("");
+        console.log("Generuji nový příklad - aktuální počet:", totalAnswers, "z", problemCount);
+        try {
+          const newProblem = generateProblem();
+          setCurrentProblem(newProblem);
+          setUserAnswer("");
+          console.log("Nový příklad vygenerován:", newProblem);
+        } catch (error) {
+          console.error("Chyba při generování nového příkladu:", error);
+          // Fallback - zkusím to znovu nebo ukončím hru
+          endGame();
+        }
       }
     }, 1000);
   }, [

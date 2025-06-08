@@ -1,56 +1,85 @@
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/useAuth";
-import ModernHeader from "@/components/layout/ModernHeader";
-import AppNavigation from "@/components/layout/AppNavigation";
-import AppFooter from "@/components/layout/AppFooter";
-import PracticeSection from "@/components/practice/PracticeSection";
-import StatisticsViewer from "@/components/StatisticsViewer";
+import { useUserTheme } from "@/hooks/useUserTheme";
 import WelcomeDashboard from "@/components/dashboard/WelcomeDashboard";
-import WelcomeCard from "@/components/auth/WelcomeCard";
+import PracticeTabs from "@/components/practice/PracticeTabs";
+import StatisticsTabs from "@/components/statistics/StatisticsTabs";
+import ModernHeader from "@/components/layout/ModernHeader";
 
 const HomePage = () => {
   const { authState } = useAuth();
-  const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<"dashboard" | "practice" | "statistics">("dashboard");
-  
-  // Redirect to auth page if user is not authenticated
-  if (!authState.isAuthenticated && !authState.isLoading) {
-    navigate("/auth");
-    return null;
-  }
+  const { theme, getCSSVariables } = useUserTheme(authState.user?.id);
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const [practiceDefaultTab, setPracticeDefaultTab] = useState<"spelling" | "math">("spelling");
 
   const handleNavigateToTab = (tab: "practice" | "statistics") => {
     setActiveTab(tab);
   };
-  
+
+  const handleNavigateToPractice = (defaultTab: "spelling" | "math") => {
+    setPracticeDefaultTab(defaultTab); // Nastavím správnou záložku
+    setActiveTab("practice"); // Přejdu na procvičování
+  };
+
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-bg">
+    <div 
+      className={`min-h-screen bg-gradient-to-br ${theme.bgGradient}`}
+      style={getCSSVariables}
+    >
       <ModernHeader />
-      
-      {authState.isAuthenticated ? (
-        <div className="flex-1 flex flex-col">
-          <div className="w-full max-w-6xl mx-auto px-4 py-6">
-            <AppNavigation 
-              activeTab={activeTab} 
-              setActiveTab={setActiveTab} 
+      <div className="container mx-auto p-4 max-w-7xl">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-3 mb-6">
+            <TabsTrigger 
+              value="dashboard"
+              className="data-[state=active]:shadow-sm"
+              style={{
+                '--active-bg': `${theme.primaryColor}22`,
+                '--active-color': theme.accentColor
+              } as React.CSSProperties}
+            >
+              Dashboard
+            </TabsTrigger>
+            <TabsTrigger 
+              value="practice"
+              className="data-[state=active]:shadow-sm"
+              style={{
+                '--active-bg': `${theme.primaryColor}22`,
+                '--active-color': theme.accentColor
+              } as React.CSSProperties}
+            >
+              Procvičování
+            </TabsTrigger>
+            <TabsTrigger 
+              value="statistics"
+              className="data-[state=active]:shadow-sm"
+              style={{
+                '--active-bg': `${theme.primaryColor}22`,
+                '--active-color': theme.accentColor
+              } as React.CSSProperties}
+            >
+              Statistiky
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="dashboard">
+            <WelcomeDashboard 
+              onNavigateToTab={handleNavigateToTab}
+              onNavigateToPractice={handleNavigateToPractice}
             />
-            
-            <main className="flex-1">
-              {activeTab === "dashboard" && <WelcomeDashboard onNavigateToTab={handleNavigateToTab} />}
-              {activeTab === "practice" && <PracticeSection />}
-              {activeTab === "statistics" && <StatisticsViewer />}
-            </main>
-          </div>
-        </div>
-      ) : (
-        <div className="flex-1 flex items-center justify-center p-4">
-          <WelcomeCard />
-        </div>
-      )}
-      
-      <AppFooter />
+          </TabsContent>
+
+          <TabsContent value="practice">
+            <PracticeTabs defaultTab={practiceDefaultTab} />
+          </TabsContent>
+
+          <TabsContent value="statistics">
+            <StatisticsTabs />
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 };

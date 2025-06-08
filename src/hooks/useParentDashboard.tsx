@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { UserProfile } from "@/types/authTypes";
+import { useStatistics } from "@/hooks/useStatistics";
 
 interface StatTotals {
   correct: number;
@@ -43,12 +44,16 @@ const CHILDREN_PROFILES: UserProfile[] = [
 export function useParentDashboard(userId: string | undefined) {
   const [children] = useState<UserProfile[]>(CHILDREN_PROFILES);
   const [selectedChild, setSelectedChild] = useState<string | null>('gabi');
-  const [childMathStats, setChildMathStats] = useState([]);
-  const [childSpellingStats, setChildSpellingStats] = useState([]);
-  const [loading, setLoading] = useState(false);
   
-  // Calculate summary statistics for selected child
-  const childMathTotal = childMathStats.reduce(
+  // Použití centralizovaného hook pro statistiky s databází
+  const { 
+    mathStats, 
+    spellingStats, 
+    isLoading: statsLoading 
+  } = useStatistics(selectedChild);
+  
+  // Calculate summary statistics for selected child z databázových dat
+  const childMathTotal = mathStats.reduce(
     (acc, stat: any) => {
       acc.correct += stat.correct_answers || 0;
       acc.wrong += stat.wrong_answers || 0;
@@ -58,7 +63,7 @@ export function useParentDashboard(userId: string | undefined) {
     { correct: 0, wrong: 0, total: 0 } as StatTotals
   );
   
-  const childSpellingTotal = childSpellingStats.reduce(
+  const childSpellingTotal = spellingStats.reduce(
     (acc, stat: any) => {
       acc.correct += stat.correct_answers || 0;
       acc.wrong += stat.wrong_answers || 0;
@@ -76,55 +81,16 @@ export function useParentDashboard(userId: string | undefined) {
     ? Math.round((childSpellingTotal.correct / childSpellingTotal.total) * 100) 
     : 0;
 
-  // Load statistics from localStorage for the selected child
-  useEffect(() => {
-    const fetchChildStats = async () => {
-      if (!selectedChild) {
-        setChildMathStats([]);
-        setChildSpellingStats([]);
-        return;
-      }
-      
-      setLoading(true);
-      
-      try {
-        console.log("Načítám lokální statistiky pro dítě:", selectedChild);
-        
-        // Load from localStorage
-        const mathStatsKey = `mathStats_${selectedChild}`;
-        const spellingStatsKey = `spellingStats_${selectedChild}`;
-        
-        const mathStats = JSON.parse(localStorage.getItem(mathStatsKey) || '[]');
-        const spellingStats = JSON.parse(localStorage.getItem(spellingStatsKey) || '[]');
-
-        console.log("Matematické statistiky:", mathStats);
-        console.log("Statistiky pravopisu:", spellingStats);
-        
-        setChildMathStats(mathStats);
-        setChildSpellingStats(spellingStats);
-        
-      } catch (error) {
-        console.error("Chyba při načítání statistik dítěte:", error);
-        setChildMathStats([]);
-        setChildSpellingStats([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchChildStats();
-  }, [selectedChild]);
-
   return {
     children,
     selectedChild,
     setSelectedChild,
-    childMathStats,
-    childSpellingStats,
+    childMathStats: mathStats, // Nyní z databáze
+    childSpellingStats: spellingStats, // Nyní z databáze
     childMathTotal,
     childSpellingTotal,
     mathAccuracy,
     spellingAccuracy,
-    loading
+    loading: statsLoading
   };
 }

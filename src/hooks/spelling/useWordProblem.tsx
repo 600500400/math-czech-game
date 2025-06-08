@@ -1,222 +1,124 @@
+
 import { useState, useCallback } from "react";
-import { SpellingGroup, SpellingAnswer } from "@/types/spellingTypes";
-import { spellingGroups } from "@/data/spellingData";
+import { SpellingAnswer } from "@/types/spellingTypes";
+import { getWordsFromGroups, createDisplayedWord } from "@/utils/spellingUtils";
 
-interface UseWordProblemProps {
-  selectedGroups: string[];
-  onCorrectAnswer: () => void;
-  onWrongAnswer: () => void;
-  showAnimation: boolean;
-  setLastAnswerCorrect: (isCorrect: boolean | null) => void;
-  setShowAnimation: (show: boolean) => void;
-  addAnswer: (answer: SpellingAnswer) => void;
-}
-
-export const useWordProblem = ({
-  selectedGroups,
-  onCorrectAnswer,
-  onWrongAnswer,
-  showAnimation,
-  setLastAnswerCorrect,
-  setShowAnimation,
-  addAnswer
-}: UseWordProblemProps) => {
-  // State for current word
+export const useWordProblem = (
+  selectedGroups: string[],
+  addAnswer: (answer: SpellingAnswer) => void,
+  correctAnswers: number,
+  wrongAnswers: number,
+  problemCount: number,
+  endGame: () => void
+) => {
   const [currentWord, setCurrentWord] = useState("");
   const [displayedWord, setDisplayedWord] = useState("");
   const [wordGroup, setWordGroup] = useState("");
   const [isPhrase, setIsPhrase] = useState(false);
-  
-  // State for i/y positions in the word
-  const [missingPositions, setMissingPositions] = useState<number[]>([]);
   const [correctLetters, setCorrectLetters] = useState<string[]>([]);
+  const [missingPositions, setMissingPositions] = useState<number[]>([]);
   const [currentPosition, setCurrentPosition] = useState(0);
 
-  // Pomocné funkce pro generování problémů a pozic
-  const generateProblem = (selectedGroups: string[]) => {
-    console.log("🎯 generateProblem: Začínám generování s vybranými skupinami:", selectedGroups);
-    
-    // Výběr náhodné skupiny ze seznamu vybraných skupin
-    const groupName = selectedGroups[Math.floor(Math.random() * selectedGroups.length)];
-    const group = spellingGroups.find(g => g.name === groupName);
-    
-    console.log("🎯 generateProblem: Vybraná skupina:", groupName, "nalezena:", !!group);
-    
-    if (!group || !group.words || group.words.length === 0) {
-      console.error("🎯 generateProblem: Skupina nemá slova!");
-      return { word: "", group: "", isPhrase: false };
-    }
-
-    // Pokusíme se najít slovo s i/y (max 50 pokusů)
-    let attempts = 0;
-    const maxAttempts = 50;
-    
-    while (attempts < maxAttempts) {
-      const wordObj = group.words[Math.floor(Math.random() * group.words.length)];
-      const word = wordObj.word;
-      const isPhrase = word.includes(" ");
-      
-      console.log(`🎯 generateProblem: Pokus ${attempts + 1}: testuju slovo "${word}"`);
-      
-      // Kontrola, zda slovo obsahuje i/y/í/ý
-      const hasTargetLetters = /[iyíý]/i.test(word);
-      
-      console.log(`🎯 generateProblem: Slovo "${word}" obsahuje i/y/í/ý:`, hasTargetLetters);
-      
-      if (hasTargetLetters) {
-        console.log(`🎯 generateProblem: ✅ Vybrané slovo: "${word}" ze skupiny ${groupName}`);
-        return {
-          word: word,
-          group: groupName,
-          isPhrase
-        };
-      }
-      
-      attempts++;
-    }
-    
-    console.error(`🎯 generateProblem: ❌ Nenalezeno vhodné slovo po ${maxAttempts} pokusech`);
-    return { word: "", group: "", isPhrase: false };
-  };
-
-  const generateMissingPositions = (word: string) => {
-    console.log("🔍 generateMissingPositions: Analyzuji slovo:", word);
-    
-    // Najít všechny pozice, kde je 'i' nebo 'y'
-    const positions: number[] = [];
-    const letters: string[] = [];
-    
-    for (let i = 0; i < word.length; i++) {
-      const char = word[i];
-      const lowerChar = char.toLowerCase();
-      if (lowerChar === 'i' || lowerChar === 'y' || lowerChar === 'í' || lowerChar === 'ý') {
-        positions.push(i);
-        letters.push(lowerChar);
-        console.log(`🔍 generateMissingPositions: Pozice ${i}: "${char}" -> "${lowerChar}"`);
-      }
-    }
-    
-    console.log("🔍 generateMissingPositions: Nalezené pozice:", positions);
-    console.log("🔍 generateMissingPositions: Nalezená písmena:", letters);
-    
-    // Vytvořit slovo s mezerami na místech i/y
-    let displayWord = '';
-    for (let i = 0; i < word.length; i++) {
-      if (positions.includes(i)) {
-        displayWord += '_';
-      } else {
-        displayWord += word[i];
-      }
-    }
-    
-    console.log("🔍 generateMissingPositions: Zobrazované slovo:", displayWord);
-    
-    return { displayWord, positions, letters };
-  };
-
-  // Generování nového problému
-  const generateNewProblem = useCallback(() => {
-    console.log("🚀 generateNewProblem: Spouštím generování nového problému");
-    
+  const generateNewWord = useCallback(() => {
+    console.log("Generuji nové slovo...");
     if (selectedGroups.length === 0) {
-      console.error("🚀 generateNewProblem: Žádné vybrané skupiny!");
-      return null;
+      console.warn("Žádné skupiny nevybrány");
+      endGame();
+      return;
     }
 
-    const { word, group, isPhrase } = generateProblem(selectedGroups);
-    
-    if (!word) {
-      console.error("🚀 generateNewProblem: Nepodařilo se vygenerovat slovo!");
-      return null;
-    }
-    
-    const { displayWord, positions, letters } = generateMissingPositions(word);
-    
-    console.log("🚀 generateNewProblem: Nastavuji stav s:", {
-      currentWord: word,
-      displayedWord: displayWord,
-      wordGroup: group,
-      isPhrase,
-      missingPositions: positions,
-      correctLetters: letters,
-      currentPosition: 0
-    });
-    
-    setCurrentWord(word);
-    setWordGroup(group);
-    setIsPhrase(isPhrase);
-    setDisplayedWord(displayWord);
-    setMissingPositions(positions);
-    setCorrectLetters(letters);
-    setCurrentPosition(0);
-    
-    return { word, displayWord, positions, letters };
-  }, [selectedGroups]);
+    try {
+      const allWords = getWordsFromGroups(selectedGroups);
+      if (allWords.length === 0) {
+        console.warn("Žádná slova k dispozici");
+        endGame();
+        return;
+      }
 
-  // Odpověď na otázku
-  const handleAnswer = useCallback((answer: "i" | "y") => {
-    console.log("💭 handleAnswer: Odpovídám:", answer);
-    console.log("💭 handleAnswer: Současná pozice:", currentPosition);
-    console.log("💭 handleAnswer: Správná písmena:", correctLetters);
-    console.log("💭 handleAnswer: Správné písmeno na pozici:", correctLetters[currentPosition]);
-    
-    const correctLetter = correctLetters[currentPosition];
-    
-    // Normalizace pro porovnání (í->i, ý->y)
-    const normalizedCorrect = correctLetter === 'í' ? 'i' : correctLetter === 'ý' ? 'y' : correctLetter;
-    const isCorrect = normalizedCorrect === answer;
-    
-    console.log("💭 handleAnswer: Normalizované správné písmeno:", normalizedCorrect);
-    console.log("💭 handleAnswer: Je odpověď správná?", isCorrect);
-    
-    // Create detailed answer record
-    const answerRecord: SpellingAnswer = {
+      const randomWord = allWords[Math.floor(Math.random() * allWords.length)];
+      console.log("Vybrané slovo:", randomWord);
+      
+      setCurrentWord(randomWord.word);
+      setWordGroup(randomWord.group);
+      setIsPhrase(randomWord.isPhrase || false);
+
+      const { displayWord, positions, letters } = createDisplayedWord(randomWord.word);
+      setDisplayedWord(displayWord);
+      setMissingPositions(positions);
+      setCorrectLetters(letters);
+      setCurrentPosition(0);
+      
+      console.log("Nové slovo nastaveno:", {
+        word: randomWord.word,
+        displayWord,
+        positions,
+        letters
+      });
+    } catch (error) {
+      console.error("Chyba při generování nového slova:", error);
+      endGame();
+    }
+  }, [selectedGroups, endGame]);
+
+  const handleAnswer = useCallback((letter: "i" | "y") => {
+    if (currentPosition >= missingPositions.length) {
+      console.warn("Všechny pozice již vyplněny");
+      return;
+    }
+
+    const position = missingPositions[currentPosition];
+    const correctAnswer = correctLetters[currentPosition];
+    const isCorrect = letter === correctAnswer;
+
+    console.log("Odpověď:", letter, "správná:", correctAnswer, "pozice:", position, "správně:", isCorrect);
+
+    // Zaznamenat odpověď
+    const answer: SpellingAnswer = {
       word: currentWord,
-      position: currentPosition,
-      userAnswer: answer,
-      correctAnswer: normalizedCorrect,
+      position,
+      userAnswer: letter,
+      correctAnswer,
       isCorrect,
       timestamp: new Date().toISOString(),
-      wordGroup: wordGroup
+      wordGroup
     };
-    
-    // Add to answers array
-    addAnswer(answerRecord);
-    
-    // Aktualizace statistik
-    if (isCorrect) {
-      onCorrectAnswer();
-      setLastAnswerCorrect(true);
-    } else {
-      onWrongAnswer();
-      setLastAnswerCorrect(false);
-    }
-    
-    // Zobrazení animace
-    setShowAnimation(true);
-    
-    // Po 2 sekundách skryjeme animaci
-    setTimeout(() => {
-      setShowAnimation(false);
-    }, 2000);
-    
-    // Posun na další písmeno nebo další slovo
-    setTimeout(() => {
-      if (currentPosition + 1 < missingPositions.length) {
-        // Další písmeno ve stejném slově
-        console.log("💭 handleAnswer: Posun na další pozici:", currentPosition + 1);
-        setCurrentPosition(prev => prev + 1);
-      } else {
-        // Všechna písmena ve slově byla zodpovězena
-        console.log("💭 handleAnswer: Generuji nové slovo");
-        generateNewProblem();
-      }
-    }, 1000);
-  }, [correctLetters, currentPosition, generateNewProblem, missingPositions.length, onCorrectAnswer, onWrongAnswer, setLastAnswerCorrect, setShowAnimation, addAnswer, currentWord, wordGroup]);
 
-  // Odpovědi na i/y
-  const handleAnswerI = useCallback(() => handleAnswer("i"), [handleAnswer]);
-  const handleAnswerY = useCallback(() => handleAnswer("y"), [handleAnswer]);
+    addAnswer(answer);
+
+    // Posunout na další pozici nebo další slovo
+    const nextPosition = currentPosition + 1;
+    
+    if (nextPosition >= missingPositions.length) {
+      // Hotovo s tímto slovem - zkontrolovat, zda pokračovat
+      setTimeout(() => {
+        const totalAnswers = correctAnswers + wrongAnswers + 1; // +1 pro aktuální odpověď
+        
+        if (totalAnswers >= problemCount) {
+          console.log("Hra končí - dosaženo maximálního počtu odpovědí:", totalAnswers, "z", problemCount);
+          endGame();
+        } else {
+          console.log("Generuji nové slovo - aktuální počet:", totalAnswers, "z", problemCount);
+          generateNewWord();
+        }
+      }, 1500); // Krátká pauza pro animaci
+    } else {
+      // Pokračovat na další pozici ve stejném slově
+      setCurrentPosition(nextPosition);
+      console.log("Pokračuji na pozici:", nextPosition);
+    }
+  }, [
+    currentPosition,
+    missingPositions,
+    correctLetters,
+    currentWord,
+    wordGroup,
+    addAnswer,
+    correctAnswers,
+    wrongAnswers,
+    problemCount,
+    endGame,
+    generateNewWord
+  ]);
 
   return {
     currentWord,
@@ -226,8 +128,7 @@ export const useWordProblem = ({
     correctLetters,
     missingPositions,
     currentPosition,
-    generateNewProblem,
-    handleAnswerI,
-    handleAnswerY
+    generateNewWord,
+    handleAnswer
   };
 };

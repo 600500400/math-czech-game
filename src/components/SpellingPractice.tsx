@@ -5,11 +5,16 @@ import { StatisticsDialog } from "./spelling/StatisticsDialog";
 import { FunGraphics } from "./spelling/FunGraphics";
 import { GameControls } from "./spelling/GameControls";
 import { useSpellingGame } from "@/hooks/spelling/useSpellingGame";
+import { useAuth } from "@/hooks/useAuth";
+import { useUserTheme } from "@/hooks/useUserTheme";
 import { spellingGroups } from "@/data/spellingData";
 import { ConfettiExplosion } from "@/components/ui/confetti-explosion";
 import { useState, useEffect } from "react";
 
 const SpellingPractice = () => {
+  const { authState } = useAuth();
+  const { theme, getCSSVariables } = useUserTheme(authState.user?.id);
+  
   const {
     correctAnswers,
     wrongAnswers,
@@ -56,7 +61,7 @@ const SpellingPractice = () => {
   const hasStats = correctAnswers > 0 || wrongAnswers > 0;
 
   return (
-    <div className="space-y-4 relative">
+    <div className="space-y-4 relative" style={getCSSVariables}>
       {/* Fun Graphics Component - moved outside dialogs for visibility with higher z-index */}
       <div className="z-[9999]">
         {showAnimation && (
@@ -70,11 +75,16 @@ const SpellingPractice = () => {
           trigger={showConfetti} 
           particleCount={30}
           duration={2000}
-          colors={['#FFC700', '#FF0000', '#2E3191', '#41D3BD', '#FB5607']}
+          colors={[theme.primaryColor, theme.secondaryColor, theme.accentColor, '#FFC700', '#FF0000']}
         />
       </div>
       
-      <h1 className="text-3xl font-bold text-center text-orange-500">Procvičování vyjmenovaných slov</h1>
+      <h1 
+        className="text-3xl font-bold text-center"
+        style={{ color: theme.primaryColor }}
+      >
+        Procvičování vyjmenovaných slov {theme.avatar}
+      </h1>
 
       <GameControls 
         selectedGroupsCount={selectedGroups.length}

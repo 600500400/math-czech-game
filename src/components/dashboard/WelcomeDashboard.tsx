@@ -4,16 +4,19 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useStatistics } from "@/hooks/useStatistics";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useUserTheme } from "@/hooks/useUserTheme";
 import { Calculator, PenTool, Target, TrendingUp, Star, Trophy } from "lucide-react";
 
 interface WelcomeDashboardProps {
   onNavigateToTab?: (tab: "practice" | "statistics") => void;
+  onNavigateToPractice?: (defaultTab: "spelling" | "math") => void;
 }
 
-const WelcomeDashboard = ({ onNavigateToTab }: WelcomeDashboardProps) => {
+const WelcomeDashboard = ({ onNavigateToTab, onNavigateToPractice }: WelcomeDashboardProps) => {
   const { authState } = useAuth();
   const { mathStats, spellingStats } = useStatistics(authState.user?.id || null);
   const { t } = useLanguage();
+  const { theme, getCSSVariables } = useUserTheme(authState.user?.id);
 
   const userName = authState.profile?.username || t('user.user');
   
@@ -31,20 +34,28 @@ const WelcomeDashboard = ({ onNavigateToTab }: WelcomeDashboardProps) => {
   const progressToNextLevel = (totalCorrect % 50) / 50 * 100;
 
   const handleMathPractice = () => {
-    onNavigateToTab?.("practice");
+    if (onNavigateToPractice) {
+      onNavigateToPractice("math"); // Správně předám "math" záložku
+    } else {
+      onNavigateToTab?.("practice");
+    }
   };
 
   const handleSpellingPractice = () => {
-    onNavigateToTab?.("practice");
+    if (onNavigateToPractice) {
+      onNavigateToPractice("spelling");
+    } else {
+      onNavigateToTab?.("practice");
+    }
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto space-y-6 animate-fade-in">
-      {/* Welcome Section */}
+    <div className="w-full max-w-6xl mx-auto space-y-6 animate-fade-in" style={getCSSVariables}>
+      {/* Welcome Section s personalizovaným designem */}
       <div className="text-center space-y-4 py-8">
         <div className="relative inline-block">
           <h1 className="text-4xl md:text-5xl font-heading font-bold gradient-text">
-            {t('dashboard.welcomeBack')}, {userName}! 👋
+            {t('dashboard.welcomeBack')}, {userName}! {theme.avatar}
           </h1>
           <div className="absolute -top-2 -right-2">
             <Star className="w-8 h-8 text-yellow-400 animate-pulse" />
@@ -55,11 +66,11 @@ const WelcomeDashboard = ({ onNavigateToTab }: WelcomeDashboardProps) => {
         </p>
       </div>
 
-      {/* Quick Stats */}
+      {/* Quick Stats s personalizovanými barvami */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="glass border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
           <CardContent className="p-6 text-center">
-            <Trophy className="w-8 h-8 text-brand-500 mx-auto mb-2" />
+            <Trophy className="w-8 h-8 mx-auto mb-2" style={{ color: theme.primaryColor }} />
             <div className="text-2xl font-bold text-gray-900">{totalGames}</div>
             <div className="text-sm text-gray-600">{t('dashboard.totalGames')}</div>
           </CardContent>
@@ -67,7 +78,7 @@ const WelcomeDashboard = ({ onNavigateToTab }: WelcomeDashboardProps) => {
         
         <Card className="glass border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
           <CardContent className="p-6 text-center">
-            <Target className="w-8 h-8 text-success-500 mx-auto mb-2" />
+            <Target className="w-8 h-8 mx-auto mb-2" style={{ color: theme.accentColor }} />
             <div className="text-2xl font-bold text-gray-900">{successRate}%</div>
             <div className="text-sm text-gray-600">{t('dashboard.successRate')}</div>
           </CardContent>
@@ -75,7 +86,7 @@ const WelcomeDashboard = ({ onNavigateToTab }: WelcomeDashboardProps) => {
         
         <Card className="glass border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
           <CardContent className="p-6 text-center">
-            <TrendingUp className="w-8 h-8 text-brand-500 mx-auto mb-2" />
+            <TrendingUp className="w-8 h-8 mx-auto mb-2" style={{ color: theme.primaryColor }} />
             <div className="text-2xl font-bold text-gray-900">{totalCorrect}</div>
             <div className="text-sm text-gray-600">{t('dashboard.correctAnswers')}</div>
           </CardContent>
@@ -90,7 +101,7 @@ const WelcomeDashboard = ({ onNavigateToTab }: WelcomeDashboardProps) => {
         </Card>
       </div>
 
-      {/* Level Progress */}
+      {/* Level Progress s personalizovanými barvami */}
       <Card className="glass border-0 shadow-lg">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -106,8 +117,11 @@ const WelcomeDashboard = ({ onNavigateToTab }: WelcomeDashboardProps) => {
             </div>
             <div className="w-full bg-gray-200 rounded-full h-3">
               <div 
-                className="h-3 rounded-full bg-gradient-primary transition-all duration-500"
-                style={{ width: `${progressToNextLevel}%` }}
+                className="h-3 rounded-full transition-all duration-500"
+                style={{ 
+                  width: `${progressToNextLevel}%`,
+                  background: `linear-gradient(to right, ${theme.primaryColor}, ${theme.accentColor})`
+                }}
               />
             </div>
             <p className="text-sm text-gray-600 text-center">
@@ -117,17 +131,23 @@ const WelcomeDashboard = ({ onNavigateToTab }: WelcomeDashboardProps) => {
         </CardContent>
       </Card>
 
-      {/* Quick Actions */}
+      {/* Quick Actions s personalizovanými barvami */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="glass border-0 shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer"
               onClick={handleMathPractice}>
           <CardContent className="p-8 text-center space-y-4">
-            <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300">
+            <div 
+              className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300"
+              style={{ background: `linear-gradient(135deg, ${theme.primaryColor}, ${theme.accentColor})` }}
+            >
               <Calculator className="w-8 h-8 text-white" />
             </div>
             <h3 className="text-xl font-heading font-semibold">{t('dashboard.mathTitle')}</h3>
             <p className="text-gray-600">{t('dashboard.mathDescription')}</p>
-            <Button className="bg-gradient-primary hover:scale-105 transition-all duration-300 shadow-lg">
+            <Button 
+              className="hover:scale-105 transition-all duration-300 shadow-lg text-white"
+              style={{ background: `linear-gradient(135deg, ${theme.primaryColor}, ${theme.accentColor})` }}
+            >
               {t('dashboard.startPracticing')}
             </Button>
           </CardContent>
@@ -136,20 +156,29 @@ const WelcomeDashboard = ({ onNavigateToTab }: WelcomeDashboardProps) => {
         <Card className="glass border-0 shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer"
               onClick={handleSpellingPractice}>
           <CardContent className="p-8 text-center space-y-4">
-            <div className="w-16 h-16 bg-gradient-success rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300">
+            <div 
+              className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300"
+              style={{ background: `linear-gradient(135deg, ${theme.secondaryColor}, ${theme.primaryColor})` }}
+            >
               <PenTool className="w-8 h-8 text-white" />
             </div>
             <h3 className="text-xl font-heading font-semibold">{t('dashboard.spellingTitle')}</h3>
             <p className="text-gray-600">{t('dashboard.spellingDescription')}</p>
-            <Button className="bg-gradient-success hover:scale-105 transition-all duration-300 shadow-lg">
+            <Button 
+              className="hover:scale-105 transition-all duration-300 shadow-lg text-white"
+              style={{ background: `linear-gradient(135deg, ${theme.secondaryColor}, ${theme.primaryColor})` }}
+            >
               {t('dashboard.startPracticing')}
             </Button>
           </CardContent>
         </Card>
       </div>
 
-      {/* Motivational Quote */}
-      <Card className="glass border-0 shadow-lg bg-gradient-to-r from-brand-50 to-brand-100">
+      {/* Motivational Quote s personalizovaným pozadím */}
+      <Card 
+        className="glass border-0 shadow-lg"
+        style={{ background: `linear-gradient(135deg, ${theme.secondaryColor}33, ${theme.primaryColor}22)` }}
+      >
         <CardContent className="p-6 text-center">
           <div className="max-w-2xl mx-auto">
             <p className="text-lg italic text-gray-700 mb-2">

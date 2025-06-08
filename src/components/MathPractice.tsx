@@ -1,5 +1,7 @@
 
 import { useMathGame } from "@/hooks/math/useMathGame";
+import { useAuth } from "@/hooks/useAuth";
+import { useUserTheme } from "@/hooks/useUserTheme";
 import { ConfettiExplosion } from "@/components/ui/confetti-explosion";
 import { FunGraphics } from "./spelling/FunGraphics";
 import CustomGameControls from "./math/CustomGameControls";
@@ -10,6 +12,8 @@ import { useLanguage } from "@/hooks/useLanguage";
 
 const MathPractice = () => {
   const { t } = useLanguage();
+  const { authState } = useAuth();
+  const { theme, getCSSVariables } = useUserTheme(authState.user?.id);
   
   const {
     correctAnswers,
@@ -51,15 +55,18 @@ const MathPractice = () => {
   } = useMathGame();
 
   return (
-    <div className="space-y-4 relative">
+    <div className="space-y-4 relative" style={getCSSVariables}>
       {/* Fun Graphics & Confetti Components - moved above dialogs for visibility */}
       {showAnimation && (
         <FunGraphics isCorrect={lastAnswerCorrect} showAnimation={showAnimation} />
       )}
       {showConfetti && <ConfettiExplosion particleCount={30} />}
       
-      <h1 className="text-3xl font-bold text-center text-orange-500">
-        {t('practice.practiceMath')}
+      <h1 
+        className="text-3xl font-bold text-center"
+        style={{ color: theme.primaryColor }}
+      >
+        {t('practice.practiceMath')} {theme.avatar}
       </h1>
       
       {/* Custom Game Controls without counters */}
