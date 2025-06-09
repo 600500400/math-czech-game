@@ -25,6 +25,7 @@ const ParentDashboard = () => {
     childSpellingTotal,
     mathAccuracy,
     spellingAccuracy,
+    allChildrenStats, // Now properly contains all children's stats
     loading
   } = useParentDashboard(userId);
 
@@ -36,23 +37,6 @@ const ParentDashboard = () => {
       navigate("/");
     }
   }, [authState.profile, navigate]);
-
-  // Load stats for all children for comparison
-  const allChildrenStats = children.reduce((acc, child) => {
-    if (child.id === selectedChild) {
-      acc[child.id] = {
-        mathStats: childMathStats,
-        spellingStats: childSpellingStats
-      };
-    } else {
-      // For now, use empty data for other children
-      acc[child.id] = {
-        mathStats: [],
-        spellingStats: []
-      };
-    }
-    return acc;
-  }, {} as { [childId: string]: { mathStats: any[], spellingStats: any[] } });
 
   const filteredMathStats = getFilteredStats(childMathStats, 'math');
   const filteredSpellingStats = getFilteredStats(childSpellingStats, 'spelling');
@@ -110,7 +94,7 @@ const ParentDashboard = () => {
               spellingAccuracy={spellingAccuracy}
               filteredMathStats={filteredMathStats}
               filteredSpellingStats={filteredSpellingStats}
-              allChildrenStats={allChildrenStats}
+              allChildrenStats={allChildrenStats} // Now properly populated
               filters={filters}
               onFilterChange={setFilters}
             />

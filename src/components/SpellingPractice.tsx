@@ -60,6 +60,12 @@ const SpellingPractice = () => {
 
   const hasStats = correctAnswers > 0 || wrongAnswers > 0;
 
+  // Custom end game handler that doesn't show stats dialog automatically
+  const handleEndGame = () => {
+    endGame();
+    // Remove automatic stats dialog display - user can still access it via button
+  };
+
   return (
     <div className="space-y-4 relative" style={getCSSVariables}>
       {/* Fun Graphics Component - moved outside dialogs for visibility with higher z-index */}
@@ -110,7 +116,7 @@ const SpellingPractice = () => {
       <WordProblemDialog
         open={showProblem}
         onOpenChange={(open) => {
-          if (!open) endGame();
+          if (!open) handleEndGame(); // Use custom handler
         }}
         displayedWord={displayedWord}
         currentWord={currentWord}
@@ -121,12 +127,12 @@ const SpellingPractice = () => {
         currentPosition={currentPosition}
         onAnswerI={handleAnswerI}
         onAnswerY={handleAnswerY}
-        onEndGame={endGame}
+        onEndGame={handleEndGame} // Use custom handler
         correctAnswers={correctAnswers}
         wrongAnswers={wrongAnswers}
       />
       
-      {/* Statistics Dialog with answers */}
+      {/* Statistics Dialog with answers - only shown when manually requested */}
       <StatisticsDialog 
         open={showStatsDialog}
         onOpenChange={setShowStatsDialog}

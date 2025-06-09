@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -11,7 +10,7 @@ import { toast } from "sonner";
 const USER_IDENTITIES = [
   {
     id: 'gabi',
-    name: 'Gabi',
+    name: 'Gábi',
     role: 'child' as const,
     avatar: '👧',
     color: 'bg-pink-100 hover:bg-pink-200 border-pink-300',

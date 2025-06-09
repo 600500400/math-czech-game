@@ -13,8 +13,8 @@ interface StatTotals {
 const CHILDREN_PROFILES: UserProfile[] = [
   {
     id: 'gabi',
-    username: 'Gabi',
-    full_name: 'Gabi',
+    username: 'Gábi',
+    full_name: 'Gábi',
     role: 'child',
     created_at: new Date().toISOString()
   },
@@ -44,13 +44,43 @@ const CHILDREN_PROFILES: UserProfile[] = [
 export function useParentDashboard(userId: string | undefined) {
   const [children] = useState<UserProfile[]>(CHILDREN_PROFILES);
   const [selectedChild, setSelectedChild] = useState<string | null>('gabi');
+  const [allChildrenStats, setAllChildrenStats] = useState<{ [childId: string]: { mathStats: any[], spellingStats: any[] } }>({});
   
-  // Použití centralizovaného hook pro statistiky s databází
+  // Použití centralizovaného hook pro statistiky s databází pro vybrané dítě
   const { 
     mathStats, 
     spellingStats, 
     isLoading: statsLoading 
   } = useStatistics(selectedChild);
+  
+  // Hook for each child to get their individual stats
+  const gabiStats = useStatistics('gabi');
+  const misaStats = useStatistics('misa');
+  const adaStats = useStatistics('ada');
+  const hostStats = useStatistics('host');
+  
+  // Update all children stats when individual stats change
+  useEffect(() => {
+    const updatedStats = {
+      'gabi': {
+        mathStats: gabiStats.mathStats,
+        spellingStats: gabiStats.spellingStats
+      },
+      'misa': {
+        mathStats: misaStats.mathStats,
+        spellingStats: misaStats.spellingStats
+      },
+      'ada': {
+        mathStats: adaStats.mathStats,
+        spellingStats: adaStats.spellingStats
+      },
+      'host': {
+        mathStats: hostStats.mathStats,
+        spellingStats: hostStats.spellingStats
+      }
+    };
+    setAllChildrenStats(updatedStats);
+  }, [gabiStats.mathStats, gabiStats.spellingStats, misaStats.mathStats, misaStats.spellingStats, adaStats.mathStats, adaStats.spellingStats, hostStats.mathStats, hostStats.spellingStats]);
   
   // Calculate summary statistics for selected child z databázových dat
   const childMathTotal = mathStats.reduce(
@@ -91,6 +121,7 @@ export function useParentDashboard(userId: string | undefined) {
     childSpellingTotal,
     mathAccuracy,
     spellingAccuracy,
+    allChildrenStats, // Now properly populated with all children's stats
     loading: statsLoading
   };
 }

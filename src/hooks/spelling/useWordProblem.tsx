@@ -1,5 +1,5 @@
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { SpellingAnswer } from "@/types/spellingTypes";
 import { getWordsFromGroups, createDisplayedWord } from "@/utils/spellingUtils";
 
@@ -31,21 +31,24 @@ export const useWordProblem = ({
   const [currentPosition, setCurrentPosition] = useState(0);
 
   const generateNewWord = useCallback(() => {
-    console.log("Generuji nové slovo...");
+    console.log("🎯 generateNewWord: Generuji nové slovo pro skupiny:", selectedGroups);
+    
     if (selectedGroups.length === 0) {
-      console.warn("Žádné skupiny nevybrány");
+      console.warn("⚠️ generateNewWord: Žádné skupiny nevybrány");
       return;
     }
 
     try {
       const allWords = getWordsFromGroups(selectedGroups);
+      console.log("📚 generateNewWord: Dostupná slova:", allWords.length);
+      
       if (allWords.length === 0) {
-        console.warn("Žádná slova k dispozici");
+        console.warn("⚠️ generateNewWord: Žádná slova k dispozici");
         return;
       }
 
       const randomWord = allWords[Math.floor(Math.random() * allWords.length)];
-      console.log("Vybrané slovo:", randomWord);
+      console.log("🎲 generateNewWord: Vybrané slovo:", randomWord);
       
       setCurrentWord(randomWord.word);
       setWordGroup(randomWord.group);
@@ -57,20 +60,30 @@ export const useWordProblem = ({
       setCorrectLetters(letters);
       setCurrentPosition(0);
       
-      console.log("Nové slovo nastaveno:", {
+      console.log("✅ generateNewWord: Nové slovo úspěšně nastaveno:", {
         word: randomWord.word,
         displayWord,
         positions,
         letters
       });
     } catch (error) {
-      console.error("Chyba při generování nového slova:", error);
+      console.error("❌ generateNewWord: Chyba při generování nového slova:", error);
     }
   }, [selectedGroups]);
 
+  // Generate initial word when groups are selected
+  useEffect(() => {
+    if (selectedGroups.length > 0 && !currentWord) {
+      console.log("🚀 useWordProblem: Generuji první slovo pro vybrané skupiny");
+      generateNewWord();
+    }
+  }, [selectedGroups, currentWord, generateNewWord]);
+
   const handleAnswer = useCallback((letter: "i" | "y") => {
+    console.log("🎯 handleAnswer: Zpracovávám odpověď:", letter);
+    
     if (currentPosition >= missingPositions.length) {
-      console.warn("Všechny pozice již vyplněny");
+      console.warn("⚠️ handleAnswer: Všechny pozice již vyplněny");
       return;
     }
 
@@ -78,7 +91,12 @@ export const useWordProblem = ({
     const correctAnswer = correctLetters[currentPosition];
     const isCorrect = letter === correctAnswer;
 
-    console.log("Odpověď:", letter, "správná:", correctAnswer, "pozice:", position, "správně:", isCorrect);
+    console.log("🔍 handleAnswer: Kontrola odpovědi:", {
+      userAnswer: letter,
+      correctAnswer,
+      position,
+      isCorrect
+    });
 
     // Zaznamenat odpověď
     const answer: SpellingAnswer = {
@@ -114,13 +132,14 @@ export const useWordProblem = ({
     
     if (nextPosition >= missingPositions.length) {
       // Hotovo s tímto slovem - generovat nové
+      console.log("🎯 handleAnswer: Slovo dokončeno, generuji nové za 1.5s");
       setTimeout(() => {
         generateNewWord();
       }, 1500);
     } else {
       // Pokračovat na další pozici ve stejném slově
       setCurrentPosition(nextPosition);
-      console.log("Pokračuji na pozici:", nextPosition);
+      console.log("➡️ handleAnswer: Pokračuji na pozici:", nextPosition);
     }
   }, [
     currentPosition,

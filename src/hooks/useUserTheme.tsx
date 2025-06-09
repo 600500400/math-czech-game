@@ -1,4 +1,3 @@
-
 import { useMemo } from "react";
 
 export interface UserTheme {
@@ -16,7 +15,7 @@ export interface UserTheme {
 const USER_THEMES: Record<string, UserTheme> = {
   gabi: {
     id: 'gabi',
-    name: 'Gabi',
+    name: 'Gábi',
     avatar: '👧',
     primaryColor: 'rgb(236, 72, 153)', // pink-500
     secondaryColor: 'rgb(251, 207, 232)', // pink-200
