@@ -54,10 +54,9 @@ export const useGameControls = ({
     resetGameTimer();
     startGameTimer();
     
-    const problem = generateNewProblem();
-    if (problem) {
-      setShowProblem(true);
-    }
+    // Generate new problem and start the game
+    generateNewProblem();
+    setShowProblem(true);
   }, [
     selectedGroups, 
     generateNewProblem, 
@@ -70,11 +69,11 @@ export const useGameControls = ({
     resetGameTimer
   ]);
 
-  // End game handler
+  // End game handler - without automatic stats dialog display
   const endGame = useCallback(() => {
     const gameDuration = getGameDuration();
     setShowProblem(false);
-    setShowStatsDialog(true);
+    // Remove automatic stats dialog display - user can access it via button
     
     // Save statistics if user is logged in and there are some results
     if (userId && saveSpellingStatistics && (correctAnswers > 0 || wrongAnswers > 0)) {
@@ -141,7 +140,6 @@ export const useGameControls = ({
   }, [
     correctAnswers, 
     wrongAnswers, 
-    setShowStatsDialog, 
     selectedGroups, 
     saveSpellingStatistics, 
     userId,

@@ -41,13 +41,14 @@ export const WordProblemDialog = ({
   
   const handleEndGame = () => {
     onEndGame();
+    onOpenChange(false);
   };
 
   const totalAnswers = correctAnswers + wrongAnswers;
   const correctPercentage = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 0;
   
   return (
-    <Dialog open={open} onOpenChange={(open) => !open && onEndGame()}>
+    <Dialog open={open} onOpenChange={(open) => !open && handleEndGame()}>
       <DialogContent className="z-[8000] bg-gradient-to-b from-blue-50 to-white border-2 border-blue-200 rounded-xl shadow-xl">
         <DialogHeader>
           <DialogTitle className="text-center text-xl font-bold text-blue-600 flex items-center justify-center gap-2">
