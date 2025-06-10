@@ -1,53 +1,56 @@
 
 import { Button } from "@/components/ui/button";
-import { Settings, Play } from "lucide-react";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { Settings, Target } from "lucide-react";
 
 interface CustomGameControlsProps {
-  problemCount: number;
-  correctAnswers: number;
-  wrongAnswers: number;
-  totalAnswers: number;
-  correctPercentage: number;
-  difficultySet: boolean;
-  gameEnded: boolean;
-  onSetDifficulty: () => void;
+  onShowDifficultyDialog: () => void;
   onStartGame: () => void;
-  onResetGame: () => void;
+  onShowDetailedErrors: () => void;
+  hasDetailedErrors: boolean;
+  difficultySettings: any;
 }
 
-const CustomGameControls = ({
-  difficultySet,
-  gameEnded,
-  onSetDifficulty,
+export const CustomGameControls = ({
+  onShowDifficultyDialog,
   onStartGame,
-  onResetGame
+  onShowDetailedErrors,
+  hasDetailedErrors,
+  difficultySettings
 }: CustomGameControlsProps) => {
-  const isMobile = useIsMobile();
+  const hasValidSettings = difficultySettings && 
+    Object.values(difficultySettings.operations).some((enabled: any) => enabled);
 
   return (
-    <div className="flex flex-col gap-4">
-      {/* Primary Action Button */}
+    <div className="space-y-2">
+      {/* Primary action button - more prominent */}
       <Button 
         onClick={onStartGame} 
-        className={`bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-lg touch-manipulation ${isMobile ? 'h-16' : 'h-14'}`}
-        disabled={!difficultySet}
+        className="w-full bg-orange-500 hover:bg-orange-600 text-lg py-6" 
+        disabled={!hasValidSettings}
       >
-        <Play className="mr-2 h-5 w-5" /> 
         Spustit hru
       </Button>
+      
+      {/* Secondary actions - less prominent */}
+      <div className="flex gap-2">
+        <Button 
+          onClick={onShowDifficultyDialog} 
+          variant="outline"
+          className="flex-1 border-orange-300 text-orange-600 hover:bg-orange-50 py-2"
+        >
+          <Settings size={16} className="mr-2" /> Nastavení obtížnosti
+        </Button>
         
-      {/* Secondary Actions */}
-      <Button
-        variant="outline"
-        className={`text-orange-500 border-orange-500 hover:bg-orange-50 active:bg-orange-100 touch-manipulation ${isMobile ? 'h-12' : ''}`}
-        onClick={onSetDifficulty}
-      >
-        <Settings className="mr-2 h-5 w-5" />
-        Nastavit obtížnost
-      </Button>
+        {hasDetailedErrors && (
+          <Button 
+            onClick={onShowDetailedErrors} 
+            variant="outline"
+            className="flex-1 border-orange-300 text-orange-600 hover:bg-orange-50 py-2"
+          >
+            <Target size={16} className="mr-2" /> Detailní chyby
+          </Button>
+        )}
+      </div>
     </div>
   );
 };
-
-export default CustomGameControls;

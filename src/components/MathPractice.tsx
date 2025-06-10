@@ -1,128 +1,123 @@
 
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CustomGameControls } from "./math/CustomGameControls";
+import { DifficultyDialog } from "./math/DifficultyDialog";
+import { ProblemDialog } from "./math/ProblemDialog";
+import { DetailedErrorsDialog } from "./math/DetailedErrorsDialog";
+import { FunGraphics } from "./spelling/FunGraphics";
 import { useMathGame } from "@/hooks/math/useMathGame";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserTheme } from "@/hooks/useUserTheme";
 import { ConfettiExplosion } from "@/components/ui/confetti-explosion";
-import { FunGraphics } from "./spelling/FunGraphics";
-import CustomGameControls from "./math/CustomGameControls";
-import DifficultyDialog from "./math/DifficultyDialog";
-import ProblemDialog from "./math/ProblemDialog";
-import StatisticsDialog from "./math/StatisticsDialog";
-import { useLanguage } from "@/hooks/useLanguage";
 
 const MathPractice = () => {
-  const { t } = useLanguage();
   const { authState } = useAuth();
   const { theme, getCSSVariables } = useUserTheme(authState.user?.id);
   
   const {
-    correctAnswers,
-    wrongAnswers,
-    problemCount,
     currentProblem,
     userAnswer,
+    correctAnswers,
+    wrongAnswers,
+    totalProblems,
     showProblem,
     showDifficultyDialog,
-    showStatsDialog,
-    maxValue,
-    maxMultiplyValue,
-    maxDivideValue,
-    difficultySet,
-    gameEnded,
-    lastAnswerCorrect,
+    showDetailedErrors,
+    isAnswerCorrect,
     showAnimation,
-    showConfetti,
-    totalAnswers,
-    correctPercentage,
-    allowedOperations,
+    lastAnswerCorrect,
     answers,
+    difficultySettings,
+    errorsByOperation,
     
     setUserAnswer,
     setShowDifficultyDialog,
-    setShowStatsDialog,
-    setMaxValue,
-    setMaxMultiplyValue,
-    setMaxDivideValue,
-    setAllowedOperations,
-    
-    setDifficulty,
-    toggleOperation,
-    startNewGame,
-    checkAnswer,
-    endGame,
-    resetGame,
-    handleKeyPress,
+    setShowDetailedErrors,
+    handleAnswerSubmit,
+    handleStartGame,
+    handleEndGame,
+    updateDifficultySettings
   } = useMathGame();
+
+  const [showConfetti, setShowConfetti] = useState(false);
+  
+  // Trigger confetti when correct answer is given
+  useEffect(() => {
+    if (lastAnswerCorrect === true && showAnimation) {
+      setShowConfetti(true);
+      const timer = setTimeout(() => setShowConfetti(false), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [lastAnswerCorrect, showAnimation]);
+
+  const totalAnswers = correctAnswers + wrongAnswers;
+  const correctPercentage = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 0;
 
   return (
     <div className="space-y-4 relative" style={getCSSVariables}>
-      {/* Fun Graphics & Confetti Components - moved above dialogs for visibility */}
-      {showAnimation && (
-        <FunGraphics isCorrect={lastAnswerCorrect} showAnimation={showAnimation} />
-      )}
-      {showConfetti && <ConfettiExplosion particleCount={30} />}
+      {/* Fun Graphics Component - moved outside dialogs for visibility with higher z-index */}
+      <div className="z-[9999]">
+        {showAnimation && (
+          <FunGraphics isCorrect={lastAnswerCorrect} showAnimation={showAnimation} />
+        )}
+      </div>
+      
+      {/* Confetti effect when answers are correct - with high z-index */}
+      <div className="z-[9999] relative">
+        <ConfettiExplosion 
+          trigger={showConfetti} 
+          particleCount={30}
+          duration={2000}
+          colors={[theme.primaryColor, theme.secondaryColor, theme.accentColor, '#FFC700', '#FF0000']}
+        />
+      </div>
       
       <h1 
         className="text-3xl font-bold text-center"
         style={{ color: theme.primaryColor }}
       >
-        {t('practice.practiceMath')} {theme.avatar}
+        Procvičování matematiky {theme.avatar}
       </h1>
-      
-      {/* Custom Game Controls without counters */}
+
       <CustomGameControls 
-        problemCount={problemCount}
-        correctAnswers={correctAnswers}
-        wrongAnswers={wrongAnswers}
-        totalAnswers={totalAnswers}
-        correctPercentage={correctPercentage}
-        difficultySet={difficultySet}
-        gameEnded={gameEnded}
-        onSetDifficulty={() => setShowDifficultyDialog(true)}
-        onStartGame={startNewGame}
-        onResetGame={resetGame}
+        onShowDifficultyDialog={() => setShowDifficultyDialog(true)}
+        onStartGame={handleStartGame}
+        onShowDetailedErrors={() => setShowDetailedErrors(true)}
+        hasDetailedErrors={answers.length > 0}
+        difficultySettings={difficultySettings}
       />
 
-      {/* Difficulty Dialog */}
-      <DifficultyDialog 
+      {/* Difficulty Settings Dialog */}
+      <DifficultyDialog
         open={showDifficultyDialog}
         onOpenChange={setShowDifficultyDialog}
-        maxValue={maxValue}
-        maxMultiplyValue={maxMultiplyValue}
-        maxDivideValue={maxDivideValue}
-        setMaxValue={setMaxValue}
-        setMaxMultiplyValue={setMaxMultiplyValue}
-        setMaxDivideValue={setMaxDivideValue}
-        allowedOperations={allowedOperations}
-        toggleOperation={toggleOperation}
-        setDifficulty={setDifficulty}
+        difficultySettings={difficultySettings}
+        onSave={updateDifficultySettings}
       />
 
-      {/* Problem Dialog */}
-      <ProblemDialog 
+      {/* Math Problem Dialog */}
+      <ProblemDialog
         open={showProblem}
-        onOpenChange={(open) => !open && endGame()}
-        currentProblem={currentProblem}
+        onOpenChange={(open) => {
+          if (!open) handleEndGame();
+        }}
+        problem={currentProblem}
         userAnswer={userAnswer}
         setUserAnswer={setUserAnswer}
-        handleKeyPress={handleKeyPress}
-        checkAnswer={checkAnswer}
-        endGame={endGame}
+        onSubmit={handleAnswerSubmit}
+        onEndGame={handleEndGame}
         correctAnswers={correctAnswers}
         wrongAnswers={wrongAnswers}
-        totalAnswers={totalAnswers}
-        correctPercentage={correctPercentage}
+        isAnswerCorrect={isAnswerCorrect}
       />
-
-      {/* Statistics Dialog with answers */}
-      <StatisticsDialog 
-        open={showStatsDialog}
-        onOpenChange={setShowStatsDialog}
-        correctAnswers={correctAnswers}
-        wrongAnswers={wrongAnswers}
-        totalAnswers={totalAnswers}
-        correctPercentage={correctPercentage}
+      
+      {/* Detailed Errors Dialog */}
+      <DetailedErrorsDialog 
+        open={showDetailedErrors}
+        onOpenChange={setShowDetailedErrors}
         answers={answers}
+        errorsByOperation={errorsByOperation}
       />
     </div>
   );
