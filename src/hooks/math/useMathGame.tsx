@@ -25,30 +25,6 @@ export const useMathGame = () => {
     maxDivideValue: gameState.maxDivideValue,
   });
   
-  // Enhanced addAnswer function
-  const enhancedAddAnswer = useCallback((answer: any) => {
-    gameState.addAnswer(answer);
-    addMathAnswer(answer);
-  }, [gameState.addAnswer, addMathAnswer]);
-  
-  const answerHandler = useAnswerHandler({
-    currentProblem: gameState.currentProblem,
-    userAnswer: gameState.userAnswer,
-    correctAnswers: gameState.correctAnswers,
-    wrongAnswers: gameState.wrongAnswers,
-    problemCount: gameState.problemCount,
-    generateProblem: problemGenerator.generateProblem,
-    setCorrectAnswers: gameState.setCorrectAnswers,
-    setWrongAnswers: gameState.setWrongAnswers,
-    setLastAnswerCorrect: gameState.setLastAnswerCorrect,
-    setShowAnimation: gameState.setShowAnimation,
-    setShowConfetti: gameState.setShowConfetti,
-    setUserAnswer: gameState.setUserAnswer,
-    setCurrentProblem: gameState.setCurrentProblem,
-    addAnswer: enhancedAddAnswer,
-    endGame: () => {} // Will be set by gameFlow
-  });
-  
   const gameFlow = useGameFlow({
     allowedOperations: gameState.allowedOperations,
     maxValue: gameState.maxValue,
@@ -59,6 +35,31 @@ export const useMathGame = () => {
     generateProblem: problemGenerator.generateProblem,
     setCurrentProblem: gameState.setCurrentProblem,
     resetUserAnswer: () => gameState.setUserAnswer(""),
+  });
+
+  // Enhanced addAnswer function that saves detailed answers
+  const enhancedAddAnswer = useCallback((answer: any) => {
+    console.log("🔍 useMathGame: Ukládám detailní odpověď:", answer);
+    gameState.addAnswer(answer);
+    addMathAnswer(answer);
+  }, [gameState.addAnswer, addMathAnswer]);
+  
+  const answerHandler = useAnswerHandler({
+    currentProblem: gameState.currentProblem,
+    userAnswer: gameState.userAnswer,
+    correctAnswers: gameState.correctAnswers,
+    wrongAnswers: gameState.wrongAnswers,
+    problemCount: gameFlow.problemCount,
+    generateProblem: problemGenerator.generateProblem,
+    setCorrectAnswers: gameState.setCorrectAnswers,
+    setWrongAnswers: gameState.setWrongAnswers,
+    setLastAnswerCorrect: gameState.setLastAnswerCorrect,
+    setShowAnimation: gameState.setShowAnimation,
+    setShowConfetti: gameState.setShowConfetti,
+    setUserAnswer: gameState.setUserAnswer,
+    setCurrentProblem: gameState.setCurrentProblem,
+    addAnswer: enhancedAddAnswer, // Using enhanced function
+    endGame: gameFlow.endGame
   });
 
   // Helper functions for the component
@@ -72,16 +73,35 @@ export const useMathGame = () => {
       gameState.maxMultiplyValue,
       gameState.maxDivideValue,
       gameState.allowedOperations,
-      gameState.setDifficultySet
+      gameFlow.setDifficultySet
     );
-  }, [difficultySettings, gameState]);
+  }, [difficultySettings, gameState, gameFlow.setDifficultySet]);
 
   return {
-    // Game state properties
-    ...gameState,
+    // Game state properties from gameState
+    currentProblem: gameState.currentProblem,
+    userAnswer: gameState.userAnswer,
+    correctAnswers: gameState.correctAnswers,
+    wrongAnswers: gameState.wrongAnswers,
+    lastAnswerCorrect: gameState.lastAnswerCorrect,
+    showAnimation: gameState.showAnimation,
+    answers: gameState.answers,
+    maxValue: gameState.maxValue,
+    maxMultiplyValue: gameState.maxMultiplyValue,
+    maxDivideValue: gameState.maxDivideValue,
+    allowedOperations: gameState.allowedOperations,
+    
+    // Game flow properties from gameFlow (these override gameState where needed)
+    showProblem: gameFlow.showProblem,
+    showDifficultyDialog: gameFlow.showDifficultyDialog,
+    difficultySet: gameFlow.difficultySet,
+    
+    // State setters
+    setUserAnswer: gameState.setUserAnswer,
+    setShowDifficultyDialog: gameFlow.setShowDifficultyDialog,
     
     // Problem generator
-    ...problemGenerator,
+    generateProblem: problemGenerator.generateProblem,
     
     // Answer handler methods
     checkAnswer: answerHandler.checkAnswer,

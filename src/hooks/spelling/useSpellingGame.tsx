@@ -29,6 +29,7 @@ export const useSpellingGame = () => {
   
   // Enhanced addAnswer function that saves to both game stats and detailed answers
   const enhancedAddAnswer = useCallback((answer: any) => {
+    console.log("🔍 useSpellingGame: Ukládám detailní odpověď:", answer);
     gameStats.addAnswer(answer);
     addSpellingAnswer(answer);
   }, [gameStats.addAnswer, addSpellingAnswer]);
@@ -41,7 +42,7 @@ export const useSpellingGame = () => {
     showAnimation: animation.showAnimation,
     setLastAnswerCorrect: animation.setLastAnswerCorrect,
     setShowAnimation: animation.setShowAnimation,
-    addAnswer: enhancedAddAnswer
+    addAnswer: enhancedAddAnswer // Using enhanced function
   });
 
   // Game controls with all necessary dependencies

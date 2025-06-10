@@ -29,6 +29,13 @@ const StatisticsViewer = () => {
   const { mathAnswers, spellingAnswers, clearAllAnswers } = useDetailedAnswers(currentUserId);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   
+  console.log("📊 StatisticsViewer: Předávám detailní odpovědi:", {
+    mathAnswersCount: mathAnswers.length,
+    spellingAnswersCount: spellingAnswers.length,
+    mathStatsCount: mathStats?.length || 0,
+    spellingStatsCount: spellingStats?.length || 0
+  });
+  
   if (!authState.isAuthenticated) {
     return <UnauthenticatedState />;
   }
