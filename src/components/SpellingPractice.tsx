@@ -58,8 +58,6 @@ const SpellingPractice = () => {
     }
   }, [lastAnswerCorrect, showAnimation]);
 
-  const hasStats = correctAnswers > 0 || wrongAnswers > 0;
-
   // Custom end game handler that doesn't show stats dialog automatically
   const handleEndGame = () => {
     endGame();
@@ -94,10 +92,8 @@ const SpellingPractice = () => {
 
       <GameControls 
         selectedGroupsCount={selectedGroups.length}
-        hasStats={hasStats}
         onShowGroupDialog={() => setShowGroupDialog(true)}
         onStartGame={startNewGame}
-        onShowStats={() => setShowStatsDialog(true)}
       />
 
       {/* Group Selection Dialog */}

@@ -4,18 +4,14 @@ import { Settings } from "lucide-react";
 
 interface GameControlsProps {
   selectedGroupsCount: number;
-  hasStats: boolean;
   onShowGroupDialog: () => void;
   onStartGame: () => void;
-  onShowStats: () => void;
 }
 
 export const GameControls = ({
   selectedGroupsCount,
-  hasStats,
   onShowGroupDialog,
-  onStartGame,
-  onShowStats
+  onStartGame
 }: GameControlsProps) => {
   return (
     <div className="space-y-2">
@@ -36,15 +32,6 @@ export const GameControls = ({
       >
         <Settings size={16} className="mr-2" /> Vybrat skupiny slov
       </Button>
-      
-      {hasStats && (
-        <Button 
-          onClick={onShowStats} 
-          className="w-full bg-blue-500 hover:bg-blue-600"
-        >
-          Zobrazit statistiky
-        </Button>
-      )}
     </div>
   );
 };
