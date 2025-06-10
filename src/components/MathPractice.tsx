@@ -2,9 +2,9 @@
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CustomGameControls } from "./math/CustomGameControls";
-import { DifficultyDialog } from "./math/DifficultyDialog";
-import { ProblemDialog } from "./math/ProblemDialog";
-import { DetailedErrorsDialog } from "./math/DetailedErrorsDialog";
+import DifficultyDialog from "./math/DifficultyDialog";
+import ProblemDialog from "./math/ProblemDialog";
+import DetailedErrorsDialog from "./math/DetailedErrorsDialog";
 import { FunGraphics } from "./spelling/FunGraphics";
 import { useMathGame } from "@/hooks/math/useMathGame";
 import { useAuth } from "@/hooks/useAuth";
@@ -20,27 +20,29 @@ const MathPractice = () => {
     userAnswer,
     correctAnswers,
     wrongAnswers,
-    totalProblems,
     showProblem,
     showDifficultyDialog,
-    showDetailedErrors,
-    isAnswerCorrect,
-    showAnimation,
     lastAnswerCorrect,
+    showAnimation,
     answers,
-    difficultySettings,
-    errorsByOperation,
+    maxValue,
+    maxMultiplyValue,
+    maxDivideValue,
+    allowedOperations,
+    difficultySet,
     
     setUserAnswer,
     setShowDifficultyDialog,
-    setShowDetailedErrors,
-    handleAnswerSubmit,
-    handleStartGame,
-    handleEndGame,
-    updateDifficultySettings
+    checkAnswer,
+    handleKeyPress,
+    startNewGame,
+    endGame,
+    toggleOperation,
+    setDifficulty,
   } = useMathGame();
 
   const [showConfetti, setShowConfetti] = useState(false);
+  const [showDetailedErrors, setShowDetailedErrors] = useState(false);
   
   // Trigger confetti when correct answer is given
   useEffect(() => {
@@ -53,6 +55,19 @@ const MathPractice = () => {
 
   const totalAnswers = correctAnswers + wrongAnswers;
   const correctPercentage = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 0;
+
+  // Create difficulty settings object for compatibility
+  const difficultySettings = {
+    operations: {
+      "+": allowedOperations.includes("+"),
+      "-": allowedOperations.includes("-"),
+      "*": allowedOperations.includes("*"),
+      "/": allowedOperations.includes("/")
+    },
+    maxValue,
+    maxMultiplyValue,
+    maxDivideValue
+  };
 
   return (
     <div className="space-y-4 relative" style={getCSSVariables}>
@@ -82,7 +97,7 @@ const MathPractice = () => {
 
       <CustomGameControls 
         onShowDifficultyDialog={() => setShowDifficultyDialog(true)}
-        onStartGame={handleStartGame}
+        onStartGame={startNewGame}
         onShowDetailedErrors={() => setShowDetailedErrors(true)}
         hasDetailedErrors={answers.length > 0}
         difficultySettings={difficultySettings}
@@ -92,24 +107,33 @@ const MathPractice = () => {
       <DifficultyDialog
         open={showDifficultyDialog}
         onOpenChange={setShowDifficultyDialog}
-        difficultySettings={difficultySettings}
-        onSave={updateDifficultySettings}
+        maxValue={maxValue}
+        maxMultiplyValue={maxMultiplyValue}
+        maxDivideValue={maxDivideValue}
+        setMaxValue={() => {}} // These will be handled by the dialog internally
+        setMaxMultiplyValue={() => {}}
+        setMaxDivideValue={() => {}}
+        allowedOperations={allowedOperations}
+        toggleOperation={toggleOperation}
+        setDifficulty={setDifficulty}
       />
 
       {/* Math Problem Dialog */}
       <ProblemDialog
         open={showProblem}
         onOpenChange={(open) => {
-          if (!open) handleEndGame();
+          if (!open) endGame();
         }}
-        problem={currentProblem}
+        currentProblem={currentProblem}
         userAnswer={userAnswer}
         setUserAnswer={setUserAnswer}
-        onSubmit={handleAnswerSubmit}
-        onEndGame={handleEndGame}
+        handleKeyPress={handleKeyPress}
+        checkAnswer={checkAnswer}
+        endGame={endGame}
         correctAnswers={correctAnswers}
         wrongAnswers={wrongAnswers}
-        isAnswerCorrect={isAnswerCorrect}
+        totalAnswers={totalAnswers}
+        correctPercentage={correctPercentage}
       />
       
       {/* Detailed Errors Dialog */}
@@ -117,7 +141,6 @@ const MathPractice = () => {
         open={showDetailedErrors}
         onOpenChange={setShowDetailedErrors}
         answers={answers}
-        errorsByOperation={errorsByOperation}
       />
     </div>
   );

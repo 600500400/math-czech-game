@@ -77,15 +77,23 @@ export const useMathGame = () => {
   }, [difficultySettings, gameState]);
 
   return {
+    // Game state properties
     ...gameState,
-    ...problemGenerator,
-    ...answerHandler,
-    ...gameFlow,
     
-    toggleOperation,
-    setDifficulty,
+    // Problem generator
+    ...problemGenerator,
+    
+    // Answer handler methods
+    checkAnswer: answerHandler.checkAnswer,
+    handleKeyPress: answerHandler.handleKeyPress,
+    
+    // Game flow methods
     startNewGame: gameFlow.startNewGame,
     endGame: gameFlow.endGame,
     resetGame: gameFlow.resetGame,
+    
+    // Difficulty management
+    toggleOperation,
+    setDifficulty,
   };
 };
