@@ -1,7 +1,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { SpellingAnswer } from "@/types/spellingTypes";
-import { getWordsFromGroups, createDisplayedWord } from "@/utils/spellingUtils";
+import { getWordsFromGroups, createDisplayedWord, checkSpellingAnswer } from "@/utils/spellingUtils";
 
 interface UseWordProblemProps {
   selectedGroups: string[];
@@ -89,7 +89,9 @@ export const useWordProblem = ({
 
     const position = missingPositions[currentPosition];
     const correctAnswer = correctLetters[currentPosition];
-    const isCorrect = letter === correctAnswer;
+    
+    // Use the checkSpellingAnswer function for proper comparison
+    const isCorrect = checkSpellingAnswer(correctAnswer, letter);
 
     console.log("🔍 handleAnswer: Kontrola odpovědi:", {
       userAnswer: letter,

@@ -1,4 +1,6 @@
 
+import { removeDiacritics } from "@/lib/utils";
+
 // Helper function to create displayed word with missing letters
 export function createDisplayedWord(word: string) {
   console.log("🔤 createDisplayedWord: Zpracovávám slovo:", word);
@@ -11,7 +13,9 @@ export function createDisplayedWord(word: string) {
     const char = word[i].toLowerCase();
     if (char === 'i' || char === 'y' || char === 'í' || char === 'ý') {
       positions.push(i);
-      letters.push(char);
+      // Store normalized letter (without diacritics) for comparison
+      const normalizedChar = removeDiacritics(char);
+      letters.push(normalizedChar);
     }
   }
   
@@ -27,7 +31,7 @@ export function createDisplayedWord(word: string) {
   
   console.log("🔤 createDisplayedWord: Zobrazené slovo:", displayWord);
   console.log("🔤 createDisplayedWord: Pozice:", positions);
-  console.log("🔤 createDisplayedWord: Písmena:", letters);
+  console.log("🔤 createDisplayedWord: Písmena (normalizovaná):", letters);
   
   return {
     displayWord,
