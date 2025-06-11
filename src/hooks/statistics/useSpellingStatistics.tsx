@@ -51,11 +51,12 @@ export const useSpellingStatistics = (userId: string | null) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["spellingStatistics"] });
+      // Zobrazit pouze jednu toast notifikaci
       toast.success("Statistiky pravopisu uloženy");
     },
     onError: (error: any) => {
       console.error("Chyba při ukládání statistik pravopisu:", error);
-      toast.error(`Nepodařilo se uložit statistiky pravopisu: ${error.message || 'Neznámá chyba'}`);
+      // Toast se zobrazí v useGameControls při chybě
     },
   });
 

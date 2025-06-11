@@ -69,11 +69,10 @@ export const useGameControls = ({
     resetGameTimer
   ]);
 
-  // End game handler - without automatic stats dialog display
+  // End game handler - with single toast notification
   const endGame = useCallback(() => {
     const gameDuration = getGameDuration();
     setShowProblem(false);
-    // Remove automatic stats dialog display - user can access it via button
     
     // Save statistics if user is logged in and there are some results
     if (userId && saveSpellingStatistics && (correctAnswers > 0 || wrongAnswers > 0)) {
@@ -85,7 +84,7 @@ export const useGameControls = ({
       });
       
       try {
-        // Pokus o uložení statistik
+        // Pokus o uložení statistik - bez vlastní toast notifikace
         saveSpellingStatistics.mutate({
           correctAnswers: correctAnswers,
           wrongAnswers: wrongAnswers,
@@ -98,11 +97,12 @@ export const useGameControls = ({
         }, {
           onSuccess: () => {
             console.log("Statistiky úspěšně uloženy");
-            toast.success("Statistiky hry byly úspěšně uloženy");
+            // Nezobrazeit toast zde - už se zobrazí v useSpellingStatistics
           },
           onError: (error: any) => {
             console.error("Chyba při ukládání statistik:", error);
-            toast.error("Statistiky nemohly být uloženy do databáze, ale byly zálohovány lokálně");
+            // Zobrazit toast pouze při chybě
+            toast.error("Statistiky nemohly být uloženy do databáze");
             
             // Záložní uložení do localStorage
             try {
