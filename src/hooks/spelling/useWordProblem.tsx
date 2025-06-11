@@ -43,28 +43,56 @@ export const useWordProblem = ({
       console.log("📚 generateNewWord: Dostupná slova:", allWords.length);
       
       if (allWords.length === 0) {
-        console.warn("⚠️ generateNewWord: Žádná slova k dispozici");
+        console.error("❌ generateNewWord: Žádná platná slova k dispozici pro vybrané skupiny");
         return;
       }
 
-      const randomWord = allWords[Math.floor(Math.random() * allWords.length)];
-      console.log("🎲 generateNewWord: Vybrané slovo:", randomWord);
-      
-      setCurrentWord(randomWord.word);
-      setWordGroup(randomWord.group);
-      setIsPhrase(randomWord.isPhrase || false);
+      // Try to find a valid word (with safety limit to prevent infinite loop)
+      let attempts = 0;
+      const maxAttempts = 50;
+      let validWord = null;
 
-      const { displayWord, positions, letters } = createDisplayedWord(randomWord.word);
-      setDisplayedWord(displayWord);
-      setMissingPositions(positions);
-      setCorrectLetters(letters);
+      while (attempts < maxAttempts && !validWord) {
+        const randomWord = allWords[Math.floor(Math.random() * allWords.length)];
+        console.log(`🎲 generateNewWord: Pokus ${attempts + 1}: testuju slovo "${randomWord.word}"`);
+        
+        const { displayWord, positions, letters } = createDisplayedWord(randomWord.word);
+        
+        // Check if word actually has positions to fill
+        if (positions.length > 0) {
+          validWord = {
+            ...randomWord,
+            displayWord,
+            positions,
+            letters
+          };
+          console.log("✅ generateNewWord: Nalezeno platné slovo:", validWord);
+        } else {
+          console.log(`⚠️ generateNewWord: Slovo "${randomWord.word}" nemá žádné i/y pozice`);
+        }
+        
+        attempts++;
+      }
+
+      if (!validWord) {
+        console.error("❌ generateNewWord: Nepodařilo se najít platné slovo po", maxAttempts, "pokusech");
+        return;
+      }
+
+      // Set the valid word
+      setCurrentWord(validWord.word);
+      setWordGroup(validWord.group);
+      setIsPhrase(validWord.isPhrase || false);
+      setDisplayedWord(validWord.displayWord);
+      setMissingPositions(validWord.positions);
+      setCorrectLetters(validWord.letters);
       setCurrentPosition(0);
       
       console.log("✅ generateNewWord: Nové slovo úspěšně nastaveno:", {
-        word: randomWord.word,
-        displayWord,
-        positions,
-        letters
+        word: validWord.word,
+        displayWord: validWord.displayWord,
+        positions: validWord.positions,
+        letters: validWord.letters
       });
     } catch (error) {
       console.error("❌ generateNewWord: Chyba při generování nového slova:", error);
