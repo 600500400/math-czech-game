@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserTheme } from "@/hooks/useUserTheme";
 import { useStatistics } from "@/hooks/useStatistics";
+import { useDetailedAnswers } from "@/hooks/statistics/useDetailedAnswers";
 import WelcomeDashboard from "@/components/dashboard/WelcomeDashboard";
 import PracticeTabs from "@/components/practice/PracticeTabs";
 import StatisticsTabs from "@/components/statistics/StatisticsTabs";
@@ -13,6 +14,7 @@ const HomePage = () => {
   const { authState } = useAuth();
   const { theme, getCSSVariables } = useUserTheme(authState.user?.id);
   const { mathStats, spellingStats } = useStatistics(authState.user?.id || null);
+  const { mathAnswers, spellingAnswers } = useDetailedAnswers(authState.user?.id || null);
   const [activeTab, setActiveTab] = useState("dashboard");
   const [practiceDefaultTab, setPracticeDefaultTab] = useState<"spelling" | "math">("spelling");
 
@@ -78,7 +80,12 @@ const HomePage = () => {
           </TabsContent>
 
           <TabsContent value="statistics">
-            <StatisticsTabs mathStats={mathStats} spellingStats={spellingStats} />
+            <StatisticsTabs 
+              mathStats={mathStats} 
+              spellingStats={spellingStats}
+              mathAnswers={mathAnswers}
+              spellingAnswers={spellingAnswers}
+            />
           </TabsContent>
         </Tabs>
       </div>

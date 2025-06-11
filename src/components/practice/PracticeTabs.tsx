@@ -21,7 +21,7 @@ const PracticeTabs = ({ defaultTab = "spelling" }: PracticeTabsProps) => {
   const userId = authState.user?.id || null;
   const { theme, getCSSVariables } = useUserTheme(userId);
   
-  // Get statistics for both game types
+  // Get statistics for both game types (for summary display only)
   const { mathStats, spellingStats } = useStatistics(userId);
   
   // Calculate cumulative statistics for spelling
