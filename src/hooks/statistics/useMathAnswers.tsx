@@ -6,32 +6,42 @@ import { supabase } from "@/integrations/supabase/client";
 export const useMathAnswers = (userId: string | null) => {
   const [mathAnswers, setMathAnswers] = useState<MathAnswer[]>([]);
 
-  // Load math answers from Supabase when component mounts
+  // Load math answers from Supabase when component mounts or userId changes
   useEffect(() => {
-    loadMathAnswers();
+    console.log("useMathAnswers - useEffect triggered with userId:", userId);
+    if (userId) {
+      loadMathAnswers();
+    } else {
+      console.log("useMathAnswers - žádný userId, mazám data");
+      setMathAnswers([]);
+    }
   }, [userId]);
 
   // Load math answers from Supabase
   const loadMathAnswers = async () => {
     try {
       if (!userId) {
-        console.log("Žádný userId - nelze načíst matematické odpovědi");
+        console.log("useMathAnswers - Žádný userId - nelze načíst matematické odpovědi");
         return;
       }
+      
+      console.log("useMathAnswers - načítám matematické odpovědi pro userId:", userId);
       
       const { data, error } = await supabase
         .from('math_answers')
         .select('*')
-        .eq('user_id', userId) // Nyní jako text - podporuje jak běžné uživatele tak lokální jako "gabi"
+        .eq('user_id', userId)
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error("Error loading math answers:", error);
+        console.error("useMathAnswers - Error loading math answers:", error);
         return;
       }
 
+      console.log("useMathAnswers - načteno z databáze:", data?.length || 0, "záznamů");
+
       // Convert database format to app format
-      const convertedAnswers: MathAnswer[] = data.map(item => ({
+      const convertedAnswers: MathAnswer[] = (data || []).map(item => ({
         problem: item.problem as any,
         userAnswer: Number(item.user_answer),
         correctAnswer: Number(item.correct_answer),
@@ -39,10 +49,10 @@ export const useMathAnswers = (userId: string | null) => {
         timestamp: item.created_at
       }));
 
-      console.log("useMathAnswers - načítání matematických odpovědí z databáze:", convertedAnswers);
+      console.log("useMathAnswers - konvertované odpovědi:", convertedAnswers);
       setMathAnswers(convertedAnswers);
     } catch (error) {
-      console.error("Error loading math answers:", error);
+      console.error("useMathAnswers - Error loading math answers:", error);
     }
   };
 
@@ -50,7 +60,7 @@ export const useMathAnswers = (userId: string | null) => {
   const saveMathAnswers = async (answers: MathAnswer[]) => {
     try {
       if (!userId) {
-        console.error("Žádný userId - nelze uložit matematické odpovědi");
+        console.error("useMathAnswers - Žádný userId - nelze uložit matematické odpovědi");
         return;
       }
       
@@ -62,7 +72,7 @@ export const useMathAnswers = (userId: string | null) => {
 
       if (answers.length > 0) {
         const dbAnswers = answers.map(answer => ({
-          user_id: userId, // Nyní jako text - podporuje jak běžné uživatele tak lokální jako "gabi"
+          user_id: userId,
           problem: answer.problem as any,
           user_answer: answer.userAnswer,
           correct_answer: answer.correctAnswer,
@@ -75,7 +85,7 @@ export const useMathAnswers = (userId: string | null) => {
           .insert(dbAnswers);
 
         if (error) {
-          console.error("Error saving math answers:", error);
+          console.error("useMathAnswers - Error saving math answers:", error);
           return;
         }
       }
@@ -83,7 +93,7 @@ export const useMathAnswers = (userId: string | null) => {
       setMathAnswers(answers);
       console.log("useMathAnswers - uloženy matematické odpovědi do databáze:", answers);
     } catch (error) {
-      console.error("Error saving math answers:", error);
+      console.error("useMathAnswers - Error saving math answers:", error);
     }
   };
 
@@ -91,14 +101,16 @@ export const useMathAnswers = (userId: string | null) => {
   const addMathAnswer = async (answer: MathAnswer) => {
     try {
       if (!userId) {
-        console.error("Žádný userId - nelze přidat matematickou odpověď");
+        console.error("useMathAnswers - Žádný userId - nelze přidat matematickou odpověď");
         return;
       }
+      
+      console.log("useMathAnswers - přidávám matematickou odpověď:", answer);
       
       const { error } = await supabase
         .from('math_answers')
         .insert({
-          user_id: userId, // Nyní jako text - podporuje jak běžné uživatele tak lokální jako "gabi"
+          user_id: userId,
           problem: answer.problem as any,
           user_answer: answer.userAnswer,
           correct_answer: answer.correctAnswer,
@@ -107,14 +119,15 @@ export const useMathAnswers = (userId: string | null) => {
         });
 
       if (error) {
-        console.error("Error adding math answer:", error);
+        console.error("useMathAnswers - Error adding math answer:", error);
         return;
       }
 
       const newAnswers = [...mathAnswers, answer];
       setMathAnswers(newAnswers);
+      console.log("useMathAnswers - přidána matematická odpověď, celkem:", newAnswers.length);
     } catch (error) {
-      console.error("Error adding math answer:", error);
+      console.error("useMathAnswers - Error adding math answer:", error);
     }
   };
 
@@ -122,7 +135,7 @@ export const useMathAnswers = (userId: string | null) => {
   const clearMathAnswers = async () => {
     try {
       if (!userId) {
-        console.error("Žádný userId - nelze vymazat matematické odpovědi");
+        console.error("useMathAnswers - Žádný userId - nelze vymazat matematické odpovědi");
         return;
       }
       
@@ -135,9 +148,15 @@ export const useMathAnswers = (userId: string | null) => {
       
       console.log("useMathAnswers - vymazány matematické odpovědi z databáze pro uživatele:", userId);
     } catch (error) {
-      console.error("Error clearing math answers:", error);
+      console.error("useMathAnswers - Error clearing math answers:", error);
     }
   };
+
+  console.log("useMathAnswers - aktuální stav:", {
+    userId,
+    mathAnswersCount: mathAnswers.length,
+    wrongAnswersCount: mathAnswers.filter(a => !a.isCorrect).length
+  });
 
   return {
     mathAnswers,

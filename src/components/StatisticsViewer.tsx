@@ -3,7 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useStatistics } from "@/hooks/useStatistics";
 import { useDetailedAnswers } from "@/hooks/statistics/useDetailedAnswers";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import EmptyStatisticsState from "./statistics/EmptyStatisticsState";
 import LoadingStatisticsState from "./statistics/LoadingStatisticsState";
 import UnauthenticatedState from "./statistics/UnauthenticatedState";
@@ -29,12 +29,19 @@ const StatisticsViewer = () => {
   const { mathAnswers, spellingAnswers, clearAllAnswers } = useDetailedAnswers(currentUserId);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   
-  console.log("📊 StatisticsViewer: Předávám detailní odpovědi:", {
-    mathAnswersCount: mathAnswers.length,
-    spellingAnswersCount: spellingAnswers.length,
-    mathStatsCount: mathStats?.length || 0,
-    spellingStatsCount: spellingStats?.length || 0
-  });
+  // Debug logging
+  useEffect(() => {
+    console.log("📊 StatisticsViewer - render s parametry:", {
+      authUserId: authState.user?.id,
+      currentUserId,
+      mathStatsCount: mathStats?.length || 0,
+      spellingStatsCount: spellingStats?.length || 0,
+      mathAnswersCount: mathAnswers.length,
+      spellingAnswersCount: spellingAnswers.length,
+      mathWrongCount: mathAnswers.filter(a => !a.isCorrect).length,
+      spellingWrongCount: spellingAnswers.filter(a => !a.isCorrect).length
+    });
+  }, [authState.user?.id, currentUserId, mathStats, spellingStats, mathAnswers, spellingAnswers]);
   
   if (!authState.isAuthenticated) {
     return <UnauthenticatedState />;

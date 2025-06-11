@@ -5,6 +5,8 @@ import { useMathAnswers } from "./useMathAnswers";
 import { useSpellingAnswers } from "./useSpellingAnswers";
 
 export const useDetailedAnswers = (userId: string | null) => {
+  console.log("useDetailedAnswers - inicializace s userId:", userId);
+  
   const {
     mathAnswers,
     addMathAnswer,
@@ -22,6 +24,7 @@ export const useDetailedAnswers = (userId: string | null) => {
   // Clear all answers for user from Supabase
   const clearAllAnswers = async () => {
     try {
+      console.log("useDetailedAnswers - mazám všechny detailní odpovědi pro userId:", userId);
       await Promise.all([
         clearMathAnswers(),
         clearSpellingAnswers()
@@ -29,7 +32,7 @@ export const useDetailedAnswers = (userId: string | null) => {
       
       console.log("useDetailedAnswers - vymazány všechny detailní odpovědi z databáze");
     } catch (error) {
-      console.error("Error clearing answers:", error);
+      console.error("useDetailedAnswers - Error clearing answers:", error);
     }
   };
 
