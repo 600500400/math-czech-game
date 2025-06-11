@@ -9,6 +9,9 @@ import { ChildComparison } from "./ChildComparison";
 import { ExportControls } from "./ExportControls";
 import { TimeFilters, FilterState } from "./TimeFilters";
 import { UserProfile } from "@/types/authTypes";
+import { UserTheme } from "@/hooks/useUserTheme";
+import { MathAnswer } from "@/types/mathTypes";
+import { SpellingAnswer } from "@/types/spellingTypes";
 
 interface DashboardTabsProps {
   selectedChild: string | null;
@@ -22,6 +25,9 @@ interface DashboardTabsProps {
   allChildrenStats: { [childId: string]: { mathStats: any[], spellingStats: any[] } };
   filters: FilterState;
   onFilterChange: (filters: FilterState) => void;
+  mathAnswers?: MathAnswer[];
+  spellingAnswers?: SpellingAnswer[];
+  selectedTheme?: UserTheme;
 }
 
 export const DashboardTabs: React.FC<DashboardTabsProps> = ({
@@ -35,7 +41,10 @@ export const DashboardTabs: React.FC<DashboardTabsProps> = ({
   filteredSpellingStats,
   allChildrenStats,
   filters,
-  onFilterChange
+  onFilterChange,
+  mathAnswers = [],
+  spellingAnswers = [],
+  selectedTheme
 }) => {
   const selectedChildName = children.find(child => child.id === selectedChild)?.username || '';
 
@@ -61,11 +70,14 @@ export const DashboardTabs: React.FC<DashboardTabsProps> = ({
               spellingTotal={childSpellingTotal}
               mathAccuracy={mathAccuracy}
               spellingAccuracy={spellingAccuracy}
+              selectedTheme={selectedTheme}
             />
             
             <ActivityHistory 
               mathStats={filteredMathStats} 
-              spellingStats={filteredSpellingStats} 
+              spellingStats={filteredSpellingStats}
+              mathAnswers={mathAnswers}
+              spellingAnswers={spellingAnswers}
             />
           </>
         )}
@@ -77,6 +89,7 @@ export const DashboardTabs: React.FC<DashboardTabsProps> = ({
             mathStats={filteredMathStats}
             spellingStats={filteredSpellingStats}
             selectedChild={selectedChild}
+            selectedTheme={selectedTheme}
           />
         ) : (
           <Card>

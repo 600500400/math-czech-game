@@ -3,6 +3,8 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useParentDashboard } from "@/hooks/useParentDashboard";
+import { useUserTheme } from "@/hooks/useUserTheme";
+import { useDetailedAnswers } from "@/hooks/statistics/useDetailedAnswers";
 import { ChildSelection } from "@/components/dashboard/ChildSelection";
 import { EmptyDashboard } from "@/components/dashboard/EmptyDashboard";
 import { DashboardTabs } from "@/components/dashboard/DashboardTabs";
@@ -25,9 +27,15 @@ const ParentDashboard = () => {
     childSpellingTotal,
     mathAccuracy,
     spellingAccuracy,
-    allChildrenStats, // Now properly contains all children's stats
+    allChildrenStats,
     loading
   } = useParentDashboard(userId);
+
+  // Get theme for selected child
+  const { theme, getCSSVariables } = useUserTheme(selectedChild);
+  
+  // Get detailed answers for selected child
+  const { mathAnswers, spellingAnswers } = useDetailedAnswers(selectedChild);
 
   const { filters, setFilters, getFilteredStats } = useDashboardFilters();
 
@@ -64,7 +72,10 @@ const ParentDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div 
+      className={`min-h-screen bg-gradient-to-br ${theme.bgGradient}`}
+      style={getCSSVariables}
+    >
       <ModernHeader />
       <div className="container mx-auto p-4 max-w-7xl">
         <div className="mb-6">
@@ -82,6 +93,7 @@ const ParentDashboard = () => {
             selectedChild={selectedChild}
             setSelectedChild={setSelectedChild}
             loading={loading}
+            selectedTheme={theme}
           />
 
           {children.length > 0 ? (
@@ -94,9 +106,12 @@ const ParentDashboard = () => {
               spellingAccuracy={spellingAccuracy}
               filteredMathStats={filteredMathStats}
               filteredSpellingStats={filteredSpellingStats}
-              allChildrenStats={allChildrenStats} // Now properly populated
+              allChildrenStats={allChildrenStats}
               filters={filters}
               onFilterChange={setFilters}
+              mathAnswers={mathAnswers}
+              spellingAnswers={spellingAnswers}
+              selectedTheme={theme}
             />
           ) : (
             <EmptyDashboard />

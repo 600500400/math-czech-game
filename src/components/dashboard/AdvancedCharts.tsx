@@ -4,18 +4,24 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area, BarChart, Bar } from "recharts";
 import { format } from "date-fns";
 import { cs } from "date-fns/locale";
+import { UserTheme } from "@/hooks/useUserTheme";
 
 interface AdvancedChartsProps {
   mathStats: any[];
   spellingStats: any[];
   selectedChild: string | null;
+  selectedTheme?: UserTheme;
 }
 
 export const AdvancedCharts: React.FC<AdvancedChartsProps> = ({
   mathStats,
   spellingStats,
-  selectedChild
+  selectedChild,
+  selectedTheme
 }) => {
+  const primaryColor = selectedTheme?.primaryColor || 'rgb(59, 130, 246)';
+  const secondaryColor = selectedTheme?.accentColor || 'rgb(16, 185, 129)';
+
   // Prepare data for progress over time chart
   const progressData = React.useMemo(() => {
     const mathData = mathStats.map(stat => ({
@@ -96,18 +102,18 @@ export const AdvancedCharts: React.FC<AdvancedChartsProps> = ({
                 <Line 
                   type="monotone" 
                   dataKey="math" 
-                  stroke="#3b82f6" 
+                  stroke={primaryColor}
                   strokeWidth={3}
                   name="Matematika (%)"
-                  dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
+                  dot={{ fill: primaryColor, strokeWidth: 2, r: 4 }}
                 />
                 <Line 
                   type="monotone" 
                   dataKey="spelling" 
-                  stroke="#10b981" 
+                  stroke={secondaryColor}
                   strokeWidth={3}
                   name="Pravopis (%)"
-                  dot={{ fill: '#10b981', strokeWidth: 2, r: 4 }}
+                  dot={{ fill: secondaryColor, strokeWidth: 2, r: 4 }}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -133,8 +139,8 @@ export const AdvancedCharts: React.FC<AdvancedChartsProps> = ({
                   type="monotone" 
                   dataKey="math" 
                   stackId="1"
-                  stroke="#3b82f6" 
-                  fill="#3b82f6"
+                  stroke={primaryColor}
+                  fill={primaryColor}
                   fillOpacity={0.6}
                   name="Matematika"
                 />
@@ -142,8 +148,8 @@ export const AdvancedCharts: React.FC<AdvancedChartsProps> = ({
                   type="monotone" 
                   dataKey="spelling" 
                   stackId="1"
-                  stroke="#10b981" 
-                  fill="#10b981"
+                  stroke={secondaryColor}
+                  fill={secondaryColor}
                   fillOpacity={0.6}
                   name="Pravopis"
                 />
@@ -167,7 +173,7 @@ export const AdvancedCharts: React.FC<AdvancedChartsProps> = ({
                   <XAxis dataKey="operation" />
                   <YAxis />
                   <Tooltip formatter={(value: number) => [`${value.toFixed(1)}%`, 'Úspěšnost']} />
-                  <Bar dataKey="accuracy" fill="#3b82f6" />
+                  <Bar dataKey="accuracy" fill={primaryColor} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -186,7 +192,7 @@ export const AdvancedCharts: React.FC<AdvancedChartsProps> = ({
                   <XAxis dataKey="group" />
                   <YAxis />
                   <Tooltip formatter={(value: number) => [`${value.toFixed(1)}%`, 'Úspěšnost']} />
-                  <Bar dataKey="accuracy" fill="#10b981" />
+                  <Bar dataKey="accuracy" fill={secondaryColor} />
                 </BarChart>
               </ResponsiveContainer>
             </div>

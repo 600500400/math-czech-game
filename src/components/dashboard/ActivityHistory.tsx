@@ -5,15 +5,22 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Calendar } from "lucide-react";
 import { MathStatistics, SpellingStatistics } from "@/types/authTypes";
+import { MathAnswer } from "@/types/mathTypes";
+import { SpellingAnswer } from "@/types/spellingTypes";
+import ErrorsTooltip from "@/components/statistics/ErrorsTooltip";
 
 interface ActivityHistoryProps {
   mathStats: MathStatistics[];
   spellingStats: SpellingStatistics[];
+  mathAnswers?: MathAnswer[];
+  spellingAnswers?: SpellingAnswer[];
 }
 
 export const ActivityHistory: React.FC<ActivityHistoryProps> = ({
   mathStats,
-  spellingStats
+  spellingStats,
+  mathAnswers = [],
+  spellingAnswers = []
 }) => {
   // Format date helper
   const formatDate = (dateString: string) => {
@@ -27,12 +34,32 @@ export const ActivityHistory: React.FC<ActivityHistoryProps> = ({
     }).format(date);
   };
 
+  // Function to get answers for a specific session
+  const getAnswersForSession = (stat: any, type: 'math' | 'spelling') => {
+    const sessionTime = new Date(stat.created_at).getTime();
+    const sessionWindowMs = 10 * 60 * 1000; // 10 minutes window
+    
+    if (type === 'math') {
+      return mathAnswers.filter(answer => {
+        const answerTime = new Date(answer.timestamp).getTime();
+        const timeDiff = Math.abs(answerTime - sessionTime);
+        return timeDiff < sessionWindowMs;
+      });
+    } else {
+      return spellingAnswers.filter(answer => {
+        const answerTime = new Date(answer.timestamp).getTime();
+        const timeDiff = Math.abs(answerTime - sessionTime);
+        return timeDiff < sessionWindowMs;
+      });
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>Historie cvičení</CardTitle>
         <CardDescription>
-          Podrobný přehled všech cvičení
+          Podrobný přehled všech cvičení s detailními chybami
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -48,12 +75,12 @@ export const ActivityHistory: React.FC<ActivityHistoryProps> = ({
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Datum</TableHead>
+                      <TableHead className="min-w-[160px]">Datum</TableHead>
                       <TableHead>Operace</TableHead>
-                      <TableHead>Obtížnost</TableHead>
-                      <TableHead>Správně</TableHead>
-                      <TableHead>Špatně</TableHead>
-                      <TableHead>Úspěšnost</TableHead>
+                      <TableHead className="min-w-[200px]">Obtížnost</TableHead>
+                      <TableHead className="text-center">Správně</TableHead>
+                      <TableHead className="text-center">Špatně</TableHead>
+                      <TableHead className="text-center">Úspěšnost</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -62,6 +89,7 @@ export const ActivityHistory: React.FC<ActivityHistoryProps> = ({
                       const accuracy = total > 0 
                         ? Math.round((stat.correct_answers / total) * 100) 
                         : 0;
+                      const sessionAnswers = getAnswersForSession(stat, 'math');
                         
                       return (
                         <TableRow key={stat.id}>
@@ -72,18 +100,22 @@ export const ActivityHistory: React.FC<ActivityHistoryProps> = ({
                             </div>
                           </TableCell>
                           <TableCell>{stat.operation}</TableCell>
-                          <TableCell>
+                          <TableCell className="text-sm">
                             Max: {stat.difficulty_level.maxValue}, 
                             Násobení: {stat.difficulty_level.maxMultiplyValue}, 
                             Dělení: {stat.difficulty_level.maxDivideValue}
                           </TableCell>
-                          <TableCell className="font-medium text-green-500">
+                          <TableCell className="text-center font-medium text-green-500">
                             {stat.correct_answers}
                           </TableCell>
-                          <TableCell className="font-medium text-red-500">
-                            {stat.wrong_answers}
+                          <TableCell className="text-center">
+                            <ErrorsTooltip 
+                              wrongCount={stat.wrong_answers}
+                              answers={sessionAnswers}
+                              type="math"
+                            />
                           </TableCell>
-                          <TableCell>{accuracy}%</TableCell>
+                          <TableCell className="text-center font-bold">{accuracy}%</TableCell>
                         </TableRow>
                       );
                     })}
@@ -103,11 +135,11 @@ export const ActivityHistory: React.FC<ActivityHistoryProps> = ({
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Datum</TableHead>
+                      <TableHead className="min-w-[160px]">Datum</TableHead>
                       <TableHead>Skupina slov</TableHead>
-                      <TableHead>Správně</TableHead>
-                      <TableHead>Špatně</TableHead>
-                      <TableHead>Úspěšnost</TableHead>
+                      <TableHead className="text-center">Správně</TableHead>
+                      <TableHead className="text-center">Špatně</TableHead>
+                      <TableHead className="text-center">Úspěšnost</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -116,6 +148,7 @@ export const ActivityHistory: React.FC<ActivityHistoryProps> = ({
                       const accuracy = total > 0 
                         ? Math.round((stat.correct_answers / total) * 100) 
                         : 0;
+                      const sessionAnswers = getAnswersForSession(stat, 'spelling');
                         
                       return (
                         <TableRow key={stat.id}>
@@ -126,13 +159,17 @@ export const ActivityHistory: React.FC<ActivityHistoryProps> = ({
                             </div>
                           </TableCell>
                           <TableCell>{stat.word_group}</TableCell>
-                          <TableCell className="font-medium text-green-500">
+                          <TableCell className="text-center font-medium text-green-500">
                             {stat.correct_answers}
                           </TableCell>
-                          <TableCell className="font-medium text-red-500">
-                            {stat.wrong_answers}
+                          <TableCell className="text-center">
+                            <ErrorsTooltip 
+                              wrongCount={stat.wrong_answers}
+                              answers={sessionAnswers}
+                              type="spelling"
+                            />
                           </TableCell>
-                          <TableCell>{accuracy}%</TableCell>
+                          <TableCell className="text-center font-bold">{accuracy}%</TableCell>
                         </TableRow>
                       );
                     })}
