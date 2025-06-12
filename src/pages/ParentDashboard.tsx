@@ -58,14 +58,42 @@ const ParentDashboard = () => {
             <h1 className="text-2xl sm:text-3xl font-bold gradient-text mb-2">Rodičovský dashboard</h1>
             <p className="text-gray-600">Načítám data...</p>
           </div>
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-3">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
-                <p className="text-center text-muted-foreground">Načítám dashboard...</p>
-              </div>
-            </CardContent>
-          </Card>
+          
+          {/* Use enhanced loading skeleton */}
+          <div className="space-y-6">
+            <Card className="border-2 border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+              <CardContent className="p-6">
+                <div className="flex flex-col items-center space-y-4">
+                  <div className="relative">
+                    <div className="h-12 w-12 rounded-full bg-blue-200 animate-pulse"></div>
+                    <div className="absolute inset-0 h-12 w-12 border-4 border-blue-300 rounded-full animate-spin border-t-blue-500"></div>
+                  </div>
+                  <div className="text-center space-y-2">
+                    <p className="text-blue-700 font-medium">Načítám rodičovský dashboard...</p>
+                    <p className="text-sm text-blue-600">Připravuji přehled vašich dětí</p>
+                  </div>
+                  <div className="w-64 h-2 bg-blue-200 rounded-full overflow-hidden">
+                    <div className="h-full bg-blue-500 rounded-full animate-pulse w-3/4 transition-all duration-1000"></div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            {/* Skeleton for child selection */}
+            <Card>
+              <CardContent className="p-6 space-y-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="h-5 w-5 bg-gray-200 rounded animate-pulse"></div>
+                  <div className="h-6 w-32 bg-gray-200 rounded animate-pulse"></div>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i} className="h-20 bg-gray-200 rounded-lg animate-pulse"></div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     );

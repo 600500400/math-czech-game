@@ -1,53 +1,75 @@
 
-import { RefreshCw } from "lucide-react";
-import { AdvancedSkeleton, StatisticsSkeleton } from "@/components/ui/advanced-skeleton";
+import React from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { LoadingState, DataLoadingSkeleton } from "@/components/ui/loading-states";
+import { StatisticsLoadingSkeleton } from "@/components/ui/skeleton-collection";
 
 interface LoadingStatisticsStateProps {
   hasRetried?: boolean;
+  retryCount?: number;
+  showDetailedSkeleton?: boolean;
 }
 
 const LoadingStatisticsState = ({ 
-  hasRetried = false
+  hasRetried = false,
+  retryCount = 0,
+  showDetailedSkeleton = false
 }: LoadingStatisticsStateProps) => {
-  return (
-    <div className="pt-4 space-y-6">
-      {/* Loading header with icon */}
-      <div className="flex flex-col items-center justify-center space-y-4">
-        <div className="relative">
-          <RefreshCw className="h-8 w-8 animate-spin text-orange-500" />
-          <div className="absolute inset-0 h-8 w-8 border-2 border-orange-200 rounded-full animate-ping" />
-        </div>
+  
+  // Show skeleton after first retry for better UX
+  if (showDetailedSkeleton || retryCount > 0) {
+    return (
+      <div className="pt-4 space-y-6">
+        <Card>
+          <CardContent className="p-6">
+            <DataLoadingSkeleton 
+              title="Načítám statistiky..."
+              description="Analýza vašich výsledků"
+              showProgress={true}
+            />
+          </CardContent>
+        </Card>
         
-        <div className="text-center space-y-2">
-          <p className="text-gray-700 font-medium">Načítání statistik...</p>
-          <p className="text-xs text-gray-400">Načítání lokálních dat, prosím čekejte</p>
-        </div>
-
+        <StatisticsLoadingSkeleton />
+        
         {hasRetried && (
-          <div className="text-center bg-amber-50 border border-amber-200 rounded-lg p-3">
-            <p className="text-xs text-amber-600 font-medium">
-              Načítání trvá déle než obvykle.
-            </p>
-          </div>
+          <Card className="bg-amber-50 border-amber-200">
+            <CardContent className="p-4 text-center">
+              <p className="text-sm text-amber-700 font-medium">
+                Načítání trvá déle než obvykle, prosím čekejte...
+              </p>
+              <p className="text-xs text-amber-600 mt-1">
+                Pokus {retryCount} - používám lokální data jako fallback
+              </p>
+            </CardContent>
+          </Card>
         )}
       </div>
+    );
+  }
 
-      {/* Skeleton loading content */}
-      <div className="max-w-4xl mx-auto">
-        <StatisticsSkeleton />
-      </div>
-
-      {/* Additional loading indicators */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <AdvancedSkeleton variant="text" width="150px" />
-          <AdvancedSkeleton variant="card" height="200px" />
-        </div>
-        <div className="space-y-4">
-          <AdvancedSkeleton variant="text" width="150px" />
-          <AdvancedSkeleton variant="card" height="200px" />
-        </div>
-      </div>
+  return (
+    <div className="pt-4 space-y-6">
+      <Card>
+        <CardContent className="p-8">
+          <LoadingState 
+            size="lg"
+            variant="spinner"
+            message="Načítám statistiky..."
+            showProgress={false}
+          />
+        </CardContent>
+      </Card>
+      
+      {hasRetried && (
+        <Card className="bg-blue-50 border-blue-200">
+          <CardContent className="p-4 text-center">
+            <p className="text-sm text-blue-700">
+              Kontroluji lokální data...
+            </p>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
