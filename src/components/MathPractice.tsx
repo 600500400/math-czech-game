@@ -42,7 +42,6 @@ const MathPractice = () => {
   } = useMathGame();
 
   const [showConfetti, setShowConfetti] = useState(false);
-  const [showDetailedErrors, setShowDetailedErrors] = useState(false);
   
   // Trigger confetti when correct answer is given
   useEffect(() => {
@@ -98,8 +97,6 @@ const MathPractice = () => {
       <CustomGameControls 
         onShowDifficultyDialog={() => setShowDifficultyDialog(true)}
         onStartGame={startNewGame}
-        onShowDetailedErrors={() => setShowDetailedErrors(true)}
-        hasDetailedErrors={answers.length > 0}
         difficultySettings={difficultySettings}
       />
 
@@ -136,10 +133,10 @@ const MathPractice = () => {
         correctPercentage={correctPercentage}
       />
       
-      {/* Detailed Errors Dialog */}
+      {/* Detailed Errors Dialog - kept for potential future use from statistics */}
       <DetailedErrorsDialog 
-        open={showDetailedErrors}
-        onOpenChange={setShowDetailedErrors}
+        open={false}
+        onOpenChange={() => {}}
         answers={answers}
       />
     </div>
