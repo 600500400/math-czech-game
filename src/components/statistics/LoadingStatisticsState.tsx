@@ -1,8 +1,8 @@
 
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { LoadingState, DataLoadingSkeleton } from "@/components/ui/loading-states";
-import { StatisticsLoadingSkeleton } from "@/components/ui/skeleton-collection";
+import { LoadingState } from "@/components/ui/loading-states";
+import { StatisticsLoadingSkeleton, DataLoadingSkeleton } from "@/components/ui/skeleton-collection";
 
 interface LoadingStatisticsStateProps {
   hasRetried?: boolean;
