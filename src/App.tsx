@@ -10,6 +10,8 @@ import UserSelection from "./pages/UserSelection";
 import ParentDashboard from "./pages/ParentDashboard";
 import NotFound from "./pages/NotFound";
 import FeedbackButton from "./components/FeedbackButton";
+import PWAInstallPrompt from "./components/pwa/PWAInstallPrompt";
+import OfflineIndicator from "./components/pwa/OfflineIndicator";
 import "@/i18n";
 
 const queryClient = new QueryClient({
@@ -35,6 +37,8 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
           <FeedbackButton />
+          <PWAInstallPrompt />
+          <OfflineIndicator />
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
