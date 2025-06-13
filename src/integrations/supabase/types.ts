@@ -9,6 +9,39 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      achievements: {
+        Row: {
+          condition_data: Json | null
+          created_at: string | null
+          description: string
+          icon: string
+          id: string
+          name: string
+          type: Database["public"]["Enums"]["achievement_type"]
+          xp_reward: number
+        }
+        Insert: {
+          condition_data?: Json | null
+          created_at?: string | null
+          description: string
+          icon: string
+          id?: string
+          name: string
+          type: Database["public"]["Enums"]["achievement_type"]
+          xp_reward?: number
+        }
+        Update: {
+          condition_data?: Json | null
+          created_at?: string | null
+          description?: string
+          icon?: string
+          id?: string
+          name?: string
+          type?: Database["public"]["Enums"]["achievement_type"]
+          xp_reward?: number
+        }
+        Relationships: []
+      }
       feedback: {
         Row: {
           category: string
@@ -219,15 +252,133 @@ export type Database = {
         }
         Relationships: []
       }
+      user_achievements: {
+        Row: {
+          achievement_id: string | null
+          completed: boolean | null
+          id: string
+          progress: number | null
+          unlocked_at: string | null
+          user_id: string
+        }
+        Insert: {
+          achievement_id?: string | null
+          completed?: boolean | null
+          id?: string
+          progress?: number | null
+          unlocked_at?: string | null
+          user_id: string
+        }
+        Update: {
+          achievement_id?: string | null
+          completed?: boolean | null
+          id?: string
+          progress?: number | null
+          unlocked_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_achievements_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "achievements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_levels: {
+        Row: {
+          created_at: string | null
+          current_level: number | null
+          id: string
+          total_xp: number | null
+          updated_at: string | null
+          user_id: string
+          xp_to_next_level: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          current_level?: number | null
+          id?: string
+          total_xp?: number | null
+          updated_at?: string | null
+          user_id: string
+          xp_to_next_level?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          current_level?: number | null
+          id?: string
+          total_xp?: number | null
+          updated_at?: string | null
+          user_id?: string
+          xp_to_next_level?: number | null
+        }
+        Relationships: []
+      }
+      user_streaks: {
+        Row: {
+          created_at: string | null
+          current_streak: number | null
+          id: string
+          last_activity_date: string | null
+          longest_streak: number | null
+          streak_type: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          current_streak?: number | null
+          id?: string
+          last_activity_date?: string | null
+          longest_streak?: number | null
+          streak_type?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          current_streak?: number | null
+          id?: string
+          last_activity_date?: string | null
+          longest_streak?: number | null
+          streak_type?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      calculate_xp_for_level: {
+        Args: { level_num: number }
+        Returns: number
+      }
+      update_user_level: {
+        Args: { p_user_id: string; p_xp_gained: number }
+        Returns: {
+          new_level: number
+          level_up: boolean
+        }[]
+      }
     }
     Enums: {
-      [_ in never]: never
+      achievement_type:
+        | "first_correct"
+        | "streak_3"
+        | "streak_7"
+        | "streak_30"
+        | "perfect_game"
+        | "speed_demon"
+        | "math_master"
+        | "spelling_wizard"
+        | "persistent_learner"
+        | "early_bird"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -342,6 +493,19 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      achievement_type: [
+        "first_correct",
+        "streak_3",
+        "streak_7",
+        "streak_30",
+        "perfect_game",
+        "speed_demon",
+        "math_master",
+        "spelling_wizard",
+        "persistent_learner",
+        "early_bird",
+      ],
+    },
   },
 } as const

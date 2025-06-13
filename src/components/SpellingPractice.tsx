@@ -1,3 +1,4 @@
+
 import { GroupSelectionDialog } from "./spelling/GroupSelectionDialog";
 import { WordProblemDialog } from "./spelling/WordProblemDialog";
 import { StatisticsDialog } from "./spelling/StatisticsDialog";
@@ -6,16 +7,20 @@ import { GameControls } from "./spelling/GameControls";
 import { useSpellingGame } from "@/hooks/spelling/useSpellingGame";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserTheme } from "@/hooks/useUserTheme";
+import { useGamification } from "@/hooks/gamification/useGamification";
 import { spellingGroups } from "@/data/spellingData";
 import { SuccessParticles, ErrorParticles } from "@/components/ui/advanced-particle-system";
 import { GlassCard } from "@/components/ui/glass-morphism";
 import { FloatingIcon, HoverScale } from "@/components/ui/microanimations";
+import { LevelDisplay } from "@/components/gamification/LevelDisplay";
+import { StreakDisplay } from "@/components/gamification/StreakDisplay";
 import { useState, useEffect } from "react";
 import { useEnhancedMobileInteractions } from "@/hooks/useEnhancedMobileInteractions";
 
 const SpellingPractice = () => {
   const { authState } = useAuth();
   const { theme, getCSSVariables, getGradientClasses } = useUserTheme(authState.user?.id);
+  const { leveling, streaks, processGameCompletion } = useGamification();
   
   const {
     correctAnswers,
@@ -59,6 +64,7 @@ const SpellingPractice = () => {
 
   const [showSuccessParticles, setShowSuccessParticles] = useState(false);
   const [showErrorParticles, setShowErrorParticles] = useState(false);
+  const [gameStartTime, setGameStartTime] = useState<number | null>(null);
   
   // Trigger particle effects and enhanced feedback when answers are given
   useEffect(() => {
@@ -78,12 +84,29 @@ const SpellingPractice = () => {
   // Enhanced game start with feedback
   const handleStartNewGame = () => {
     triggerGameStartFeedback();
+    setGameStartTime(Date.now());
     startNewGame();
   };
 
-  // Enhanced game end with feedback
-  const handleEndGame = () => {
+  // Enhanced game end with feedback and gamification
+  const handleEndGame = async () => {
     triggerGameEndFeedback();
+    
+    // Process gamification if we have game data
+    if (gameStartTime && (correctAnswers > 0 || wrongAnswers > 0)) {
+      const gameDuration = Math.round((Date.now() - gameStartTime) / 1000);
+      const perfectGame = wrongAnswers === 0 && correctAnswers >= 5;
+      
+      await processGameCompletion({
+        correct_answers: correctAnswers,
+        wrong_answers: wrongAnswers,
+        game_duration: gameDuration,
+        perfect_game: perfectGame,
+        subject: 'spelling'
+      });
+    }
+    
+    setGameStartTime(null);
     endGame();
   };
 
@@ -117,6 +140,20 @@ const SpellingPractice = () => {
           Procvičování vyjmenovaných slov {theme.avatar}
         </h1>
       </FloatingIcon>
+
+      {/* Gamification displays */}
+      {authState.user && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <LevelDisplay 
+            userLevel={leveling.userLevel} 
+            progress={leveling.getLevelProgress()} 
+          />
+          <StreakDisplay 
+            userStreak={streaks.userStreak} 
+            isAtRisk={streaks.isStreakAtRisk()} 
+          />
+        </div>
+      )}
 
       {/* Glass morphism game controls */}
       <HoverScale>

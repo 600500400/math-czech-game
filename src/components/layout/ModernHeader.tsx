@@ -6,10 +6,14 @@ import UserMenu from "@/components/UserMenu";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useGamification } from "@/hooks/gamification/useGamification";
+import { LevelDisplay } from "@/components/gamification/LevelDisplay";
+import { StreakDisplay } from "@/components/gamification/StreakDisplay";
 
 const ModernHeader = () => {
   const { authState } = useAuth();
   const { t } = useLanguage();
+  const { leveling, streaks } = useGamification();
 
   return (
     <header className="w-full bg-background/80 backdrop-blur-md border-b border-border sticky top-0 z-50">
@@ -32,6 +36,22 @@ const ModernHeader = () => {
               </p>
             </div>
           </div>
+
+          {/* Center - Gamification displays for authenticated users */}
+          {authState.user && (
+            <div className="hidden md:flex items-center gap-4">
+              <LevelDisplay 
+                userLevel={leveling.userLevel} 
+                progress={leveling.getLevelProgress()} 
+                compact 
+              />
+              <StreakDisplay 
+                userStreak={streaks.userStreak} 
+                isAtRisk={streaks.isStreakAtRisk()} 
+                compact 
+              />
+            </div>
+          )}
 
           {/* Controls */}
           <div className="flex items-center gap-2">
