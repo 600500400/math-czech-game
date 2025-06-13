@@ -79,9 +79,9 @@ const FeedbackButton = () => {
         <Button
           variant="outline"
           size="sm"
-          className="fixed bottom-4 right-4 z-50 shadow-lg bg-white hover:bg-gray-50 border-2 border-brand-200 hover:border-brand-300 transition-all duration-200 hover:scale-105"
+          className="flex items-center gap-2 bg-white border-gray-200 hover:bg-gray-50"
         >
-          <MessageSquare className="h-4 w-4 mr-2" />
+          <MessageSquare className="h-4 w-4" />
           <span className="hidden sm:inline">{t('feedback.title')}</span>
         </Button>
       </DialogTrigger>

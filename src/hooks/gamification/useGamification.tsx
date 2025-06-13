@@ -2,12 +2,14 @@
 import { useAchievements } from "./useAchievements";
 import { useLeveling } from "./useLeveling";
 import { useStreaks } from "./useStreaks";
+import { useLeaderboards } from "./useLeaderboards";
 import { GameSession } from "@/types/gamificationTypes";
 
 export const useGamification = () => {
   const achievements = useAchievements();
   const leveling = useLeveling();
   const streaks = useStreaks();
+  const leaderboards = useLeaderboards();
 
   // Process game completion with all gamification elements
   const processGameCompletion = async (gameSession: GameSession) => {
@@ -32,6 +34,10 @@ export const useGamification = () => {
         await achievements.checkStreakAchievements(newStreak);
       }
       
+      // Refresh leaderboards
+      await leaderboards.fetchGlobalLeaderboard();
+      await leaderboards.fetchWeeklyLeaderboard();
+      
     } catch (error) {
       console.error('Error processing game completion:', error);
     }
@@ -41,6 +47,7 @@ export const useGamification = () => {
     achievements,
     leveling,
     streaks,
+    leaderboards,
     processGameCompletion
   };
 };

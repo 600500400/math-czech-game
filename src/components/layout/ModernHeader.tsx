@@ -1,9 +1,10 @@
 
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
-import { BookOpen, Sparkles } from "lucide-react";
+import { BookOpen, Sparkles, MessageSquare } from "lucide-react";
 import UserMenu from "@/components/UserMenu";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import FeedbackButton from "@/components/FeedbackButton";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useGamification } from "@/hooks/gamification/useGamification";
@@ -57,6 +58,7 @@ const ModernHeader = () => {
           <div className="flex items-center gap-2">
             <ThemeToggle />
             <LanguageSwitcher />
+            <FeedbackButton />
             <UserMenu />
           </div>
         </div>
