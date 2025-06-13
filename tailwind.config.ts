@@ -170,6 +170,55 @@ const config = {
           "0%, 100%": { boxShadow: "0 0 5px rgba(249, 115, 22, 0.5)" },
           "50%": { boxShadow: "0 0 20px rgba(249, 115, 22, 0.8)" }
         },
+        // Enhanced animations
+        "wiggle": {
+          "0%, 100%": { transform: "rotate(0deg)" },
+          "25%": { transform: "rotate(-3deg)" },
+          "75%": { transform: "rotate(3deg)" }
+        },
+        "heartbeat": {
+          "0%, 100%": { transform: "scale(1)" },
+          "50%": { transform: "scale(1.1)" }
+        },
+        "shake": {
+          "0%, 100%": { transform: "translateX(0)" },
+          "25%": { transform: "translateX(-5px)" },
+          "75%": { transform: "translateX(5px)" }
+        },
+        "glow-pulse": {
+          "0%": { 
+            boxShadow: "0 0 5px rgba(59, 130, 246, 0.5)",
+            filter: "brightness(1)"
+          },
+          "100%": { 
+            boxShadow: "0 0 25px rgba(59, 130, 246, 0.8)",
+            filter: "brightness(1.2)"
+          }
+        },
+        "particle-float": {
+          "0%, 100%": { 
+            transform: "translateY(0px) rotate(0deg)",
+            opacity: "1"
+          },
+          "50%": { 
+            transform: "translateY(-20px) rotate(180deg)",
+            opacity: "0.7"
+          }
+        },
+        "particle-spiral": {
+          "0%": { 
+            transform: "rotate(0deg) translateX(0px) rotate(0deg)",
+            opacity: "1"
+          },
+          "100%": { 
+            transform: "rotate(360deg) translateX(50px) rotate(-360deg)",
+            opacity: "0"
+          }
+        },
+        "backdrop-blur": {
+          "0%": { backdropFilter: "blur(0px)" },
+          "100%": { backdropFilter: "blur(12px)" }
+        }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -183,12 +232,29 @@ const config = {
         "confetti-fall": "confetti-fall 3s ease-in-out forwards",
         "float": "float 3s ease-in-out infinite",
         "glow": "glow 2s ease-in-out infinite alternate",
+        // Enhanced animations
+        "wiggle": "wiggle 0.5s ease-in-out",
+        "heartbeat": "heartbeat 1.5s ease-in-out infinite",
+        "shake": "shake 0.5s ease-in-out",
+        "glow-pulse": "glow-pulse 2s ease-in-out infinite alternate",
+        "particle-float": "particle-float 3s ease-in-out infinite",
+        "particle-spiral": "particle-spiral 2s linear infinite",
+        "backdrop-blur": "backdrop-blur 0.3s ease-out"
       },
       backgroundImage: {
         'gradient-primary': 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
         'gradient-success': 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
         'gradient-bg': 'linear-gradient(135deg, #fef7f0 0%, #fff7ed 50%, #f0f9ff 100%)',
+        'gradient-glass': 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
       },
+      backdropBlur: {
+        xs: '2px',
+      },
+      backdropSaturate: {
+        125: '1.25',
+        150: '1.5',
+        200: '2',
+      }
     },
   },
   plugins: [require("tailwindcss-animate")],

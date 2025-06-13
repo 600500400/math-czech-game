@@ -9,7 +9,9 @@ import { FunGraphics } from "./spelling/FunGraphics";
 import { useMathGame } from "@/hooks/math/useMathGame";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserTheme } from "@/hooks/useUserTheme";
-import { ConfettiExplosion } from "@/components/ui/confetti-explosion";
+import { SuccessParticles, ErrorParticles } from "@/components/ui/advanced-particle-system";
+import { GlassCard, GlassDialog } from "@/components/ui/glass-morphism";
+import { FloatingIcon, HoverScale } from "@/components/ui/microanimations";
 
 const MathPractice = () => {
   const { authState } = useAuth();
@@ -41,13 +43,18 @@ const MathPractice = () => {
     setDifficulty,
   } = useMathGame();
 
-  const [showConfetti, setShowConfetti] = useState(false);
+  const [showSuccessParticles, setShowSuccessParticles] = useState(false);
+  const [showErrorParticles, setShowErrorParticles] = useState(false);
   
-  // Trigger confetti when correct answer is given
+  // Trigger particle effects when answers are given
   useEffect(() => {
     if (lastAnswerCorrect === true && showAnimation) {
-      setShowConfetti(true);
-      const timer = setTimeout(() => setShowConfetti(false), 2000);
+      setShowSuccessParticles(true);
+      const timer = setTimeout(() => setShowSuccessParticles(false), 3000);
+      return () => clearTimeout(timer);
+    } else if (lastAnswerCorrect === false && showAnimation) {
+      setShowErrorParticles(true);
+      const timer = setTimeout(() => setShowErrorParticles(false), 2000);
       return () => clearTimeout(timer);
     }
   }, [lastAnswerCorrect, showAnimation]);
@@ -69,7 +76,14 @@ const MathPractice = () => {
   };
 
   return (
-    <div className="space-y-4 relative" style={getCSSVariables}>
+    <div className="space-y-4 relative min-h-screen" style={getCSSVariables}>
+      {/* Background glass effect */}
+      <div className="fixed inset-0 bg-gradient-to-br from-blue-50/50 to-purple-50/50 -z-10" />
+      
+      {/* Enhanced particle effects */}
+      <SuccessParticles trigger={showSuccessParticles} />
+      <ErrorParticles trigger={showErrorParticles} />
+      
       {/* Fun Graphics Component - moved outside dialogs for visibility with higher z-index */}
       <div className="z-[9999]">
         {showAnimation && (
@@ -77,30 +91,28 @@ const MathPractice = () => {
         )}
       </div>
       
-      {/* Confetti effect when answers are correct - with high z-index */}
-      <div className="z-[9999] relative">
-        <ConfettiExplosion 
-          trigger={showConfetti} 
-          particleCount={30}
-          duration={2000}
-          colors={[theme.primaryColor, theme.secondaryColor, theme.accentColor, '#FFC700', '#FF0000']}
-        />
-      </div>
-      
-      <h1 
-        className="text-3xl font-bold text-center"
-        style={{ color: theme.primaryColor }}
-      >
-        Procvičování matematiky {theme.avatar}
-      </h1>
+      {/* Enhanced header with floating animation */}
+      <FloatingIcon className="text-center">
+        <h1 
+          className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
+          style={{ color: theme.primaryColor }}
+        >
+          Procvičování matematiky {theme.avatar}
+        </h1>
+      </FloatingIcon>
 
-      <CustomGameControls 
-        onShowDifficultyDialog={() => setShowDifficultyDialog(true)}
-        onStartGame={startNewGame}
-        difficultySettings={difficultySettings}
-      />
+      {/* Glass morphism game controls */}
+      <HoverScale>
+        <GlassCard className="hover:bg-white/25 transition-all duration-500">
+          <CustomGameControls 
+            onShowDifficultyDialog={() => setShowDifficultyDialog(true)}
+            onStartGame={startNewGame}
+            difficultySettings={difficultySettings}
+          />
+        </GlassCard>
+      </HoverScale>
 
-      {/* Difficulty Settings Dialog */}
+      {/* Enhanced Difficulty Settings Dialog with glass morphism */}
       <DifficultyDialog
         open={showDifficultyDialog}
         onOpenChange={setShowDifficultyDialog}

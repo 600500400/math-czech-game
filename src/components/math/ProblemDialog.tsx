@@ -9,6 +9,8 @@ import NumericKeyboard from "./NumericKeyboard";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useTouchGestures } from "@/hooks/useTouchGestures";
 import { useMobileInteractions } from "@/hooks/useMobileInteractions";
+import { GlassDialog } from "@/components/ui/glass-morphism";
+import { HoverScale, GlowingElement } from "@/components/ui/microanimations";
 
 interface ProblemDialogProps {
   open: boolean;
@@ -91,79 +93,95 @@ const ProblemDialog: React.FC<ProblemDialogProps> = ({
     <Dialog open={open} onOpenChange={(open) => !open && endGame()}>
       <DialogContent 
         ref={elementRef}
-        className={`z-[9000] touch-manipulation ${isMobile ? 'max-w-[95vw] max-h-[95vh] overflow-y-auto' : ''}`}
+        className={`z-[9000] touch-manipulation overflow-hidden ${isMobile ? 'max-w-[95vw] max-h-[95vh] overflow-y-auto' : ''}`}
       >
-        <DialogHeader>
-          <DialogTitle className={isMobile ? "text-lg" : ""}>Řeš příklad</DialogTitle>
-          <DialogDescription className="sr-only">
-            Zde můžete řešit matematické příklady
-          </DialogDescription>
-        </DialogHeader>
-        <div className="py-4 space-y-4">
-          {currentProblem && (
-            <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg border-2 border-dashed border-blue-200">
-              <p className={`font-bold text-center mb-4 ${isMobile ? 'text-xl' : 'text-2xl'}`}>
-                {currentProblem.num1} {formatOperation(currentProblem.operation)} {currentProblem.num2} = ?
-              </p>
-            </div>
-          )}
-          <Input
-            type="number"
-            value={userAnswer}
-            onChange={(e) => setUserAnswer(e.target.value)}
-            onKeyDown={handleKeyPress}
-            placeholder="Zadej odpověď"
-            className={`text-lg touch-manipulation ${isMobile ? 'h-14 text-lg' : 'h-12'}`}
-            autoFocus={!isMobile}
-            inputMode="numeric"
-            pattern="[0-9]*"
-          />
-          
-          {/* Enhanced Numeric Keyboard with better touch targets */}
-          <div className="mt-4">
-            <NumericKeyboard 
-              onKeyPress={handleKeyboardInput}
-              onClear={handleClear}
-              onSubmit={handleCheckAnswer}
-            />
-          </div>
-          
-          {/* In-game statistics */}
-          {totalAnswers > 0 && (
-            <div className="mt-4 space-y-2 bg-gray-50 p-3 rounded-lg">
-              <div className="flex justify-between text-sm font-medium">
-                <span className="text-green-600 flex items-center gap-1">
-                  <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                  Správně: {correctAnswers}
-                </span>
-                <span className="text-red-600 flex items-center gap-1">
-                  <span className="w-2 h-2 bg-red-500 rounded-full"></span>
-                  Špatně: {wrongAnswers}
-                </span>
+        <GlassDialog className="p-0 border-0 bg-transparent">
+          <div className="p-6">
+            <DialogHeader>
+              <DialogTitle className={`text-center bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent ${isMobile ? 'text-lg' : 'text-xl'}`}>
+                Řeš příklad
+              </DialogTitle>
+              <DialogDescription className="sr-only">
+                Zde můžete řešit matematické příklady
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="py-4 space-y-4">
+              {currentProblem && (
+                <HoverScale>
+                  <GlowingElement color="blue" className="bg-gradient-to-r from-blue-50/80 to-purple-50/80 backdrop-blur-sm p-6 rounded-xl border border-white/30 shadow-lg">
+                    <p className={`font-bold text-center mb-4 bg-gradient-to-r from-blue-800 to-purple-800 bg-clip-text text-transparent ${isMobile ? 'text-xl' : 'text-2xl'}`}>
+                      {currentProblem.num1} {formatOperation(currentProblem.operation)} {currentProblem.num2} = ?
+                    </p>
+                  </GlowingElement>
+                </HoverScale>
+              )}
+              
+              <Input
+                type="number"
+                value={userAnswer}
+                onChange={(e) => setUserAnswer(e.target.value)}
+                onKeyDown={handleKeyPress}
+                placeholder="Zadej odpověď"
+                className={`text-lg touch-manipulation glass-light border-white/30 ${isMobile ? 'h-14 text-lg' : 'h-12'}`}
+                autoFocus={!isMobile}
+                inputMode="numeric"
+                pattern="[0-9]*"
+              />
+              
+              {/* Enhanced Numeric Keyboard with better touch targets */}
+              <div className="mt-4">
+                <NumericKeyboard 
+                  onKeyPress={handleKeyboardInput}
+                  onClear={handleClear}
+                  onSubmit={handleCheckAnswer}
+                />
               </div>
-              <Progress value={correctPercentage} className="h-3" />
-              <p className="text-xs text-center text-gray-600">
-                {correctPercentage}% úspěšnost
-              </p>
+              
+              {/* Enhanced in-game statistics */}
+              {totalAnswers > 0 && (
+                <div className="mt-4 space-y-2 glass-light p-4 rounded-lg border border-white/20">
+                  <div className="flex justify-between text-sm font-medium">
+                    <span className="text-green-600 flex items-center gap-1">
+                      <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                      Správně: {correctAnswers}
+                    </span>
+                    <span className="text-red-600 flex items-center gap-1">
+                      <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                      Špatně: {wrongAnswers}
+                    </span>
+                  </div>
+                  <Progress value={correctPercentage} className="h-3" />
+                  <p className="text-xs text-center text-gray-600">
+                    {correctPercentage}% úspěšnost
+                  </p>
+                </div>
+              )}
             </div>
-          )}
-        </div>
-        <DialogFooter className={`flex gap-3 ${isMobile ? 'flex-col' : 'flex-row'}`}>
-          <Button 
-            onClick={handleCheckAnswer}
-            className={`bg-orange-500 hover:bg-orange-600 active:bg-orange-700 touch-manipulation transform active:scale-95 transition-all duration-150 ${isMobile ? 'w-full h-14 text-lg' : 'w-auto h-12'}`}
-            disabled={!userAnswer.trim()}
-          >
-            ✓ Odpovědět
-          </Button>
-          <Button 
-            onClick={handleEndGame}
-            variant="outline"
-            className={`bg-red-50 hover:bg-red-100 active:bg-red-200 border-red-200 text-red-700 touch-manipulation transform active:scale-95 transition-all duration-150 ${isMobile ? 'w-full h-14 text-lg' : 'w-auto h-12'}`}
-          >
-            ✕ Ukončit hru
-          </Button>
-        </DialogFooter>
+            
+            <DialogFooter className={`flex gap-3 ${isMobile ? 'flex-col' : 'flex-row'}`}>
+              <HoverScale>
+                <Button 
+                  onClick={handleCheckAnswer}
+                  className={`bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 active:scale-95 touch-manipulation transform transition-all duration-150 shadow-lg hover:shadow-xl ${isMobile ? 'w-full h-14 text-lg' : 'w-auto h-12'}`}
+                  disabled={!userAnswer.trim()}
+                >
+                  ✓ Odpovědět
+                </Button>
+              </HoverScale>
+              
+              <HoverScale>
+                <Button 
+                  onClick={handleEndGame}
+                  variant="outline"
+                  className={`glass-light border-red-200/50 text-red-700 hover:bg-red-100/50 active:scale-95 touch-manipulation transform transition-all duration-150 ${isMobile ? 'w-full h-14 text-lg' : 'w-auto h-12'}`}
+                >
+                  ✕ Ukončit hru
+                </Button>
+              </HoverScale>
+            </DialogFooter>
+          </div>
+        </GlassDialog>
       </DialogContent>
     </Dialog>
   );

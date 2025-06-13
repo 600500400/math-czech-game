@@ -8,7 +8,9 @@ import { useSpellingGame } from "@/hooks/spelling/useSpellingGame";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserTheme } from "@/hooks/useUserTheme";
 import { spellingGroups } from "@/data/spellingData";
-import { ConfettiExplosion } from "@/components/ui/confetti-explosion";
+import { SuccessParticles, ErrorParticles } from "@/components/ui/advanced-particle-system";
+import { GlassCard } from "@/components/ui/glass-morphism";
+import { FloatingIcon, HoverScale } from "@/components/ui/microanimations";
 import { useState, useEffect } from "react";
 
 const SpellingPractice = () => {
@@ -47,13 +49,18 @@ const SpellingPractice = () => {
     endGame,
   } = useSpellingGame();
 
-  const [showConfetti, setShowConfetti] = useState(false);
+  const [showSuccessParticles, setShowSuccessParticles] = useState(false);
+  const [showErrorParticles, setShowErrorParticles] = useState(false);
   
-  // Trigger confetti when correct answer is given
+  // Trigger particle effects when answers are given
   useEffect(() => {
     if (lastAnswerCorrect === true && showAnimation) {
-      setShowConfetti(true);
-      const timer = setTimeout(() => setShowConfetti(false), 2000);
+      setShowSuccessParticles(true);
+      const timer = setTimeout(() => setShowSuccessParticles(false), 3000);
+      return () => clearTimeout(timer);
+    } else if (lastAnswerCorrect === false && showAnimation) {
+      setShowErrorParticles(true);
+      const timer = setTimeout(() => setShowErrorParticles(false), 2000);
       return () => clearTimeout(timer);
     }
   }, [lastAnswerCorrect, showAnimation]);
@@ -65,7 +72,14 @@ const SpellingPractice = () => {
   };
 
   return (
-    <div className="space-y-4 relative" style={getCSSVariables}>
+    <div className="space-y-4 relative min-h-screen" style={getCSSVariables}>
+      {/* Background glass effect */}
+      <div className="fixed inset-0 bg-gradient-to-br from-green-50/50 to-blue-50/50 -z-10" />
+      
+      {/* Enhanced particle effects */}
+      <SuccessParticles trigger={showSuccessParticles} />
+      <ErrorParticles trigger={showErrorParticles} />
+      
       {/* Fun Graphics Component - moved outside dialogs for visibility with higher z-index */}
       <div className="z-[9999]">
         {showAnimation && (
@@ -73,28 +87,26 @@ const SpellingPractice = () => {
         )}
       </div>
       
-      {/* Confetti effect when answers are correct - with high z-index */}
-      <div className="z-[9999] relative">
-        <ConfettiExplosion 
-          trigger={showConfetti} 
-          particleCount={30}
-          duration={2000}
-          colors={[theme.primaryColor, theme.secondaryColor, theme.accentColor, '#FFC700', '#FF0000']}
-        />
-      </div>
-      
-      <h1 
-        className="text-3xl font-bold text-center"
-        style={{ color: theme.primaryColor }}
-      >
-        Procvičování vyjmenovaných slov {theme.avatar}
-      </h1>
+      {/* Enhanced header with floating animation */}
+      <FloatingIcon className="text-center">
+        <h1 
+          className="text-3xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent"
+          style={{ color: theme.primaryColor }}
+        >
+          Procvičování vyjmenovaných slov {theme.avatar}
+        </h1>
+      </FloatingIcon>
 
-      <GameControls 
-        selectedGroupsCount={selectedGroups.length}
-        onShowGroupDialog={() => setShowGroupDialog(true)}
-        onStartGame={startNewGame}
-      />
+      {/* Glass morphism game controls */}
+      <HoverScale>
+        <GlassCard className="hover:bg-white/25 transition-all duration-500">
+          <GameControls 
+            selectedGroupsCount={selectedGroups.length}
+            onShowGroupDialog={() => setShowGroupDialog(true)}
+            onStartGame={startNewGame}
+          />
+        </GlassCard>
+      </HoverScale>
 
       {/* Group Selection Dialog */}
       <GroupSelectionDialog
