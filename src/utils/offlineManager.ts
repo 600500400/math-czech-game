@@ -40,9 +40,12 @@ class OfflineManager {
   }
 
   private registerBackgroundSync() {
-    if ('serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype) {
+    if ('serviceWorker' in navigator && 'ServiceWorkerRegistration' in window) {
       navigator.serviceWorker.ready.then(registration => {
-        return registration.sync.register('sync-game-data');
+        // Check if sync is supported
+        if ('sync' in registration) {
+          return (registration as any).sync.register('sync-game-data');
+        }
       }).catch(error => {
         console.warn('Background sync registration failed:', error);
       });

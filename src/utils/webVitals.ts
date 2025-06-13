@@ -1,5 +1,5 @@
 
-import { getCLS, getFID, getFCP, getLCP, getTTFB } from 'web-vitals';
+import { onCLS, onFID, onFCP, onLCP, onTTFB } from 'web-vitals';
 
 interface VitalMetric {
   name: string;
@@ -19,11 +19,11 @@ class WebVitalsMonitor {
 
   private initializeVitalsTracking() {
     // Track Core Web Vitals
-    getCLS(this.handleVital.bind(this));
-    getFID(this.handleVital.bind(this));
-    getFCP(this.handleVital.bind(this));
-    getLCP(this.handleVital.bind(this));
-    getTTFB(this.handleVital.bind(this));
+    onCLS(this.handleVital.bind(this));
+    onFID(this.handleVital.bind(this));
+    onFCP(this.handleVital.bind(this));
+    onLCP(this.handleVital.bind(this));
+    onTTFB(this.handleVital.bind(this));
 
     // Track custom performance metrics
     this.trackCustomMetrics();

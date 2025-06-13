@@ -7,7 +7,7 @@ import {
   Wifi, 
   WifiOff, 
   Download, 
-  Sync, 
+  RefreshCw, 
   Battery, 
   Smartphone,
   Gauge
@@ -131,7 +131,7 @@ const PWAStatusBar = () => {
                     disabled={!isOnline || offlineStatus.syncInProgress}
                     className="text-xs h-6"
                   >
-                    <Sync className="w-3 h-3 mr-1" />
+                    <RefreshCw className="w-3 h-3 mr-1" />
                     Sync
                   </Button>
                 )}
