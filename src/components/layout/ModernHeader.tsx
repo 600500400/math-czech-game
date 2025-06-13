@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { BookOpen, Sparkles } from "lucide-react";
 import UserMenu from "@/components/UserMenu";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { useLanguage } from "@/hooks/useLanguage";
 
 const ModernHeader = () => {
@@ -11,7 +12,7 @@ const ModernHeader = () => {
   const { t } = useLanguage();
 
   return (
-    <header className="w-full bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-50">
+    <header className="w-full bg-background/80 backdrop-blur-md border-b border-border sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -26,14 +27,15 @@ const ModernHeader = () => {
               <h1 className="text-xl font-heading font-bold gradient-text">
                 Procvička
               </h1>
-              <p className="text-xs text-gray-500 -mt-1">
+              <p className="text-xs text-muted-foreground -mt-1">
                 {t('auth.title')}
               </p>
             </div>
           </div>
 
-          {/* User Menu and Language Switcher */}
+          {/* Controls */}
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             <LanguageSwitcher />
             <UserMenu />
           </div>

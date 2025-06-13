@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CustomGameControls } from "./math/CustomGameControls";
@@ -16,7 +15,7 @@ import { useEnhancedMobileInteractions } from "@/hooks/useEnhancedMobileInteract
 
 const MathPractice = () => {
   const { authState } = useAuth();
-  const { theme, getCSSVariables } = useUserTheme(authState.user?.id);
+  const { theme, getCSSVariables, getGradientClasses } = useUserTheme(authState.user?.id);
   
   const {
     currentProblem,
@@ -106,8 +105,8 @@ const MathPractice = () => {
 
   return (
     <div className="space-y-4 relative min-h-screen" style={getCSSVariables}>
-      {/* Background glass effect */}
-      <div className="fixed inset-0 bg-gradient-to-br from-blue-50/50 to-purple-50/50 -z-10" />
+      {/* Background glass effect with theme support */}
+      <div className={`fixed inset-0 bg-gradient-to-br ${getGradientClasses.background} -z-10`} />
       
       {/* Enhanced particle effects */}
       <SuccessParticles trigger={showSuccessParticles} />
@@ -123,8 +122,7 @@ const MathPractice = () => {
       {/* Enhanced header with floating animation */}
       <FloatingIcon className="text-center">
         <h1 
-          className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
-          style={{ color: theme.primaryColor }}
+          className={`text-3xl font-bold bg-gradient-to-r ${getGradientClasses.primary} bg-clip-text text-transparent`}
         >
           Procvičování matematiky {theme.avatar}
         </h1>
@@ -132,7 +130,7 @@ const MathPractice = () => {
 
       {/* Glass morphism game controls */}
       <HoverScale>
-        <GlassCard className="hover:bg-white/25 transition-all duration-500">
+        <GlassCard className="hover:bg-white/25 dark:hover:bg-white/10 transition-all duration-500">
           <CustomGameControls 
             onShowDifficultyDialog={handleShowDifficultyDialog}
             onStartGame={handleStartNewGame}

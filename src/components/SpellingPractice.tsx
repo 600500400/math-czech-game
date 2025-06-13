@@ -15,7 +15,7 @@ import { useEnhancedMobileInteractions } from "@/hooks/useEnhancedMobileInteract
 
 const SpellingPractice = () => {
   const { authState } = useAuth();
-  const { theme, getCSSVariables } = useUserTheme(authState.user?.id);
+  const { theme, getCSSVariables, getGradientClasses } = useUserTheme(authState.user?.id);
   
   const {
     correctAnswers,
@@ -95,8 +95,8 @@ const SpellingPractice = () => {
 
   return (
     <div className="space-y-4 relative min-h-screen" style={getCSSVariables}>
-      {/* Background glass effect */}
-      <div className="fixed inset-0 bg-gradient-to-br from-green-50/50 to-blue-50/50 -z-10" />
+      {/* Background glass effect with theme support */}
+      <div className={`fixed inset-0 bg-gradient-to-br ${getGradientClasses.background} -z-10`} />
       
       {/* Enhanced particle effects */}
       <SuccessParticles trigger={showSuccessParticles} />
@@ -112,8 +112,7 @@ const SpellingPractice = () => {
       {/* Enhanced header with floating animation */}
       <FloatingIcon className="text-center">
         <h1 
-          className="text-3xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent"
-          style={{ color: theme.primaryColor }}
+          className={`text-3xl font-bold bg-gradient-to-r ${getGradientClasses.primary} bg-clip-text text-transparent`}
         >
           Procvičování vyjmenovaných slov {theme.avatar}
         </h1>
@@ -121,7 +120,7 @@ const SpellingPractice = () => {
 
       {/* Glass morphism game controls */}
       <HoverScale>
-        <GlassCard className="hover:bg-white/25 transition-all duration-500">
+        <GlassCard className="hover:bg-white/25 dark:hover:bg-white/10 transition-all duration-500">
           <GameControls 
             selectedGroupsCount={selectedGroups.length}
             onShowGroupDialog={handleShowGroupDialog}
