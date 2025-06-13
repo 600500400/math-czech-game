@@ -26,40 +26,55 @@ export const useLeaderboards = () => {
     try {
       setIsLoading(true);
       
-      // Get top 50 users by total XP
-      const { data: levelData, error } = await supabase
+      // Get top 50 users by total XP - first get user_levels data
+      const { data: levelData, error: levelError } = await supabase
         .from('user_levels')
-        .select(`
-          user_id,
-          total_xp,
-          current_level,
-          profiles!inner(full_name)
-        `)
+        .select('user_id, total_xp, current_level')
         .order('total_xp', { ascending: false })
         .limit(50);
 
-      if (error) throw error;
+      if (levelError) throw levelError;
+
+      if (!levelData || levelData.length === 0) {
+        setGlobalLeaderboard([]);
+        return;
+      }
+
+      // Get profiles for these users
+      const userIds = levelData.map(entry => entry.user_id);
+      const { data: profiles, error: profileError } = await supabase
+        .from('profiles')
+        .select('id, full_name')
+        .in('id', userIds);
+
+      if (profileError) {
+        console.error('Error fetching profiles:', profileError);
+      }
 
       // Get streak data for these users
-      const userIds = levelData?.map(entry => entry.user_id) || [];
-      const { data: streakData } = await supabase
+      const { data: streakData, error: streakError } = await supabase
         .from('user_streaks')
         .select('user_id, current_streak, longest_streak')
         .in('user_id', userIds);
 
+      if (streakError) {
+        console.error('Error fetching streaks:', streakError);
+      }
+
       // Combine data
-      const leaderboard: LeaderboardEntry[] = levelData?.map((entry, index) => {
+      const leaderboard: LeaderboardEntry[] = levelData.map((entry, index) => {
+        const profile = profiles?.find(p => p.id === entry.user_id);
         const streakInfo = streakData?.find(s => s.user_id === entry.user_id);
         return {
           user_id: entry.user_id,
-          username: entry.profiles?.full_name || 'Uživatel',
-          total_xp: entry.total_xp,
-          current_level: entry.current_level,
+          username: profile?.full_name || 'Uživatel',
+          total_xp: entry.total_xp || 0,
+          current_level: entry.current_level || 1,
           current_streak: streakInfo?.current_streak || 0,
           longest_streak: streakInfo?.longest_streak || 0,
           rank: index + 1
         };
-      }) || [];
+      });
 
       setGlobalLeaderboard(leaderboard);
 
@@ -106,6 +121,11 @@ export const useLeaderboards = () => {
 
       // Get user profiles
       const activeUserIds = Object.keys(weeklyPoints);
+      if (activeUserIds.length === 0) {
+        setWeeklyLeaderboard([]);
+        return;
+      }
+
       const { data: profiles } = await supabase
         .from('profiles')
         .select('id, full_name')
