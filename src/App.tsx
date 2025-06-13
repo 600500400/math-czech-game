@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,6 +12,7 @@ import NotFound from "./pages/NotFound";
 import FeedbackButton from "./components/FeedbackButton";
 import PWAInstallPrompt from "./components/pwa/PWAInstallPrompt";
 import OfflineIndicator from "./components/pwa/OfflineIndicator";
+import PWAStatusBar from "./components/pwa/PWAStatusBar";
 import "@/i18n";
 
 const queryClient = new QueryClient({
@@ -41,6 +41,7 @@ const App = () => (
             <FeedbackButton />
             <PWAInstallPrompt />
             <OfflineIndicator />
+            <PWAStatusBar />
           </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>
