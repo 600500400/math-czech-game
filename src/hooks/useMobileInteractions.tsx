@@ -36,16 +36,18 @@ export const useMobileInteractions = () => {
 
     const preventDoubleTabZoom = (e: TouchEvent) => {
       let t2 = e.timeStamp;
-      let t1 = e.currentTarget?.getAttribute('data-lastTouch') || t2;
+      const currentTarget = e.currentTarget as HTMLElement;
+      let t1 = currentTarget?.getAttribute('data-lastTouch') || t2.toString();
       let dt = t2 - parseInt(t1);
       let fingers = e.touches.length;
       
-      e.currentTarget?.setAttribute('data-lastTouch', t2.toString());
+      currentTarget?.setAttribute('data-lastTouch', t2.toString());
 
       if (!dt || dt > 500 || fingers > 1) return; // not double-tap
 
       e.preventDefault(); // double tap - prevent zoom
-      e.target?.dispatchEvent(new Event('click', { bubbles: true }));
+      const target = e.target as HTMLElement;
+      target?.dispatchEvent(new Event('click', { bubbles: true }));
     };
 
     document.addEventListener('touchstart', preventZoom, { passive: false });

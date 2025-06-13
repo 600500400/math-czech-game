@@ -21,7 +21,7 @@ export const useTouchGestures = (options: TouchGestureOptions) => {
   } = options;
 
   const touchStart = useRef<{ x: number; y: number } | null>(null);
-  const elementRef = useRef<HTMLElement>(null);
+  const elementRef = useRef<HTMLDivElement>(null);
 
   const triggerHaptic = useCallback((type: 'light' | 'medium' | 'heavy' = 'light') => {
     if (!hapticFeedback) return;
