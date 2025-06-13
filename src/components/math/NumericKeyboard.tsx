@@ -1,8 +1,7 @@
 
 import { Button } from "@/components/ui/button";
-import { Keyboard, Plus, Minus, Divide, X as Multiply } from "lucide-react";
-import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useMobileInteractions } from "@/hooks/useMobileInteractions";
 
 interface NumericKeyboardProps {
   onKeyPress: (key: string) => void;
@@ -12,71 +11,69 @@ interface NumericKeyboardProps {
 
 const NumericKeyboard = ({ onKeyPress, onClear, onSubmit }: NumericKeyboardProps) => {
   const isMobile = useIsMobile();
-  const [isVisible, setIsVisible] = useState(isMobile); // Na mobilu zobrazit defaultně
+  const { triggerTapHaptic } = useMobileInteractions();
 
-  const toggleKeyboard = () => {
-    setIsVisible(prev => !prev);
+  const handleKeyPress = (key: string) => {
+    triggerTapHaptic();
+    onKeyPress(key);
   };
 
-  return (
-    <div className="w-full">
-      {!isMobile && (
-        <div className="flex justify-center mb-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={toggleKeyboard}
-            className="flex items-center gap-1"
-          >
-            <Keyboard size={16} />
-            {isVisible ? "Skrýt klávesnici" : "Zobrazit klávesnici"}
-          </Button>
-        </div>
-      )}
+  const handleClear = () => {
+    triggerTapHaptic();
+    onClear();
+  };
 
-      {isVisible && (
-        <div className="bg-white border border-gray-200 rounded-lg p-2 shadow-md">
-          <div className="grid grid-cols-3 gap-2 mb-2">
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
-              <Button
-                key={num}
-                variant="outline"
-                onClick={() => onKeyPress(num.toString())}
-                className="h-12 text-lg font-medium hover:bg-gray-100 active:bg-gray-200 touch-manipulation"
-              >
-                {num}
-              </Button>
-            ))}
+  const handleSubmit = () => {
+    triggerTapHaptic();
+    onSubmit();
+  };
+
+  const keys = [
+    ['1', '2', '3'],
+    ['4', '5', '6'], 
+    ['7', '8', '9'],
+    ['Clear', '0', 'Enter']
+  ];
+
+  return (
+    <div className="grid grid-cols-3 gap-3 max-w-xs mx-auto">
+      {keys.flat().map((key) => {
+        if (key === 'Clear') {
+          return (
             <Button
+              key={key}
+              onClick={handleClear}
               variant="outline"
-              onClick={() => onKeyPress("0")}
-              className="h-12 text-lg font-medium hover:bg-gray-100 active:bg-gray-200 touch-manipulation"
+              className={`bg-red-50 hover:bg-red-100 active:bg-red-200 border-red-200 text-red-700 font-medium touch-manipulation transform active:scale-95 transition-all duration-150 ${isMobile ? 'h-14 text-lg' : 'h-12'}`}
             >
-              0
+              ⌫
             </Button>
+          );
+        }
+        
+        if (key === 'Enter') {
+          return (
             <Button
-              variant="outline"
-              onClick={() => onKeyPress(".")}
-              className="h-12 text-lg font-medium hover:bg-gray-100 active:bg-gray-200 touch-manipulation"
+              key={key}
+              onClick={handleSubmit}
+              className={`bg-green-500 hover:bg-green-600 active:bg-green-700 text-white font-medium touch-manipulation transform active:scale-95 transition-all duration-150 ${isMobile ? 'h-14 text-lg' : 'h-12'}`}
             >
-              .
+              ✓
             </Button>
-            <Button
-              variant="outline"
-              onClick={onClear}
-              className="h-12 text-lg font-medium hover:bg-gray-100 active:bg-gray-200 text-red-500 touch-manipulation"
-            >
-              C
-            </Button>
-          </div>
+          );
+        }
+        
+        return (
           <Button
-            onClick={onSubmit}
-            className="w-full bg-orange-500 hover:bg-orange-600 active:bg-orange-700 h-12 text-lg touch-manipulation"
+            key={key}
+            onClick={() => handleKeyPress(key)}
+            variant="outline"
+            className={`bg-blue-50 hover:bg-blue-100 active:bg-blue-200 border-blue-200 text-blue-800 font-semibold touch-manipulation transform active:scale-95 transition-all duration-150 ${isMobile ? 'h-14 text-xl' : 'h-12 text-lg'}`}
           >
-            Odpovědět
+            {key}
           </Button>
-        </div>
-      )}
+        );
+      })}
     </div>
   );
 };
