@@ -1,5 +1,5 @@
 
-import { onCLS, onFID, onFCP, onLCP, onTTFB } from 'web-vitals';
+import { onCLS, onINP, onFCP, onLCP, onTTFB } from 'web-vitals';
 
 interface VitalMetric {
   name: string;
@@ -20,7 +20,7 @@ class WebVitalsMonitor {
   private initializeVitalsTracking() {
     // Track Core Web Vitals
     onCLS(this.handleVital.bind(this));
-    onFID(this.handleVital.bind(this));
+    onINP(this.handleVital.bind(this)); // INP replaced FID
     onFCP(this.handleVital.bind(this));
     onLCP(this.handleVital.bind(this));
     onTTFB(this.handleVital.bind(this));
@@ -106,7 +106,7 @@ class WebVitalsMonitor {
   getPerformanceScore(): number {
     const weights = {
       LCP: 0.25,   // Largest Contentful Paint
-      FID: 0.25,   // First Input Delay
+      INP: 0.25,   // Interaction to Next Paint (replaced FID)
       CLS: 0.25,   // Cumulative Layout Shift
       FCP: 0.15,   // First Contentful Paint
       TTFB: 0.1    // Time to First Byte
@@ -156,8 +156,8 @@ function generateRecommendations(metrics: VitalMetric[], score: number): string[
         case 'LCP':
           recommendations.push('Optimalizujte načítání hlavního obsahu (LCP)');
           break;
-        case 'FID':
-          recommendations.push('Zlepšete rychlost reakce na uživatelské akce (FID)');
+        case 'INP':
+          recommendations.push('Zlepšete rychlost reakce na uživatelské akce (INP)');
           break;
         case 'CLS':
           recommendations.push('Snižte neočekávané posuny layoutu (CLS)');
