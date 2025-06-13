@@ -1,4 +1,3 @@
-
 import { GroupSelectionDialog } from "./spelling/GroupSelectionDialog";
 import { WordProblemDialog } from "./spelling/WordProblemDialog";
 import { StatisticsDialog } from "./spelling/StatisticsDialog";
@@ -12,6 +11,7 @@ import { SuccessParticles, ErrorParticles } from "@/components/ui/advanced-parti
 import { GlassCard } from "@/components/ui/glass-morphism";
 import { FloatingIcon, HoverScale } from "@/components/ui/microanimations";
 import { useState, useEffect } from "react";
+import { useEnhancedMobileInteractions } from "@/hooks/useEnhancedMobileInteractions";
 
 const SpellingPractice = () => {
   const { authState } = useAuth();
@@ -49,26 +49,48 @@ const SpellingPractice = () => {
     endGame,
   } = useSpellingGame();
 
+  const {
+    triggerCorrectFeedback,
+    triggerIncorrectFeedback,
+    triggerGameStartFeedback,
+    triggerGameEndFeedback,
+    triggerButtonFeedback
+  } = useEnhancedMobileInteractions();
+
   const [showSuccessParticles, setShowSuccessParticles] = useState(false);
   const [showErrorParticles, setShowErrorParticles] = useState(false);
   
-  // Trigger particle effects when answers are given
+  // Trigger particle effects and enhanced feedback when answers are given
   useEffect(() => {
     if (lastAnswerCorrect === true && showAnimation) {
       setShowSuccessParticles(true);
+      triggerCorrectFeedback();
       const timer = setTimeout(() => setShowSuccessParticles(false), 3000);
       return () => clearTimeout(timer);
     } else if (lastAnswerCorrect === false && showAnimation) {
       setShowErrorParticles(true);
+      triggerIncorrectFeedback();
       const timer = setTimeout(() => setShowErrorParticles(false), 2000);
       return () => clearTimeout(timer);
     }
-  }, [lastAnswerCorrect, showAnimation]);
+  }, [lastAnswerCorrect, showAnimation, triggerCorrectFeedback, triggerIncorrectFeedback]);
 
-  // Custom end game handler that doesn't show stats dialog automatically
+  // Enhanced game start with feedback
+  const handleStartNewGame = () => {
+    triggerGameStartFeedback();
+    startNewGame();
+  };
+
+  // Enhanced game end with feedback
   const handleEndGame = () => {
+    triggerGameEndFeedback();
     endGame();
-    // Remove automatic stats dialog display - user can still access it via button
+  };
+
+  // Enhanced button interactions
+  const handleShowGroupDialog = () => {
+    triggerButtonFeedback();
+    setShowGroupDialog(true);
   };
 
   return (
@@ -102,8 +124,8 @@ const SpellingPractice = () => {
         <GlassCard className="hover:bg-white/25 transition-all duration-500">
           <GameControls 
             selectedGroupsCount={selectedGroups.length}
-            onShowGroupDialog={() => setShowGroupDialog(true)}
-            onStartGame={startNewGame}
+            onShowGroupDialog={handleShowGroupDialog}
+            onStartGame={handleStartNewGame}
           />
         </GlassCard>
       </HoverScale>
@@ -124,7 +146,7 @@ const SpellingPractice = () => {
       <WordProblemDialog
         open={showProblem}
         onOpenChange={(open) => {
-          if (!open) handleEndGame(); // Use custom handler
+          if (!open) handleEndGame();
         }}
         displayedWord={displayedWord}
         currentWord={currentWord}
@@ -135,7 +157,7 @@ const SpellingPractice = () => {
         currentPosition={currentPosition}
         onAnswerI={handleAnswerI}
         onAnswerY={handleAnswerY}
-        onEndGame={handleEndGame} // Use custom handler
+        onEndGame={handleEndGame}
         correctAnswers={correctAnswers}
         wrongAnswers={wrongAnswers}
       />

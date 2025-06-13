@@ -12,6 +12,7 @@ import { useUserTheme } from "@/hooks/useUserTheme";
 import { SuccessParticles, ErrorParticles } from "@/components/ui/advanced-particle-system";
 import { GlassCard, GlassDialog } from "@/components/ui/glass-morphism";
 import { FloatingIcon, HoverScale } from "@/components/ui/microanimations";
+import { useEnhancedMobileInteractions } from "@/hooks/useEnhancedMobileInteractions";
 
 const MathPractice = () => {
   const { authState } = useAuth();
@@ -43,24 +44,52 @@ const MathPractice = () => {
     setDifficulty,
   } = useMathGame();
 
+  const {
+    triggerCorrectFeedback,
+    triggerIncorrectFeedback,
+    triggerGameStartFeedback,
+    triggerGameEndFeedback,
+    triggerButtonFeedback
+  } = useEnhancedMobileInteractions();
+
   const [showSuccessParticles, setShowSuccessParticles] = useState(false);
   const [showErrorParticles, setShowErrorParticles] = useState(false);
   
-  // Trigger particle effects when answers are given
+  // Trigger particle effects and enhanced feedback when answers are given
   useEffect(() => {
     if (lastAnswerCorrect === true && showAnimation) {
       setShowSuccessParticles(true);
+      triggerCorrectFeedback();
       const timer = setTimeout(() => setShowSuccessParticles(false), 3000);
       return () => clearTimeout(timer);
     } else if (lastAnswerCorrect === false && showAnimation) {
       setShowErrorParticles(true);
+      triggerIncorrectFeedback();
       const timer = setTimeout(() => setShowErrorParticles(false), 2000);
       return () => clearTimeout(timer);
     }
-  }, [lastAnswerCorrect, showAnimation]);
+  }, [lastAnswerCorrect, showAnimation, triggerCorrectFeedback, triggerIncorrectFeedback]);
 
   const totalAnswers = correctAnswers + wrongAnswers;
   const correctPercentage = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 0;
+
+  // Enhanced game start with feedback
+  const handleStartNewGame = () => {
+    triggerGameStartFeedback();
+    startNewGame();
+  };
+
+  // Enhanced game end with feedback
+  const handleEndGame = () => {
+    triggerGameEndFeedback();
+    endGame();
+  };
+
+  // Enhanced button interactions
+  const handleShowDifficultyDialog = () => {
+    triggerButtonFeedback();
+    setShowDifficultyDialog(true);
+  };
 
   // Create difficulty settings object for compatibility
   const difficultySettings = {
@@ -105,8 +134,8 @@ const MathPractice = () => {
       <HoverScale>
         <GlassCard className="hover:bg-white/25 transition-all duration-500">
           <CustomGameControls 
-            onShowDifficultyDialog={() => setShowDifficultyDialog(true)}
-            onStartGame={startNewGame}
+            onShowDifficultyDialog={handleShowDifficultyDialog}
+            onStartGame={handleStartNewGame}
             difficultySettings={difficultySettings}
           />
         </GlassCard>
@@ -131,14 +160,14 @@ const MathPractice = () => {
       <ProblemDialog
         open={showProblem}
         onOpenChange={(open) => {
-          if (!open) endGame();
+          if (!open) handleEndGame();
         }}
         currentProblem={currentProblem}
         userAnswer={userAnswer}
         setUserAnswer={setUserAnswer}
         handleKeyPress={handleKeyPress}
         checkAnswer={checkAnswer}
-        endGame={endGame}
+        endGame={handleEndGame}
         correctAnswers={correctAnswers}
         wrongAnswers={wrongAnswers}
         totalAnswers={totalAnswers}
