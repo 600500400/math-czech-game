@@ -48,32 +48,41 @@ export const FunGraphics = ({
   useEffect(() => {
     console.log("🎨 FunGraphics: Animation change - showAnimation:", showAnimation, "isCorrect:", isCorrect, "animationId:", animationId);
     
-    // Clear any existing cleanup timeout
+    // Clear any existing cleanup timeout immediately
     if (cleanupTimeoutRef.current) {
       clearTimeout(cleanupTimeoutRef.current);
       cleanupTimeoutRef.current = null;
     }
     
-    // If animation should not show, hide immediately
+    // If animation should not show, hide immediately and don't show
     if (!showAnimation || !mountedRef.current || isCorrect === null) {
       console.log("🎨 FunGraphics: Hiding animation immediately");
       setIsVisible(false);
       return;
     }
     
-    // Show animation
+    // Show animation only if all conditions are met
+    console.log("🎨 FunGraphics: Starting animation");
     setCurrentAnimationId(animationId);
     setIsVisible(true);
     
-    // Schedule automatic cleanup - reduced timeout
+    // Schedule automatic cleanup with shorter timeout
     cleanupTimeoutRef.current = setTimeout(() => {
       if (mountedRef.current) {
         console.log("🎨 FunGraphics: Auto-cleanup for animation ID:", animationId);
         setIsVisible(false);
       }
-    }, 800); // Reduced from 1000 to 800ms for faster cleanup
+    }, 600); // Further reduced to 600ms for faster cleanup
     
   }, [isCorrect, showAnimation, animationId]);
+  
+  // Force hide when showAnimation becomes false
+  useEffect(() => {
+    if (!showAnimation) {
+      console.log("🎨 FunGraphics: showAnimation is false, forcing hide");
+      setIsVisible(false);
+    }
+  }, [showAnimation]);
   
   // Don't render if not visible or should not show
   if (!showAnimation || !isVisible || isCorrect === null) {

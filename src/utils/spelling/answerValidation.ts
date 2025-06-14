@@ -24,18 +24,20 @@ export function checkSpellingAnswer(correctLetter: string, userAnswer: string): 
   return isCorrect;
 }
 
-// Funkce pro zobrazení slova s aktuální mezerou
+// Funkce pro zobrazení slova s aktuální mezerou a doplněnými písmeny
 export function renderWordWithCurrentGap(
   currentWord: string, 
   missingPositions: number[], 
   correctLetters: string[], 
-  currentPosition: number
+  currentPosition: number,
+  filledAnswers: { [position: number]: string } = {}
 ): string {
   console.log("🖼️ renderWordWithCurrentGap: ZAČÁTEK VYKRESLOVÁNÍ");
   console.log("🖼️ renderWordWithCurrentGap: currentWord:", currentWord);
   console.log("🖼️ renderWordWithCurrentGap: missingPositions:", missingPositions);
   console.log("🖼️ renderWordWithCurrentGap: correctLetters:", correctLetters);
   console.log("🖼️ renderWordWithCurrentGap: currentPosition:", currentPosition);
+  console.log("🖼️ renderWordWithCurrentGap: filledAnswers:", filledAnswers);
   
   if (!currentWord || missingPositions.length === 0) {
     console.log("🖼️ renderWordWithCurrentGap: Vracím původní slovo (žádné změny)");
@@ -49,14 +51,14 @@ export function renderWordWithCurrentGap(
     
     if (positionIndex !== -1) {
       // Tato pozice má být mezera nebo už vyplněné písmeno
-      if (positionIndex === currentPosition) {
+      if (positionIndex < currentPosition) {
+        // Pro už zodpovězené pozice vložíme původní písmeno (doplněno)
+        result += currentWord[i];
+        console.log(`🖼️ renderWordWithCurrentGap: Pozice ${i} (index ${positionIndex}): ZODPOVĚZENO -> '${currentWord[i]}'`);
+      } else if (positionIndex === currentPosition) {
         // Pro aktuální pozici vložíme podtržítko
         result += '_';
         console.log(`🖼️ renderWordWithCurrentGap: Pozice ${i} (index ${positionIndex}): AKTUÁLNÍ -> '_'`);
-      } else if (positionIndex < currentPosition) {
-        // Pro už zodpovězené pozice vložíme původní písmeno
-        result += currentWord[i];
-        console.log(`🖼️ renderWordWithCurrentGap: Pozice ${i} (index ${positionIndex}): ZODPOVĚZENO -> '${currentWord[i]}'`);
       } else {
         // Pro budoucí pozice vložíme podtržítko
         result += '_';

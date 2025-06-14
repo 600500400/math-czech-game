@@ -74,25 +74,33 @@ export const useAnswerHandling = ({
       onWrongAnswer();
     }
 
-    // Show animation with simplified timing
+    // Show animation with proper timing
     console.log("🎬 handleAnswer: Starting animation sequence");
     setLastAnswerCorrect(isCorrect);
     setShowAnimation(true);
 
-    // Posunout na další pozici nebo další slovo
-    const nextPosition = currentPosition + 1;
-    
-    if (nextPosition >= missingPositions.length) {
-      // Hotovo s tímto slovem - generovat nové za kratší dobu
-      console.log("🎯 handleAnswer: Slovo dokončeno, generuji nové za 1.2s");
+    // Auto-hide animation and move to next after shorter time
+    setTimeout(() => {
+      console.log("🎬 handleAnswer: Hiding animation");
+      setShowAnimation(false);
+      setLastAnswerCorrect(null);
+      
+      // Small delay for smooth transition
       setTimeout(() => {
-        generateNewWord();
-      }, 1200); // Shorter delay
-    } else {
-      // Pokračovat na další pozici ve stejném slově
-      moveToNextPosition();
-      console.log("➡️ handleAnswer: Pokračuji na pozici:", nextPosition);
-    }
+        const nextPosition = currentPosition + 1;
+        
+        if (nextPosition >= missingPositions.length) {
+          // Hotovo s tímto slovem - generovat nové
+          console.log("🎯 handleAnswer: Word completed, generating new word");
+          generateNewWord();
+        } else {
+          // Pokračovat na další pozici ve stejném slově
+          console.log("➡️ handleAnswer: Moving to next position:", nextPosition);
+          moveToNextPosition();
+        }
+      }, 100);
+      
+    }, 800); // Shortened animation time
 
   }, [
     currentPosition,

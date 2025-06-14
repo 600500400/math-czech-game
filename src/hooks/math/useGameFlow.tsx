@@ -41,7 +41,10 @@ export function useGameFlow({
   // Start new game flow
   const startNewGame = useCallback(() => {
     console.log("🎮 useGameFlow: Starting new game, recording start time");
-    setGameStartTime(Date.now());
+    const startTime = Date.now();
+    setGameStartTime(startTime);
+    console.log("🎮 useGameFlow: Game start time set to:", new Date(startTime).toLocaleTimeString());
+    
     setCurrentProblem(generateProblem());
     setShowProblem(true);
     setGameEnded(false);
@@ -51,32 +54,53 @@ export function useGameFlow({
   // End game flow (now "take break")
   const endGame = useCallback(() => {
     console.log("🎮 useGameFlow: Ending game");
+    console.log("🎮 useGameFlow: Game start time was:", gameStartTime ? new Date(gameStartTime).toLocaleTimeString() : 'NULL');
+    console.log("🎮 useGameFlow: Current time:", new Date().toLocaleTimeString());
+    
     setShowProblem(false);
     setGameEnded(true);
     setShowStatsDialog(true);
     
     // Save statistics if user is logged in and has game data
     if (userId && gameStartTime && (correctAnswers > 0 || wrongAnswers > 0)) {
-      const gameDuration = Math.round((Date.now() - gameStartTime) / 1000);
+      const endTime = Date.now();
+      const gameDuration = Math.round((endTime - gameStartTime) / 1000);
       const operationString = allowedOperations.join(',');
       
-      console.log("🎮 useGameFlow: Saving statistics with game duration:", gameDuration, "seconds");
+      console.log("🎮 useGameFlow: Calculating game duration:");
+      console.log("🎮 useGameFlow: - Start time:", new Date(gameStartTime).toLocaleTimeString());
+      console.log("🎮 useGameFlow: - End time:", new Date(endTime).toLocaleTimeString());
+      console.log("🎮 useGameFlow: - Duration in seconds:", gameDuration);
+      console.log("🎮 useGameFlow: - Correct answers:", correctAnswers);
+      console.log("🎮 useGameFlow: - Wrong answers:", wrongAnswers);
       
-      saveMathStatistics.mutate({
-        correctAnswers,
-        wrongAnswers,
-        operation: operationString,
-        gameDuration, // Properly calculated game duration
-        difficultyLevel: {
-          maxValue,
-          maxMultiplyValue,
-          maxDivideValue
-        }
-      });
+      // Ensure gameDuration is a valid number and greater than 0
+      if (gameDuration > 0) {
+        console.log("🎮 useGameFlow: Saving statistics with valid game duration");
+        
+        saveMathStatistics.mutate({
+          correctAnswers,
+          wrongAnswers,
+          operation: operationString,
+          gameDuration, // This should now be properly calculated
+          difficultyLevel: {
+            maxValue,
+            maxMultiplyValue,
+            maxDivideValue
+          }
+        });
+      } else {
+        console.warn("🎮 useGameFlow: Invalid game duration calculated:", gameDuration);
+      }
     } else {
-      console.log("🎮 useGameFlow: Not saving statistics - userId:", userId, "gameStartTime:", gameStartTime, "hasAnswers:", (correctAnswers > 0 || wrongAnswers > 0));
+      console.log("🎮 useGameFlow: Not saving statistics - missing requirements:", {
+        userId: !!userId,
+        gameStartTime: !!gameStartTime,
+        hasAnswers: (correctAnswers > 0 || wrongAnswers > 0)
+      });
     }
     
+    // Reset game start time
     setGameStartTime(null);
   }, [
     correctAnswers, 
