@@ -1,18 +1,13 @@
-import { GroupSelectionDialog } from "./spelling/GroupSelectionDialog";
-import { WordProblemDialog } from "./spelling/WordProblemDialog";
-import { StatisticsDialog } from "./spelling/StatisticsDialog";
+
 import { FunGraphics } from "./spelling/FunGraphics";
-import { GameControls } from "./spelling/GameControls";
+import { SpellingPracticeHeader } from "./spelling/SpellingPracticeHeader";
+import { SpellingPracticeStats } from "./spelling/SpellingPracticeStats";
+import { SpellingPracticeControls } from "./spelling/SpellingPracticeControls";
+import { SpellingPracticeDialogs } from "./spelling/SpellingPracticeDialogs";
 import { useSpellingGame } from "@/hooks/spelling/useSpellingGame";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserTheme } from "@/hooks/useUserTheme";
 import { useGamification } from "@/hooks/gamification/useGamification";
-import { spellingGroups } from "@/data/spellingData";
-import { SuccessParticles, ErrorParticles } from "@/components/ui/advanced-particle-system";
-import { GlassCard } from "@/components/ui/glass-morphism";
-import { FloatingIcon, HoverScale } from "@/components/ui/microanimations";
-import { LevelDisplay } from "@/components/gamification/LevelDisplay";
-import { StreakDisplay } from "@/components/gamification/StreakDisplay";
 import { useState, useEffect } from "react";
 import { useEnhancedMobileInteractions } from "@/hooks/useEnhancedMobileInteractions";
 
@@ -119,57 +114,36 @@ const SpellingPractice = () => {
       />
       
       {/* Enhanced header with floating animation */}
-      <FloatingIcon className="text-center">
-        <h1 
-          className={`text-3xl font-bold bg-gradient-to-r ${getGradientClasses.primary} bg-clip-text text-transparent`}
-        >
-          Procvičování vyjmenovaných slov {theme.avatar}
-        </h1>
-      </FloatingIcon>
+      <SpellingPracticeHeader 
+        theme={theme}
+        getGradientClasses={getGradientClasses}
+      />
 
       {/* Gamification displays */}
-      {authState.user && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <LevelDisplay 
-            userLevel={leveling.userLevel} 
-            progress={leveling.getLevelProgress()} 
-          />
-          <StreakDisplay 
-            userStreak={streaks.userStreak} 
-            isAtRisk={streaks.isStreakAtRisk()} 
-          />
-        </div>
-      )}
+      <SpellingPracticeStats 
+        authState={authState}
+        leveling={leveling}
+        streaks={streaks}
+      />
 
       {/* Glass morphism game controls */}
-      <HoverScale>
-        <GlassCard className="hover:bg-white/25 dark:hover:bg-white/10 transition-all duration-500">
-          <GameControls 
-            selectedGroupsCount={selectedGroups.length}
-            onShowGroupDialog={handleShowGroupDialog}
-            onStartGame={handleStartNewGame}
-          />
-        </GlassCard>
-      </HoverScale>
+      <SpellingPracticeControls 
+        selectedGroups={selectedGroups}
+        onShowGroupDialog={handleShowGroupDialog}
+        onStartNewGame={handleStartNewGame}
+      />
 
-      {/* Group Selection Dialog */}
-      <GroupSelectionDialog
-        open={showGroupDialog}
-        onOpenChange={setShowGroupDialog}
-        spellingGroups={spellingGroups}
+      {/* All dialogs */}
+      <SpellingPracticeDialogs 
+        showGroupDialog={showGroupDialog}
+        setShowGroupDialog={setShowGroupDialog}
         selectedGroups={selectedGroups}
         toggleGroup={toggleGroup}
         setGroups={setGroups}
         toggleAllGroups={toggleAllGroups}
         allSelected={allSelected}
-      />
-
-      {/* Word Problem Dialog with statistics */}
-      <WordProblemDialog
-        open={showProblem}
-        onOpenChange={(open) => {
-          if (!open) handleEndGame();
-        }}
+        showProblem={showProblem}
+        onEndGame={handleEndGame}
         displayedWord={displayedWord}
         currentWord={currentWord}
         isPhrase={isPhrase}
@@ -177,19 +151,12 @@ const SpellingPractice = () => {
         missingPositions={missingPositions}
         correctLetters={correctLetters}
         currentPosition={currentPosition}
-        onAnswerI={handleAnswerI}
-        onAnswerY={handleAnswerY}
-        onEndGame={handleEndGame}
+        handleAnswerI={handleAnswerI}
+        handleAnswerY={handleAnswerY}
         correctAnswers={correctAnswers}
         wrongAnswers={wrongAnswers}
-      />
-      
-      {/* Statistics Dialog with answers - only shown when manually requested */}
-      <StatisticsDialog 
-        open={showStatsDialog}
-        onOpenChange={setShowStatsDialog}
-        correctAnswers={correctAnswers}
-        wrongAnswers={wrongAnswers}
+        showStatsDialog={showStatsDialog}
+        setShowStatsDialog={setShowStatsDialog}
         totalAnswers={totalAnswers}
         answers={answers}
       />
