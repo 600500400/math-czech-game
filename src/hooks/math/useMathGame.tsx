@@ -10,7 +10,12 @@ import { useGameFlow } from "./useGameFlow";
 export const useMathGame = () => {
   const gameState = useGameState();
   const difficultySettings = useDifficultySettings();
-  const problemGenerator = useProblemGenerator(difficultySettings);
+  const problemGenerator = useProblemGenerator({
+    allowedOperations: difficultySettings.allowedOperations,
+    maxValue: difficultySettings.maxValue,
+    maxMultiplyValue: difficultySettings.maxMultiplyValue,
+    maxDivideValue: difficultySettings.maxDivideValue
+  });
   
   const answerHandler = useAnswerHandler({
     currentProblem: gameState.currentProblem,

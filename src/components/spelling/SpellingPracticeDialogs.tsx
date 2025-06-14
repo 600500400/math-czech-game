@@ -1,6 +1,6 @@
 
 import { GroupSelectionDialog } from "./GroupSelectionDialog";
-import { WordProblemDialog } from "./WordProblemDialog";
+import WordProblemDialog from "./WordProblemDialog";
 import { StatisticsDialog } from "./StatisticsDialog";
 import { spellingGroups } from "@/data/spellingData";
 import { SpellingAnswer } from "@/types/spellingTypes";

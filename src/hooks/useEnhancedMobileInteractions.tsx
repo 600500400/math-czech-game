@@ -52,6 +52,17 @@ export const useEnhancedMobileInteractions = () => {
     triggerCelebrationHaptic();
   }, [playCelebrationSound, triggerCelebrationHaptic]);
 
+  // Enhanced feedback for milestone achievements
+  const triggerMilestoneFeedback = useCallback(() => {
+    playCelebrationSound();
+    triggerCelebrationHaptic();
+    
+    // Additional celebration after delay for milestone
+    setTimeout(() => {
+      triggerCelebrationHaptic();
+    }, 500);
+  }, [playCelebrationSound, triggerCelebrationHaptic]);
+
   // Enhanced feedback for button interactions
   const triggerButtonFeedback = useCallback(() => {
     playButtonClickSound();
@@ -86,6 +97,7 @@ export const useEnhancedMobileInteractions = () => {
     triggerGameStartFeedback,
     triggerGameEndFeedback,
     triggerCelebrationFeedback,
+    triggerMilestoneFeedback,
     
     // Advanced feedback sequences
     triggerPerfectScoreFeedback,
