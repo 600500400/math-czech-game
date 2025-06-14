@@ -188,7 +188,7 @@ const MathPractice = () => {
         setMaxDivideValue={() => {}}
         allowedOperations={allowedOperations}
         toggleOperation={toggleOperation}
-        setDifficulty={(level: "easy" | "medium" | "hard") => setDifficulty(level)}
+        setDifficulty={() => setShowDifficultyDialog(false)}
       />
 
       {/* Math Problem Dialog */}
