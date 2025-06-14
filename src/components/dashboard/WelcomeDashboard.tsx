@@ -24,13 +24,28 @@ const WelcomeDashboard: React.FC<WelcomeDashboardProps> = ({
   const userName = authState.profile?.full_name || "Studente";
   const firstName = userName.split(" ")[0];
 
+  // Calculate totals from individual statistics records
+  const mathTotals = mathStats.reduce((acc, stat) => {
+    acc.correct += stat.correct_answers;
+    acc.wrong += stat.wrong_answers;
+    acc.total += stat.correct_answers + stat.wrong_answers;
+    return acc;
+  }, { correct: 0, wrong: 0, total: 0 });
+
+  const spellingTotals = spellingStats.reduce((acc, stat) => {
+    acc.correct += stat.correct_answers;
+    acc.wrong += stat.wrong_answers;
+    acc.total += stat.correct_answers + stat.wrong_answers;
+    return acc;
+  }, { correct: 0, wrong: 0, total: 0 });
+
   // Calculate recent performance
-  const mathAccuracy = mathStats?.total_problems > 0 
-    ? Math.round((mathStats.correct_answers / mathStats.total_problems) * 100)
+  const mathAccuracy = mathTotals.total > 0 
+    ? Math.round((mathTotals.correct / mathTotals.total) * 100)
     : 0;
   
-  const spellingAccuracy = spellingStats?.total_words > 0
-    ? Math.round((spellingStats.correct_words / spellingStats.total_words) * 100)
+  const spellingAccuracy = spellingTotals.total > 0
+    ? Math.round((spellingTotals.correct / spellingTotals.total) * 100)
     : 0;
 
   // Get performance badges
@@ -79,7 +94,7 @@ const WelcomeDashboard: React.FC<WelcomeDashboardProps> = ({
                 </Badge>
               </div>
               <p className="text-xs text-muted-foreground">
-                {mathStats?.total_problems || 0} vyřešených příkladů
+                {mathTotals.total} vyřešených příkladů
               </p>
               <Button 
                 onClick={() => onNavigateToPractice("math")}
@@ -106,7 +121,7 @@ const WelcomeDashboard: React.FC<WelcomeDashboardProps> = ({
                 </Badge>
               </div>
               <p className="text-xs text-muted-foreground">
-                {spellingStats?.total_words || 0} napsaných slov
+                {spellingTotals.total} napsaných slov
               </p>
               <Button 
                 onClick={() => onNavigateToPractice("spelling")}
