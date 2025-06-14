@@ -54,7 +54,7 @@ const ProblemDialog: React.FC<ProblemDialogProps> = ({
     setUserAnswer("");
   };
   
-  const handleEndGame = () => {
+  const handleTakeBreak = () => {
     triggerTapHaptic();
     endGame();
   };
@@ -86,6 +86,17 @@ const ProblemDialog: React.FC<ProblemDialogProps> = ({
     }
   };
 
+  // Check if milestone reached for celebration
+  const getMilestoneMessage = () => {
+    const milestones = [5, 10, 15, 20, 25, 30, 50, 100];
+    const currentMilestone = milestones.find(m => correctAnswers === m);
+    
+    if (currentMilestone) {
+      return `🎉 Skvělé! Máš ${currentMilestone} správných odpovědí!`;
+    }
+    return null;
+  };
+
   return (
     <Dialog open={open} onOpenChange={(open) => !open && endGame()}>
       <DialogContent 
@@ -114,19 +125,20 @@ const ProblemDialog: React.FC<ProblemDialogProps> = ({
                 </HoverScale>
               )}
               
+              {/* Hidden input to prevent mobile keyboard */}
               <Input
-                type="number"
+                type="text"
                 value={userAnswer}
-                onChange={(e) => setUserAnswer(e.target.value)}
+                onChange={() => {}} // No-op since we use numeric keyboard
                 onKeyDown={handleKeyPress}
                 placeholder="Zadej odpověď"
                 className={`text-lg touch-manipulation glass-light border-white/30 ${isMobile ? 'h-14 text-lg' : 'h-12'}`}
-                autoFocus={!isMobile}
-                inputMode="numeric"
-                pattern="[0-9]*"
+                readOnly={isMobile} // Prevent mobile keyboard
+                inputMode={isMobile ? "none" : "numeric"} // Disable mobile keyboard
+                style={{ caretColor: 'transparent' }} // Hide cursor on mobile
               />
               
-              {/* Enhanced Numeric Keyboard - only enter symbol will trigger answer check */}
+              {/* Enhanced Numeric Keyboard */}
               <div className="mt-4">
                 <NumericKeyboard 
                   onKeyPress={handleKeyboardInput}
@@ -135,6 +147,15 @@ const ProblemDialog: React.FC<ProblemDialogProps> = ({
                   disabled={!userAnswer.trim()}
                 />
               </div>
+              
+              {/* Milestone celebration */}
+              {getMilestoneMessage() && (
+                <div className="mt-4 p-4 bg-gradient-to-r from-green-100 to-blue-100 rounded-lg border border-green-200 text-center">
+                  <p className="text-lg font-semibold text-green-700">
+                    {getMilestoneMessage()}
+                  </p>
+                </div>
+              )}
               
               {/* Enhanced in-game statistics */}
               {totalAnswers > 0 && (
@@ -160,11 +181,11 @@ const ProblemDialog: React.FC<ProblemDialogProps> = ({
             <DialogFooter className={`flex gap-3 ${isMobile ? 'flex-col' : 'flex-row'}`}>
               <HoverScale>
                 <Button 
-                  onClick={handleEndGame}
+                  onClick={handleTakeBreak}
                   variant="outline"
-                  className={`glass-light border-red-200/50 text-red-700 hover:bg-red-100/50 active:scale-95 touch-manipulation transform transition-all duration-150 ${isMobile ? 'w-full h-14 text-lg' : 'w-auto h-12'}`}
+                  className={`glass-light border-orange-200/50 text-orange-700 hover:bg-orange-100/50 active:scale-95 touch-manipulation transform transition-all duration-150 ${isMobile ? 'w-full h-14 text-lg' : 'w-auto h-12'}`}
                 >
-                  ✕ Ukončit hru
+                  ⏸️ Přestávka
                 </Button>
               </HoverScale>
             </DialogFooter>

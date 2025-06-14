@@ -1,8 +1,7 @@
-
-const CACHE_NAME = 'procvicka-v2';
-const STATIC_CACHE = 'procvicka-static-v2';
-const DYNAMIC_CACHE = 'procvicka-dynamic-v2';
-const IMAGE_CACHE = 'procvicka-images-v2';
+const CACHE_NAME = 'procvicka-v3';
+const STATIC_CACHE = 'procvicka-static-v3';
+const DYNAMIC_CACHE = 'procvicka-dynamic-v3';
+const IMAGE_CACHE = 'procvicka-images-v3';
 
 // Cache strategies for different types of resources
 const cacheStrategies = {
@@ -19,11 +18,10 @@ const cacheStrategies = {
 
 // Install event - cache static resources
 self.addEventListener('install', (event) => {
-  console.log('SW: Installing new service worker');
+  console.log('SW: Installing new service worker v3');
   event.waitUntil(
     Promise.all([
       caches.open(STATIC_CACHE).then(cache => cache.addAll(cacheStrategies.static)),
-      // Prefetch critical resources
       caches.open(IMAGE_CACHE).then(cache => {
         return cache.addAll([
           '/public/images/happy-kid.png',
@@ -32,7 +30,7 @@ self.addEventListener('install', (event) => {
         ]);
       })
     ]).then(() => {
-      console.log('SW: Installation complete');
+      console.log('SW: Installation complete v3');
       return self.skipWaiting();
     }).catch(error => {
       console.error('SW: Installation failed:', error);
@@ -42,19 +40,19 @@ self.addEventListener('install', (event) => {
 
 // Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
-  console.log('SW: Activating new service worker');
+  console.log('SW: Activating new service worker v3');
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
-          if (!['procvicka-static-v2', 'procvicka-dynamic-v2', 'procvicka-images-v2'].includes(cacheName)) {
+          if (!['procvicka-static-v3', 'procvicka-dynamic-v3', 'procvicka-images-v3'].includes(cacheName)) {
             console.log('SW: Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
       );
     }).then(() => {
-      console.log('SW: Activation complete');
+      console.log('SW: Activation complete v3');
       return self.clients.claim();
     })
   );

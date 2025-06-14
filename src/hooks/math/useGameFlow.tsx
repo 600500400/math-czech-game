@@ -34,38 +34,35 @@ export function useGameFlow({
   const [showProblem, setShowProblem] = useState(false);
   const [showDifficultyDialog, setShowDifficultyDialog] = useState(false);
   const [showStatsDialog, setShowStatsDialog] = useState(false);
-  const [difficultySet, setDifficultySet] = useState(true); // Default to true so game can start immediately
+  const [difficultySet, setDifficultySet] = useState(true);
   const [gameEnded, setGameEnded] = useState(false);
-  const [problemCount, setProblemCount] = useState(10);
+  const [gameStartTime, setGameStartTime] = useState<number | null>(null);
 
   // Start new game flow
   const startNewGame = useCallback(() => {
-    // Set the default number of problems
-    setProblemCount(10);
-    // Generate first problem
+    setGameStartTime(Date.now());
     setCurrentProblem(generateProblem());
-    // Show the problem dialog
     setShowProblem(true);
-    // Reset game ended state
     setGameEnded(false);
-    // Reset user answer
     resetUserAnswer();
-  }, [generateProblem, setCurrentProblem, setProblemCount, setShowProblem, resetUserAnswer]);
+  }, [generateProblem, setCurrentProblem, resetUserAnswer]);
 
-  // End game flow
+  // End game flow (now "take break")
   const endGame = useCallback(() => {
     setShowProblem(false);
     setGameEnded(true);
     setShowStatsDialog(true);
     
-    // Save statistics if user is logged in
-    if (userId && (correctAnswers > 0 || wrongAnswers > 0)) {
+    // Save statistics if user is logged in and has game data
+    if (userId && gameStartTime && (correctAnswers > 0 || wrongAnswers > 0)) {
+      const gameDuration = Math.round((Date.now() - gameStartTime) / 1000);
       const operationString = allowedOperations.join(',');
       
       saveMathStatistics.mutate({
         correctAnswers,
         wrongAnswers,
         operation: operationString,
+        gameDuration, // Now properly saving game duration
         difficultyLevel: {
           maxValue,
           maxMultiplyValue,
@@ -73,6 +70,8 @@ export function useGameFlow({
         }
       });
     }
+    
+    setGameStartTime(null);
   }, [
     correctAnswers, 
     wrongAnswers, 
@@ -81,7 +80,8 @@ export function useGameFlow({
     maxMultiplyValue, 
     maxDivideValue, 
     userId, 
-    saveMathStatistics
+    saveMathStatistics,
+    gameStartTime
   ]);
 
   // Reset game state
@@ -96,14 +96,12 @@ export function useGameFlow({
     showStatsDialog,
     difficultySet,
     gameEnded,
-    problemCount,
     
     setShowProblem,
     setShowDifficultyDialog,
     setShowStatsDialog,
     setDifficultySet,
     setGameEnded,
-    setProblemCount,
     
     startNewGame,
     endGame,

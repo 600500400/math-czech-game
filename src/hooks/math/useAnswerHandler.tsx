@@ -1,123 +1,99 @@
 
-import { useCallback } from 'react';
-import { Problem, MathAnswer } from '@/types/mathTypes';
+import { useCallback, useEffect } from "react";
+import { Problem, MathAnswer } from "@/types/mathTypes";
+import { useEnhancedMobileInteractions } from "@/hooks/useEnhancedMobileInteractions";
 
 interface UseAnswerHandlerProps {
   currentProblem: Problem | null;
   userAnswer: string;
-  correctAnswers: number;
-  wrongAnswers: number;
-  problemCount: number;
-  generateProblem: () => Problem;
-  setCorrectAnswers: (value: React.SetStateAction<number>) => void;
-  setWrongAnswers: (value: React.SetStateAction<number>) => void;
-  setLastAnswerCorrect: (value: React.SetStateAction<boolean | null>) => void;
-  setShowAnimation: (value: React.SetStateAction<boolean>) => void;
-  setShowConfetti: (value: React.SetStateAction<boolean>) => void;
-  setUserAnswer: (value: React.SetStateAction<string>) => void;
-  setCurrentProblem: (value: React.SetStateAction<Problem | null>) => void;
+  setUserAnswer: (answer: string) => void;
+  setLastAnswerCorrect: (correct: boolean | null) => void;
+  setShowAnimation: (show: boolean) => void;
+  incrementCorrect: () => void;
+  incrementWrong: () => void;
   addAnswer: (answer: MathAnswer) => void;
-  endGame: () => void;
+  generateProblem: () => Problem;
+  setCurrentProblem: (problem: Problem) => void;
 }
 
 export function useAnswerHandler({
   currentProblem,
   userAnswer,
-  correctAnswers,
-  wrongAnswers,
-  problemCount,
-  generateProblem,
-  setCorrectAnswers,
-  setWrongAnswers,
+  setUserAnswer,
   setLastAnswerCorrect,
   setShowAnimation,
-  setShowConfetti,
-  setUserAnswer,
-  setCurrentProblem,
+  incrementCorrect,
+  incrementWrong,
   addAnswer,
-  endGame
+  generateProblem,
+  setCurrentProblem
 }: UseAnswerHandlerProps) {
   
+  const {
+    triggerCorrectFeedback,
+    triggerIncorrectFeedback,
+    triggerMilestoneFeedback
+  } = useEnhancedMobileInteractions();
+
   const checkAnswer = useCallback(() => {
-    if (!currentProblem) return;
-    
-    const parsedAnswer = parseFloat(userAnswer);
-    const isCorrect = !isNaN(parsedAnswer) && parsedAnswer === currentProblem.result;
-    
+    if (!currentProblem || !userAnswer.trim()) return;
+
+    const userNum = parseFloat(userAnswer);
+    const correctAnswer = currentProblem.result;
+    const isCorrect = Math.abs(userNum - correctAnswer) < 0.01;
+
     // Create detailed answer record
     const answerRecord: MathAnswer = {
       problem: currentProblem,
-      userAnswer: parsedAnswer || 0,
-      correctAnswer: currentProblem.result,
-      isCorrect,
+      userAnswer: userNum,
+      correctAnswer: correctAnswer,
+      isCorrect: isCorrect,
       timestamp: new Date().toISOString()
     };
-    
-    // Add to answers array
+
     addAnswer(answerRecord);
-    
-    const newCorrectAnswers = isCorrect ? correctAnswers + 1 : correctAnswers;
-    const newWrongAnswers = isCorrect ? wrongAnswers : wrongAnswers + 1;
-    
+
+    // Update statistics and show feedback
     if (isCorrect) {
-      setCorrectAnswers(prev => prev + 1);
+      incrementCorrect();
       setLastAnswerCorrect(true);
+      triggerCorrectFeedback();
     } else {
-      setWrongAnswers(prev => prev + 1);
+      incrementWrong();
       setLastAnswerCorrect(false);
+      triggerIncorrectFeedback();
     }
-    
-    // Zobrazíme animaci
+
+    // Show animation and generate next problem
     setShowAnimation(true);
-    if (isCorrect) setShowConfetti(true);
     
-    // Časovač pro skrytí animace
     setTimeout(() => {
       setShowAnimation(false);
-      setShowConfetti(false);
-    }, 2000);
-    
-    // Posuneme se na další příklad nebo ukončíme hru
-    setTimeout(() => {
-      const totalAnswers = newCorrectAnswers + newWrongAnswers;
+      setLastAnswerCorrect(null);
       
-      if (totalAnswers >= problemCount) {
-        console.log("Hra končí - dosaženo maximálního počtu příkladů:", totalAnswers, "z", problemCount);
-        endGame();
-      } else {
-        console.log("Generuji nový příklad - aktuální počet:", totalAnswers, "z", problemCount);
-        try {
-          const newProblem = generateProblem();
-          setCurrentProblem(newProblem);
-          setUserAnswer("");
-          console.log("Nový příklad vygenerován:", newProblem);
-        } catch (error) {
-          console.error("Chyba při generování nového příkladu:", error);
-          // Fallback - zkusím to znovu nebo ukončím hru
-          endGame();
-        }
-      }
-    }, 1000);
+      // Generate next problem
+      const nextProblem = generateProblem();
+      setCurrentProblem(nextProblem);
+      setUserAnswer("");
+    }, 1500);
+
   }, [
-    correctAnswers, 
-    currentProblem, 
-    endGame, 
-    generateProblem, 
-    problemCount, 
-    setCorrectAnswers, 
-    setCurrentProblem, 
-    setLastAnswerCorrect, 
-    setShowAnimation, 
-    setShowConfetti, 
-    setUserAnswer, 
-    setWrongAnswers, 
-    userAnswer, 
-    wrongAnswers,
-    addAnswer
+    currentProblem,
+    userAnswer,
+    incrementCorrect,
+    incrementWrong,
+    addAnswer,
+    setLastAnswerCorrect,
+    setShowAnimation,
+    generateProblem,
+    setCurrentProblem,
+    setUserAnswer,
+    triggerCorrectFeedback,
+    triggerIncorrectFeedback
   ]);
 
   const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       checkAnswer();
     }
   }, [checkAnswer]);

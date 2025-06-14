@@ -20,10 +20,11 @@ export const ConfettiExplosion: React.FC<ConfettiProps> = ({
   useEffect(() => {
     if (!trigger) {
       setShowConfetti(false);
+      setParticles([]);
       return;
     }
 
-    // Only set showConfetti to true and generate particles if it's not already shown
+    // Only generate particles if not already showing
     if (!showConfetti) {
       setShowConfetti(true);
       const newParticles = [];
@@ -39,7 +40,7 @@ export const ConfettiExplosion: React.FC<ConfettiProps> = ({
         
         newParticles.push(
           <div
-            key={i}
+            key={`confetti-${i}-${Date.now()}`}
             className="absolute rounded-full w-2 h-2 opacity-0 animate-confetti"
             style={style}
           />
@@ -47,17 +48,21 @@ export const ConfettiExplosion: React.FC<ConfettiProps> = ({
       }
       
       setParticles(newParticles);
-      
-      const timer = setTimeout(() => {
-        setShowConfetti(false);
-        setParticles([]);
-      }, duration);
-      
-      return () => clearTimeout(timer);
     }
-  }, [trigger, duration, particleCount, colors]); // Make sure to include all dependencies
+    
+    // Cleanup timer
+    const timer = setTimeout(() => {
+      setShowConfetti(false);
+      setParticles([]);
+    }, duration);
+    
+    return () => {
+      clearTimeout(timer);
+      setParticles([]);
+    };
+  }, [trigger, duration, particleCount, colors, showConfetti]);
   
-  if (!showConfetti) return null;
+  if (!showConfetti || particles.length === 0) return null;
   
   return (
     <div className="fixed inset-0 pointer-events-none z-[9999] overflow-hidden" aria-hidden="true">

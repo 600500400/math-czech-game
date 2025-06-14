@@ -1,118 +1,105 @@
 
 import { useCallback } from "react";
+import { Operation } from "@/types/mathTypes";
 import { useGameState } from "./useGameState";
-import { useDifficultySettings } from "./useDifficultySettings";
 import { useProblemGenerator } from "./useProblemGenerator";
 import { useAnswerHandler } from "./useAnswerHandler";
+import { useDifficultySettings } from "./useDifficultySettings";
 import { useGameFlow } from "./useGameFlow";
-import { useAuth } from "../useAuth";
-import { useStatistics } from "../useStatistics";
-import { useDetailedAnswers } from "../statistics/useDetailedAnswers";
 
 export const useMathGame = () => {
-  const { authState } = useAuth();
-  const userId = authState.user?.id || null;
-  
-  const { saveMathStatistics } = useStatistics(userId);
-  const { addMathAnswer } = useDetailedAnswers(userId);
-  
   const gameState = useGameState();
   const difficultySettings = useDifficultySettings();
-  const problemGenerator = useProblemGenerator({
-    allowedOperations: gameState.allowedOperations,
-    maxValue: gameState.maxValue,
-    maxMultiplyValue: gameState.maxMultiplyValue,
-    maxDivideValue: gameState.maxDivideValue,
-  });
-  
-  const gameFlow = useGameFlow({
-    allowedOperations: gameState.allowedOperations,
-    maxValue: gameState.maxValue,
-    maxMultiplyValue: gameState.maxMultiplyValue,
-    maxDivideValue: gameState.maxDivideValue,
-    correctAnswers: gameState.correctAnswers,
-    wrongAnswers: gameState.wrongAnswers,
-    generateProblem: problemGenerator.generateProblem,
-    setCurrentProblem: gameState.setCurrentProblem,
-    resetUserAnswer: () => gameState.setUserAnswer(""),
-  });
-
-  // Enhanced addAnswer function that saves detailed answers
-  const enhancedAddAnswer = useCallback((answer: any) => {
-    console.log("🔍 useMathGame: Ukládám detailní odpověď:", answer);
-    gameState.addAnswer(answer);
-    addMathAnswer(answer);
-  }, [gameState.addAnswer, addMathAnswer]);
+  const problemGenerator = useProblemGenerator(difficultySettings);
   
   const answerHandler = useAnswerHandler({
     currentProblem: gameState.currentProblem,
     userAnswer: gameState.userAnswer,
-    correctAnswers: gameState.correctAnswers,
-    wrongAnswers: gameState.wrongAnswers,
-    problemCount: gameFlow.problemCount,
-    generateProblem: problemGenerator.generateProblem,
-    setCorrectAnswers: gameState.setCorrectAnswers,
-    setWrongAnswers: gameState.setWrongAnswers,
+    setUserAnswer: gameState.setUserAnswer,
     setLastAnswerCorrect: gameState.setLastAnswerCorrect,
     setShowAnimation: gameState.setShowAnimation,
-    setShowConfetti: gameState.setShowConfetti,
-    setUserAnswer: gameState.setUserAnswer,
-    setCurrentProblem: gameState.setCurrentProblem,
-    addAnswer: enhancedAddAnswer, // Using enhanced function
-    endGame: gameFlow.endGame
+    incrementCorrect: gameState.incrementCorrect,
+    incrementWrong: gameState.incrementWrong,
+    addAnswer: gameState.addAnswer,
+    generateProblem: problemGenerator.generateProblem,
+    setCurrentProblem: gameState.setCurrentProblem
   });
 
-  // Helper functions for the component
-  const toggleOperation = useCallback((operation: any) => {
-    difficultySettings.toggleOperation(operation, gameState.allowedOperations, gameState.setAllowedOperations);
-  }, [difficultySettings, gameState.allowedOperations, gameState.setAllowedOperations]);
+  const gameFlow = useGameFlow({
+    allowedOperations: difficultySettings.allowedOperations,
+    maxValue: difficultySettings.maxValue,
+    maxMultiplyValue: difficultySettings.maxMultiplyValue,
+    maxDivideValue: difficultySettings.maxDivideValue,
+    correctAnswers: gameState.correctAnswers,
+    wrongAnswers: gameState.wrongAnswers,
+    generateProblem: problemGenerator.generateProblem,
+    setCurrentProblem: gameState.setCurrentProblem,
+    resetUserAnswer: () => gameState.setUserAnswer("")
+  });
 
-  const setDifficulty = useCallback(() => {
-    difficultySettings.setDifficulty(
-      gameState.maxValue,
-      gameState.maxMultiplyValue,
-      gameState.maxDivideValue,
-      gameState.allowedOperations,
-      gameFlow.setDifficultySet
-    );
-  }, [difficultySettings, gameState, gameFlow.setDifficultySet]);
+  // Start new game with progressive approach
+  const startNewGame = useCallback(() => {
+    // Reset game state but don't set automatic end
+    gameState.setCorrectAnswers(0);
+    gameState.setWrongAnswers(0);
+    gameState.setGameEnded(false);
+    gameState.setShowAnimation(false);
+    gameState.setLastAnswerCorrect(null);
+    gameState.resetAnswers();
+    
+    // Generate first problem
+    const newProblem = problemGenerator.generateProblem();
+    gameState.setCurrentProblem(newProblem);
+    gameState.setUserAnswer("");
+    
+    // Show problem dialog
+    gameFlow.setShowProblem(true);
+    gameFlow.setGameEnded(false);
+  }, [gameState, problemGenerator, gameFlow]);
+
+  // End game (now called "take break")
+  const endGame = useCallback(() => {
+    gameFlow.endGame();
+    gameState.setGameEnded(true);
+  }, [gameFlow, gameState]);
+
+  // Toggle operation
+  const toggleOperation = useCallback((operation: Operation) => {
+    difficultySettings.toggleOperation(operation);
+  }, [difficultySettings]);
+
+  // Set difficulty preset
+  const setDifficulty = useCallback((level: "easy" | "medium" | "hard") => {
+    difficultySettings.setDifficulty(level);
+  }, [difficultySettings]);
 
   return {
-    // Game state properties from gameState
+    // Game state
     currentProblem: gameState.currentProblem,
     userAnswer: gameState.userAnswer,
     correctAnswers: gameState.correctAnswers,
     wrongAnswers: gameState.wrongAnswers,
+    showProblem: gameFlow.showProblem,
+    showDifficultyDialog: gameFlow.showDifficultyDialog,
+    showStatsDialog: gameFlow.showStatsDialog,
     lastAnswerCorrect: gameState.lastAnswerCorrect,
     showAnimation: gameState.showAnimation,
     answers: gameState.answers,
-    maxValue: gameState.maxValue,
-    maxMultiplyValue: gameState.maxMultiplyValue,
-    maxDivideValue: gameState.maxDivideValue,
-    allowedOperations: gameState.allowedOperations,
-    
-    // Game flow properties from gameFlow (these override gameState where needed)
-    showProblem: gameFlow.showProblem,
-    showDifficultyDialog: gameFlow.showDifficultyDialog,
     difficultySet: gameFlow.difficultySet,
     
-    // State setters
+    // Difficulty settings
+    maxValue: difficultySettings.maxValue,
+    maxMultiplyValue: difficultySettings.maxMultiplyValue,
+    maxDivideValue: difficultySettings.maxDivideValue,
+    allowedOperations: difficultySettings.allowedOperations,
+    
+    // Actions
     setUserAnswer: gameState.setUserAnswer,
     setShowDifficultyDialog: gameFlow.setShowDifficultyDialog,
-    
-    // Problem generator
-    generateProblem: problemGenerator.generateProblem,
-    
-    // Answer handler methods
     checkAnswer: answerHandler.checkAnswer,
     handleKeyPress: answerHandler.handleKeyPress,
-    
-    // Game flow methods
-    startNewGame: gameFlow.startNewGame,
-    endGame: gameFlow.endGame,
-    resetGame: gameFlow.resetGame,
-    
-    // Difficulty management
+    startNewGame,
+    endGame,
     toggleOperation,
     setDifficulty,
   };
