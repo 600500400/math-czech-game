@@ -29,7 +29,7 @@ const ModernHeader = () => {
               <Sparkles className="w-4 h-4 text-brand-500 absolute -top-1 -right-1 animate-pulse" />
             </div>
             <div>
-              <h1 className="text-xl font-heading font-bold gradient-text">
+              <h1 className="text-xl font-heading font-bold text-foreground">
                 Procvička
               </h1>
               <p className="text-xs text-muted-foreground -mt-1">
