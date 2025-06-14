@@ -64,18 +64,23 @@ export function useAnswerHandler({
       triggerIncorrectFeedback();
     }
 
-    // Show animation and generate next problem
+    // Show animation
     setShowAnimation(true);
     
+    // Hide animation and generate next problem after shorter delay
     setTimeout(() => {
+      // First hide animation and reset answer state
       setShowAnimation(false);
       setLastAnswerCorrect(null);
       
-      // Generate next problem
-      const nextProblem = generateProblem();
-      setCurrentProblem(nextProblem);
-      setUserAnswer("");
-    }, 1500);
+      // Then generate next problem after animation cleanup
+      setTimeout(() => {
+        const nextProblem = generateProblem();
+        setCurrentProblem(nextProblem);
+        setUserAnswer("");
+      }, 100); // Small delay to ensure animation cleanup
+      
+    }, 1000); // Reduced from 1500 to 1000ms
 
   }, [
     currentProblem,

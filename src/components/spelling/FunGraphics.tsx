@@ -54,39 +54,26 @@ export const FunGraphics = ({
       cleanupTimeoutRef.current = null;
     }
     
-    // If animation should not show or component unmounted, hide immediately
-    if (!showAnimation || !mountedRef.current) {
+    // If animation should not show, hide immediately
+    if (!showAnimation || !mountedRef.current || isCorrect === null) {
       console.log("🎨 FunGraphics: Hiding animation immediately");
       setIsVisible(false);
       return;
     }
     
-    // If this is a new animation (different ID), reset and start fresh
-    if (animationId !== currentAnimationId) {
-      console.log("🎨 FunGraphics: New animation ID detected, starting fresh");
-      setCurrentAnimationId(animationId);
-      setIsVisible(false);
-      
-      // Small delay before showing new animation
-      setTimeout(() => {
-        if (mountedRef.current && showAnimation && animationId === currentAnimationId) {
-          setIsVisible(true);
-        }
-      }, 25);
-    } else if (!isVisible && showAnimation) {
-      // Same animation ID, just show if not already visible
-      setIsVisible(true);
-    }
+    // Show animation
+    setCurrentAnimationId(animationId);
+    setIsVisible(true);
     
-    // Schedule automatic cleanup - shorter timeout to prevent persistent display
+    // Schedule automatic cleanup - reduced timeout
     cleanupTimeoutRef.current = setTimeout(() => {
-      if (mountedRef.current && animationId === currentAnimationId) {
+      if (mountedRef.current) {
         console.log("🎨 FunGraphics: Auto-cleanup for animation ID:", animationId);
         setIsVisible(false);
       }
-    }, 1000); // Reduced from 1400 to 1000ms
+    }, 800); // Reduced from 1000 to 800ms for faster cleanup
     
-  }, [isCorrect, showAnimation, animationId, currentAnimationId, isVisible]);
+  }, [isCorrect, showAnimation, animationId]);
   
   // Don't render if not visible or should not show
   if (!showAnimation || !isVisible || isCorrect === null) {
