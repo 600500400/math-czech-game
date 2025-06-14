@@ -61,38 +61,14 @@ const SpellingPractice = () => {
     triggerButtonFeedback
   } = useEnhancedMobileInteractions();
 
-  const [showSuccessParticles, setShowSuccessParticles] = useState(false);
-  const [showErrorParticles, setShowErrorParticles] = useState(false);
   const [gameStartTime, setGameStartTime] = useState<number | null>(null);
   
-  // Improved particle effects coordination to prevent conflicts with FunGraphics
+  // Simplified feedback - only haptic, no particles during animation
   useEffect(() => {
     if (lastAnswerCorrect === true && showAnimation) {
-      // Delay particle effects slightly to avoid visual conflict with FunGraphics
-      const particleDelay = setTimeout(() => {
-        setShowSuccessParticles(true);
-        triggerCorrectFeedback();
-      }, 500);
-      
-      const hideTimer = setTimeout(() => setShowSuccessParticles(false), 3000);
-      
-      return () => {
-        clearTimeout(particleDelay);
-        clearTimeout(hideTimer);
-      };
+      triggerCorrectFeedback();
     } else if (lastAnswerCorrect === false && showAnimation) {
-      // Shorter delay for error particles
-      const particleDelay = setTimeout(() => {
-        setShowErrorParticles(true);
-        triggerIncorrectFeedback();
-      }, 300);
-      
-      const hideTimer = setTimeout(() => setShowErrorParticles(false), 2000);
-      
-      return () => {
-        clearTimeout(particleDelay);
-        clearTimeout(hideTimer);
-      };
+      triggerIncorrectFeedback();
     }
   }, [lastAnswerCorrect, showAnimation, triggerCorrectFeedback, triggerIncorrectFeedback]);
 
@@ -136,12 +112,11 @@ const SpellingPractice = () => {
       {/* Background glass effect with theme support */}
       <div className={`fixed inset-0 bg-gradient-to-br ${getGradientClasses.background} -z-10`} />
       
-      {/* Coordinated particle effects - only show when FunGraphics allows */}
-      {!showAnimation && <SuccessParticles trigger={showSuccessParticles} />}
-      {!showAnimation && <ErrorParticles trigger={showErrorParticles} />}
-      
-      {/* Single FunGraphics Component - centralized animation control */}
-      <FunGraphics isCorrect={lastAnswerCorrect} showAnimation={showAnimation} />
+      {/* SINGLE, SIMPLIFIED FunGraphics Component */}
+      <FunGraphics 
+        isCorrect={lastAnswerCorrect} 
+        showAnimation={showAnimation}
+      />
       
       {/* Enhanced header with floating animation */}
       <FloatingIcon className="text-center">

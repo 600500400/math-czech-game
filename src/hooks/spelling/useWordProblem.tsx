@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useEffect } from "react";
 import { SpellingAnswer } from "@/types/spellingTypes";
 import { getWordsFromGroups, createDisplayedWord, checkSpellingAnswer } from "@/utils/spellingUtils";
@@ -79,6 +78,11 @@ export const useWordProblem = ({
         return;
       }
 
+      // FORCE RESET ANIMATION BEFORE SETTING NEW WORD
+      console.log("🎯 generateNewWord: Force reset animace před nastavením nového slova");
+      setShowAnimation(false);
+      setLastAnswerCorrect(null);
+
       // Set the valid word
       setCurrentWord(validWord.word);
       setWordGroup(validWord.group);
@@ -97,7 +101,7 @@ export const useWordProblem = ({
     } catch (error) {
       console.error("❌ generateNewWord: Chyba při generování nového slova:", error);
     }
-  }, [selectedGroups]);
+  }, [selectedGroups, setShowAnimation, setLastAnswerCorrect]);
 
   // Generate initial word when groups are selected
   useEffect(() => {
@@ -148,42 +152,26 @@ export const useWordProblem = ({
       onWrongAnswer();
     }
 
-    // Show animation with improved state management
+    // Show animation with simplified timing
     console.log("🎬 handleAnswer: Starting animation sequence");
     setLastAnswerCorrect(isCorrect);
     setShowAnimation(true);
-
-    // Enhanced animation timing with proper cleanup
-    const animationDuration = 2000;
-    const hideTimeout = setTimeout(() => {
-      console.log("🎬 handleAnswer: Hiding animation after timeout");
-      setShowAnimation(false);
-      
-      // Reset animation state after hiding
-      setTimeout(() => {
-        setLastAnswerCorrect(null);
-      }, 100);
-    }, animationDuration);
 
     // Posunout na další pozici nebo další slovo
     const nextPosition = currentPosition + 1;
     
     if (nextPosition >= missingPositions.length) {
-      // Hotovo s tímto slovem - generovat nové
-      console.log("🎯 handleAnswer: Slovo dokončeno, generuji nové za 1.8s");
+      // Hotovo s tímto slovem - generovat nové za kratší dobu
+      console.log("🎯 handleAnswer: Slovo dokončeno, generuji nové za 1.2s");
       setTimeout(() => {
         generateNewWord();
-      }, 1800); // Slightly shorter to prevent overlap with animation
+      }, 1200); // Shorter delay
     } else {
       // Pokračovat na další pozici ve stejném slově
       setCurrentPosition(nextPosition);
       console.log("➡️ handleAnswer: Pokračuji na pozici:", nextPosition);
     }
 
-    // Cleanup function to prevent memory leaks
-    return () => {
-      clearTimeout(hideTimeout);
-    };
   }, [
     currentPosition,
     missingPositions,
