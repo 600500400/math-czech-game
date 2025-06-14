@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Star, Trophy, Award, Gift, Smile, HeartIcon as Heart } from "lucide-react";
 
 interface FunGraphicsProps {
@@ -10,14 +10,43 @@ interface FunGraphicsProps {
 export const FunGraphics = ({ isCorrect, showAnimation }: FunGraphicsProps) => {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [showIcon, setShowIcon] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const mountedRef = useRef(true);
+  const cleanupTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   useEffect(() => {
-    // Reset image if animation is not active
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      if (cleanupTimeoutRef.current) {
+        clearTimeout(cleanupTimeoutRef.current);
+      }
+    };
+  }, []);
+  
+  useEffect(() => {
+    console.log("🎨 FunGraphics: Animation state changed - showAnimation:", showAnimation, "isCorrect:", isCorrect);
+    
+    // Clear any existing cleanup timeout
+    if (cleanupTimeoutRef.current) {
+      clearTimeout(cleanupTimeoutRef.current);
+      cleanupTimeoutRef.current = null;
+    }
+    
+    // Reset state immediately if animation should not show
     if (!showAnimation) {
+      console.log("🎨 FunGraphics: Hiding animation and resetting state");
+      setIsVisible(false);
       setImageSrc(null);
       setShowIcon(false);
       return;
     }
+    
+    // Only proceed if component is still mounted and we should show animation
+    if (!mountedRef.current) return;
+    
+    console.log("🎨 FunGraphics: Starting animation setup");
+    setIsVisible(true);
     
     // Show icon with 50% probability
     const shouldShowIcon = Math.random() > 0.5;
@@ -25,7 +54,6 @@ export const FunGraphics = ({ isCorrect, showAnimation }: FunGraphicsProps) => {
     
     // Choose a random image based on the result
     if (isCorrect === true) {
-      // Updated correct images with direct local paths ensuring they work
       const correctImages = [
         "/images/happy-kid.png",
         "/images/stars.png",
@@ -42,9 +70,23 @@ export const FunGraphics = ({ isCorrect, showAnimation }: FunGraphicsProps) => {
       ];
       setImageSrc(wrongImages[Math.floor(Math.random() * wrongImages.length)]);
     }
+    
+    // Schedule cleanup after a reasonable time
+    cleanupTimeoutRef.current = setTimeout(() => {
+      if (mountedRef.current) {
+        console.log("🎨 FunGraphics: Auto-cleanup triggered");
+        setIsVisible(false);
+        setImageSrc(null);
+        setShowIcon(false);
+      }
+    }, 3000); // Slightly longer than the expected animation duration
+    
   }, [isCorrect, showAnimation]);
   
-  if (!showAnimation) return null;
+  // Don't render anything if not visible or animation should not show
+  if (!showAnimation || !isVisible) {
+    return null;
+  }
 
   // Icon selection based on correct/wrong answer
   const renderIcon = () => {
@@ -79,12 +121,12 @@ export const FunGraphics = ({ isCorrect, showAnimation }: FunGraphicsProps) => {
               className="h-32 object-contain"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
-                console.log(`Image failed to load: ${target.src}`);
+                console.log(`🎨 FunGraphics: Image failed to load: ${target.src}`);
                 target.style.display = "none";
                 
                 // Create text element instead
                 const parent = target.parentElement;
-                if (parent) {
+                if (parent && mountedRef.current) {
                   const textEl = document.createElement("div");
                   textEl.className = "text-3xl font-bold text-center";
                   textEl.textContent = isCorrect ? "Super!" : "Zkus to znovu";
@@ -111,7 +153,7 @@ export const FunGraphics = ({ isCorrect, showAnimation }: FunGraphicsProps) => {
       </div>
       
       {/* Flying emojis */}
-      {isCorrect && showAnimation && (
+      {isCorrect && isVisible && (
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <span className="absolute animate-[fade-in_1s] top-0 left-1/4 text-4xl">🎉</span>
           <span className="absolute animate-[fade-in_1s] delay-75 bottom-0 left-1/3 text-4xl">⭐</span>

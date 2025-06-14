@@ -1,4 +1,3 @@
-
 import { GroupSelectionDialog } from "./spelling/GroupSelectionDialog";
 import { WordProblemDialog } from "./spelling/WordProblemDialog";
 import { StatisticsDialog } from "./spelling/StatisticsDialog";
@@ -66,18 +65,34 @@ const SpellingPractice = () => {
   const [showErrorParticles, setShowErrorParticles] = useState(false);
   const [gameStartTime, setGameStartTime] = useState<number | null>(null);
   
-  // Trigger particle effects and enhanced feedback when answers are given
+  // Improved particle effects coordination to prevent conflicts with FunGraphics
   useEffect(() => {
     if (lastAnswerCorrect === true && showAnimation) {
-      setShowSuccessParticles(true);
-      triggerCorrectFeedback();
-      const timer = setTimeout(() => setShowSuccessParticles(false), 3000);
-      return () => clearTimeout(timer);
+      // Delay particle effects slightly to avoid visual conflict with FunGraphics
+      const particleDelay = setTimeout(() => {
+        setShowSuccessParticles(true);
+        triggerCorrectFeedback();
+      }, 500);
+      
+      const hideTimer = setTimeout(() => setShowSuccessParticles(false), 3000);
+      
+      return () => {
+        clearTimeout(particleDelay);
+        clearTimeout(hideTimer);
+      };
     } else if (lastAnswerCorrect === false && showAnimation) {
-      setShowErrorParticles(true);
-      triggerIncorrectFeedback();
-      const timer = setTimeout(() => setShowErrorParticles(false), 2000);
-      return () => clearTimeout(timer);
+      // Shorter delay for error particles
+      const particleDelay = setTimeout(() => {
+        setShowErrorParticles(true);
+        triggerIncorrectFeedback();
+      }, 300);
+      
+      const hideTimer = setTimeout(() => setShowErrorParticles(false), 2000);
+      
+      return () => {
+        clearTimeout(particleDelay);
+        clearTimeout(hideTimer);
+      };
     }
   }, [lastAnswerCorrect, showAnimation, triggerCorrectFeedback, triggerIncorrectFeedback]);
 
@@ -121,16 +136,12 @@ const SpellingPractice = () => {
       {/* Background glass effect with theme support */}
       <div className={`fixed inset-0 bg-gradient-to-br ${getGradientClasses.background} -z-10`} />
       
-      {/* Enhanced particle effects */}
-      <SuccessParticles trigger={showSuccessParticles} />
-      <ErrorParticles trigger={showErrorParticles} />
+      {/* Coordinated particle effects - only show when FunGraphics allows */}
+      {!showAnimation && <SuccessParticles trigger={showSuccessParticles} />}
+      {!showAnimation && <ErrorParticles trigger={showErrorParticles} />}
       
-      {/* Fun Graphics Component - moved outside dialogs for visibility with higher z-index */}
-      <div className="z-[9999]">
-        {showAnimation && (
-          <FunGraphics isCorrect={lastAnswerCorrect} showAnimation={showAnimation} />
-        )}
-      </div>
+      {/* Single FunGraphics Component - centralized animation control */}
+      <FunGraphics isCorrect={lastAnswerCorrect} showAnimation={showAnimation} />
       
       {/* Enhanced header with floating animation */}
       <FloatingIcon className="text-center">

@@ -148,29 +148,42 @@ export const useWordProblem = ({
       onWrongAnswer();
     }
 
-    // Show animation
+    // Show animation with improved state management
+    console.log("🎬 handleAnswer: Starting animation sequence");
     setLastAnswerCorrect(isCorrect);
     setShowAnimation(true);
 
-    // Hide animation after delay
-    setTimeout(() => {
+    // Enhanced animation timing with proper cleanup
+    const animationDuration = 2000;
+    const hideTimeout = setTimeout(() => {
+      console.log("🎬 handleAnswer: Hiding animation after timeout");
       setShowAnimation(false);
-    }, 2000);
+      
+      // Reset animation state after hiding
+      setTimeout(() => {
+        setLastAnswerCorrect(null);
+      }, 100);
+    }, animationDuration);
 
     // Posunout na další pozici nebo další slovo
     const nextPosition = currentPosition + 1;
     
     if (nextPosition >= missingPositions.length) {
       // Hotovo s tímto slovem - generovat nové
-      console.log("🎯 handleAnswer: Slovo dokončeno, generuji nové za 1.5s");
+      console.log("🎯 handleAnswer: Slovo dokončeno, generuji nové za 1.8s");
       setTimeout(() => {
         generateNewWord();
-      }, 1500);
+      }, 1800); // Slightly shorter to prevent overlap with animation
     } else {
       // Pokračovat na další pozici ve stejném slově
       setCurrentPosition(nextPosition);
       console.log("➡️ handleAnswer: Pokračuji na pozici:", nextPosition);
     }
+
+    // Cleanup function to prevent memory leaks
+    return () => {
+      clearTimeout(hideTimeout);
+    };
   }, [
     currentPosition,
     missingPositions,
