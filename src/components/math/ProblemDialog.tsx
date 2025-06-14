@@ -42,7 +42,7 @@ const ProblemDialog: React.FC<ProblemDialogProps> = ({
   correctPercentage
 }) => {
   const isMobile = useIsMobile();
-  const { triggerTapHaptic, triggerSuccessHaptic } = useMobileInteractions();
+  const { triggerTapHaptic } = useMobileInteractions();
 
   const handleKeyboardInput = (key: string) => {
     triggerTapHaptic();
@@ -60,18 +60,15 @@ const ProblemDialog: React.FC<ProblemDialogProps> = ({
   };
 
   const handleCheckAnswer = () => {
-    triggerSuccessHaptic();
     checkAnswer();
   };
 
   // Touch gestures for navigation
   const { elementRef } = useTouchGestures({
     onSwipeRight: () => {
-      // Could be used for navigation between problems in the future
       console.log('Swipe right detected');
     },
     onSwipeLeft: () => {
-      // Could be used for navigation between problems in the future  
       console.log('Swipe left detected');
     },
     hapticFeedback: true
@@ -129,12 +126,13 @@ const ProblemDialog: React.FC<ProblemDialogProps> = ({
                 pattern="[0-9]*"
               />
               
-              {/* Enhanced Numeric Keyboard with better touch targets */}
+              {/* Enhanced Numeric Keyboard - only enter symbol will trigger answer check */}
               <div className="mt-4">
                 <NumericKeyboard 
                   onKeyPress={handleKeyboardInput}
                   onClear={handleClear}
                   onSubmit={handleCheckAnswer}
+                  disabled={!userAnswer.trim()}
                 />
               </div>
               
@@ -160,16 +158,6 @@ const ProblemDialog: React.FC<ProblemDialogProps> = ({
             </div>
             
             <DialogFooter className={`flex gap-3 ${isMobile ? 'flex-col' : 'flex-row'}`}>
-              <HoverScale>
-                <Button 
-                  onClick={handleCheckAnswer}
-                  className={`bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 active:scale-95 touch-manipulation transform transition-all duration-150 shadow-lg hover:shadow-xl ${isMobile ? 'w-full h-14 text-lg' : 'w-auto h-12'}`}
-                  disabled={!userAnswer.trim()}
-                >
-                  ✓ Odpovědět
-                </Button>
-              </HoverScale>
-              
               <HoverScale>
                 <Button 
                   onClick={handleEndGame}

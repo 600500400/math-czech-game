@@ -29,6 +29,10 @@ serve(async (req) => {
     
     console.log('AI Assistant request:', { message, context });
 
+    if (!openAIApiKey) {
+      throw new Error('OpenAI API key není nastaven');
+    }
+
     // Build context-aware system prompt
     let systemPrompt = `Jsi AI studentský asistent pro českou vzdělávací aplikaci. Tvoje role:
 
@@ -79,7 +83,16 @@ Využij tyto informace pro personalizované rady.`;
     const data = await response.json();
     
     if (!response.ok) {
-      throw new Error(`OpenAI API error: ${data.error?.message || 'Unknown error'}`);
+      console.error('OpenAI API Error:', data);
+      
+      // Handle specific API errors
+      if (data.error?.code === 'insufficient_quota') {
+        throw new Error('OpenAI API kvóta byla vyčerpána. Zkuste to prosím později.');
+      } else if (data.error?.code === 'rate_limit_exceeded') {
+        throw new Error('Příliš mnoho požadavků. Zkuste to prosím za chvíli.');
+      } else {
+        throw new Error(`OpenAI API chyba: ${data.error?.message || 'Neznámá chyba'}`);
+      }
     }
 
     const assistantResponse = data.choices[0].message.content;
@@ -94,9 +107,21 @@ Využij tyto informace pro personalizované rady.`;
     });
   } catch (error) {
     console.error('Error in AI assistant function:', error);
+    
+    // Provide user-friendly error messages
+    let userMessage = 'Promiň, teď nemůžu odpovědět. ';
+    
+    if (error.message.includes('quota') || error.message.includes('kvóta')) {
+      userMessage += 'API kvóta byla vyčerpána. Zkus to prosím později.';
+    } else if (error.message.includes('rate_limit')) {
+      userMessage += 'Příliš mnoho požadavků najednou. Zkus to za chvíli.';
+    } else {
+      userMessage += 'Zkus to prosím později.';
+    }
+    
     return new Response(
       JSON.stringify({ 
-        error: error.message,
+        error: userMessage,
         success: false 
       }),
       {

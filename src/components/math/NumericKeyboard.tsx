@@ -7,9 +7,10 @@ interface NumericKeyboardProps {
   onKeyPress: (key: string) => void;
   onClear: () => void;
   onSubmit: () => void;
+  disabled?: boolean;
 }
 
-const NumericKeyboard = ({ onKeyPress, onClear, onSubmit }: NumericKeyboardProps) => {
+const NumericKeyboard = ({ onKeyPress, onClear, onSubmit, disabled = false }: NumericKeyboardProps) => {
   const isMobile = useIsMobile();
   const { triggerTapHaptic } = useMobileInteractions();
 
@@ -24,8 +25,10 @@ const NumericKeyboard = ({ onKeyPress, onClear, onSubmit }: NumericKeyboardProps
   };
 
   const handleSubmit = () => {
-    triggerTapHaptic();
-    onSubmit();
+    if (!disabled) {
+      triggerTapHaptic();
+      onSubmit();
+    }
   };
 
   const keys = [
@@ -56,9 +59,14 @@ const NumericKeyboard = ({ onKeyPress, onClear, onSubmit }: NumericKeyboardProps
             <Button
               key={key}
               onClick={handleSubmit}
-              className={`bg-green-500 hover:bg-green-600 active:bg-green-700 text-white font-medium touch-manipulation transform active:scale-95 transition-all duration-150 ${isMobile ? 'h-14 text-lg' : 'h-12'}`}
+              disabled={disabled}
+              className={`${
+                disabled 
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                  : 'bg-green-500 hover:bg-green-600 active:bg-green-700 text-white'
+              } font-medium touch-manipulation transform active:scale-95 transition-all duration-150 ${isMobile ? 'h-14 text-lg' : 'h-12'}`}
             >
-              ✓
+              ↵
             </Button>
           );
         }
