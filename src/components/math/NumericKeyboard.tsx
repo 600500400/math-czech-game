@@ -12,7 +12,7 @@ interface NumericKeyboardProps {
 
 const NumericKeyboard = ({ onKeyPress, onClear, onSubmit, disabled = false }: NumericKeyboardProps) => {
   const isMobile = useIsMobile();
-  const { triggerTapHaptic } = useMobileInteractions();
+  const { triggerTapHaptic } = useMobileInteractions({ hapticsEnabled: true, preventZoom: true });
 
   const handleKeyPress = (key: string) => {
     triggerTapHaptic();

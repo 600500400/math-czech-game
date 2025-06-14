@@ -42,7 +42,7 @@ const ProblemDialog: React.FC<ProblemDialogProps> = ({
   correctPercentage
 }) => {
   const isMobile = useIsMobile();
-  const { triggerTapHaptic } = useMobileInteractions();
+  const { triggerTapHaptic } = useMobileInteractions({ hapticsEnabled: true, preventZoom: true });
 
   const handleKeyboardInput = (key: string) => {
     triggerTapHaptic();

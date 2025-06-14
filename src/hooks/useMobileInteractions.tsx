@@ -1,33 +1,27 @@
 
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useEnhancedHaptics } from './useEnhancedHaptics';
 
-export const useMobileInteractions = () => {
-  const triggerHaptic = useCallback((intensity: 'light' | 'medium' | 'heavy' = 'light') => {
-    // Modern vibration API
-    if ('vibrate' in navigator) {
-      const patterns = {
-        light: [10],
-        medium: [15, 5, 15],
-        heavy: [20, 10, 20]
-      };
-      navigator.vibrate(patterns[intensity]);
-    }
-  }, []);
+interface MobileInteractionSettings {
+  hapticsEnabled: boolean;
+  preventZoom: boolean;
+}
 
-  const triggerSuccessHaptic = useCallback(() => {
-    triggerHaptic('medium');
-  }, [triggerHaptic]);
+export const useMobileInteractions = (settings: MobileInteractionSettings = { hapticsEnabled: true, preventZoom: true }) => {
+  const [interactionSettings, setInteractionSettings] = useState(settings);
+  const {
+    triggerTapHaptic,
+    triggerSuccessHaptic,
+    triggerErrorHaptic,
+    triggerCelebrationHaptic,
+    triggerGameStartHaptic,
+    triggerGameEndHaptic
+  } = useEnhancedHaptics({ enabled: interactionSettings.hapticsEnabled, intensity: 'medium' });
 
-  const triggerErrorHaptic = useCallback(() => {
-    triggerHaptic('heavy');
-  }, [triggerHaptic]);
-
-  const triggerTapHaptic = useCallback(() => {
-    triggerHaptic('light');
-  }, [triggerHaptic]);
-
-  // Prevent zoom on double tap for better UX
+  // Prevent zoom on double tap and pinch
   useEffect(() => {
+    if (!interactionSettings.preventZoom) return;
+
     const preventZoom = (e: TouchEvent) => {
       if (e.touches.length > 1) {
         e.preventDefault();
@@ -57,12 +51,24 @@ export const useMobileInteractions = () => {
       document.removeEventListener('touchstart', preventZoom);
       document.removeEventListener('touchend', preventDoubleTabZoom);
     };
+  }, [interactionSettings.preventZoom]);
+
+  // Update settings
+  const updateSettings = useCallback((newSettings: Partial<MobileInteractionSettings>) => {
+    setInteractionSettings(prev => ({ ...prev, ...newSettings }));
   }, []);
 
   return {
-    triggerHaptic,
+    // Haptic feedback methods
+    triggerTapHaptic,
     triggerSuccessHaptic,
     triggerErrorHaptic,
-    triggerTapHaptic
+    triggerCelebrationHaptic,
+    triggerGameStartHaptic,
+    triggerGameEndHaptic,
+    
+    // Settings
+    settings: interactionSettings,
+    updateSettings
   };
 };

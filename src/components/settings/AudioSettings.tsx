@@ -5,9 +5,9 @@ import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Volume2, VolumeX, Music, Zap, TestTube } from 'lucide-react';
+import { Volume2, VolumeX, TestTube } from 'lucide-react';
 import { useAudioSystem } from '@/hooks/useAudioSystem';
-import { useAdvancedHaptics } from '@/hooks/useAdvancedHaptics';
+import { HapticSettings } from './HapticSettings';
 
 export const AudioSettings: React.FC = () => {
   const {
@@ -22,14 +22,6 @@ export const AudioSettings: React.FC = () => {
     playButtonClickSound,
     playCelebrationSound
   } = useAudioSystem();
-
-  const {
-    isSupported: hapticsSupported,
-    triggerSuccessHaptic,
-    triggerErrorHaptic,
-    triggerCelebrationHaptic,
-    triggerTapHaptic
-  } = useAdvancedHaptics();
 
   const handleEnableAudio = async () => {
     if (settings.enabled) {
@@ -47,20 +39,15 @@ export const AudioSettings: React.FC = () => {
   };
 
   const testSound = (type: 'correct' | 'incorrect' | 'celebration') => {
-    triggerTapHaptic();
-    
     switch (type) {
       case 'correct':
         playCorrectSound();
-        triggerSuccessHaptic();
         break;
       case 'incorrect':
         playIncorrectSound();
-        triggerErrorHaptic();
         break;
       case 'celebration':
         playCelebrationSound();
-        triggerCelebrationHaptic();
         break;
     }
   };
@@ -160,97 +147,8 @@ export const AudioSettings: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Haptic Feedback */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Zap className="h-5 w-5" />
-            Vibrační odezva
-            {!hapticsSupported && <Badge variant="secondary">Nepodporováno</Badge>}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-1">
-            <p className="font-medium">Stav podpory</p>
-            <p className="text-sm text-muted-foreground">
-              {hapticsSupported 
-                ? "Vibrační odezva je podporována na tomto zařízení" 
-                : "Vibrační odezva není na tomto zařízení dostupná"
-              }
-            </p>
-          </div>
-
-          {hapticsSupported && (
-            <div className="space-y-2">
-              <p className="font-medium flex items-center gap-2">
-                <TestTube className="h-4 w-4" />
-                Vyzkoušet vibrace
-              </p>
-              <div className="flex gap-2 flex-wrap">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={triggerSuccessHaptic}
-                  className="text-green-600 border-green-200 hover:bg-green-50"
-                >
-                  ✓ Úspěch
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={triggerErrorHaptic}
-                  className="text-red-600 border-red-200 hover:bg-red-50"
-                >
-                  ✗ Chyba
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={triggerCelebrationHaptic}
-                  className="text-purple-600 border-purple-200 hover:bg-purple-50"
-                >
-                  🎉 Oslava
-                </Button>
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Progressive Enhancement Info */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Music className="h-5 w-5" />
-            Pokročilé funkce
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-sm">Web Audio API</span>
-              <Badge variant={audioSupported ? "default" : "secondary"}>
-                {audioSupported ? "Podporováno" : "Nepodporováno"}
-              </Badge>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm">Vibration API</span>
-              <Badge variant={hapticsSupported ? "default" : "secondary"}>
-                {hapticsSupported ? "Podporováno" : "Nepodporováno"}
-              </Badge>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm">Offline podpora</span>
-              <Badge variant="default">Aktivní</Badge>
-            </div>
-          </div>
-          
-          <p className="text-xs text-muted-foreground">
-            Aplikace automaticky přizpůsobuje funkce podle možností vašeho zařízení.
-            Na novějších zařízeních máte k dispozici pokročilé audio a haptické efekty.
-          </p>
-        </CardContent>
-      </Card>
+      {/* Haptic Settings - New Section */}
+      <HapticSettings />
     </div>
   );
 };
