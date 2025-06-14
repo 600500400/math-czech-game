@@ -30,7 +30,14 @@ serve(async (req) => {
     console.log('AI Assistant request:', { message, context });
 
     if (!openAIApiKey) {
-      throw new Error('OpenAI API key není nastaven');
+      console.error('OpenAI API key is missing');
+      return new Response(JSON.stringify({ 
+        error: 'API klíč není nastaven. Kontaktujte administrátora.',
+        success: false 
+      }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     // Build context-aware system prompt
@@ -44,7 +51,7 @@ serve(async (req) => {
 6. Oslavuj pokroky a úspěchy
 
 Tvoje odpovědi by měly být:
-- Krátké a srozumitelné
+- Krátké a srozumitelné (maximálně 2-3 věty)
 - Pozitivní a motivující
 - Praktické s konkrétními tipy
 - V češtině`;
@@ -58,10 +65,7 @@ Tvoje odpovědi by měly být:
 Zaměř se na tyto oblasti a poskytni tipy pro zlepšení.`;
     }
 
-    if (context?.userStats) {
-      systemPrompt += `\n\nStatistiky studenta: ${JSON.stringify(context.userStats)}
-Využij tyto informace pro personalizované rady.`;
-    }
+    console.log('Sending request to OpenAI...');
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -75,27 +79,45 @@ Využij tyto informace pro personalizované rady.`;
           { role: 'system', content: systemPrompt },
           { role: 'user', content: message }
         ],
-        max_tokens: 300,
+        max_tokens: 150,
         temperature: 0.7,
       }),
     });
 
     const data = await response.json();
     
+    console.log('OpenAI response status:', response.status);
+    console.log('OpenAI response data:', data);
+    
     if (!response.ok) {
       console.error('OpenAI API Error:', data);
       
-      // Handle specific API errors
+      let errorMessage = 'Promiň, teď nemůžu odpovědět. ';
+      
       if (data.error?.code === 'insufficient_quota') {
-        throw new Error('OpenAI API kvóta byla vyčerpána. Zkuste to prosím později.');
+        errorMessage += 'API kvóta byla vyčerpána.';
       } else if (data.error?.code === 'rate_limit_exceeded') {
-        throw new Error('Příliš mnoho požadavků. Zkuste to prosím za chvíli.');
+        errorMessage += 'Příliš mnoho požadavků najednou.';
+      } else if (data.error?.code === 'invalid_api_key') {
+        errorMessage += 'API klíč není platný.';
       } else {
-        throw new Error(`OpenAI API chyba: ${data.error?.message || 'Neznámá chyba'}`);
+        errorMessage += 'Zkus to prosím později.';
       }
+      
+      return new Response(JSON.stringify({ 
+        error: errorMessage,
+        success: false 
+      }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
-    const assistantResponse = data.choices[0].message.content;
+    const assistantResponse = data.choices[0]?.message?.content;
+    
+    if (!assistantResponse) {
+      throw new Error('Prázdná odpověď z OpenAI');
+    }
     
     console.log('AI Assistant response:', assistantResponse);
 
@@ -105,29 +127,16 @@ Využij tyto informace pro personalizované rady.`;
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
+
   } catch (error) {
     console.error('Error in AI assistant function:', error);
     
-    // Provide user-friendly error messages
-    let userMessage = 'Promiň, teď nemůžu odpovědět. ';
-    
-    if (error.message.includes('quota') || error.message.includes('kvóta')) {
-      userMessage += 'API kvóta byla vyčerpána. Zkus to prosím později.';
-    } else if (error.message.includes('rate_limit')) {
-      userMessage += 'Příliš mnoho požadavků najednou. Zkus to za chvíli.';
-    } else {
-      userMessage += 'Zkus to prosím později.';
-    }
-    
-    return new Response(
-      JSON.stringify({ 
-        error: userMessage,
-        success: false 
-      }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    );
+    return new Response(JSON.stringify({ 
+      error: 'Promiň, teď nemůžu odpovědět. Zkus to prosím později.',
+      success: false 
+    }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 });
