@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useRef } from "react";
-import { Star, Trophy, Heart, Frown } from "lucide-react";
+import { Trophy, Heart } from "lucide-react";
 
 interface FunGraphicsProps {
   isCorrect: boolean | null;
@@ -16,17 +16,20 @@ export const FunGraphics = ({
   onForceCleanup 
 }: FunGraphicsProps) => {
   const [isVisible, setIsVisible] = useState(false);
-  const [currentAnimationId, setCurrentAnimationId] = useState(0);
-  const mountedRef = useRef(true);
-  const cleanupTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Clear any existing timeout
+  const clearExistingTimeout = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+  };
   
   // Force cleanup function
   const forceCleanup = () => {
     console.log("🎨 FunGraphics: Force cleanup called");
-    if (cleanupTimeoutRef.current) {
-      clearTimeout(cleanupTimeoutRef.current);
-      cleanupTimeoutRef.current = null;
-    }
+    clearExistingTimeout();
     setIsVisible(false);
   };
   
@@ -37,87 +40,65 @@ export const FunGraphics = ({
     }
   }, [onForceCleanup]);
   
+  // Cleanup on unmount
   useEffect(() => {
-    mountedRef.current = true;
     return () => {
-      mountedRef.current = false;
-      forceCleanup();
+      clearExistingTimeout();
     };
   }, []);
   
+  // Main animation effect
   useEffect(() => {
-    console.log("🎨 FunGraphics: Animation change - showAnimation:", showAnimation, "isCorrect:", isCorrect, "animationId:", animationId);
+    console.log("🎨 FunGraphics: Animation effect - showAnimation:", showAnimation, "isCorrect:", isCorrect);
     
-    // Clear any existing cleanup timeout immediately
-    if (cleanupTimeoutRef.current) {
-      clearTimeout(cleanupTimeoutRef.current);
-      cleanupTimeoutRef.current = null;
-    }
+    // Clear any existing timeout first
+    clearExistingTimeout();
     
-    // If animation should not show, hide immediately and don't show
-    if (!showAnimation || !mountedRef.current || isCorrect === null) {
+    // Hide immediately if animation should not show
+    if (!showAnimation || isCorrect === null) {
       console.log("🎨 FunGraphics: Hiding animation immediately");
       setIsVisible(false);
       return;
     }
     
-    // Show animation only if all conditions are met
-    console.log("🎨 FunGraphics: Starting animation");
-    setCurrentAnimationId(animationId);
+    // Show animation
+    console.log("🎨 FunGraphics: Showing animation");
     setIsVisible(true);
     
-    // Schedule automatic cleanup with shorter timeout
-    cleanupTimeoutRef.current = setTimeout(() => {
-      if (mountedRef.current) {
-        console.log("🎨 FunGraphics: Auto-cleanup for animation ID:", animationId);
-        setIsVisible(false);
-      }
-    }, 600); // Further reduced to 600ms for faster cleanup
+    // Schedule hide after 600ms
+    timeoutRef.current = setTimeout(() => {
+      console.log("🎨 FunGraphics: Auto-hiding animation");
+      setIsVisible(false);
+      timeoutRef.current = null;
+    }, 600);
     
   }, [isCorrect, showAnimation, animationId]);
   
-  // Force hide when showAnimation becomes false
-  useEffect(() => {
-    if (!showAnimation) {
-      console.log("🎨 FunGraphics: showAnimation is false, forcing hide");
-      setIsVisible(false);
-    }
-  }, [showAnimation]);
-  
-  // Don't render if not visible or should not show
+  // Don't render anything if not visible or conditions not met
   if (!showAnimation || !isVisible || isCorrect === null) {
     return null;
   }
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-[8500] flex items-center justify-center">
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
-        
-        {/* Simple feedback with icon and text */}
-        <div className={`${isCorrect ? 'animate-bounce' : 'animate-pulse'} bg-white/95 rounded-xl shadow-lg p-6 border-2 ${isCorrect ? 'border-green-300' : 'border-orange-300'}`}>
+    <div className="fixed inset-0 pointer-events-none z-[8000] flex items-center justify-center">
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+        <div className={`bg-white/95 rounded-xl shadow-lg p-6 border-2 ${isCorrect ? 'border-green-300 animate-bounce' : 'border-orange-300 animate-pulse'}`}>
           <div className="flex flex-col items-center gap-3">
-            {/* Icon */}
-            <div className="flex justify-center">
-              {isCorrect ? (
-                <Trophy size={48} className="text-yellow-500 animate-pulse" />
-              ) : (
-                <Heart size={48} className="text-red-400 animate-pulse" />
-              )}
-            </div>
-            
-            {/* Text */}
+            {isCorrect ? (
+              <Trophy size={48} className="text-yellow-500" />
+            ) : (
+              <Heart size={48} className="text-red-400" />
+            )}
             <p className={`text-2xl font-bold text-center ${isCorrect ? 'text-green-600' : 'text-orange-600'}`}>
               {isCorrect ? 'Výborně!' : 'Zkus to znovu!'}
             </p>
           </div>
         </div>
         
-        {/* Simple celebration for correct answers - reduced number of elements */}
         {isCorrect && (
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
             <div className="absolute top-8 left-1/4 text-2xl animate-bounce">🎉</div>
             <div className="absolute top-16 right-1/4 text-2xl animate-bounce delay-150">⭐</div>
-            <div className="absolute bottom-20 left-1/3 text-2xl animate-bounce delay-300">🏆</div>
           </div>
         )}
       </div>

@@ -36,7 +36,8 @@ export const useWordProblem = ({
     currentPosition,
     resetWordState,
     updateWordState,
-    moveToNextPosition
+    moveToNextPosition,
+    setDisplayedWord
   } = useWordState();
 
   // Use the word generation hook
@@ -50,6 +51,8 @@ export const useWordProblem = ({
   // Use the answer handling hook
   const { handleAnswer, handleAnswerI, handleAnswerY } = useAnswerHandling({
     currentWord,
+    displayedWord,
+    setDisplayedWord,
     wordGroup,
     missingPositions,
     correctLetters,

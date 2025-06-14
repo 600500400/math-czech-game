@@ -51,6 +51,7 @@ export const useWordState = () => {
     currentPosition,
     resetWordState,
     updateWordState,
-    moveToNextPosition
+    moveToNextPosition,
+    setDisplayedWord
   };
 };

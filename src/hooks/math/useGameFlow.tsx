@@ -40,7 +40,7 @@ export function useGameFlow({
 
   // Start new game flow
   const startNewGame = useCallback(() => {
-    console.log("🎮 useGameFlow: Starting new game, recording start time");
+    console.log("🎮 useGameFlow: Starting new game");
     const startTime = Date.now();
     setGameStartTime(startTime);
     console.log("🎮 useGameFlow: Game start time set to:", new Date(startTime).toLocaleTimeString());
@@ -51,7 +51,7 @@ export function useGameFlow({
     resetUserAnswer();
   }, [generateProblem, setCurrentProblem, resetUserAnswer]);
 
-  // End game flow (now "take break")
+  // End game flow
   const endGame = useCallback(() => {
     console.log("🎮 useGameFlow: Ending game");
     console.log("🎮 useGameFlow: Game start time was:", gameStartTime ? new Date(gameStartTime).toLocaleTimeString() : 'NULL');
@@ -67,22 +67,21 @@ export function useGameFlow({
       const gameDuration = Math.round((endTime - gameStartTime) / 1000);
       const operationString = allowedOperations.join(',');
       
-      console.log("🎮 useGameFlow: Calculating game duration:");
+      console.log("🎮 useGameFlow: Saving game statistics:");
       console.log("🎮 useGameFlow: - Start time:", new Date(gameStartTime).toLocaleTimeString());
       console.log("🎮 useGameFlow: - End time:", new Date(endTime).toLocaleTimeString());
       console.log("🎮 useGameFlow: - Duration in seconds:", gameDuration);
       console.log("🎮 useGameFlow: - Correct answers:", correctAnswers);
       console.log("🎮 useGameFlow: - Wrong answers:", wrongAnswers);
       
-      // Ensure gameDuration is a valid number and greater than 0
       if (gameDuration > 0) {
-        console.log("🎮 useGameFlow: Saving statistics with valid game duration");
+        console.log("🎮 useGameFlow: Calling saveMathStatistics.mutate with duration:", gameDuration);
         
         saveMathStatistics.mutate({
           correctAnswers,
           wrongAnswers,
           operation: operationString,
-          gameDuration, // This should now be properly calculated
+          gameDuration,
           difficultyLevel: {
             maxValue,
             maxMultiplyValue,
@@ -90,7 +89,7 @@ export function useGameFlow({
           }
         });
       } else {
-        console.warn("🎮 useGameFlow: Invalid game duration calculated:", gameDuration);
+        console.warn("🎮 useGameFlow: Invalid game duration:", gameDuration);
       }
     } else {
       console.log("🎮 useGameFlow: Not saving statistics - missing requirements:", {

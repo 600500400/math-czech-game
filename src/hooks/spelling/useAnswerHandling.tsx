@@ -1,10 +1,12 @@
 
 import { useCallback } from "react";
 import { SpellingAnswer } from "@/types/spellingTypes";
-import { checkSpellingAnswer } from "@/utils/spellingUtils";
+import { checkSpellingAnswer, renderWordWithCurrentGap } from "@/utils/spellingUtils";
 
 interface UseAnswerHandlingProps {
   currentWord: string;
+  displayedWord: string;
+  setDisplayedWord: (word: string) => void;
   wordGroup: string;
   missingPositions: number[];
   correctLetters: string[];
@@ -20,6 +22,8 @@ interface UseAnswerHandlingProps {
 
 export const useAnswerHandling = ({
   currentWord,
+  displayedWord,
+  setDisplayedWord,
   wordGroup,
   missingPositions,
   correctLetters,
@@ -54,7 +58,7 @@ export const useAnswerHandling = ({
       isCorrect
     });
 
-    // Zaznamenat odpověď
+    // Record the answer
     const answer: SpellingAnswer = {
       word: currentWord,
       position,
@@ -74,39 +78,50 @@ export const useAnswerHandling = ({
       onWrongAnswer();
     }
 
-    // Show animation with proper timing
+    // Show animation
     console.log("🎬 handleAnswer: Starting animation sequence");
     setLastAnswerCorrect(isCorrect);
     setShowAnimation(true);
 
-    // Auto-hide animation and move to next after shorter time
+    // After animation, update the displayed word and continue
     setTimeout(() => {
       console.log("🎬 handleAnswer: Hiding animation");
       setShowAnimation(false);
       setLastAnswerCorrect(null);
       
-      // Small delay for smooth transition
+      // Update displayed word to show the filled letter
+      const nextPosition = currentPosition + 1;
+      const updatedDisplayedWord = renderWordWithCurrentGap(
+        currentWord, 
+        missingPositions, 
+        correctLetters, 
+        nextPosition
+      );
+      
+      console.log("🔤 handleAnswer: Updating displayed word:", updatedDisplayedWord);
+      setDisplayedWord(updatedDisplayedWord);
+      
       setTimeout(() => {
-        const nextPosition = currentPosition + 1;
-        
         if (nextPosition >= missingPositions.length) {
-          // Hotovo s tímto slovem - generovat nové
+          // Word completed - generate new word
           console.log("🎯 handleAnswer: Word completed, generating new word");
           generateNewWord();
         } else {
-          // Pokračovat na další pozici ve stejném slově
+          // Move to next position in same word
           console.log("➡️ handleAnswer: Moving to next position:", nextPosition);
           moveToNextPosition();
         }
       }, 100);
       
-    }, 800); // Shortened animation time
+    }, 600);
 
   }, [
     currentPosition,
     missingPositions,
     correctLetters,
     currentWord,
+    displayedWord,
+    setDisplayedWord,
     wordGroup,
     addAnswer,
     onCorrectAnswer,
