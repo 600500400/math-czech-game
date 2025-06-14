@@ -14,7 +14,6 @@ import { AchievementsPage } from "./components/gamification/AchievementsPage";
 import NotFound from "./pages/NotFound";
 import PWAInstallPrompt from "./components/pwa/PWAInstallPrompt";
 import OfflineIndicator from "./components/pwa/OfflineIndicator";
-import PWAStatusBar from "./components/pwa/PWAStatusBar";
 import "@/i18n";
 
 const queryClient = new QueryClient({
@@ -44,7 +43,6 @@ const App = () => (
             </Routes>
             <PWAInstallPrompt />
             <OfflineIndicator />
-            <PWAStatusBar />
           </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>
