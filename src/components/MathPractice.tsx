@@ -183,12 +183,12 @@ const MathPractice = () => {
         maxValue={maxValue}
         maxMultiplyValue={maxMultiplyValue}
         maxDivideValue={maxDivideValue}
-        setMaxValue={() => {}} // These will be handled by the dialog internally
+        setMaxValue={() => {}} // These will now be handled by setDifficulty function
         setMaxMultiplyValue={() => {}}
         setMaxDivideValue={() => {}}
         allowedOperations={allowedOperations}
         toggleOperation={toggleOperation}
-        setDifficulty={setDifficulty}
+        setDifficulty={(level: "easy" | "medium" | "hard") => setDifficulty(level)}
       />
 
       {/* Math Problem Dialog */}

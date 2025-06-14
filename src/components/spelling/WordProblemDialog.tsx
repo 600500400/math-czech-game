@@ -45,7 +45,7 @@ const WordProblemDialog: React.FC<WordProblemDialogProps> = ({
   const isMobile = useIsMobile();
   const { triggerTapHaptic } = useMobileInteractions({ hapticsEnabled: true, preventZoom: true });
 
-  const handleTakeBreak = () => {
+  const handleEndGame = () => {
     triggerTapHaptic();
     onEndGame();
   };
@@ -155,11 +155,11 @@ const WordProblemDialog: React.FC<WordProblemDialogProps> = ({
             <DialogFooter className={`flex gap-3 ${isMobile ? 'flex-col' : 'flex-row'}`}>
               <HoverScale>
                 <Button 
-                  onClick={handleTakeBreak}
+                  onClick={handleEndGame}
                   variant="outline"
                   className={`glass-light border-orange-200/50 text-orange-700 hover:bg-orange-100/50 active:scale-95 touch-manipulation transform transition-all duration-150 ${isMobile ? 'w-full h-14 text-lg' : 'w-auto h-12'}`}
                 >
-                  ⏸️ Přestávka
+                  🚪 Ukončit
                 </Button>
               </HoverScale>
             </DialogFooter>

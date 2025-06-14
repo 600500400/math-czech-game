@@ -73,20 +73,20 @@ export const FunGraphics = ({
           setIsVisible(true);
         }
       }, 25);
-    } else if (!isVisible) {
+    } else if (!isVisible && showAnimation) {
       // Same animation ID, just show if not already visible
       setIsVisible(true);
     }
     
-    // Schedule automatic cleanup
+    // Schedule automatic cleanup - shorter timeout to prevent persistent display
     cleanupTimeoutRef.current = setTimeout(() => {
       if (mountedRef.current && animationId === currentAnimationId) {
         console.log("🎨 FunGraphics: Auto-cleanup for animation ID:", animationId);
         setIsVisible(false);
       }
-    }, 1400); // Slightly shorter than hook timeout
+    }, 1000); // Reduced from 1400 to 1000ms
     
-  }, [isCorrect, showAnimation, animationId, currentAnimationId]);
+  }, [isCorrect, showAnimation, animationId, currentAnimationId, isVisible]);
   
   // Don't render if not visible or should not show
   if (!showAnimation || !isVisible || isCorrect === null) {
@@ -116,13 +116,12 @@ export const FunGraphics = ({
           </div>
         </div>
         
-        {/* Simple celebration for correct answers */}
+        {/* Simple celebration for correct answers - reduced number of elements */}
         {isCorrect && (
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-8 left-1/4 text-3xl animate-bounce">🎉</div>
-            <div className="absolute top-16 right-1/4 text-3xl animate-bounce delay-75">⭐</div>
-            <div className="absolute bottom-20 left-1/3 text-3xl animate-bounce delay-150">🌟</div>
-            <div className="absolute bottom-12 right-1/3 text-3xl animate-bounce delay-300">🏆</div>
+            <div className="absolute top-8 left-1/4 text-2xl animate-bounce">🎉</div>
+            <div className="absolute top-16 right-1/4 text-2xl animate-bounce delay-150">⭐</div>
+            <div className="absolute bottom-20 left-1/3 text-2xl animate-bounce delay-300">🏆</div>
           </div>
         )}
       </div>

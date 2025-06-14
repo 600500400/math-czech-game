@@ -40,6 +40,7 @@ export function useGameFlow({
 
   // Start new game flow
   const startNewGame = useCallback(() => {
+    console.log("🎮 useGameFlow: Starting new game, recording start time");
     setGameStartTime(Date.now());
     setCurrentProblem(generateProblem());
     setShowProblem(true);
@@ -49,6 +50,7 @@ export function useGameFlow({
 
   // End game flow (now "take break")
   const endGame = useCallback(() => {
+    console.log("🎮 useGameFlow: Ending game");
     setShowProblem(false);
     setGameEnded(true);
     setShowStatsDialog(true);
@@ -58,17 +60,21 @@ export function useGameFlow({
       const gameDuration = Math.round((Date.now() - gameStartTime) / 1000);
       const operationString = allowedOperations.join(',');
       
+      console.log("🎮 useGameFlow: Saving statistics with game duration:", gameDuration, "seconds");
+      
       saveMathStatistics.mutate({
         correctAnswers,
         wrongAnswers,
         operation: operationString,
-        gameDuration, // Now properly saving game duration
+        gameDuration, // Properly calculated game duration
         difficultyLevel: {
           maxValue,
           maxMultiplyValue,
           maxDivideValue
         }
       });
+    } else {
+      console.log("🎮 useGameFlow: Not saving statistics - userId:", userId, "gameStartTime:", gameStartTime, "hasAnswers:", (correctAnswers > 0 || wrongAnswers > 0));
     }
     
     setGameStartTime(null);

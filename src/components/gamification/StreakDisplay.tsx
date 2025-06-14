@@ -35,7 +35,7 @@ export const StreakDisplay = ({ userStreak, isAtRisk, compact = false }: StreakD
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <Flame className={`w-5 h-5 ${isAtRisk ? 'text-orange-500' : 'text-orange-400'}`} />
-          <span className="font-semibold">Denní šňůra</span>
+          <span className="font-semibold">Denní lekce</span>
         </div>
         {isAtRisk && (
           <Badge variant="destructive" className="flex items-center gap-1">

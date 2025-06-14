@@ -9,6 +9,7 @@ import WelcomeDashboard from "@/components/dashboard/WelcomeDashboard";
 import PracticeTabs from "@/components/practice/PracticeTabs";
 import StatisticsTabs from "@/components/statistics/StatisticsTabs";
 import ModernHeader from "@/components/layout/ModernHeader";
+import { AIAssistantDrawer } from "@/components/ai/AIAssistantDrawer";
 
 const HomePage = () => {
   const { authState } = useAuth();
@@ -89,6 +90,15 @@ const HomePage = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* AI Assistant available on all tabs */}
+      <AIAssistantDrawer 
+        subject={activeTab === 'practice' ? practiceDefaultTab : undefined}
+        context={{
+          recentErrors: [],
+          userStats: activeTab === 'practice' && practiceDefaultTab === 'math' ? mathStats : spellingStats
+        }}
+      />
     </div>
   );
 };
