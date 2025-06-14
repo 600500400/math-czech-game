@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import {
@@ -82,7 +81,6 @@ const FeedbackButton = () => {
           className="flex items-center gap-2 bg-white border-gray-200 hover:bg-gray-50"
         >
           <MessageSquare className="h-4 w-4" />
-          <span className="hidden sm:inline">{t('feedback.title')}</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
