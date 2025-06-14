@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,6 +35,28 @@ const DifficultyDialog: React.FC<DifficultyDialogProps> = ({
   toggleOperation,
   setDifficulty 
 }) => {
+  // Local state for inputs
+  const [localMaxValue, setLocalMaxValue] = useState(maxValue);
+  const [localMaxMultiplyValue, setLocalMaxMultiplyValue] = useState(maxMultiplyValue);
+  const [localMaxDivideValue, setLocalMaxDivideValue] = useState(maxDivideValue);
+
+  // Update local state when props change
+  useEffect(() => {
+    setLocalMaxValue(maxValue);
+    setLocalMaxMultiplyValue(maxMultiplyValue);
+    setLocalMaxDivideValue(maxDivideValue);
+  }, [maxValue, maxMultiplyValue, maxDivideValue]);
+
+  const handleSaveDifficulty = () => {
+    // Update the parent state with local values
+    setMaxValue(localMaxValue);
+    setMaxMultiplyValue(localMaxMultiplyValue);
+    setMaxDivideValue(localMaxDivideValue);
+    
+    // Close dialog
+    setDifficulty();
+  };
+
   const operationInfo = [
     { operation: "+" as Operation, label: "Sčítání", icon: <Plus size={16} /> },
     { operation: "-" as Operation, label: "Odčítání", icon: <Minus size={16} /> },
@@ -54,8 +76,8 @@ const DifficultyDialog: React.FC<DifficultyDialogProps> = ({
             <Input
               id="max-value"
               type="number"
-              value={maxValue}
-              onChange={(e) => setMaxValue(parseInt(e.target.value) || 0)}
+              value={localMaxValue}
+              onChange={(e) => setLocalMaxValue(parseInt(e.target.value) || 1)}
               min={1}
             />
           </div>
@@ -65,8 +87,8 @@ const DifficultyDialog: React.FC<DifficultyDialogProps> = ({
             <Input
               id="max-multiply-value"
               type="number"
-              value={maxMultiplyValue}
-              onChange={(e) => setMaxMultiplyValue(parseInt(e.target.value) || 0)}
+              value={localMaxMultiplyValue}
+              onChange={(e) => setLocalMaxMultiplyValue(parseInt(e.target.value) || 1)}
               min={1}
             />
           </div>
@@ -76,8 +98,8 @@ const DifficultyDialog: React.FC<DifficultyDialogProps> = ({
             <Input
               id="max-divide-value"
               type="number"
-              value={maxDivideValue}
-              onChange={(e) => setMaxDivideValue(parseInt(e.target.value) || 0)}
+              value={localMaxDivideValue}
+              onChange={(e) => setLocalMaxDivideValue(parseInt(e.target.value) || 1)}
               min={1}
             />
           </div>
@@ -88,7 +110,7 @@ const DifficultyDialog: React.FC<DifficultyDialogProps> = ({
               {operationInfo.map(({ operation, label, icon }) => (
                 <div 
                   key={operation}
-                  className={`flex items-center space-x-2 p-3 border-2 rounded-lg transition-all duration-200 ${
+                  className={`flex items-center space-x-2 p-3 border-2 rounded-lg transition-all duration-200 cursor-pointer ${
                     allowedOperations.includes(operation) 
                       ? 'border-orange-500 bg-orange-50' 
                       : 'border-gray-200 hover:border-orange-300'
@@ -114,7 +136,7 @@ const DifficultyDialog: React.FC<DifficultyDialogProps> = ({
         </div>
         <DialogFooter>
           <Button 
-            onClick={setDifficulty}
+            onClick={handleSaveDifficulty}
             className="bg-orange-500 hover:bg-orange-600"
           >
             Nastavit
