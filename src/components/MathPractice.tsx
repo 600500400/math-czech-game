@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { MathProblemDialog } from "./math/MathProblemDialog";
 import DifficultyDialog from "./math/DifficultyDialog";
@@ -92,13 +91,8 @@ const MathPractice = () => {
 
       {/* Glass morphism game controls */}
       <MathPracticeControls 
-        allowedOperations={mathGame.allowedOperations}
-        maxValue={mathGame.maxValue}
-        maxMultiplyValue={mathGame.maxMultiplyValue}
-        maxDivideValue={mathGame.maxDivideValue}
         onShowDifficultyDialog={handleShowDifficultyDialog}
         onStartNewGame={handleStartNewGame}
-        toggleOperation={mathGame.toggleOperation}
       />
 
       {/* Math Problem Dialog */}

@@ -1,46 +1,39 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Settings, Play } from "lucide-react";
-import { Operation } from "@/types/mathTypes";
+import { Settings } from "lucide-react";
+import { HoverScale } from "@/components/ui/microanimations";
+import { GlassCard } from "@/components/ui/glass-morphism";
 
 interface MathPracticeControlsProps {
-  allowedOperations: Operation[];
-  maxValue: number;
-  maxMultiplyValue: number;
-  maxDivideValue: number;
   onShowDifficultyDialog: () => void;
   onStartNewGame: () => void;
-  toggleOperation: (operation: Operation) => void;
 }
 
 export const MathPracticeControls: React.FC<MathPracticeControlsProps> = ({
-  allowedOperations,
-  maxValue,
-  maxMultiplyValue,
-  maxDivideValue,
   onShowDifficultyDialog,
   onStartNewGame,
-  toggleOperation
 }) => {
   return (
-    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-      <Button
-        onClick={onShowDifficultyDialog}
-        variant="outline"
-        className="flex items-center gap-2 glass-light border-white/30"
-      >
-        <Settings size={16} />
-        Nastavení obtížnosti
-      </Button>
-      
-      <Button
-        onClick={onStartNewGame}
-        className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
-      >
-        <Play size={16} />
-        Začít hru
-      </Button>
-    </div>
+    <HoverScale>
+      <GlassCard className="hover:bg-white/25 dark:hover:bg-white/10 transition-all duration-500">
+        <div className="space-y-2">
+          <Button
+            onClick={onStartNewGame}
+            className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 text-lg py-6"
+          >
+            Spustit hru
+          </Button>
+          <Button
+            onClick={onShowDifficultyDialog}
+            variant="outline"
+            className="w-full py-2"
+          >
+            <Settings size={16} className="mr-2" />
+            Nastavení obtížnosti
+          </Button>
+        </div>
+      </GlassCard>
+    </HoverScale>
   );
 };
