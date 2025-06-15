@@ -1,9 +1,13 @@
-
 import { useCallback } from 'react';
 import { useAudioSystem } from './useAudioSystem';
 import { useAdvancedHaptics } from './useAdvancedHaptics';
 
-export const useEnhancedMobileInteractions = () => {
+interface EnhancedMobileInteractionsConfig {
+  hapticsEnabled?: boolean;
+  intensity?: 'light' | 'medium' | 'heavy';
+}
+
+export const useEnhancedMobileInteractions = (config: EnhancedMobileInteractionsConfig = {}) => {
   const {
     playCorrectSound,
     playIncorrectSound,
@@ -20,7 +24,10 @@ export const useEnhancedMobileInteractions = () => {
     triggerGameStartHaptic,
     triggerGameEndHaptic,
     triggerTapHaptic
-  } = useAdvancedHaptics();
+  } = useAdvancedHaptics({
+    enabled: config.hapticsEnabled ?? true,
+    intensity: config.intensity ?? 'medium'
+  });
 
   // Enhanced feedback for correct answers
   const triggerCorrectFeedback = useCallback(() => {
