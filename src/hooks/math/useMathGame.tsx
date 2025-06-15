@@ -52,15 +52,9 @@ export const useMathGame = () => {
     gameState.setLastAnswerCorrect(null);
     gameState.resetAnswers();
     
-    // Generate first problem
-    const newProblem = problemGenerator.generateProblem();
-    gameState.setCurrentProblem(newProblem);
-    gameState.setUserAnswer("");
-    
-    // Show problem dialog
-    gameFlow.setShowProblem(true);
-    gameFlow.setGameEnded(false);
-  }, [gameState, problemGenerator, gameFlow]);
+    // Use gameFlow to start the game properly
+    gameFlow.startNewGame();
+  }, [gameState, gameFlow]);
 
   // End game (now called "take break")
   const endGame = useCallback(() => {
@@ -76,7 +70,8 @@ export const useMathGame = () => {
   // Set difficulty preset
   const setDifficulty = useCallback((level: "easy" | "medium" | "hard") => {
     difficultySettings.setDifficulty(level);
-  }, [difficultySettings]);
+    gameFlow.setShowDifficultyDialog(false);
+  }, [difficultySettings, gameFlow]);
 
   return {
     // Game state
@@ -100,7 +95,9 @@ export const useMathGame = () => {
     
     // Actions
     setUserAnswer: gameState.setUserAnswer,
+    setShowProblem: gameFlow.setShowProblem,
     setShowDifficultyDialog: gameFlow.setShowDifficultyDialog,
+    setShowStatsDialog: gameFlow.setShowStatsDialog,
     checkAnswer: answerHandler.checkAnswer,
     handleKeyPress: answerHandler.handleKeyPress,
     startNewGame,

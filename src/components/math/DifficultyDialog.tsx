@@ -14,12 +14,9 @@ interface DifficultyDialogProps {
   maxValue: number;
   maxMultiplyValue: number;
   maxDivideValue: number;
-  setMaxValue: (value: number) => void;
-  setMaxMultiplyValue: (value: number) => void;
-  setMaxDivideValue: (value: number) => void;
   allowedOperations: Operation[];
   toggleOperation: (operation: Operation) => void;
-  setDifficulty: () => void;
+  setDifficulty: (level: "easy" | "medium" | "hard") => void;
 }
 
 const DifficultyDialog: React.FC<DifficultyDialogProps> = ({ 
@@ -28,9 +25,6 @@ const DifficultyDialog: React.FC<DifficultyDialogProps> = ({
   maxValue, 
   maxMultiplyValue,
   maxDivideValue,
-  setMaxValue,
-  setMaxMultiplyValue,
-  setMaxDivideValue,
   allowedOperations,
   toggleOperation,
   setDifficulty 
@@ -48,13 +42,8 @@ const DifficultyDialog: React.FC<DifficultyDialogProps> = ({
   }, [maxValue, maxMultiplyValue, maxDivideValue]);
 
   const handleSaveDifficulty = () => {
-    // Update the parent state with local values
-    setMaxValue(localMaxValue);
-    setMaxMultiplyValue(localMaxMultiplyValue);
-    setMaxDivideValue(localMaxDivideValue);
-    
     // Close dialog
-    setDifficulty();
+    onOpenChange(false);
   };
 
   const operationInfo = [

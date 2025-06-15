@@ -1,6 +1,7 @@
+
 import { useEffect } from "react";
 import { MathProblemDialog } from "./math/MathProblemDialog";
-import { DifficultyDialog } from "./math/DifficultyDialog";
+import DifficultyDialog from "./math/DifficultyDialog";
 import { StatisticsDialog } from "./math/StatisticsDialog";
 import { MathPracticeHeader } from "./math/MathPracticeHeader";
 import { MathPracticeControls } from "./math/MathPracticeControls";
@@ -19,7 +20,10 @@ const MathPractice = () => {
     triggerGameStartFeedback,
     triggerGameEndFeedback,
     triggerButtonFeedback
-  } = useEnhancedMobileInteractions();
+  } = useEnhancedMobileInteractions({
+    hapticsEnabled: true,
+    preventZoom: true
+  });
 
   // Simplified feedback effects
   useEffect(() => {
@@ -33,7 +37,7 @@ const MathPractice = () => {
   // Enhanced game start with feedback
   const handleStartNewGame = () => {
     triggerGameStartFeedback();
-    mathGame.startNewGame(); // Use only mathGame.startNewGame, not duplicate timing
+    mathGame.startNewGame();
   };
 
   // Enhanced game end with feedback
@@ -79,7 +83,7 @@ const MathPractice = () => {
       {/* Math Problem Dialog */}
       <MathProblemDialog
         open={mathGame.showProblem}
-        onOpenChange={mathGame.setShowProblem}
+        onOpenChange={(open) => !open && mathGame.endGame()}
         problem={mathGame.currentProblem}
         userAnswer={mathGame.userAnswer}
         setUserAnswer={mathGame.setUserAnswer}
@@ -105,7 +109,7 @@ const MathPractice = () => {
       {/* Statistics Dialog */}
       <StatisticsDialog
         open={mathGame.showStatsDialog}
-        onOpenChange={mathGame.setShowStatsDialog}
+        onOpenChange={(open) => !open && mathGame.endGame()}
         correctAnswers={mathGame.correctAnswers}
         wrongAnswers={mathGame.wrongAnswers}
         answers={mathGame.answers}
