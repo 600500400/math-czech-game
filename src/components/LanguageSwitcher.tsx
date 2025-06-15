@@ -15,7 +15,7 @@ const LanguageSwitcher = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="flex items-center gap-2">
+        <Button variant="outline" size="sm" className="w-9 p-0 gap-0 sm:w-auto sm:px-3 sm:gap-2">
           <Globe className="h-4 w-4" />
           <span className="hidden sm:inline">{currentLanguage.toUpperCase()}</span>
         </Button>

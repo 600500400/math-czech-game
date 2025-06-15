@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -75,7 +76,7 @@ const UserMenu = () => {
         <Button 
           variant="outline" 
           size="sm" 
-          className="flex items-center gap-2 px-3 bg-white border-gray-200 hover:bg-gray-50"
+          className="w-9 p-0 gap-0 sm:w-auto sm:px-3 sm:gap-2 bg-white border-gray-200 hover:bg-gray-50"
         >
           <Avatar className="h-6 w-6">
             <AvatarFallback className="text-xs font-medium bg-blue-100 text-blue-700">

@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import {
@@ -78,7 +79,7 @@ const FeedbackButton = () => {
         <Button
           variant="outline"
           size="sm"
-          className="flex items-center gap-2 bg-white border-gray-200 hover:bg-gray-50"
+          className="w-9 p-0 sm:w-auto sm:px-3 bg-white border-gray-200 hover:bg-gray-50"
         >
           <MessageSquare className="h-4 w-4" />
         </Button>

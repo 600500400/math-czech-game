@@ -29,7 +29,7 @@ export const ThemeToggle = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon" className="relative">
+        <Button variant="outline" size="sm" className="relative w-9 p-0">
           {getIcon()}
           <span className="sr-only">Toggle theme</span>
         </Button>
