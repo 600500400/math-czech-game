@@ -10,6 +10,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { useGamification } from "@/hooks/gamification/useGamification";
 import { LevelDisplay } from "@/components/gamification/LevelDisplay";
 import { StreakDisplay } from "@/components/gamification/StreakDisplay";
+import DonateButton from "@/components/donation/DonateButton";
 
 const ModernHeader = () => {
   const { authState } = useAuth();
@@ -56,6 +57,7 @@ const ModernHeader = () => {
 
           {/* Controls */}
           <div className="flex items-center gap-2">
+            <DonateButton />
             <ThemeToggle />
             <LanguageSwitcher />
             <FeedbackButton />

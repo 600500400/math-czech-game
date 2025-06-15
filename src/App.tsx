@@ -15,6 +15,7 @@ import NotFound from "./pages/NotFound";
 import PWAInstallPrompt from "./components/pwa/PWAInstallPrompt";
 import OfflineIndicator from "./components/pwa/OfflineIndicator";
 import "@/i18n";
+import DonationSuccess from "./pages/DonationSuccess";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -39,6 +40,7 @@ const App = () => (
               <Route path="/parent-dashboard" element={<ParentDashboard />} />
               <Route path="/leaderboards" element={<LeaderboardsPage />} />
               <Route path="/achievements" element={<AchievementsPage />} />
+              <Route path="/donation-success" element={<DonationSuccess />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <PWAInstallPrompt />
