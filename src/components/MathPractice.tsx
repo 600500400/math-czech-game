@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { MathProblemDialog } from "./math/MathProblemDialog";
 import DifficultyDialog from "./math/DifficultyDialog";
@@ -20,7 +19,7 @@ const MathPractice = () => {
     triggerGameStartFeedback,
     triggerGameEndFeedback,
     triggerButtonFeedback
-  } = useEnhancedMobileInteractions();
+  } = useEnhancedMobileInteractions({});
 
   // Simplified feedback effects
   useEffect(() => {

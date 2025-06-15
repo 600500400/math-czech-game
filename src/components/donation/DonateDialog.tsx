@@ -59,8 +59,8 @@ export const DonateDialog = ({ open, onOpenChange }: DonateDialogProps) => {
     defaultValues: {
       amount: 100,
       currency: "CZK",
-      donorName: authState.userProfile?.full_name ?? "",
-      donorEmail: authState.session?.user.email ?? "",
+      donorName: authState.profile?.full_name ?? "",
+      donorEmail: authState.user?.email ?? "",
       message: "",
     },
   });
