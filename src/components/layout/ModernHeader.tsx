@@ -22,12 +22,12 @@ const ModernHeader = () => {
       <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2 sm:space-x-3">
             <div className="relative">
-              <div className="w-10 h-10 bg-gradient-primary rounded-xl flex items-center justify-center shadow-lg">
-                <BookOpen className="w-6 h-6 text-white" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-primary rounded-xl flex items-center justify-center shadow-lg">
+                <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
-              <Sparkles className="w-4 h-4 text-brand-500 absolute -top-1 -right-1 animate-pulse" />
+              <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-brand-500 absolute -top-1 -right-1 animate-pulse" />
             </div>
             <div className="hidden sm:block">
               <h1 className="text-xl font-heading font-bold text-foreground">
@@ -41,7 +41,7 @@ const ModernHeader = () => {
 
           {/* Center - Gamification displays for authenticated users */}
           {authState.user && (
-            <div className="hidden md:flex items-center gap-4">
+            <div className="hidden lg:flex items-center gap-4">
               <LevelDisplay 
                 userLevel={leveling.userLevel} 
                 progress={leveling.getLevelProgress()} 
@@ -56,7 +56,7 @@ const ModernHeader = () => {
           )}
 
           {/* Controls */}
-          <div className="flex items-center gap-1 sm:gap-2">
+          <div className="flex items-center gap-1">
             <DonateButton />
             <ThemeToggle />
             <LanguageSwitcher />

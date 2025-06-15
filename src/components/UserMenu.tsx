@@ -59,9 +59,9 @@ const UserMenu = () => {
   if (!authState.isAuthenticated) {
     return (
       <Link to="/select-user">
-        <Button variant="outline" size="sm" className="bg-white border-gray-200 hover:bg-gray-50">
-          <UserIcon className="mr-2 h-4 w-4" />
-          Vybrat uživatele
+        <Button variant="outline" size="sm" className="h-9 px-2 sm:px-3 bg-white border-gray-200 hover:bg-gray-50">
+          <UserIcon className="h-4 w-4 sm:mr-2" />
+          <span className="hidden sm:inline">Vybrat uživatele</span>
         </Button>
       </Link>
     );
@@ -76,14 +76,14 @@ const UserMenu = () => {
         <Button 
           variant="outline" 
           size="sm" 
-          className="w-9 p-0 gap-0 sm:w-auto sm:px-3 sm:gap-2 bg-white border-gray-200 hover:bg-gray-50"
+          className="h-9 px-2 sm:px-3 bg-white border-gray-200 hover:bg-gray-50 gap-1 sm:gap-2"
         >
-          <Avatar className="h-6 w-6">
+          <Avatar className="h-5 w-5 sm:h-6 sm:w-6">
             <AvatarFallback className="text-xs font-medium bg-blue-100 text-blue-700">
               {getNameInitials()}
             </AvatarFallback>
           </Avatar>
-          <span className="hidden sm:inline font-medium">
+          <span className="hidden sm:inline font-medium max-w-20 truncate">
             {getDisplayName()}
           </span>
         </Button>
