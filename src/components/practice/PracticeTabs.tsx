@@ -6,8 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useStatistics } from "@/hooks/useStatistics";
 import MathPractice from "@/components/MathPractice";
 import SpellingPractice from "@/components/SpellingPractice";
-import { Calculator, BookOpen, Brain } from "lucide-react";
-import { AIAssistantDrawer } from "@/components/ai/AIAssistantDrawer";
+import { Calculator, BookOpen } from "lucide-react";
 
 interface PracticeTabsProps {
   defaultTab?: "spelling" | "math";
@@ -83,22 +82,6 @@ const PracticeTabs: React.FC<PracticeTabsProps> = ({ defaultTab = "spelling" }) 
           </Card>
         </TabsContent>
       </Tabs>
-
-      {/* AI Assistant with subject context */}
-      <AIAssistantDrawer 
-        subject={activeTab}
-        context={{
-          recentErrors: getRecentErrors(activeTab),
-          userStats: getSubjectStats(activeTab)
-        }}
-        trigger={
-          <div className="fixed bottom-4 right-4 z-50">
-            <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-full p-3 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group">
-              <Brain className="h-6 w-6 text-white group-hover:scale-110 transition-transform" />
-            </div>
-          </div>
-        }
-      />
     </div>
   );
 };

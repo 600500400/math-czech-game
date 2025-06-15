@@ -10,6 +10,7 @@ import PracticeTabs from "@/components/practice/PracticeTabs";
 import StatisticsTabs from "@/components/statistics/StatisticsTabs";
 import ModernHeader from "@/components/layout/ModernHeader";
 import { AIAssistantDrawer } from "@/components/ai/AIAssistantDrawer";
+import { Brain } from "lucide-react";
 
 const HomePage = () => {
   const { authState } = useAuth();
@@ -27,6 +28,14 @@ const HomePage = () => {
     setPracticeDefaultTab(defaultTab); // Nastavím správnou záložku
     setActiveTab("practice"); // Přejdu na procvičování
   };
+
+  const practiceTrigger = (
+    <div className="fixed bottom-4 right-4 z-50">
+      <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-full p-3 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group">
+        <Brain className="h-6 w-6 text-white group-hover:scale-110 transition-transform" />
+      </div>
+    </div>
+  );
 
   return (
     <div 
@@ -93,10 +102,13 @@ const HomePage = () => {
 
       {/* AI Assistant available on all tabs */}
       <AIAssistantDrawer 
+        trigger={activeTab === 'practice' ? practiceTrigger : undefined}
         subject={activeTab === 'practice' ? practiceDefaultTab : undefined}
         context={{
           recentErrors: [],
-          userStats: activeTab === 'practice' && practiceDefaultTab === 'math' ? mathStats : spellingStats
+          userStats: activeTab === 'practice' 
+            ? (practiceDefaultTab === 'math' ? mathStats : spellingStats) 
+            : { math: mathStats, spelling: spellingStats }
         }}
       />
     </div>

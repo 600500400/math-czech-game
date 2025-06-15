@@ -1,13 +1,11 @@
-
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
 import { useStatistics } from "@/hooks/useStatistics";
-import { BookOpen, Calculator, BarChart3, Target, Brain } from "lucide-react";
+import { BookOpen, Calculator, BarChart3, Target } from "lucide-react";
 import { AIInsights } from "@/components/ai/AIInsights";
-import { AIAssistantDrawer } from "@/components/ai/AIAssistantDrawer";
 
 interface WelcomeDashboardProps {
   onNavigateToTab: (tab: "practice" | "statistics") => void;
@@ -165,9 +163,6 @@ const WelcomeDashboard: React.FC<WelcomeDashboardProps> = ({
           </CardContent>
         </Card>
       </div>
-
-      {/* AI Assistant Integration */}
-      <AIAssistantDrawer />
     </div>
   );
 };
