@@ -9,9 +9,14 @@ const DonateButton = () => {
 
   return (
     <>
-      <Button variant="outline" size="sm" onClick={() => setDialogOpen(true)}>
-        <Heart className="mr-2 h-4 w-4 text-red-500" />
-        Podpořit
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => setDialogOpen(true)}
+        className="w-9 p-0 sm:w-auto sm:px-3"
+      >
+        <Heart className="h-4 w-4 text-red-500 sm:mr-2" />
+        <span className="hidden sm:inline">Podpořit</span>
       </Button>
       <DonateDialog open={dialogOpen} onOpenChange={setDialogOpen} />
     </>
