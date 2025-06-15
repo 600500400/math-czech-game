@@ -1,3 +1,4 @@
+
 import { useCallback } from 'react';
 import { useAudioSystem } from './useAudioSystem';
 import { useAdvancedHaptics } from './useAdvancedHaptics';
@@ -24,57 +25,68 @@ export const useEnhancedMobileInteractions = (config: EnhancedMobileInteractions
     triggerGameStartHaptic,
     triggerGameEndHaptic,
     triggerTapHaptic
-  } = useAdvancedHaptics({
-    enabled: config.hapticsEnabled ?? true,
-    intensity: config.intensity ?? 'medium'
-  });
+  } = useAdvancedHaptics();
 
   // Enhanced feedback for correct answers
   const triggerCorrectFeedback = useCallback(() => {
     playCorrectSound();
-    triggerSuccessHaptic();
-  }, [playCorrectSound, triggerSuccessHaptic]);
+    if (config.hapticsEnabled !== false) {
+      triggerSuccessHaptic();
+    }
+  }, [playCorrectSound, triggerSuccessHaptic, config.hapticsEnabled]);
 
   // Enhanced feedback for incorrect answers
   const triggerIncorrectFeedback = useCallback(() => {
     playIncorrectSound();
-    triggerErrorHaptic();
-  }, [playIncorrectSound, triggerErrorHaptic]);
+    if (config.hapticsEnabled !== false) {
+      triggerErrorHaptic();
+    }
+  }, [playIncorrectSound, triggerErrorHaptic, config.hapticsEnabled]);
 
   // Enhanced feedback for game start
   const triggerGameStartFeedback = useCallback(() => {
     playGameStartSound();
-    triggerGameStartHaptic();
-  }, [playGameStartSound, triggerGameStartHaptic]);
+    if (config.hapticsEnabled !== false) {
+      triggerGameStartHaptic();
+    }
+  }, [playGameStartSound, triggerGameStartHaptic, config.hapticsEnabled]);
 
   // Enhanced feedback for game end
   const triggerGameEndFeedback = useCallback(() => {
     playGameEndSound();
-    triggerGameEndHaptic();
-  }, [playGameEndSound, triggerGameEndHaptic]);
+    if (config.hapticsEnabled !== false) {
+      triggerGameEndHaptic();
+    }
+  }, [playGameEndSound, triggerGameEndHaptic, config.hapticsEnabled]);
 
   // Enhanced feedback for celebration
   const triggerCelebrationFeedback = useCallback(() => {
     playCelebrationSound();
-    triggerCelebrationHaptic();
-  }, [playCelebrationSound, triggerCelebrationHaptic]);
+    if (config.hapticsEnabled !== false) {
+      triggerCelebrationHaptic();
+    }
+  }, [playCelebrationSound, triggerCelebrationHaptic, config.hapticsEnabled]);
 
   // Enhanced feedback for milestone achievements
   const triggerMilestoneFeedback = useCallback(() => {
     playCelebrationSound();
-    triggerCelebrationHaptic();
-    
-    // Additional celebration after delay for milestone
-    setTimeout(() => {
+    if (config.hapticsEnabled !== false) {
       triggerCelebrationHaptic();
-    }, 500);
-  }, [playCelebrationSound, triggerCelebrationHaptic]);
+      
+      // Additional celebration after delay for milestone
+      setTimeout(() => {
+        triggerCelebrationHaptic();
+      }, 500);
+    }
+  }, [playCelebrationSound, triggerCelebrationHaptic, config.hapticsEnabled]);
 
   // Enhanced feedback for button interactions
   const triggerButtonFeedback = useCallback(() => {
     playButtonClickSound();
-    triggerTapHaptic();
-  }, [playButtonClickSound, triggerTapHaptic]);
+    if (config.hapticsEnabled !== false) {
+      triggerTapHaptic();
+    }
+  }, [playButtonClickSound, triggerTapHaptic, config.hapticsEnabled]);
 
   // Enhanced feedback sequences for different scenarios
   const triggerPerfectScoreFeedback = useCallback(() => {
@@ -90,9 +102,11 @@ export const useEnhancedMobileInteractions = (config: EnhancedMobileInteractions
   const triggerImprovementFeedback = useCallback(() => {
     // Encouraging feedback for improvement
     playCorrectSound();
-    setTimeout(() => triggerSuccessHaptic(), 100);
-    setTimeout(() => triggerSuccessHaptic(), 300);
-  }, [playCorrectSound, triggerSuccessHaptic]);
+    if (config.hapticsEnabled !== false) {
+      setTimeout(() => triggerSuccessHaptic(), 100);
+      setTimeout(() => triggerSuccessHaptic(), 300);
+    }
+  }, [playCorrectSound, triggerSuccessHaptic, config.hapticsEnabled]);
 
   return {
     // Basic feedback
