@@ -20,10 +20,7 @@ const MathPractice = () => {
     triggerGameStartFeedback,
     triggerGameEndFeedback,
     triggerButtonFeedback
-  } = useEnhancedMobileInteractions({
-    hapticsEnabled: true,
-    preventZoom: true
-  });
+  } = useEnhancedMobileInteractions();
 
   // Simplified feedback effects
   useEffect(() => {
@@ -83,7 +80,7 @@ const MathPractice = () => {
       {/* Math Problem Dialog */}
       <MathProblemDialog
         open={mathGame.showProblem}
-        onOpenChange={(open) => !open && mathGame.endGame()}
+        onOpenChange={mathGame.setShowProblem}
         problem={mathGame.currentProblem}
         userAnswer={mathGame.userAnswer}
         setUserAnswer={mathGame.setUserAnswer}
