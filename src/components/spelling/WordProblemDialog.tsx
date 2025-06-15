@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -91,8 +92,31 @@ const WordProblemDialog: React.FC<WordProblemDialogProps> = ({
               <HoverScale>
                 <GlowingElement color="purple" className="bg-gradient-to-r from-purple-50/80 to-pink-50/80 backdrop-blur-sm p-6 rounded-xl border border-white/30 shadow-lg">
                   <div className="text-center">
-                    <p className={`font-mono font-bold tracking-wider bg-gradient-to-r from-purple-800 to-pink-800 bg-clip-text text-transparent ${isMobile ? 'text-xl' : 'text-2xl'}`}>
-                      {displayedWord}
+                    <p className={`font-mono font-bold tracking-wider ${isMobile ? 'text-xl' : 'text-2xl'}`}>
+                      {displayedWord.split(/([IY])/g).filter(Boolean).map((part, index) => {
+                          if (part === 'I') {
+                            return (
+                              <span key={index} className="text-blue-500 animate-pulse">
+                                i
+                              </span>
+                            );
+                          }
+                          if (part === 'Y') {
+                            return (
+                              <span key={index} className="text-green-500 animate-pulse">
+                                y
+                              </span>
+                            );
+                          }
+                          return (
+                            <span
+                              key={index}
+                              className="bg-gradient-to-r from-purple-800 to-pink-800 bg-clip-text text-transparent"
+                            >
+                              {part}
+                            </span>
+                          );
+                        })}
                     </p>
                   </div>
                 </GlowingElement>
