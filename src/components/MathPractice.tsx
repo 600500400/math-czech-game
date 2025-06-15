@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { MathProblemDialog } from "./math/MathProblemDialog";
 import DifficultyDialog from "./math/DifficultyDialog";
@@ -8,9 +9,12 @@ import { MathPracticeStats } from "./math/MathPracticeStats";
 import { useMathGame } from "@/hooks/math/useMathGame";
 import { useUserTheme } from "@/hooks/useUserTheme";
 import { useEnhancedMobileInteractions } from "@/hooks/useEnhancedMobileInteractions";
+import { useAuth } from "@/hooks/useAuth";
 
 const MathPractice = () => {
-  const { theme, getCSSVariables, getGradientClasses } = useUserTheme();
+  const { authState } = useAuth();
+  const userId = authState.profile?.username?.toLowerCase() || 'host';
+  const { theme, getCSSVariables, getGradientClasses } = useUserTheme(userId);
   const mathGame = useMathGame();
   
   const {
