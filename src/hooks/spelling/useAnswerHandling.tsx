@@ -58,6 +58,21 @@ export const useAnswerHandling = ({
       isCorrect
     });
 
+    // Immediately show the selected letter in the word
+    let tempDisplayedWord = '';
+    for (let i = 0; i < currentWord.length; i++) {
+      if (i === position) {
+        tempDisplayedWord += letter.toUpperCase();
+      } else if (missingPositions.includes(i) && missingPositions.indexOf(i) !== currentPosition) {
+        tempDisplayedWord += '_';
+      } else {
+        tempDisplayedWord += currentWord[i];
+      }
+    }
+    
+    console.log("🔤 handleAnswer: Zobrazujem vybrané písmeno:", tempDisplayedWord);
+    setDisplayedWord(tempDisplayedWord);
+
     // Record the answer
     const answer: SpellingAnswer = {
       word: currentWord,
@@ -83,13 +98,13 @@ export const useAnswerHandling = ({
     setLastAnswerCorrect(isCorrect);
     setShowAnimation(true);
 
-    // After animation, update the displayed word and continue
+    // Wait a bit longer to show the selected letter, then show animation result
     setTimeout(() => {
       console.log("🎬 handleAnswer: Hiding animation");
       setShowAnimation(false);
       setLastAnswerCorrect(null);
       
-      // Update displayed word to show the filled letter
+      // Update displayed word to show the correct letter (not user's choice)
       const nextPosition = currentPosition + 1;
       const updatedDisplayedWord = renderWordWithCurrentGap(
         currentWord, 
@@ -113,7 +128,7 @@ export const useAnswerHandling = ({
         }
       }, 100);
       
-    }, 600);
+    }, 800); // Increased from 600ms to 800ms to show the letter longer
 
   }, [
     currentPosition,
