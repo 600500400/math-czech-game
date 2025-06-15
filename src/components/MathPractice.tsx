@@ -109,7 +109,7 @@ const MathPractice = () => {
       {/* Statistics Dialog */}
       <StatisticsDialog
         open={mathGame.showStatsDialog}
-        onOpenChange={(open) => !open && mathGame.endGame()}
+        onOpenChange={mathGame.setShowStatsDialog}
         correctAnswers={mathGame.correctAnswers}
         wrongAnswers={mathGame.wrongAnswers}
         answers={mathGame.answers}
