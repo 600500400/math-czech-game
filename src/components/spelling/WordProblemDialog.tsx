@@ -90,10 +90,7 @@ const WordProblemDialog: React.FC<WordProblemDialogProps> = ({
             <div className="py-4 space-y-4">
               <HoverScale>
                 <GlowingElement color="purple" className="bg-gradient-to-r from-purple-50/80 to-pink-50/80 backdrop-blur-sm p-6 rounded-xl border border-white/30 shadow-lg">
-                  <div className="text-center space-y-2">
-                    <p className="text-sm text-gray-600 font-medium">
-                      {wordGroup} • {isPhrase ? 'Spojení' : 'Slovo'}
-                    </p>
+                  <div className="text-center">
                     <p className={`font-mono font-bold tracking-wider bg-gradient-to-r from-purple-800 to-pink-800 bg-clip-text text-transparent ${isMobile ? 'text-xl' : 'text-2xl'}`}>
                       {displayedWord}
                     </p>
