@@ -19,7 +19,7 @@ const ModernHeader = () => {
 
   return (
     <header className="w-full bg-background/80 backdrop-blur-md border-b border-border sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center space-x-3">
@@ -29,7 +29,7 @@ const ModernHeader = () => {
               </div>
               <Sparkles className="w-4 h-4 text-brand-500 absolute -top-1 -right-1 animate-pulse" />
             </div>
-            <div>
+            <div className="hidden sm:block">
               <h1 className="text-xl font-heading font-bold text-foreground">
                 Procvička
               </h1>
@@ -56,7 +56,7 @@ const ModernHeader = () => {
           )}
 
           {/* Controls */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             <DonateButton />
             <ThemeToggle />
             <LanguageSwitcher />
