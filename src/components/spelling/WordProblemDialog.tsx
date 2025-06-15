@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -177,7 +176,7 @@ const WordProblemDialog: React.FC<WordProblemDialogProps> = ({
                 <Button 
                   onClick={handleEndGame}
                   variant="outline"
-                  className={`glass-light border-orange-200/50 text-orange-700 hover:bg-orange-100/50 active:scale-95 touch-manipulation transform transition-all duration-150 ${isMobile ? 'w-full h-14 text-lg' : 'w-auto h-12'}`}
+                  className={`glass-light active:scale-95 touch-manipulation transform transition-all duration-150 ${isMobile ? 'w-full h-14 text-lg' : 'w-auto h-12'}`}
                 >
                   🚪 Ukončit
                 </Button>
