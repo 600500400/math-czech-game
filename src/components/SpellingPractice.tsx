@@ -1,7 +1,7 @@
 
 import { FunGraphics } from "./spelling/FunGraphics";
 import { SpellingPracticeHeader } from "./spelling/SpellingPracticeHeader";
-import { SpellingPracticeStats } from "./spelling/SpellingPracticeStats";
+import { GamificationStats } from "@/components/gamification/GamificationStats";
 import { SpellingPracticeControls } from "./spelling/SpellingPracticeControls";
 import { SpellingPracticeDialogs } from "./spelling/SpellingPracticeDialogs";
 import { useSpellingGame } from "@/hooks/spelling/useSpellingGame";
@@ -120,7 +120,7 @@ const SpellingPractice = () => {
       />
 
       {/* Gamification displays */}
-      <SpellingPracticeStats 
+      <GamificationStats 
         authState={authState}
         leveling={leveling}
         streaks={streaks}

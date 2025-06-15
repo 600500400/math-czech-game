@@ -1,26 +1,27 @@
 
 import { LevelDisplay } from "@/components/gamification/LevelDisplay";
 import { StreakDisplay } from "@/components/gamification/StreakDisplay";
+import { UserLevel, UserStreak } from "@/types/gamificationTypes";
 
-interface SpellingPracticeStatsProps {
+interface GamificationStatsProps {
   authState: {
     user: any;
   };
   leveling: {
-    userLevel: any;
+    userLevel: UserLevel | null;
     getLevelProgress: () => number;
   };
   streaks: {
-    userStreak: any;
+    userStreak: UserStreak | null;
     isStreakAtRisk: () => boolean;
   };
 }
 
-export const SpellingPracticeStats = ({ 
+export const GamificationStats = ({ 
   authState, 
   leveling, 
   streaks 
-}: SpellingPracticeStatsProps) => {
+}: GamificationStatsProps) => {
   if (!authState.user) {
     return null;
   }
