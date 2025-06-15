@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -102,15 +101,6 @@ const UserMenu = () => {
             </div>
           </div>
         </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        {authState.profile?.role === 'parent' && (
-          <DropdownMenuItem asChild>
-            <Link to="/parent-dashboard" className="flex items-center cursor-pointer" onClick={() => setOpen(false)}>
-              <ChartBarIcon className="mr-2 h-4 w-4" />
-              <span>Rodičovský dashboard</span>
-            </Link>
-          </DropdownMenuItem>
-        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem className="flex items-center cursor-pointer" onClick={() => signOut()}>
           <LogOut className="mr-2 h-4 w-4" />
