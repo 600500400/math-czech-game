@@ -62,19 +62,19 @@ const GameControls: React.FC<GameControlsProps> = ({
       )}
 
       <div className="space-y-2">
-        {/* Main action button - more prominent */}
+        {/* Main action button - unified blue-purple gradient */}
         <Button 
           onClick={onStartGame} 
-          className="w-full bg-orange-500 hover:bg-orange-600 text-lg py-6" 
+          className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 text-lg py-6" 
         >
           Spustit hru
         </Button>
         
-        {/* Secondary action - less prominent */}
+        {/* Secondary action - consistent blue styling */}
         <Button 
           onClick={onSetDifficulty} 
           variant="outline"
-          className="w-full border-orange-300 text-orange-600 hover:bg-orange-50"
+          className="w-full border-blue-300 text-blue-600 hover:bg-blue-50 dark:border-blue-600 dark:text-blue-400 dark:hover:bg-blue-950"
         >
           <Settings size={16} className="mr-2" /> Nastavit obtížnost
         </Button>
@@ -83,7 +83,7 @@ const GameControls: React.FC<GameControlsProps> = ({
           <div className="grid grid-cols-2 gap-2">
             <Button
               onClick={onShowStats}
-              className="w-full bg-blue-500 hover:bg-blue-600"
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white"
             >
               Zobrazit statistiku
             </Button>
@@ -91,7 +91,7 @@ const GameControls: React.FC<GameControlsProps> = ({
             <Button
               onClick={onShowErrors}
               variant="outline"
-              className="w-full border-red-300 text-red-600 hover:bg-red-50"
+              className="w-full border-red-300 text-red-600 hover:bg-red-50 dark:border-red-600 dark:text-red-400 dark:hover:bg-red-950"
             >
               <AlertCircle size={16} className="mr-1" />
               Chyby
@@ -102,7 +102,7 @@ const GameControls: React.FC<GameControlsProps> = ({
         {gameEnded && (
           <Button
             onClick={onResetGame}
-            className="w-full bg-gray-500 hover:bg-gray-600"
+            className="w-full bg-gray-500 hover:bg-gray-600 text-white"
           >
             Resetovat statistiky
           </Button>

@@ -17,7 +17,7 @@ export const GameHeader = ({
   
   return (
     <>
-      <h1 className="text-3xl font-bold text-center text-orange-500">
+      <h1 className="text-3xl font-bold text-center bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
         {t('practice.practiceSpelling')}
       </h1>
       

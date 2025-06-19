@@ -101,8 +101,8 @@ const DifficultyDialog: React.FC<DifficultyDialogProps> = ({
                   key={operation}
                   className={`flex items-center space-x-2 p-3 border-2 rounded-lg transition-all duration-200 cursor-pointer ${
                     allowedOperations.includes(operation) 
-                      ? 'border-orange-500 bg-orange-50' 
-                      : 'border-gray-200 hover:border-orange-300'
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-950 dark:border-blue-600' 
+                      : 'border-gray-200 hover:border-blue-300 dark:border-gray-700 dark:hover:border-blue-600'
                   }`}
                   onClick={() => toggleOperation(operation)}
                 >
@@ -110,7 +110,7 @@ const DifficultyDialog: React.FC<DifficultyDialogProps> = ({
                     id={`operation-${operation}`} 
                     checked={allowedOperations.includes(operation)}
                     onCheckedChange={() => toggleOperation(operation)}
-                    className="data-[state=checked]:bg-orange-500 data-[state=checked]:border-orange-500"
+                    className="data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
                   />
                   <Label 
                     htmlFor={`operation-${operation}`}
@@ -126,7 +126,7 @@ const DifficultyDialog: React.FC<DifficultyDialogProps> = ({
         <DialogFooter>
           <Button 
             onClick={handleSaveDifficulty}
-            className="bg-orange-500 hover:bg-orange-600"
+            className="bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700"
           >
             Nastavit
           </Button>

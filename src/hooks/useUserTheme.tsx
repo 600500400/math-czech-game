@@ -102,20 +102,20 @@ const USER_THEMES: Record<string, UserTheme> = {
     id: 'default',
     name: 'Uživatel',
     avatar: '🎓',
-    // Light mode
-    primaryColor: 'rgb(249, 115, 22)', // orange-500
-    secondaryColor: 'rgb(254, 215, 170)', // orange-200
-    accentColor: 'rgb(194, 65, 12)', // orange-700
-    gradientFrom: 'from-orange-400',
-    gradientTo: 'to-red-500',
-    bgGradient: 'from-orange-50 via-red-50 to-pink-50',
-    // Dark mode
-    darkPrimaryColor: 'rgb(251, 146, 60)', // orange-400
-    darkSecondaryColor: 'rgb(239, 68, 68)', // red-500
-    darkAccentColor: 'rgb(249, 115, 22)', // orange-500
-    darkGradientFrom: 'from-orange-600',
-    darkGradientTo: 'to-red-700',
-    darkBgGradient: 'from-slate-900 via-orange-900 to-slate-900'
+    // Light mode - ZMĚNĚNO Z ORANŽOVÉ NA MODRO-FIALOVOU
+    primaryColor: 'rgb(59, 130, 246)', // blue-500
+    secondaryColor: 'rgb(147, 197, 253)', // blue-300
+    accentColor: 'rgb(124, 58, 237)', // purple-700
+    gradientFrom: 'from-blue-500',
+    gradientTo: 'to-purple-600',
+    bgGradient: 'from-blue-50 via-purple-50 to-indigo-50',
+    // Dark mode - ZMĚNĚNO Z ORANŽOVÉ NA MODRO-FIALOVOU
+    darkPrimaryColor: 'rgb(96, 165, 250)', // blue-400
+    darkSecondaryColor: 'rgb(168, 85, 247)', // purple-500
+    darkAccentColor: 'rgb(147, 51, 234)', // purple-600
+    darkGradientFrom: 'from-blue-600',
+    darkGradientTo: 'to-purple-700',
+    darkBgGradient: 'from-slate-900 via-blue-900 to-slate-900'
   }
 };
 
