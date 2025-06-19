@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 import { registerServiceWorker } from './utils/pwaUtils'
+import { APP_VERSION } from './utils/version'
 
 // Import and initialize new PWA features
 import './utils/webVitals' // Initialize Web Vitals monitoring
@@ -10,6 +11,11 @@ import './utils/offlineManager' // Initialize offline manager
 
 // Register service worker for PWA functionality
 registerServiceWorker();
+
+// Initialize versioning after DOM is ready
+requestIdleCallback(() => {
+  APP_VERSION.initializeVersioning();
+});
 
 // Initialize performance optimizations
 if ('requestIdleCallback' in window) {
