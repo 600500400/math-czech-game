@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -11,6 +10,7 @@ import { DashboardTabs } from "@/components/dashboard/DashboardTabs";
 import { useDashboardFilters } from "@/components/dashboard/DashboardFilters";
 import { Card, CardContent } from "@/components/ui/card";
 import ModernHeader from "@/components/layout/ModernHeader";
+import AppFooter from "@/components/layout/AppFooter";
 
 const ParentDashboard = () => {
   const { authState } = useAuth();
@@ -51,9 +51,9 @@ const ParentDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex flex-col">
         <ModernHeader />
-        <div className="container mx-auto p-4 max-w-7xl">
+        <div className="container mx-auto p-4 max-w-7xl flex-1">
           <div className="mb-6">
             <h1 className="text-2xl sm:text-3xl font-bold gradient-text mb-2">Rodičovský dashboard</h1>
             <p className="text-gray-600">Načítám data...</p>
@@ -95,17 +95,18 @@ const ParentDashboard = () => {
             </Card>
           </div>
         </div>
+        <AppFooter />
       </div>
     );
   }
 
   return (
     <div 
-      className={`min-h-screen bg-gradient-to-br ${theme.bgGradient}`}
+      className={`min-h-screen bg-gradient-to-br ${theme.bgGradient} flex flex-col`}
       style={getCSSVariables}
     >
       <ModernHeader />
-      <div className="container mx-auto p-4 max-w-7xl">
+      <div className="container mx-auto p-4 max-w-7xl flex-1">
         <div className="mb-6">
           <h1 className="text-2xl sm:text-3xl font-bold gradient-text mb-2">
             Rodičovský dashboard
@@ -146,6 +147,8 @@ const ParentDashboard = () => {
           )}
         </div>
       </div>
+      
+      <AppFooter />
     </div>
   );
 };

@@ -9,6 +9,7 @@ import WelcomeDashboard from "@/components/dashboard/WelcomeDashboard";
 import PracticeTabs from "@/components/practice/PracticeTabs";
 import StatisticsTabs from "@/components/statistics/StatisticsTabs";
 import ModernHeader from "@/components/layout/ModernHeader";
+import AppFooter from "@/components/layout/AppFooter";
 import { AIAssistantDrawer } from "@/components/ai/AIAssistantDrawer";
 import { Brain, Bot } from "lucide-react";
 
@@ -25,8 +26,8 @@ const HomePage = () => {
   };
 
   const handleNavigateToPractice = (defaultTab: "spelling" | "math") => {
-    setPracticeDefaultTab(defaultTab); // Nastavím správnou záložku
-    setActiveTab("practice"); // Přejdu na procvičování
+    setPracticeDefaultTab(defaultTab);
+    setActiveTab("practice");
   };
 
   const assistantTrigger = (
@@ -41,11 +42,11 @@ const HomePage = () => {
 
   return (
     <div 
-      className={`min-h-screen bg-gradient-to-br ${theme.bgGradient}`}
+      className={`min-h-screen bg-gradient-to-br ${theme.bgGradient} flex flex-col`}
       style={getCSSVariables}
     >
       <ModernHeader />
-      <div className="container mx-auto p-4 max-w-7xl">
+      <div className="container mx-auto p-4 max-w-7xl flex-1">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-3 mb-6">
             <TabsTrigger 
@@ -101,6 +102,8 @@ const HomePage = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      <AppFooter />
 
       {/* AI Assistant available on all tabs */}
       <AIAssistantDrawer 
