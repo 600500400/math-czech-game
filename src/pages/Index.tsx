@@ -5,8 +5,8 @@ import { useAuth } from "@/hooks/useAuth";
 import HomePage from "./Home/HomePage";
 
 const Index = () => {
-  const { authState } = useAuth();
   const navigate = useNavigate();
+  const { authState } = useAuth();
 
   // Přesměrování podle stavu autentizace
   useEffect(() => {

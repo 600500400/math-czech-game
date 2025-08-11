@@ -26,30 +26,32 @@ const queryClient = new QueryClient({
   },
 });
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <AuthProvider>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/select-user" element={<UserSelection />} />
-              <Route path="/parent-dashboard" element={<ParentDashboard />} />
-              <Route path="/leaderboards" element={<LeaderboardsPage />} />
-              <Route path="/achievements" element={<AchievementsPage />} />
-              <Route path="/donation-success" element={<DonationSuccess />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            <PWAInstallPrompt />
-            <OfflineIndicator />
-          </AuthProvider>
-        </BrowserRouter>
-      </TooltipProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <AuthProvider>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/select-user" element={<UserSelection />} />
+                <Route path="/parent-dashboard" element={<ParentDashboard />} />
+                <Route path="/leaderboards" element={<LeaderboardsPage />} />
+                <Route path="/achievements" element={<AchievementsPage />} />
+                <Route path="/donation-success" element={<DonationSuccess />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+              <PWAInstallPrompt />
+              <OfflineIndicator />
+            </AuthProvider>
+          </BrowserRouter>
+        </TooltipProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
