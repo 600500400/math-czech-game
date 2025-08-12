@@ -140,12 +140,21 @@ const WelcomeDashboard: React.FC<WelcomeDashboardProps> = ({
 
         <Card className="hover:shadow-md transition-shadow cursor-pointer"
               onClick={() => navigate('/dictionary')}>
-          <CardContent className="p-6 text-center">
-            <Languages className="h-8 w-8 mx-auto mb-3 text-indigo-600" />
-            <h3 className="font-semibold mb-2">Slovník</h3>
-            <p className="text-sm text-muted-foreground">
-              Procvičuj si slovíčka
-            </p>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Slovník</CardTitle>
+            <Languages className="h-4 w-4 text-primary" />
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <p className="text-xs text-muted-foreground">Procvičuj si slovíčka</p>
+              <Button
+                onClick={(e) => { e.stopPropagation(); navigate('/dictionary'); }}
+                className="w-full mt-2"
+                size="sm"
+              >
+                Otevřít slovník
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
