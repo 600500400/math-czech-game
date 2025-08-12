@@ -6,25 +6,18 @@ import { toast } from "sonner";
 
 export const useDictionaryWords = (userId: string | null) => {
   const queryClient = useQueryClient();
-  const [filterDifficulty, setFilterDifficulty] = useState<'all' | 'basic' | 'intermediate' | 'advanced'>('all');
 
   // Fetch all available words (system + user words)
   const { data: words = [], isLoading, refetch } = useQuery({
-    queryKey: ["dictionaryWords", userId, filterDifficulty],
+    queryKey: ["dictionaryWords", userId],
     queryFn: async (): Promise<DictionaryWord[]> => {
       if (!userId) return [];
 
-      let query = supabase
+      const { data, error } = await supabase
         .from('dictionary_words')
         .select('*')
         .or(`user_id.eq.${userId},user_id.eq.system`)
         .order('english_word');
-
-      if (filterDifficulty !== 'all') {
-        query = query.eq('difficulty_level', filterDifficulty);
-      }
-
-      const { data, error } = await query;
 
       if (error) {
         console.error("Error fetching dictionary words:", error);
@@ -129,8 +122,6 @@ export const useDictionaryWords = (userId: string | null) => {
   return {
     words,
     isLoading,
-    filterDifficulty,
-    setFilterDifficulty,
     addWord: addWordMutation.mutate,
     deleteWord: deleteWordMutation.mutate,
     bulkImport: bulkImportMutation.mutate,

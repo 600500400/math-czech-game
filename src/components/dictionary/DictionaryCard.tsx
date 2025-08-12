@@ -8,23 +8,32 @@ interface DictionaryCardProps {
   children?: React.ReactNode;
 }
 
-// Generate example sentences with the target word (Czech)
+// Generate example sentences with the target word
 const generateExampleSentences = (
   english: string,
   czech: string,
   direction: 'en_to_cz' | 'cz_to_en'
 ) => {
-  const czechWord = czech;
+  const targetWord = direction === 'en_to_cz' ? czech : english;
+  const wordLower = targetWord.toLowerCase();
 
-  const templates = [
-    `Dnes si procvičíme slovo "${czechWord}".`,
-    `Zkus napsat větu se slovem "${czechWord}".`,
-    `Jak bys použil slovo "${czechWord}" v rozhovoru?`,
-    `Vymysli krátký příběh, kde se objeví "${czechWord}".`,
-    `Najdi synonymum ke slovu "${czechWord}" a použij ho ve větě.`
+  const czechTemplates = [
+    `Včera jsem viděl ${wordLower} v obchodě.`,
+    `Moje babička má doma krásný ${wordLower}.`,
+    `V knize se psalo o ${wordLower}, který byl velmi zajímavý.`,
+    `Děti si hrály s ${wordLower} na zahradě.`,
+    `Na stole ležel ${wordLower}, který tam někdo zapomněl.`
   ];
 
-  // Return 2 random sentences
+  const englishTemplates = [
+    `I love this ${wordLower} very much.`,
+    `Yesterday I saw a beautiful ${wordLower} in the park.`,
+    `My friend has a nice ${wordLower} at home.`,
+    `The ${wordLower} was really interesting to watch.`,
+    `Children often play with this ${wordLower} outside.`
+  ];
+
+  const templates = direction === 'en_to_cz' ? czechTemplates : englishTemplates;
   const shuffled = templates.sort(() => Math.random() - 0.5);
   return shuffled.slice(0, 2);
 };
