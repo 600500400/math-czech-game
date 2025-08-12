@@ -2,8 +2,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Trash2, Search } from "lucide-react";
 import { useDictionaryWords } from "@/hooks/dictionary/useDictionaryWords";
 import { useAuth } from "@/hooks/useAuth";
@@ -14,39 +12,12 @@ export default function DictionaryList() {
   const { 
     words, 
     isLoading, 
-    filterDifficulty, 
-    setFilterDifficulty,
     deleteWord, 
     isDeletingWord 
   } = useDictionaryWords(userId);
 
   const [searchTerm, setSearchTerm] = useState("");
 
-  const getDifficultyColor = (level: string) => {
-    switch (level) {
-      case 'basic':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100';
-      case 'intermediate':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100';
-      case 'advanced':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100';
-      default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-100';
-    }
-  };
-
-  const getDifficultyLabel = (level: string) => {
-    switch (level) {
-      case 'basic':
-        return 'Základní';
-      case 'intermediate':
-        return 'Střední';
-      case 'advanced':
-        return 'Pokročilý';
-      default:
-        return level;
-    }
-  };
 
   const filteredWords = words.filter(word => {
     const matchesSearch = searchTerm === "" || 
@@ -86,20 +57,6 @@ export default function DictionaryList() {
                 />
               </div>
             </div>
-            <Select 
-              value={filterDifficulty} 
-              onValueChange={(value: "all" | "basic" | "intermediate" | "advanced") => setFilterDifficulty(value)}
-            >
-              <SelectTrigger className="w-full sm:w-48">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Vše</SelectItem>
-                <SelectItem value="basic">Základní</SelectItem>
-                <SelectItem value="intermediate">Střední</SelectItem>
-                <SelectItem value="advanced">Pokročilý</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
         </CardContent>
       </Card>
@@ -118,15 +75,12 @@ export default function DictionaryList() {
                   className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50"
                 >
                   <div className="flex items-center gap-3 flex-1">
-                    <Badge className={getDifficultyColor(word.difficulty_level)}>
-                      {getDifficultyLabel(word.difficulty_level)}
-                    </Badge>
-                    <div className="flex-1">
-                      <div className="font-medium">{word.english_word}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {word.czech_translation}
-                      </div>
+                  <div className="flex-1">
+                    <div className="font-medium">{word.english_word}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {word.czech_translation}
                     </div>
+                  </div>
                   </div>
                   <Button
                     variant="ghost"
@@ -161,9 +115,6 @@ export default function DictionaryList() {
                   key={word.id}
                   className="flex items-center gap-3 p-3 border rounded-lg"
                 >
-                  <Badge className={getDifficultyColor(word.difficulty_level)}>
-                    {getDifficultyLabel(word.difficulty_level)}
-                  </Badge>
                   <div className="flex-1">
                     <div className="font-medium">{word.english_word}</div>
                     <div className="text-sm text-muted-foreground">

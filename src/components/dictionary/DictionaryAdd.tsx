@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Plus, Upload } from "lucide-react";
 import { useDictionaryWords } from "@/hooks/dictionary/useDictionaryWords";
@@ -115,26 +114,6 @@ export default function DictionaryAdd() {
             </div>
           </div>
 
-          <div>
-            <label className="text-sm font-medium mb-2 block">
-              Obtížnost
-            </label>
-            <Select
-              value={singleWord.difficulty_level}
-              onValueChange={(value: "basic" | "intermediate" | "advanced") =>
-                setSingleWord(prev => ({ ...prev, difficulty_level: value }))
-              }
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="basic">Základní</SelectItem>
-                <SelectItem value="intermediate">Střední</SelectItem>
-                <SelectItem value="advanced">Pokročilý</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
 
           <Button
             onClick={handleAddSingleWord}

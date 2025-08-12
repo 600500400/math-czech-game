@@ -8,26 +8,31 @@ interface DictionaryCardProps {
   children?: React.ReactNode;
 }
 
-// Generate example sentences with the word
-const generateExampleSentences = (word: string, direction: 'en_to_cz' | 'cz_to_en') => {
-  const targetWord = direction === 'en_to_cz' ? word : word;
-  
-  // Simple example sentences in Czech
-  const sentences = [
-    `Dnes jsem se naučil slovo "${targetWord}".`,
-    `Slovo "${targetWord}" používám v každodenní konverzaci.`,
-    `Význam slova "${targetWord}" je velmi důležitý.`,
-    `V této větě najdete slovo "${targetWord}".`,
-    `Procvičuji si slovo "${targetWord}" každý den.`
+// Generate example sentences with the target word (Czech)
+const generateExampleSentences = (
+  english: string,
+  czech: string,
+  direction: 'en_to_cz' | 'cz_to_en'
+) => {
+  const czechWord = czech;
+
+  const templates = [
+    `Dnes si procvičíme slovo "${czechWord}".`,
+    `Zkus napsat větu se slovem "${czechWord}".`,
+    `Jak bys použil slovo "${czechWord}" v rozhovoru?`,
+    `Vymysli krátký příběh, kde se objeví "${czechWord}".`,
+    `Najdi synonymum ke slovu "${czechWord}" a použij ho ve větě.`
   ];
-  
-  return sentences.slice(0, 2); // Return 2 example sentences
+
+  // Return 2 random sentences
+  const shuffled = templates.sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, 2);
 };
 
 export default function DictionaryCard({ word, direction, showAnswer, children }: DictionaryCardProps) {
   const questionWord = direction === 'en_to_cz' ? word.english_word : word.czech_translation;
   const answerWord = direction === 'en_to_cz' ? word.czech_translation : word.english_word;
-  const exampleSentences = generateExampleSentences(questionWord, direction);
+  const exampleSentences = generateExampleSentences(word.english_word, word.czech_translation, direction);
   
   return (
     <Card className="w-full max-w-md mx-auto">

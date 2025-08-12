@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Button } from "@/components/ui/button";
 import { BookOpen, Brain } from "lucide-react";
 
@@ -23,18 +23,21 @@ export default function DictionaryModeToggle({
           <div>
             <h3 className="text-sm font-medium mb-2">Režim:</h3>
             <div className="flex items-center justify-between p-3 border rounded-lg">
-              <div className="flex items-center gap-2">
+            <ToggleGroup
+              type="single"
+              value={mode}
+              onValueChange={(value) => value && onModeChange(value as 'simple' | 'advanced')}
+              className="grid grid-cols-2 gap-2"
+            >
+              <ToggleGroupItem value="simple" className="flex items-center justify-center gap-2 py-2 data-[state=on]:bg-primary/10 data-[state=on]:text-primary">
                 <BookOpen className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm">Jednoduchý</span>
-              </div>
-              <Switch
-                checked={mode === 'advanced'}
-                onCheckedChange={(checked) => onModeChange(checked ? 'advanced' : 'simple')}
-              />
-              <div className="flex items-center gap-2">
-                <span className="text-sm">Pokročilý</span>
+              </ToggleGroupItem>
+              <ToggleGroupItem value="advanced" className="flex items-center justify-center gap-2 py-2 data-[state=on]:bg-primary/10 data-[state=on]:text-primary">
                 <Brain className="h-4 w-4 text-muted-foreground" />
-              </div>
+                <span className="text-sm">Pokročilý</span>
+              </ToggleGroupItem>
+            </ToggleGroup>
             </div>
           </div>
 

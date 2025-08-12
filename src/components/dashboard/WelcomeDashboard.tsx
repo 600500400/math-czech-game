@@ -139,7 +139,7 @@ const WelcomeDashboard: React.FC<WelcomeDashboardProps> = ({
       </div>
 
       {/* Dictionary Section */}
-      {showDictionary && authState.user && (
+      {showDictionary && (
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
@@ -186,18 +186,16 @@ const WelcomeDashboard: React.FC<WelcomeDashboardProps> = ({
           </CardContent>
         </Card>
 
-        {authState.user && (
-          <Card className="hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => setShowDictionary(!showDictionary)}>
-            <CardContent className="p-6 text-center">
-              <Languages className="h-8 w-8 mx-auto mb-3 text-indigo-600" />
-              <h3 className="font-semibold mb-2">Slovník</h3>
-              <p className="text-sm text-muted-foreground">
-                {showDictionary ? "Skrýt slovník" : "Procvičuj si slovíčka"}
-              </p>
-            </CardContent>
-          </Card>
-        )}
+        <Card className="hover:shadow-md transition-shadow cursor-pointer"
+              onClick={() => setShowDictionary(!showDictionary)}>
+          <CardContent className="p-6 text-center">
+            <Languages className="h-8 w-8 mx-auto mb-3 text-indigo-600" />
+            <h3 className="font-semibold mb-2">Slovník</h3>
+            <p className="text-sm text-muted-foreground">
+              {showDictionary ? "Skrýt slovník" : "Procvičuj si slovíčka"}
+            </p>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
