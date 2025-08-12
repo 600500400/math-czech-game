@@ -49,7 +49,7 @@ const HomePage = () => {
       <ModernHeader />
       <div className="container mx-auto p-4 max-w-7xl flex-1">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-6">
+          <TabsList className="grid w-full grid-cols-3 mb-6">
             <TabsTrigger 
               value="dashboard"
               className="data-[state=active]:shadow-sm"
@@ -69,16 +69,6 @@ const HomePage = () => {
               } as React.CSSProperties}
             >
               Procvičování
-            </TabsTrigger>
-            <TabsTrigger 
-              value="dictionary"
-              className="data-[state=active]:shadow-sm"
-              style={{
-                '--active-bg': `${theme.primaryColor}22`,
-                '--active-color': theme.accentColor
-              } as React.CSSProperties}
-            >
-              Slovník
             </TabsTrigger>
             <TabsTrigger 
               value="statistics"
@@ -103,9 +93,6 @@ const HomePage = () => {
             <PracticeTabs defaultTab={practiceDefaultTab} />
           </TabsContent>
 
-          <TabsContent value="dictionary">
-            <DictionaryTabs />
-          </TabsContent>
 
           <TabsContent value="statistics">
             <StatisticsTabs 

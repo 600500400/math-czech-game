@@ -1,6 +1,7 @@
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
+import { BookOpen, Brain } from "lucide-react";
 
 interface DictionaryModeToggleProps {
   mode: 'simple' | 'advanced';
@@ -21,29 +22,19 @@ export default function DictionaryModeToggle({
         <div className="space-y-4">
           <div>
             <h3 className="text-sm font-medium mb-2">Režim:</h3>
-            <div className="flex gap-2">
-              <Button
-                variant={mode === 'simple' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => onModeChange('simple')}
-                className="flex-1"
-              >
-                Jednoduchý
-                <Badge variant="secondary" className="ml-2">
-                  Vím/Nevím
-                </Badge>
-              </Button>
-              <Button
-                variant={mode === 'advanced' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => onModeChange('advanced')}
-                className="flex-1"
-              >
-                Pokročilý
-                <Badge variant="secondary" className="ml-2">
-                  Psaní
-                </Badge>
-              </Button>
+            <div className="flex items-center justify-between p-3 border rounded-lg">
+              <div className="flex items-center gap-2">
+                <BookOpen className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm">Jednoduchý</span>
+              </div>
+              <Switch
+                checked={mode === 'advanced'}
+                onCheckedChange={(checked) => onModeChange(checked ? 'advanced' : 'simple')}
+              />
+              <div className="flex items-center gap-2">
+                <span className="text-sm">Pokročilý</span>
+                <Brain className="h-4 w-4 text-muted-foreground" />
+              </div>
             </div>
           </div>
 
