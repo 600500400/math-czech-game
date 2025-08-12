@@ -25,17 +25,17 @@ const WelcomeDashboard: React.FC<WelcomeDashboardProps> = ({
   const [showDictionary, setShowDictionary] = React.useState(false);
 
   const userName = authState.profile?.full_name || "Studente";
-  const firstName = userName.split(" ")[0];
+  const firstName = userName.split(" ")[0] || "Studente";
 
   // Calculate totals from individual statistics records
-  const mathTotals = mathStats.reduce((acc, stat) => {
+  const mathTotals = (mathStats || []).reduce((acc, stat) => {
     acc.correct += stat.correct_answers;
     acc.wrong += stat.wrong_answers;
     acc.total += stat.correct_answers + stat.wrong_answers;
     return acc;
   }, { correct: 0, wrong: 0, total: 0 });
 
-  const spellingTotals = spellingStats.reduce((acc, stat) => {
+  const spellingTotals = (spellingStats || []).reduce((acc, stat) => {
     acc.correct += stat.correct_answers;
     acc.wrong += stat.wrong_answers;
     acc.total += stat.correct_answers + stat.wrong_answers;

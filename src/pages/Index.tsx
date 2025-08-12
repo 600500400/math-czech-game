@@ -10,19 +10,11 @@ const Index = () => {
 
   // Přesměrování podle stavu autentizace
   useEffect(() => {
-    if (!authState.isAuthenticated && !authState.isLoading) {
-      // Pokud uživatel není přihlášen, přesměruj na výběr identity
-      navigate('/select-user');
-    } else if (authState.isAuthenticated && authState.profile?.role === 'parent') {
+    if (authState.isAuthenticated && authState.profile?.role === 'parent') {
       // Pokud je přihlášený rodič, přesměruj na dashboard
       navigate('/parent-dashboard');
     }
-  }, [authState.isAuthenticated, authState.isLoading, authState.profile?.role, navigate]);
-
-  // Pokud je uživatel přihlášen jako dítě, zobraz domovskou stránku
-  if (authState.isAuthenticated && authState.profile?.role === 'child') {
-    return <HomePage />;
-  }
+  }, [authState.isAuthenticated, authState.profile?.role, navigate]);
 
   // Během načítání zobraz loading
   if (authState.isLoading) {
@@ -33,7 +25,8 @@ const Index = () => {
     );
   }
 
-  return null;
+  // Zobraz domovskou stránku pro všechny kromě rodičů
+  return <HomePage />;
 };
 
 export default Index;
