@@ -8,11 +8,11 @@ import { useDetailedAnswers } from "@/hooks/statistics/useDetailedAnswers";
 import WelcomeDashboard from "@/components/dashboard/WelcomeDashboard";
 import PracticeTabs from "@/components/practice/PracticeTabs";
 import StatisticsTabs from "@/components/statistics/StatisticsTabs";
-import DictionaryTabs from "@/components/dictionary/DictionaryTabs";
+
 import ModernHeader from "@/components/layout/ModernHeader";
 import AppFooter from "@/components/layout/AppFooter";
-import { AIAssistantDrawer } from "@/components/ai/AIAssistantDrawer";
-import { Brain, Bot } from "lucide-react";
+
+
 
 const HomePage = () => {
   const { authState } = useAuth();
@@ -31,15 +31,6 @@ const HomePage = () => {
     setActiveTab("practice");
   };
 
-  const assistantTrigger = (
-    <div className="fixed bottom-4 right-4 z-50">
-      <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-full p-3 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer group">
-        {activeTab === 'practice'
-          ? <Brain className="h-6 w-6 text-white group-hover:scale-110 transition-transform" />
-          : <Bot className="h-6 w-6 text-white group-hover:scale-110 transition-transform" />}
-      </div>
-    </div>
-  );
 
   return (
     <div 
@@ -107,17 +98,6 @@ const HomePage = () => {
 
       <AppFooter />
 
-      {/* AI Assistant available on all tabs */}
-      <AIAssistantDrawer 
-        trigger={assistantTrigger}
-        subject={activeTab === 'practice' ? practiceDefaultTab : undefined}
-        context={{
-          recentErrors: [],
-          userStats: activeTab === 'practice' 
-            ? (practiceDefaultTab === 'math' ? mathStats : spellingStats) 
-            : { math: mathStats, spelling: spellingStats }
-        }}
-      />
     </div>
   );
 };
