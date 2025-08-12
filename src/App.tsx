@@ -1,4 +1,5 @@
 
+import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,40 +18,44 @@ import OfflineIndicator from "./components/pwa/OfflineIndicator";
 import "@/i18n";
 import DonationSuccess from "./pages/DonationSuccess";
 
+// Create query client outside of component to avoid re-initialization
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
       retry: false,
+      staleTime: 5 * 60 * 1000, // 5 minutes
     },
   },
 });
 
-const App = () => {
+const App: React.FC = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <AuthProvider>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/select-user" element={<UserSelection />} />
-                <Route path="/parent-dashboard" element={<ParentDashboard />} />
-                <Route path="/leaderboards" element={<LeaderboardsPage />} />
-                <Route path="/achievements" element={<AchievementsPage />} />
-                <Route path="/donation-success" element={<DonationSuccess />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-              <PWAInstallPrompt />
-              <OfflineIndicator />
-            </AuthProvider>
-          </BrowserRouter>
-        </TooltipProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <React.StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <AuthProvider>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/select-user" element={<UserSelection />} />
+                  <Route path="/parent-dashboard" element={<ParentDashboard />} />
+                  <Route path="/leaderboards" element={<LeaderboardsPage />} />
+                  <Route path="/achievements" element={<AchievementsPage />} />
+                  <Route path="/donation-success" element={<DonationSuccess />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+                <PWAInstallPrompt />
+                <OfflineIndicator />
+              </AuthProvider>
+            </BrowserRouter>
+          </TooltipProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </React.StrictMode>
   );
 };
 
