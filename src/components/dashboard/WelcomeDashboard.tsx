@@ -5,15 +5,11 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
 import { useStatistics } from "@/hooks/useStatistics";
 import { BookOpen, Calculator, BarChart3, Target, Languages } from "lucide-react";
-import DictionaryPractice from "@/components/dictionary/DictionaryPractice";
+import { useNavigate } from "react-router-dom";
 
 interface WelcomeDashboardProps {
   onNavigateToTab: (tab: "practice" | "statistics") => void;
   onNavigateToPractice: (defaultTab: "spelling" | "math") => void;
-}
-
-interface WelcomeDashboardState {
-  showDictionary: boolean;
 }
 
 const WelcomeDashboard: React.FC<WelcomeDashboardProps> = ({
@@ -22,7 +18,7 @@ const WelcomeDashboard: React.FC<WelcomeDashboardProps> = ({
 }) => {
   const { authState } = useAuth();
   const { mathStats, spellingStats } = useStatistics(authState.user?.id || null);
-  const [showDictionary, setShowDictionary] = React.useState(false);
+  const navigate = useNavigate();
 
   const userName = authState.profile?.full_name || "Studente";
   const firstName = userName.split(" ")[0] || "Studente";
@@ -138,30 +134,6 @@ const WelcomeDashboard: React.FC<WelcomeDashboardProps> = ({
         </Card>
       </div>
 
-      {/* Dictionary Section */}
-      {showDictionary && (
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span className="flex items-center gap-2">
-                <Languages className="h-5 w-5" />
-                Slovník
-              </span>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => setShowDictionary(false)}
-              >
-                ✕
-              </Button>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <DictionaryPractice />
-          </CardContent>
-        </Card>
-      )}
-
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="hover:shadow-md transition-shadow cursor-pointer" 
@@ -187,12 +159,12 @@ const WelcomeDashboard: React.FC<WelcomeDashboardProps> = ({
         </Card>
 
         <Card className="hover:shadow-md transition-shadow cursor-pointer"
-              onClick={() => setShowDictionary(!showDictionary)}>
+              onClick={() => navigate('/dictionary')}>
           <CardContent className="p-6 text-center">
             <Languages className="h-8 w-8 mx-auto mb-3 text-indigo-600" />
             <h3 className="font-semibold mb-2">Slovník</h3>
             <p className="text-sm text-muted-foreground">
-              {showDictionary ? "Skrýt slovník" : "Procvičuj si slovíčka"}
+              Procvičuj si slovíčka
             </p>
           </CardContent>
         </Card>

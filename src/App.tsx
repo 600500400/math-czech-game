@@ -16,6 +16,7 @@ import PWAInstallPrompt from "./components/pwa/PWAInstallPrompt";
 import OfflineIndicator from "./components/pwa/OfflineIndicator";
 import "@/i18n";
 import DonationSuccess from "./pages/DonationSuccess";
+import Dictionary from "./pages/Dictionary";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -42,6 +43,7 @@ const App = () => {
                 <Route path="/leaderboards" element={<LeaderboardsPage />} />
                 <Route path="/achievements" element={<AchievementsPage />} />
                 <Route path="/donation-success" element={<DonationSuccess />} />
+                <Route path="/dictionary" element={<Dictionary />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
               <PWAInstallPrompt />
