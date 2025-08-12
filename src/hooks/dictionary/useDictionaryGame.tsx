@@ -186,35 +186,6 @@ export const useDictionaryGame = (userId: string | null) => {
     }, 2000);
   }, [gameState.currentWord, gameState.userAnswer, gameState.mode, gameState.direction, userId, addAnswer, nextWord]);
 
-  const endGame = useCallback(() => {
-    if (gameState.correctAnswers + gameState.wrongAnswers > 0) {
-      const gameDuration = gameState.gameStartTime 
-        ? Math.floor((Date.now() - gameState.gameStartTime) / 1000)
-        : 0;
-
-      saveStatistics({
-        correct_answers: gameState.correctAnswers,
-        wrong_answers: gameState.wrongAnswers,
-        mode: gameState.mode,
-        direction: gameState.direction,
-        game_duration: gameDuration,
-      });
-
-      setGameState(prev => ({
-        ...prev,
-        showStatsDialog: true,
-      }));
-    }
-
-    setGameState(prev => ({
-      ...prev,
-      gameStarted: false,
-      currentWord: null,
-      shuffledWords: [],
-      currentIndex: 0,
-      totalWords: 0,
-    }));
-  }, [gameState.correctAnswers, gameState.wrongAnswers, gameState.mode, gameState.direction, gameState.gameStartTime, saveStatistics]);
 
   const resetGame = useCallback(() => {
     setGameState(prev => ({
