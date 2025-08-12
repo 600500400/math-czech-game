@@ -1,10 +1,13 @@
 import { Card, CardContent } from "@/components/ui/card";
+import { useMemo } from "react";
 import { DictionaryWord } from "@/types/dictionaryTypes";
 
 interface DictionaryCardProps {
   word: DictionaryWord;
   direction: 'en_to_cz' | 'cz_to_en';
   showAnswer: boolean;
+  showSentences?: boolean;
+  sentencesKey?: number;
   children?: React.ReactNode;
 }
 
@@ -38,10 +41,10 @@ const generateExampleSentences = (
   return shuffled.slice(0, 2);
 };
 
-export default function DictionaryCard({ word, direction, showAnswer, children }: DictionaryCardProps) {
+export default function DictionaryCard({ word, direction, showAnswer, showSentences = true, sentencesKey = 0, children }: DictionaryCardProps) {
   const questionWord = direction === 'en_to_cz' ? word.english_word : word.czech_translation;
   const answerWord = direction === 'en_to_cz' ? word.czech_translation : word.english_word;
-  const exampleSentences = generateExampleSentences(word.english_word, word.czech_translation, direction);
+  const exampleSentences = useMemo(() => generateExampleSentences(word.english_word, word.czech_translation, direction), [word.id, direction, sentencesKey]);
   
   return (
     <Card className="w-full max-w-md mx-auto">
@@ -57,20 +60,22 @@ export default function DictionaryCard({ word, direction, showAnswer, children }
                 <div className="font-medium">Překlad:</div>
                 <div className="text-xl text-foreground mt-1">{answerWord}</div>
               </div>
-              
-              <div className="border-t pt-3">
-                <div className="font-medium text-sm mb-2">Příklady použití:</div>
-                <div className="space-y-1">
-                  {exampleSentences.map((sentence, index) => (
-                    <div key={index} className="text-sm text-muted-foreground italic">
-                      "{sentence}"
-                    </div>
-                  ))}
-                </div>
-              </div>
             </div>
           )}
           
+          {showSentences && (
+            <div className="mt-4 border-t pt-3">
+              <div className="font-medium text-sm mb-2">Příklady použití:</div>
+              <div className="space-y-1">
+                {exampleSentences.map((sentence, index) => (
+                  <div key={index} className="text-sm text-muted-foreground italic">
+                    "{sentence}"
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {children && (
             <div className="mt-6">
               {children}

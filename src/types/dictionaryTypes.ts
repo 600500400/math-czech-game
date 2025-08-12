@@ -45,6 +45,12 @@ export interface DictionaryGameState {
   showStatsDialog: boolean;
   answers: DictionaryAnswer[];
   gameStartTime: number | null;
+
+  // Deck-based flow
+  shuffledWords: DictionaryWord[];
+  currentIndex: number;
+  totalWords: number;
+  showSentences: boolean;
 }
 
 export interface DictionaryModeSettings {

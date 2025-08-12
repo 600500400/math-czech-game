@@ -6,7 +6,7 @@ import { useDictionaryStatistics } from "./useDictionaryStatistics";
 import { toast } from "sonner";
 
 export const useDictionaryGame = (userId: string | null) => {
-  const { getRandomWord } = useDictionaryWords(userId);
+  const { words } = useDictionaryWords(userId);
   const { addAnswer } = useDictionaryAnswers(userId);
   const { saveStatistics } = useDictionaryStatistics(userId);
 
@@ -22,39 +22,103 @@ export const useDictionaryGame = (userId: string | null) => {
     showStatsDialog: false,
     answers: [],
     gameStartTime: null,
+    shuffledWords: [],
+    currentIndex: 0,
+    totalWords: 0,
+    showSentences: true,
   });
 
+  const shuffleArray = (arr: any[]) => [...arr].sort(() => Math.random() - 0.5);
+
   const startGame = useCallback(() => {
-    const word = getRandomWord();
-    if (!word) {
+    if (!words || words.length === 0) {
       toast.error("Žádná slovíčka k procvičování");
       return;
     }
 
+    const deck = shuffleArray(words);
+
     setGameState(prev => ({
       ...prev,
-      currentWord: word,
+      currentWord: deck[0],
+      shuffledWords: deck,
+      currentIndex: 0,
+      totalWords: deck.length,
       gameStarted: true,
       userAnswer: "",
       showAnswer: false,
+      correctAnswers: 0,
+      wrongAnswers: 0,
+      answers: [],
       gameStartTime: Date.now(),
     }));
-  }, [getRandomWord]);
+  }, [words]);
 
-  const nextWord = useCallback(() => {
-    const word = getRandomWord();
-    if (!word) {
-      endGame();
-      return;
+  const endGame = useCallback(() => {
+    if (gameState.correctAnswers + gameState.wrongAnswers > 0) {
+      const gameDuration = gameState.gameStartTime 
+        ? Math.floor((Date.now() - gameState.gameStartTime) / 1000)
+        : 0;
+
+      saveStatistics({
+        correct_answers: gameState.correctAnswers,
+        wrong_answers: gameState.wrongAnswers,
+        mode: gameState.mode,
+        direction: gameState.direction,
+        game_duration: gameDuration,
+      });
+
+      setGameState(prev => ({
+        ...prev,
+        showStatsDialog: true,
+      }));
     }
 
     setGameState(prev => ({
       ...prev,
-      currentWord: word,
+      gameStarted: false,
+      currentWord: null,
+      shuffledWords: [],
+      currentIndex: 0,
+      totalWords: 0,
+    }));
+  }, [gameState.correctAnswers, gameState.wrongAnswers, gameState.mode, gameState.direction, gameState.gameStartTime, saveStatistics]);
+
+  const nextWord = useCallback(() => {
+    setGameState(prev => {
+      const nextIndex = prev.currentIndex + 1;
+      if (nextIndex >= prev.totalWords) {
+        // End game if deck is finished
+        setTimeout(() => endGame(), 0);
+        return prev;
+      }
+      return {
+        ...prev,
+        currentWord: prev.shuffledWords[nextIndex],
+        currentIndex: nextIndex,
+        userAnswer: "",
+        showAnswer: false,
+      };
+    });
+  }, [endGame]);
+
+  const shuffleDeck = useCallback(() => {
+    if (!words || words.length === 0) return;
+    const deck = shuffleArray(words);
+    setGameState(prev => ({
+      ...prev,
+      shuffledWords: deck,
+      currentWord: deck[0],
+      currentIndex: 0,
+      totalWords: deck.length,
       userAnswer: "",
       showAnswer: false,
+      correctAnswers: 0,
+      wrongAnswers: 0,
+      answers: [],
+      gameStartTime: Date.now(),
     }));
-  }, [getRandomWord]);
+  }, [words]);
 
   const handleSimpleAnswer = useCallback((isCorrect: boolean) => {
     if (!gameState.currentWord || !userId) return;
@@ -146,6 +210,9 @@ export const useDictionaryGame = (userId: string | null) => {
       ...prev,
       gameStarted: false,
       currentWord: null,
+      shuffledWords: [],
+      currentIndex: 0,
+      totalWords: 0,
     }));
   }, [gameState.correctAnswers, gameState.wrongAnswers, gameState.mode, gameState.direction, gameState.gameStartTime, saveStatistics]);
 
@@ -161,6 +228,9 @@ export const useDictionaryGame = (userId: string | null) => {
       showStatsDialog: false,
       answers: [],
       gameStartTime: null,
+      shuffledWords: [],
+      currentIndex: 0,
+      totalWords: 0,
     }));
   }, []);
 
@@ -180,6 +250,10 @@ export const useDictionaryGame = (userId: string | null) => {
     setGameState(prev => ({ ...prev, showStatsDialog: show }));
   }, []);
 
+  const setShowSentences = useCallback((show: boolean) => {
+    setGameState(prev => ({ ...prev, showSentences: show }));
+  }, []);
+
   return {
     ...gameState,
     startGame,
@@ -192,5 +266,7 @@ export const useDictionaryGame = (userId: string | null) => {
     setDirection,
     setUserAnswer,
     setShowStatsDialog,
+    setShowSentences,
+    shuffleDeck,
   };
 };
