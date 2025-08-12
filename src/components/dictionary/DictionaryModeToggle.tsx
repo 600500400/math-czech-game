@@ -22,23 +22,27 @@ export default function DictionaryModeToggle({
         <div className="space-y-4">
           <div>
             <h3 className="text-sm font-medium mb-2">Režim:</h3>
-            <div className="flex items-center justify-between p-3 border rounded-lg">
             <ToggleGroup
               type="single"
               value={mode}
               onValueChange={(value) => value && onModeChange(value as 'simple' | 'advanced')}
-              className="grid grid-cols-2 gap-2"
+              className="grid grid-cols-2 gap-1 p-1 bg-muted rounded-lg"
             >
-              <ToggleGroupItem value="simple" className="flex items-center justify-center gap-2 py-2 data-[state=on]:bg-primary/10 data-[state=on]:text-primary">
-                <BookOpen className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm">Jednoduchý</span>
+              <ToggleGroupItem 
+                value="simple" 
+                className="flex items-center justify-center gap-2 py-2 px-4 data-[state=on]:bg-background data-[state=on]:text-foreground data-[state=on]:shadow-sm rounded-md transition-all"
+              >
+                <BookOpen className="h-4 w-4" />
+                <span className="text-sm font-medium">Jednoduchý</span>
               </ToggleGroupItem>
-              <ToggleGroupItem value="advanced" className="flex items-center justify-center gap-2 py-2 data-[state=on]:bg-primary/10 data-[state=on]:text-primary">
-                <Brain className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm">Pokročilý</span>
+              <ToggleGroupItem 
+                value="advanced" 
+                className="flex items-center justify-center gap-2 py-2 px-4 data-[state=on]:bg-background data-[state=on]:text-foreground data-[state=on]:shadow-sm rounded-md transition-all"
+              >
+                <Brain className="h-4 w-4" />
+                <span className="text-sm font-medium">Pokročilý</span>
               </ToggleGroupItem>
             </ToggleGroup>
-            </div>
           </div>
 
           <div>
