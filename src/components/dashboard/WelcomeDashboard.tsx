@@ -137,16 +137,6 @@ const WelcomeDashboard: React.FC<WelcomeDashboardProps> = ({
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
-        <Card className="hover:shadow-md transition-shadow cursor-pointer"
-              onClick={() => onNavigateToTab("practice")}>
-          <CardContent className="p-6 text-center">
-            <Target className="h-8 w-8 mx-auto mb-3 text-orange-600" />
-            <h3 className="font-semibold mb-2">Všechna procvičování</h3>
-            <p className="text-sm text-muted-foreground">
-              Přejdi na stránku s procvičováním
-            </p>
-          </CardContent>
-        </Card>
 
         <Card className="hover:shadow-md transition-shadow cursor-pointer"
               onClick={() => navigate('/dictionary')}>
