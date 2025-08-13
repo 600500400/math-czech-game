@@ -17,7 +17,7 @@ const generateExampleSentences = (
   czech: string,
   direction: 'en_to_cz' | 'cz_to_en'
 ) => {
-  const targetWord = direction === 'en_to_cz' ? czech : english;
+  const targetWord = direction === 'en_to_cz' ? english : czech;
   const wordLower = targetWord.toLowerCase();
 
   const czechTemplates = [
@@ -36,7 +36,7 @@ const generateExampleSentences = (
     `Children often play with this ${wordLower} outside.`
   ];
 
-  const templates = direction === 'en_to_cz' ? czechTemplates : englishTemplates;
+  const templates = direction === 'en_to_cz' ? englishTemplates : czechTemplates;
   const shuffled = templates.sort(() => Math.random() - 0.5);
   return shuffled.slice(0, 2);
 };
