@@ -76,24 +76,6 @@ export default function DictionaryAdd() {
     setBulkText("");
   };
 
-  // If user is not authenticated, show login prompt
-  if (!authState.isAuthenticated) {
-    return (
-      <Card>
-        <CardContent className="pt-6 text-center space-y-4">
-          <LogIn className="h-12 w-12 mx-auto text-muted-foreground" />
-          <h3 className="text-lg font-semibold">Přihlášení vyžadováno</h3>
-          <p className="text-muted-foreground">
-            Pro přidávání slovíček do slovníku se musíte přihlásit.
-          </p>
-          <Button onClick={() => navigate("/auth")} className="w-full">
-            Přihlásit se
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
     <div className="space-y-6">
       {/* Single Word Form */}

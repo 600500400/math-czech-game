@@ -7,16 +7,13 @@ import { toast } from "sonner";
 export const useDictionaryWords = (userId: string | null) => {
   const queryClient = useQueryClient();
 
-  // Fetch all available words (system + user words)
+  // Fetch all available words (all words for everyone)
   const { data: words = [], isLoading, refetch } = useQuery({
-    queryKey: ["dictionaryWords", userId],
+    queryKey: ["dictionaryWords"],
     queryFn: async (): Promise<DictionaryWord[]> => {
-      if (!userId) return [];
-
       const { data, error } = await supabase
         .from('dictionary_words')
         .select('*')
-        .or(`user_id.eq.${userId},user_id.eq.system`)
         .order('english_word');
 
       if (error) {
@@ -26,15 +23,15 @@ export const useDictionaryWords = (userId: string | null) => {
 
       return (data || []) as DictionaryWord[];
     },
-    enabled: !!userId,
   });
 
   // Add new word
   const addWordMutation = useMutation({
     mutationFn: async (newWord: NewDictionaryWord) => {
-      if (!userId) throw new Error("Musíte být přihlášeni pro přidání slovíčka");
+      // Allow guest users to add words with a default user_id
+      const effectiveUserId = userId || 'guest';
 
-      console.log("Adding word with userId:", userId, "word:", newWord);
+      console.log("Adding word with userId:", effectiveUserId, "word:", newWord);
 
       const { data, error } = await supabase
         .from('dictionary_words')
@@ -42,7 +39,7 @@ export const useDictionaryWords = (userId: string | null) => {
           english_word: newWord.english_word.trim(),
           czech_translation: newWord.czech_translation.trim(),
           difficulty_level: newWord.difficulty_level,
-          user_id: userId,
+          user_id: effectiveUserId,
           is_user_created: true
         })
         .select()
@@ -110,13 +107,14 @@ export const useDictionaryWords = (userId: string | null) => {
   // Bulk import words
   const bulkImportMutation = useMutation({
     mutationFn: async (words: NewDictionaryWord[]) => {
-      if (!userId) throw new Error("User not logged in");
+      // Allow guest users to bulk import
+      const effectiveUserId = userId || 'guest';
 
       const wordsToInsert = words.map(word => ({
         english_word: word.english_word.trim(),
         czech_translation: word.czech_translation.trim(),
         difficulty_level: word.difficulty_level,
-        user_id: userId,
+        user_id: effectiveUserId,
         is_user_created: true
       }));
 
