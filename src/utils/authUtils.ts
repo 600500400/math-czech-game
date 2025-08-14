@@ -1,39 +1,10 @@
 
-// Utility function to clean up auth state in localStorage and sessionStorage
+import { secureCleanupAuthState } from './secureStorage';
+
+// Enhanced utility function to clean up auth state in localStorage and sessionStorage
 export const cleanupAuthState = () => {
-  const result = {
-    removed: [] as string[],
-    kept: [] as string[]
-  };
-  
-  // Remove standard auth tokens
-  localStorage.removeItem('supabase.auth.token');
-  
-  // Remove all Supabase auth keys from localStorage
-  Object.keys(localStorage).forEach((key) => {
-    // Only remove auth-related keys, NOT user data like statistics
-    if ((key.startsWith('supabase.auth.') || key.includes('sb-') || key === 'localUser') 
-        && !key.includes('Stats_')
-        && !key.startsWith('mathStats_')
-        && !key.startsWith('spellingStats_')) {
-      localStorage.removeItem(key);
-      result.removed.push(key);
-    } else if (key.includes('Stats_') || key.startsWith('mathStats_') || key.startsWith('spellingStats_')) {
-      // Ponecháváme statistiky
-      result.kept.push(key);
-    }
-  });
-  
-  // Remove from sessionStorage if in use
-  Object.keys(sessionStorage || {}).forEach((key) => {
-    if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
-      sessionStorage.removeItem(key);
-      result.removed.push(`sessionStorage:${key}`);
-    }
-  });
-  
-  console.log("Výsledek čištění auth stavu:", result);
-  return result;
+  // Use the secure cleanup implementation
+  return secureCleanupAuthState();
 };
 
 // Attempt a global sign out and ignore any errors
