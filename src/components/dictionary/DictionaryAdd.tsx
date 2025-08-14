@@ -1,10 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Plus, Upload } from "lucide-react";
+import { Plus, Upload, LogIn } from "lucide-react";
 import { useDictionaryWords } from "@/hooks/dictionary/useDictionaryWords";
 import { useAuth } from "@/hooks/useAuth";
 import { NewDictionaryWord } from "@/types/dictionaryTypes";
@@ -12,6 +13,7 @@ import { toast } from "sonner";
 
 export default function DictionaryAdd() {
   const { authState } = useAuth();
+  const navigate = useNavigate();
   const userId = authState.user?.id || null;
   const { addWord, bulkImport, isAddingWord, isBulkImporting } = useDictionaryWords(userId);
 
@@ -73,6 +75,24 @@ export default function DictionaryAdd() {
     bulkImport(words);
     setBulkText("");
   };
+
+  // If user is not authenticated, show login prompt
+  if (!authState.isAuthenticated) {
+    return (
+      <Card>
+        <CardContent className="pt-6 text-center space-y-4">
+          <LogIn className="h-12 w-12 mx-auto text-muted-foreground" />
+          <h3 className="text-lg font-semibold">Přihlášení vyžadováno</h3>
+          <p className="text-muted-foreground">
+            Pro přidávání slovíček do slovníku se musíte přihlásit.
+          </p>
+          <Button onClick={() => navigate("/auth")} className="w-full">
+            Přihlásit se
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">
