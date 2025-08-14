@@ -32,7 +32,9 @@ export const useDictionaryWords = (userId: string | null) => {
   // Add new word
   const addWordMutation = useMutation({
     mutationFn: async (newWord: NewDictionaryWord) => {
-      if (!userId) throw new Error("User not logged in");
+      if (!userId) throw new Error("Musíte být přihlášeni pro přidání slovíčka");
+
+      console.log("Adding word with userId:", userId, "word:", newWord);
 
       const { data, error } = await supabase
         .from('dictionary_words')
@@ -46,7 +48,10 @@ export const useDictionaryWords = (userId: string | null) => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
+      }
       return data;
     },
     onSuccess: () => {
