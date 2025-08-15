@@ -1,4 +1,3 @@
-
 import React from "react";
 import { formatDate } from "@/utils/dateUtils";
 import { 
@@ -21,7 +20,7 @@ interface DetailedStatisticsTableProps {
   spellingAnswers?: SpellingAnswer[];
 }
 
-const DetailedStatisticsTable: React.FC<DetailedStatisticsTableProps> = ({ 
+export const DetailedStatisticsTable: React.FC<DetailedStatisticsTableProps> = ({ 
   type, 
   data, 
   mathAnswers = [], 

@@ -33,7 +33,12 @@ export const useDictionaryAnswers = (userId: string | null) => {
       }
 
       console.log("useDictionaryAnswers - načteno z databáze:", data?.length || 0, "odpovědí");
-      return data || [];
+      // Transform the data to match our types
+      return (data || []).map(item => ({
+        ...item,
+        mode: item.mode as 'simple' | 'advanced',
+        direction: item.direction as 'en_to_cz' | 'cz_to_en'
+      }));
     },
     enabled: !!userId,
     staleTime: 30000,
@@ -56,11 +61,12 @@ export const useDictionaryAnswers = (userId: string | null) => {
         .insert({
           user_id: userId,
           word_id: answer.word_id,
-          czech_word: answer.czech_word,
+          czech_translation: answer.czech_translation,
           english_word: answer.english_word,
           user_answer: answer.user_answer,
           is_correct: answer.is_correct,
-          answer_time: answer.answer_time
+          mode: answer.mode,
+          direction: answer.direction
         })
         .select()
         .single();
@@ -93,11 +99,12 @@ export const useDictionaryAnswers = (userId: string | null) => {
           answers.map(answer => ({
             user_id: userId,
             word_id: answer.word_id,
-            czech_word: answer.czech_word,
+            czech_translation: answer.czech_translation,
             english_word: answer.english_word,
             user_answer: answer.user_answer,
             is_correct: answer.is_correct,
-            answer_time: answer.answer_time
+            mode: answer.mode,
+            direction: answer.direction
           }))
         )
         .select();
