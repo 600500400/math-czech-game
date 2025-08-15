@@ -77,28 +77,33 @@ const MathPractice = () => {
   };
 
   return (
-    <div 
-      className={`min-h-screen bg-gradient-to-br ${theme.bgGradient} flex flex-col`}
-      style={getCSSVariables}
-    >
+    <div className="min-h-screen bg-background flex flex-col">
       <ModernHeader />
       
-      <div className="container mx-auto p-4 max-w-4xl flex-1">
+      <main className="max-w-4xl mx-auto px-4 py-6 flex-1">
+        {/* Breadcrumb Navigation */}
+        <nav aria-label="Breadcrumb" className="mb-6">
+          <ol className="flex items-center space-x-2 text-sm text-muted-foreground">
+            <li>
+              <button 
+                onClick={() => navigate('/')} 
+                className="hover:text-foreground transition-colors"
+              >
+                Přehled
+              </button>
+            </li>
+            <li className="flex items-center">
+              <ArrowLeft className="h-3 w-3 mx-2 rotate-180" />
+              <span className="text-foreground font-medium">Matematika</span>
+            </li>
+          </ol>
+        </nav>
+
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center space-x-4">
-            <Button
-              variant="outline"
-              onClick={() => navigate('/')}
-              className="flex items-center space-x-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              <span>Zpět na dashboard</span>
-            </Button>
-            <div className="flex items-center space-x-2">
-              <Calculator className="h-6 w-6 text-primary" />
-              <h1 className="text-2xl font-bold text-foreground">Procvičování matematiky</h1>
-            </div>
+        <div className="mb-6">
+          <div className="flex items-center space-x-2 mb-2">
+            <Calculator className="h-6 w-6 text-primary" />
+            <h1 className="text-2xl font-heading font-bold text-foreground">Procvičování matematiky</h1>
           </div>
         </div>
 
@@ -178,7 +183,7 @@ const MathPractice = () => {
             </CardContent>
           </Card>
         )}
-      </div>
+      </main>
 
       <AppFooter />
 

@@ -174,7 +174,7 @@ const StatisticsTabs: React.FC<StatisticsTabsProps> = ({
                       <div key={stat.id} className="flex justify-between items-center p-3 bg-muted/30 rounded-lg">
                         <div>
                           <span className="font-medium">
-                            {stat.mode} ({stat.direction === 'en_to_cz' ? 'EN → CZ' : 'CZ → EN'})
+                            Slovník ({stat.direction === 'en_to_cz' ? 'EN → CZ' : 'CZ → EN'})
                           </span>
                           <div className="text-sm text-muted-foreground">
                             {new Date(stat.created_at).toLocaleDateString('cs-CZ')}
