@@ -2,6 +2,7 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useMathStatistics } from "./statistics/useMathStatistics";
 import { useSpellingStatistics } from "./statistics/useSpellingStatistics";
+import { useDictionaryStatistics } from "./dictionary/useDictionaryStatistics";
 import { useStatisticsCore } from "./statistics/useStatisticsCore";
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -33,6 +34,12 @@ export const useStatistics = (userId: string | null) => {
     saveSpellingStatistics, 
     refetchSpellingStats 
   } = useSpellingStatistics(effectiveUserId);
+
+  const {
+    stats: dictionaryStats,
+    isLoading: dictionaryStatsLoading,
+    saveStatistics: saveDictionaryStatistics,
+  } = useDictionaryStatistics(effectiveUserId);
   
   const { getChildStatistics, checkLocalUserMode, resetUserStatistics } = useStatisticsCore(effectiveUserId);
   
@@ -44,6 +51,7 @@ export const useStatistics = (userId: string | null) => {
       // Vynucené přenačtení dat při změně uživatele
       queryClient.invalidateQueries({ queryKey: ["mathStatistics"] });
       queryClient.invalidateQueries({ queryKey: ["spellingStatistics"] });
+      queryClient.invalidateQueries({ queryKey: ["dictionaryStatistics"] });
       
       // Zavoláme refetch funkce přímo
       refetchMathStats();
@@ -84,6 +92,11 @@ export const useStatistics = (userId: string | null) => {
     spellingStatsLoading,
     saveSpellingStatistics,
     refetchSpellingStats,
+
+    // Statistiky slovníku
+    dictionaryStats,
+    dictionaryStatsLoading,
+    saveDictionaryStatistics,
     
     // Společné funkce
     getChildStatistics,
@@ -93,6 +106,6 @@ export const useStatistics = (userId: string | null) => {
     
     // Metadata
     currentUserId: effectiveUserId,
-    isLoading: mathStatsLoading || spellingStatsLoading
+    isLoading: mathStatsLoading || spellingStatsLoading || dictionaryStatsLoading
   };
 };

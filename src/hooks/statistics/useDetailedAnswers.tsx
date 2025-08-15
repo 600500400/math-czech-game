@@ -1,8 +1,10 @@
 
 import { MathAnswer } from "@/types/mathTypes";
 import { SpellingAnswer } from "@/types/spellingTypes";
+import { DictionaryAnswer } from "@/types/dictionaryTypes";
 import { useMathAnswers } from "./useMathAnswers";
 import { useSpellingAnswers } from "./useSpellingAnswers";
+import { useDictionaryAnswers } from "../dictionary/useDictionaryAnswers";
 
 export const useDetailedAnswers = (userId: string | null) => {
   console.log("useDetailedAnswers - inicializace s userId:", userId);
@@ -21,13 +23,21 @@ export const useDetailedAnswers = (userId: string | null) => {
     clearSpellingAnswers
   } = useSpellingAnswers(userId);
 
+  const {
+    dictionaryAnswers,
+    addDictionaryAnswer,
+    saveDictionaryAnswers,
+    clearDictionaryAnswers
+  } = useDictionaryAnswers(userId);
+
   // Clear all answers for user from Supabase
   const clearAllAnswers = async () => {
     try {
       console.log("useDetailedAnswers - mazám všechny detailní odpovědi pro userId:", userId);
       await Promise.all([
         clearMathAnswers(),
-        clearSpellingAnswers()
+        clearSpellingAnswers(),
+        clearDictionaryAnswers()
       ]);
       
       console.log("useDetailedAnswers - vymazány všechny detailní odpovědi z databáze");
@@ -40,17 +50,22 @@ export const useDetailedAnswers = (userId: string | null) => {
     userId,
     mathAnswersCount: mathAnswers.length,
     spellingAnswersCount: spellingAnswers.length,
+    dictionaryAnswersCount: dictionaryAnswers.length,
     mathWrongCount: mathAnswers.filter(a => !a.isCorrect).length,
-    spellingWrongCount: spellingAnswers.filter(a => !a.isCorrect).length
+    spellingWrongCount: spellingAnswers.filter(a => !a.isCorrect).length,
+    dictionaryWrongCount: dictionaryAnswers.filter(a => !a.is_correct).length
   });
 
   return {
     mathAnswers,
     spellingAnswers,
+    dictionaryAnswers,
     addMathAnswer,
     addSpellingAnswer,
+    addDictionaryAnswer,
     saveMathAnswers,
     saveSpellingAnswers,
+    saveDictionaryAnswers,
     clearAllAnswers
   };
 };

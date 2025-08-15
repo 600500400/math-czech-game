@@ -17,8 +17,8 @@ import AppFooter from "@/components/layout/AppFooter";
 const HomePage = () => {
   const { authState } = useAuth();
   const { theme, getCSSVariables } = useUserTheme(authState.user?.id);
-  const { mathStats, spellingStats } = useStatistics(authState.user?.id || null);
-  const { mathAnswers, spellingAnswers } = useDetailedAnswers(authState.user?.id || null);
+  const { mathStats, spellingStats, dictionaryStats } = useStatistics(authState.user?.id || null);
+  const { mathAnswers, spellingAnswers, dictionaryAnswers } = useDetailedAnswers(authState.user?.id || null);
   const [activeTab, setActiveTab] = useState("dashboard");
 
   const handleNavigateToTab = (tab: "statistics") => {
@@ -67,8 +67,10 @@ const HomePage = () => {
             <StatisticsTabs 
               mathStats={mathStats} 
               spellingStats={spellingStats}
+              dictionaryStats={dictionaryStats}
               mathAnswers={mathAnswers}
               spellingAnswers={spellingAnswers}
+              dictionaryAnswers={dictionaryAnswers}
             />
           </TabsContent>
         </Tabs>

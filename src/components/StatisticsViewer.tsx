@@ -20,13 +20,14 @@ const StatisticsViewer = () => {
   const {
     mathStats,
     spellingStats,
+    dictionaryStats,
     isLoading,
     currentUserId,
     resetUserStatistics,
     forceRefreshAllStatistics
   } = useStatistics(authState.user?.id || null);
   
-  const { mathAnswers, spellingAnswers, clearAllAnswers } = useDetailedAnswers(currentUserId);
+  const { mathAnswers, spellingAnswers, dictionaryAnswers, clearAllAnswers } = useDetailedAnswers(currentUserId);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   
   // Debug logging
@@ -104,8 +105,10 @@ const StatisticsViewer = () => {
         <StatisticsTabs 
           mathStats={mathStats} 
           spellingStats={spellingStats}
+          dictionaryStats={dictionaryStats}
           mathAnswers={mathAnswers}
           spellingAnswers={spellingAnswers}
+          dictionaryAnswers={dictionaryAnswers}
         />
       </CardContent>
     </Card>

@@ -1,6 +1,9 @@
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Volume2, VolumeX } from "lucide-react";
 import { useMemo } from "react";
 import { DictionaryWord } from "@/types/dictionaryTypes";
+import { useTextToSpeech } from "@/hooks/useTextToSpeech";
 
 interface DictionaryCardProps {
   word: DictionaryWord;
@@ -42,23 +45,74 @@ const generateExampleSentences = (
 };
 
 export default function DictionaryCard({ word, direction, showAnswer, showSentences = true, sentencesKey = 0, children }: DictionaryCardProps) {
+  const { speakEnglish, speakCzech, isPlaying, isSupported } = useTextToSpeech();
   const questionWord = direction === 'en_to_cz' ? word.english_word : word.czech_translation;
   const answerWord = direction === 'en_to_cz' ? word.czech_translation : word.english_word;
   const exampleSentences = useMemo(() => generateExampleSentences(word.english_word, word.czech_translation, direction), [word.id, direction, sentencesKey]);
+
+  const handlePronunciation = (text: string, language: 'en' | 'cz') => {
+    if (language === 'en') {
+      speakEnglish(text);
+    } else {
+      speakCzech(text);
+    }
+  };
   
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardContent className="pt-6">
         <div className="text-center space-y-4">
-          <div className="text-2xl font-bold text-center min-h-[3rem] flex items-center justify-center">
-            {questionWord}
+          <div className="flex items-center justify-center gap-2 min-h-[3rem]">
+            <div className="text-2xl font-bold text-center">
+              {questionWord}
+            </div>
+            {isSupported && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handlePronunciation(
+                  questionWord,
+                  direction === 'en_to_cz' ? 'en' : 'cz'
+                )}
+                disabled={isPlaying}
+                className="h-8 w-8 p-0 hover:bg-primary/10"
+                aria-label="Přehrát výslovnost"
+              >
+                {isPlaying ? (
+                  <VolumeX className="h-4 w-4" />
+                ) : (
+                  <Volume2 className="h-4 w-4" />
+                )}
+              </Button>
+            )}
           </div>
           
           {showAnswer && (
             <div className="text-lg text-muted-foreground border-t pt-4 space-y-3">
               <div>
                 <div className="font-medium">Překlad:</div>
-                <div className="text-xl text-foreground mt-1">{answerWord}</div>
+                <div className="flex items-center justify-center gap-2 mt-1">
+                  <div className="text-xl text-foreground">{answerWord}</div>
+                  {isSupported && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handlePronunciation(
+                        answerWord,
+                        direction === 'en_to_cz' ? 'cz' : 'en'
+                      )}
+                      disabled={isPlaying}
+                      className="h-6 w-6 p-0 hover:bg-primary/10 ml-1"
+                      aria-label="Přehrát výslovnost odpovědi"
+                    >
+                      {isPlaying ? (
+                        <VolumeX className="h-3 w-3" />
+                      ) : (
+                        <Volume2 className="h-3 w-3" />
+                      )}
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
           )}

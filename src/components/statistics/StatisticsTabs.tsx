@@ -1,57 +1,77 @@
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import DetailedStatisticsTable from "./DetailedStatisticsTable";
-import CumulativeChart from "./CumulativeChart";
-import { MathStatistics, SpellingStatistics } from "@/types/authTypes";
-import { FileText, Calculator } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Calculator, FileText, BookOpen } from "lucide-react";
 import { MathAnswer } from "@/types/mathTypes";
 import { SpellingAnswer } from "@/types/spellingTypes";
+import { DictionaryStatistics, DictionaryAnswer } from "@/types/dictionaryTypes";
+import DetailedStatisticsTable from "./DetailedStatisticsTable";
+import CumulativeChart from "./CumulativeChart";
+
+interface MathStatistics {
+  id: string;
+  correct_answers: number;
+  wrong_answers: number;
+  operation: string;
+  game_duration?: number;
+  created_at: string;
+}
+
+interface SpellingStatistics {
+  id: string;
+  correct_answers: number;
+  wrong_answers: number;
+  word_group: string;
+  game_duration?: number;
+  created_at: string;
+}
 import { useLanguage } from "@/hooks/useLanguage";
 
 interface StatisticsTabsProps {
   mathStats: MathStatistics[];
   spellingStats: SpellingStatistics[];
+  dictionaryStats: DictionaryStatistics[];
   mathAnswers?: MathAnswer[];
   spellingAnswers?: SpellingAnswer[];
+  dictionaryAnswers?: DictionaryAnswer[];
 }
 
-const StatisticsTabs = ({ 
+const StatisticsTabs: React.FC<StatisticsTabsProps> = ({ 
   mathStats, 
-  spellingStats, 
-  mathAnswers = [], 
-  spellingAnswers = [] 
-}: StatisticsTabsProps) => {
+  spellingStats,
+  dictionaryStats,
+  mathAnswers, 
+  spellingAnswers,
+  dictionaryAnswers
+}) => {
   const { t } = useLanguage();
-  
-  // Calculate cumulative statistics for both categories
-  const totalSpellingProblems = spellingStats.reduce((sum, stat) => 
-    sum + stat.correct_answers + stat.wrong_answers, 0);
-  const totalSpellingCorrect = spellingStats.reduce((sum, stat) => 
-    sum + stat.correct_answers, 0);
-  const totalSpellingWrong = spellingStats.reduce((sum, stat) => 
-    sum + stat.wrong_answers, 0);
-  
-  const totalMathProblems = mathStats.reduce((sum, stat) => 
-    sum + stat.correct_answers + stat.wrong_answers, 0);
-  const totalMathCorrect = mathStats.reduce((sum, stat) => 
-    sum + stat.correct_answers, 0);
-  const totalMathWrong = mathStats.reduce((sum, stat) => 
-    sum + stat.wrong_answers, 0);
 
-  // Calculate overall accuracy
-  const spellingAccuracy = totalSpellingProblems > 0 
-    ? Math.round((totalSpellingCorrect / totalSpellingProblems) * 100) 
-    : 0;
-  const mathAccuracy = totalMathProblems > 0 
-    ? Math.round((totalMathCorrect / totalMathProblems) * 100) 
-    : 0;
+  // Calculate summary statistics for math
+  const mathTotal = mathStats.reduce((sum, stat) => sum + stat.correct_answers + stat.wrong_answers, 0);
+  const mathCorrect = mathStats.reduce((sum, stat) => sum + stat.correct_answers, 0);
+  const mathWrong = mathStats.reduce((sum, stat) => sum + stat.wrong_answers, 0);
+  const mathAccuracy = mathTotal > 0 ? Math.round((mathCorrect / mathTotal) * 100) : 0;
+
+  // Calculate summary statistics for spelling
+  const spellingTotal = spellingStats.reduce((sum, stat) => sum + stat.correct_answers + stat.wrong_answers, 0);
+  const spellingCorrect = spellingStats.reduce((sum, stat) => sum + stat.correct_answers, 0);
+  const spellingWrong = spellingStats.reduce((sum, stat) => sum + stat.wrong_answers, 0);
+  const spellingAccuracy = spellingTotal > 0 ? Math.round((spellingCorrect / spellingTotal) * 100) : 0;
+
+  // Calculate summary statistics for dictionary
+  const dictionaryTotal = dictionaryStats.reduce((sum, stat) => sum + stat.correct_answers + stat.wrong_answers, 0);
+  const dictionaryCorrect = dictionaryStats.reduce((sum, stat) => sum + stat.correct_answers, 0);
+  const dictionaryWrong = dictionaryStats.reduce((sum, stat) => sum + stat.wrong_answers, 0);
+  const dictionaryAccuracy = dictionaryTotal > 0 ? Math.round((dictionaryCorrect / dictionaryTotal) * 100) : 0;
 
   return (
     <Tabs defaultValue="spelling" className="w-full">
-      <TabsList className="grid w-full grid-cols-2 mb-6">
+      <TabsList className="grid w-full grid-cols-3 mb-6"
+        aria-label="Výběr typu statistik"
+      >
         <TabsTrigger 
           value="spelling" 
-          className="text-base py-4 data-[state=active]:bg-orange-100 data-[state=active]:text-orange-800 data-[state=active]:shadow-sm data-[state=inactive]:bg-gray-50"
+          className="flex items-center justify-center space-x-1 sm:space-x-2 py-2 px-2 sm:px-4"
+          aria-label="Statistiky pravopisu"
         >
           <FileText className="mr-1 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" />
           <span className="text-xs sm:text-sm md:text-base">
@@ -61,80 +81,121 @@ const StatisticsTabs = ({
         </TabsTrigger>
         <TabsTrigger 
           value="math" 
-          className="text-base py-4 data-[state=active]:bg-blue-100 data-[state=active]:text-blue-800 data-[state=active]:shadow-sm data-[state=inactive]:bg-gray-50"
+          className="flex items-center justify-center space-x-1 sm:space-x-2 py-2 px-2 sm:px-4"
+          aria-label="Statistiky matematiky"
         >
           <Calculator className="mr-1 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-          <span className="text-xs sm:text-sm md:text-base">{t('practice.mathematics')}</span>
+          <span className="text-xs sm:text-sm md:text-base">
+            <span className="hidden sm:inline">{t('practice.math')}</span>
+            <span className="sm:hidden">{t('practice.math')}</span>
+          </span>
+        </TabsTrigger>
+        <TabsTrigger 
+          value="dictionary" 
+          className="flex items-center justify-center space-x-1 sm:space-x-2 py-2 px-2 sm:px-4"
+          aria-label="Statistiky slovníku"
+        >
+          <BookOpen className="mr-1 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+          <span className="text-xs sm:text-sm md:text-base">
+            <span className="hidden sm:inline">Slovník</span>
+            <span className="sm:hidden">Slovník</span>
+          </span>
         </TabsTrigger>
       </TabsList>
-      
-      <TabsContent value="spelling" className="mt-4 space-y-6">
-        <div className="mb-4 flex justify-between items-center bg-orange-50 px-4 py-3 rounded-lg">
-          <div className="text-gray-700 hidden sm:block">
-            <span className="font-medium">{t('statistics.total')}:</span> <span className="text-blue-600 font-bold">{totalSpellingProblems}</span>
-          </div>
-          <div className="flex gap-4">
-            <div className="text-gray-700">
-              <span className="font-medium">{t('statistics.correct')}:</span> <span className="text-green-600 font-bold">{totalSpellingCorrect}</span>
-            </div>
-            <div className="text-gray-700">
-              <span className="font-medium">{t('statistics.wrong')}:</span> <span className="text-red-600 font-bold">{totalSpellingWrong}</span>
-            </div>
-            <div className="text-gray-700">
-              <span className="font-medium">
-                <span className="hidden sm:inline">{t('statistics.accuracy')}:</span>
-                <span className="sm:hidden">{t('statistics.success')}:</span>
-              </span> <span className="text-blue-600 font-bold">{spellingAccuracy}%</span>
-            </div>
-          </div>
-        </div>
-        
-        <DetailedStatisticsTable 
-          type="spelling" 
-          data={spellingStats}
-          spellingAnswers={spellingAnswers}
-        />
-        
-        {spellingStats.length > 0 && (
-          <CumulativeChart 
-            data={spellingStats} 
-            type="spelling" 
-          />
+
+      <TabsContent value="spelling" className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              {t('practice.spelling')} - Přehled
+            </CardTitle>
+            <CardDescription>
+              Celkem problémů: {spellingTotal} | Správně: {spellingCorrect} | Špatně: {spellingWrong} | Úspěšnost: {spellingAccuracy}%
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <DetailedStatisticsTable 
+              statistics={spellingStats.map(stat => ({
+                id: stat.id,
+                created_at: stat.created_at,
+                correct_answers: stat.correct_answers,
+                wrong_answers: stat.wrong_answers,
+                type: stat.word_group,
+                game_duration: stat.game_duration
+              }))} 
+              type="spelling"
+            />
+          </CardContent>
+        </Card>
+        {spellingAnswers && spellingAnswers.length > 0 && (
+          <CumulativeChart answers={spellingAnswers} type="spelling" />
         )}
       </TabsContent>
-      
-      <TabsContent value="math" className="mt-4 space-y-6">
-        <div className="mb-4 flex justify-between items-center bg-blue-50 px-4 py-3 rounded-lg">
-          <div className="text-gray-700 hidden sm:block">
-            <span className="font-medium">{t('statistics.total')}:</span> <span className="text-blue-600 font-bold">{totalMathProblems}</span>
-          </div>
-          <div className="flex gap-4">
-            <div className="text-gray-700">
-              <span className="font-medium">{t('statistics.correct')}:</span> <span className="text-green-600 font-bold">{totalMathCorrect}</span>
-            </div>
-            <div className="text-gray-700">
-              <span className="font-medium">{t('statistics.wrong')}:</span> <span className="text-red-600 font-bold">{totalMathWrong}</span>
-            </div>
-            <div className="text-gray-700">
-              <span className="font-medium">
-                <span className="hidden sm:inline">{t('statistics.accuracy')}:</span>
-                <span className="sm:hidden">{t('statistics.success')}:</span>
-              </span> <span className="text-blue-600 font-bold">{mathAccuracy}%</span>
-            </div>
-          </div>
-        </div>
-        
-        <DetailedStatisticsTable 
-          type="math" 
-          data={mathStats}
-          mathAnswers={mathAnswers}
-        />
-        
-        {mathStats.length > 0 && (
-          <CumulativeChart 
-            data={mathStats} 
-            type="math" 
-          />
+
+      <TabsContent value="math" className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Calculator className="h-5 w-5" />
+              {t('practice.math')} - Přehled
+            </CardTitle>
+            <CardDescription>
+              Celkem problémů: {mathTotal} | Správně: {mathCorrect} | Špatně: {mathWrong} | Úspěšnost: {mathAccuracy}%
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <DetailedStatisticsTable 
+              statistics={mathStats.map(stat => ({
+                id: stat.id,
+                created_at: stat.created_at,
+                correct_answers: stat.correct_answers,
+                wrong_answers: stat.wrong_answers,
+                type: stat.operation,
+                game_duration: stat.game_duration
+              }))} 
+              type="math"
+            />
+          </CardContent>
+        </Card>
+        {mathAnswers && mathAnswers.length > 0 && (
+          <CumulativeChart answers={mathAnswers} type="math" />
+        )}
+      </TabsContent>
+
+      <TabsContent value="dictionary" className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BookOpen className="h-5 w-5" />
+              Přehled slovníku
+            </CardTitle>
+            <CardDescription>
+              Celkem problémů: {dictionaryTotal} | Správně: {dictionaryCorrect} | Špatně: {dictionaryWrong} | Úspěšnost: {dictionaryAccuracy}%
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <DetailedStatisticsTable 
+              statistics={dictionaryStats.map(stat => ({
+                id: stat.id,
+                created_at: stat.created_at,
+                correct_answers: stat.correct_answers,
+                wrong_answers: stat.wrong_answers,
+                type: `${stat.mode} (${stat.direction === 'en_to_cz' ? 'EN → CZ' : 'CZ → EN'})`,
+                game_duration: stat.game_duration
+              }))} 
+              type="dictionary"
+            />
+          </CardContent>
+        </Card>
+        {dictionaryAnswers && dictionaryAnswers.length > 0 && (
+          <CumulativeChart answers={dictionaryAnswers.map(answer => ({
+            id: answer.id,
+            isCorrect: answer.is_correct,
+            created_at: answer.created_at,
+            userAnswer: answer.user_answer,
+            correctAnswer: answer.czech_translation
+          }))} type="dictionary" />
         )}
       </TabsContent>
     </Tabs>

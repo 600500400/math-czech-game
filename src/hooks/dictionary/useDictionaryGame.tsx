@@ -7,7 +7,7 @@ import { toast } from "sonner";
 
 export const useDictionaryGame = (userId: string | null) => {
   const { words } = useDictionaryWords(userId);
-  const { addAnswer } = useDictionaryAnswers(userId);
+  const { addDictionaryAnswer } = useDictionaryAnswers(userId);
   const { saveStatistics } = useDictionaryStatistics(userId);
 
   const [gameState, setGameState] = useState<DictionaryGameState>({
@@ -134,7 +134,7 @@ export const useDictionaryGame = (userId: string | null) => {
       direction: gameState.direction,
     };
 
-    addAnswer(answer);
+    addDictionaryAnswer(answer);
 
     setGameState(prev => ({
       ...prev,
@@ -148,7 +148,7 @@ export const useDictionaryGame = (userId: string | null) => {
     setTimeout(() => {
       nextWord();
     }, 1500);
-  }, [gameState.currentWord, gameState.mode, gameState.direction, userId, addAnswer, nextWord]);
+  }, [gameState.currentWord, gameState.mode, gameState.direction, userId, addDictionaryAnswer, nextWord]);
 
   const handleAdvancedAnswer = useCallback(() => {
     if (!gameState.currentWord || !userId || !gameState.userAnswer.trim()) return;
@@ -170,7 +170,7 @@ export const useDictionaryGame = (userId: string | null) => {
       direction: gameState.direction,
     };
 
-    addAnswer(answer);
+    addDictionaryAnswer(answer);
 
     setGameState(prev => ({
       ...prev,
@@ -184,7 +184,7 @@ export const useDictionaryGame = (userId: string | null) => {
     setTimeout(() => {
       nextWord();
     }, 2000);
-  }, [gameState.currentWord, gameState.userAnswer, gameState.mode, gameState.direction, userId, addAnswer, nextWord]);
+  }, [gameState.currentWord, gameState.userAnswer, gameState.mode, gameState.direction, userId, addDictionaryAnswer, nextWord]);
 
 
   const resetGame = useCallback(() => {
