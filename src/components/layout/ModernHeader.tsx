@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { BookOpen, Sparkles, MessageSquare } from "lucide-react";
+import { Link } from "react-router-dom";
 import UserMenu from "@/components/UserMenu";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import FeedbackButton from "@/components/FeedbackButton";
@@ -22,7 +23,7 @@ const ModernHeader = () => {
       <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <div className="flex items-center space-x-2 sm:space-x-3">
+          <Link to="/" className="flex items-center space-x-2 sm:space-x-3 hover:opacity-80 transition-opacity">
             <div className="relative">
               <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-primary rounded-xl flex items-center justify-center shadow-lg">
                 <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
@@ -37,7 +38,7 @@ const ModernHeader = () => {
                 {t('auth.title')}
               </p>
             </div>
-          </div>
+          </Link>
 
           {/* Center - Gamification displays for authenticated users */}
           {authState.user && (

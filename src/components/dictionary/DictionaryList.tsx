@@ -101,13 +101,6 @@ export const DictionaryList = () => {
                   </Button>
                 )}
               </div>
-              {word.difficulty_level && (
-                <div className="mt-2">
-                  <span className="text-xs bg-secondary px-2 py-1 rounded">
-                    {word.difficulty_level}
-                  </span>
-                </div>
-              )}
             </CardContent>
           </Card>
         ))}

@@ -22,12 +22,18 @@ const Dictionary = () => {
     <div className="min-h-screen bg-background">
       <ModernHeader />
       <main className="max-w-5xl mx-auto px-4 py-6">
-        <nav aria-label="Zpět" className="mb-4">
-          <Button asChild variant="outline" size="sm" aria-label="Zpět na přehled">
-            <Link to="/parent-dashboard" className="inline-flex items-center gap-2">
-              <ArrowLeft className="h-4 w-4" /> Zpět na přehled
-            </Link>
-          </Button>
+        <nav aria-label="Breadcrumb" className="mb-6">
+          <ol className="flex items-center space-x-2 text-sm text-muted-foreground">
+            <li>
+              <Link to="/parent-dashboard" className="hover:text-foreground transition-colors">
+                Přehled
+              </Link>
+            </li>
+            <li className="flex items-center">
+              <ArrowLeft className="h-3 w-3 mx-2 rotate-180" />
+              <span className="text-foreground font-medium">Slovník</span>
+            </li>
+          </ol>
         </nav>
         <section aria-labelledby="dictionary-heading">
           <h1 id="dictionary-heading" className="sr-only">Slovník – procvičování</h1>
