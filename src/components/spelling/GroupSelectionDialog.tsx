@@ -31,7 +31,7 @@ export const GroupSelectionDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="text-xl text-center text-orange-500">Výběr skupin vyjmenovaných slov</DialogTitle>
+          <DialogTitle className="text-xl text-center text-primary">Výběr skupin vyjmenovaných slov</DialogTitle>
         </DialogHeader>
         <div className="py-4">
           <div className="flex justify-center mb-4">
@@ -39,7 +39,7 @@ export const GroupSelectionDialog = ({
               pressed={allSelected}
               onPressedChange={toggleAllGroups}
               variant="outline"
-              className="border-orange-300 hover:bg-orange-50 data-[state=on]:bg-orange-100"
+              className="border-border hover:bg-muted data-[state=on]:bg-accent"
             >
               {allSelected ? "Zrušit výběr" : "Vybrat vše"}
             </Toggle>
@@ -50,8 +50,8 @@ export const GroupSelectionDialog = ({
                 key={group.name} 
                 className={`flex items-center space-x-2 p-3 border-2 rounded-lg transition-all duration-200 ${
                   selectedGroups.includes(group.name) 
-                    ? 'border-orange-500 bg-orange-50' 
-                    : 'border-gray-200 hover:border-orange-300'
+                    ? 'border-primary bg-primary/10' 
+                    : 'border-border hover:border-primary/50'
                 }`}
                 onClick={() => toggleGroup(group.name)}
               >
@@ -59,7 +59,7 @@ export const GroupSelectionDialog = ({
                   id={`group-${group.name}`} 
                   checked={selectedGroups.includes(group.name)}
                   onCheckedChange={() => toggleGroup(group.name)}
-                  className="data-[state=checked]:bg-orange-500 data-[state=checked]:border-orange-500"
+                  className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                 />
                 <Label 
                   htmlFor={`group-${group.name}`}
@@ -74,7 +74,7 @@ export const GroupSelectionDialog = ({
         <DialogFooter>
           <Button 
             onClick={setGroups}
-            className="bg-orange-500 hover:bg-orange-600 w-full text-lg py-6"
+            className="bg-primary hover:bg-primary/90 w-full text-lg py-6"
           >
             Potvrdit výběr
           </Button>

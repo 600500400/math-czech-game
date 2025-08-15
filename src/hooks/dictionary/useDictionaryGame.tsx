@@ -205,8 +205,9 @@ export const useDictionaryGame = (userId: string | null) => {
     }));
   }, []);
 
+  // Mode is fixed to 'simple' - no longer changeable
   const setMode = useCallback((mode: 'simple' | 'advanced') => {
-    setGameState(prev => ({ ...prev, mode }));
+    // Do nothing - mode is always 'simple'
   }, []);
 
   const setDirection = useCallback((direction: 'en_to_cz' | 'cz_to_en') => {

@@ -59,9 +59,7 @@ export default function DictionaryPractice() {
           </CardHeader>
           <CardContent className="space-y-4">
             <DictionaryModeToggle
-              mode={mode}
               direction={direction}
-              onModeChange={setMode}
               onDirectionChange={setDirection}
             />
             
@@ -97,9 +95,7 @@ export default function DictionaryPractice() {
         <CardContent className="pt-6">
           <div className="flex flex-col gap-4">
             <DictionaryModeToggle
-              mode={mode}
               direction={direction}
-              onModeChange={setMode}
               onDirectionChange={setDirection}
             />
 

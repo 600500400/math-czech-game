@@ -1,50 +1,19 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Brain } from "lucide-react";
 
 interface DictionaryModeToggleProps {
-  mode: 'simple' | 'advanced';
   direction: 'en_to_cz' | 'cz_to_en';
-  onModeChange: (mode: 'simple' | 'advanced') => void;
   onDirectionChange: (direction: 'en_to_cz' | 'cz_to_en') => void;
 }
 
 export default function DictionaryModeToggle({
-  mode,
   direction,
-  onModeChange,
   onDirectionChange
 }: DictionaryModeToggleProps) {
   return (
     <Card className="mb-4">
       <CardContent className="pt-6">
-        <div className="space-y-4">
-          <div>
-            <h3 className="text-sm font-medium mb-2">Režim:</h3>
-            <ToggleGroup
-              type="single"
-              value={mode}
-              onValueChange={(value) => value && onModeChange(value as 'simple' | 'advanced')}
-              className="grid grid-cols-2 gap-1 p-1 bg-muted rounded-lg"
-            >
-              <ToggleGroupItem 
-                value="simple" 
-                className="flex items-center justify-center gap-2 py-2 px-4 data-[state=on]:bg-background data-[state=on]:text-foreground data-[state=on]:shadow-sm rounded-md transition-all"
-              >
-                <BookOpen className="h-4 w-4" />
-                <span className="text-sm font-medium">Jednoduchý</span>
-              </ToggleGroupItem>
-              <ToggleGroupItem 
-                value="advanced" 
-                className="flex items-center justify-center gap-2 py-2 px-4 data-[state=on]:bg-background data-[state=on]:text-foreground data-[state=on]:shadow-sm rounded-md transition-all"
-              >
-                <Brain className="h-4 w-4" />
-                <span className="text-sm font-medium">Pokročilý</span>
-              </ToggleGroupItem>
-            </ToggleGroup>
-          </div>
-
+        <div>
           <div>
             <h3 className="text-sm font-medium mb-2">Směr překladu:</h3>
             <div className="flex gap-2">
