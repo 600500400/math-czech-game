@@ -55,7 +55,7 @@ const StatisticsTabs = ({
         >
           <FileText className="mr-1 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" />
           <span className="text-xs sm:text-sm md:text-base">
-            <span className="hidden sm:inline">{t('practice.spellingWords')}</span>
+            <span className="hidden sm:inline">Pravopis</span>
             <span className="sm:hidden">{t('practice.spelling')}</span>
           </span>
         </TabsTrigger>
