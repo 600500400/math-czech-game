@@ -51,8 +51,8 @@ export default function DictionaryCard({ word, direction, showAnswer, showSenten
   const answerWord = direction === 'en_to_cz' ? word.czech_translation : word.english_word;
   const exampleSentences = useMemo(() => generateExampleSentences(word.english_word, word.czech_translation, direction), [word.id, direction, sentencesKey]);
 
-  const handlePronunciation = (text: string, language: 'en' | 'cz') => {
-    const lang = language === 'cz' ? 'cs-CZ' : 'en-US';
+  const handlePronunciation = (text: string, language: 'en' | 'cs') => {
+    const lang = language === 'cs' ? 'cs-CZ' : 'en-US';
     speak(text, lang);
   };
   
@@ -70,7 +70,7 @@ export default function DictionaryCard({ word, direction, showAnswer, showSenten
                 size="sm"
                 onClick={() => handlePronunciation(
                   questionWord,
-                  direction === 'en_to_cz' ? 'en' : 'cz'
+                  direction === 'en_to_cz' ? 'en' : 'cs'
                 )}
                 disabled={isLoading}
                 className="h-8 w-8 p-0 hover:bg-primary/10"
@@ -97,7 +97,7 @@ export default function DictionaryCard({ word, direction, showAnswer, showSenten
                       size="sm"
                       onClick={() => handlePronunciation(
                         answerWord,
-                        direction === 'en_to_cz' ? 'cz' : 'en'
+                        direction === 'en_to_cz' ? 'cs' : 'en'
                       )}
                       disabled={isLoading}
                       className="h-6 w-6 p-0 hover:bg-primary/10 ml-1"
