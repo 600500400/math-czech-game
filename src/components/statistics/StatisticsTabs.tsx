@@ -4,26 +4,9 @@ import { Calculator, FileText, BookOpen } from "lucide-react";
 import { MathAnswer } from "@/types/mathTypes";
 import { SpellingAnswer } from "@/types/spellingTypes";
 import { DictionaryStatistics, DictionaryAnswer } from "@/types/dictionaryTypes";
+import { MathStatistics, SpellingStatistics } from "@/types/authTypes";
 import DetailedStatisticsTable from "./DetailedStatisticsTable";
 import CumulativeChart from "./CumulativeChart";
-
-interface MathStatistics {
-  id: string;
-  correct_answers: number;
-  wrong_answers: number;
-  operation: string;
-  game_duration?: number;
-  created_at: string;
-}
-
-interface SpellingStatistics {
-  id: string;
-  correct_answers: number;
-  wrong_answers: number;
-  word_group: string;
-  game_duration?: number;
-  created_at: string;
-}
 import { useLanguage } from "@/hooks/useLanguage";
 
 interface StatisticsTabsProps {
@@ -116,20 +99,14 @@ const StatisticsTabs: React.FC<StatisticsTabsProps> = ({
           </CardHeader>
           <CardContent>
             <DetailedStatisticsTable 
-              statistics={spellingStats.map(stat => ({
-                id: stat.id,
-                created_at: stat.created_at,
-                correct_answers: stat.correct_answers,
-                wrong_answers: stat.wrong_answers,
-                type: stat.word_group,
-                game_duration: stat.game_duration
-              }))} 
+              data={spellingStats}
               type="spelling"
+              spellingAnswers={spellingAnswers}
             />
           </CardContent>
         </Card>
         {spellingAnswers && spellingAnswers.length > 0 && (
-          <CumulativeChart answers={spellingAnswers} type="spelling" />
+          <CumulativeChart data={spellingStats} type="spelling" />
         )}
       </TabsContent>
 
@@ -146,20 +123,14 @@ const StatisticsTabs: React.FC<StatisticsTabsProps> = ({
           </CardHeader>
           <CardContent>
             <DetailedStatisticsTable 
-              statistics={mathStats.map(stat => ({
-                id: stat.id,
-                created_at: stat.created_at,
-                correct_answers: stat.correct_answers,
-                wrong_answers: stat.wrong_answers,
-                type: stat.operation,
-                game_duration: stat.game_duration
-              }))} 
+              data={mathStats}
               type="math"
+              mathAnswers={mathAnswers}
             />
           </CardContent>
         </Card>
         {mathAnswers && mathAnswers.length > 0 && (
-          <CumulativeChart answers={mathAnswers} type="math" />
+          <CumulativeChart data={mathStats} type="math" />
         )}
       </TabsContent>
 
@@ -175,28 +146,57 @@ const StatisticsTabs: React.FC<StatisticsTabsProps> = ({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <DetailedStatisticsTable 
-              statistics={dictionaryStats.map(stat => ({
-                id: stat.id,
-                created_at: stat.created_at,
-                correct_answers: stat.correct_answers,
-                wrong_answers: stat.wrong_answers,
-                type: `${stat.mode} (${stat.direction === 'en_to_cz' ? 'EN → CZ' : 'CZ → EN'})`,
-                game_duration: stat.game_duration
-              }))} 
-              type="dictionary"
-            />
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="bg-muted/50 p-4 rounded-lg text-center">
+                  <div className="text-2xl font-bold text-primary">{dictionaryTotal}</div>
+                  <div className="text-sm text-muted-foreground">Celkem</div>
+                </div>
+                <div className="bg-green-100 dark:bg-green-900/20 p-4 rounded-lg text-center">
+                  <div className="text-2xl font-bold text-green-600">{dictionaryCorrect}</div>
+                  <div className="text-sm text-muted-foreground">Správně</div>
+                </div>
+                <div className="bg-red-100 dark:bg-red-900/20 p-4 rounded-lg text-center">
+                  <div className="text-2xl font-bold text-red-600">{dictionaryWrong}</div>
+                  <div className="text-sm text-muted-foreground">Špatně</div>
+                </div>
+                <div className="bg-blue-100 dark:bg-blue-900/20 p-4 rounded-lg text-center">
+                  <div className="text-2xl font-bold text-blue-600">{dictionaryAccuracy}%</div>
+                  <div className="text-sm text-muted-foreground">Úspěšnost</div>
+                </div>
+              </div>
+              
+              {dictionaryStats.length > 0 && (
+                <div className="mt-6">
+                  <h3 className="text-lg font-semibold mb-4">Nedávné hry</h3>
+                  <div className="space-y-2">
+                    {dictionaryStats.slice(0, 5).map((stat) => (
+                      <div key={stat.id} className="flex justify-between items-center p-3 bg-muted/30 rounded-lg">
+                        <div>
+                          <span className="font-medium">
+                            {stat.mode} ({stat.direction === 'en_to_cz' ? 'EN → CZ' : 'CZ → EN'})
+                          </span>
+                          <div className="text-sm text-muted-foreground">
+                            {new Date(stat.created_at).toLocaleDateString('cs-CZ')}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm">
+                            <span className="text-green-600">{stat.correct_answers}</span> / 
+                            <span className="text-red-600">{stat.wrong_answers}</span>
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {Math.round((stat.correct_answers / (stat.correct_answers + stat.wrong_answers)) * 100)}%
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
-        {dictionaryAnswers && dictionaryAnswers.length > 0 && (
-          <CumulativeChart answers={dictionaryAnswers.map(answer => ({
-            id: answer.id,
-            isCorrect: answer.is_correct,
-            created_at: answer.created_at,
-            userAnswer: answer.user_answer,
-            correctAnswer: answer.czech_translation
-          }))} type="dictionary" />
-        )}
       </TabsContent>
     </Tabs>
   );
