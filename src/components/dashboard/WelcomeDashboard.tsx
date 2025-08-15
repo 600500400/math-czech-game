@@ -8,13 +8,11 @@ import { BookOpen, Calculator, BarChart3, Target, Languages } from "lucide-react
 import { useNavigate } from "react-router-dom";
 
 interface WelcomeDashboardProps {
-  onNavigateToTab: (tab: "practice" | "statistics") => void;
-  onNavigateToPractice: (defaultTab: "spelling" | "math") => void;
+  onNavigateToTab: (tab: "statistics") => void;
 }
 
 const WelcomeDashboard: React.FC<WelcomeDashboardProps> = ({
   onNavigateToTab,
-  onNavigateToPractice,
 }) => {
   const { authState } = useAuth();
   const { mathStats, spellingStats } = useStatistics(authState.user?.id || null);
@@ -96,7 +94,7 @@ const WelcomeDashboard: React.FC<WelcomeDashboardProps> = ({
                 {mathTotals.total} vyřešených příkladů
               </p>
               <Button 
-                onClick={() => onNavigateToPractice("math")}
+                onClick={() => navigate('/math')}
                 className="w-full mt-2"
                 size="sm"
               >
@@ -123,7 +121,7 @@ const WelcomeDashboard: React.FC<WelcomeDashboardProps> = ({
                 {spellingTotals.total} napsaných slov
               </p>
               <Button 
-                onClick={() => onNavigateToPractice("spelling")}
+                onClick={() => navigate('/spelling')}
                 className="w-full mt-2"
                 size="sm"
               >

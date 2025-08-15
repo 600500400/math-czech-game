@@ -9,6 +9,8 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import Index from "./pages/Index";
 import UserSelection from "./pages/UserSelection";
 import ParentDashboard from "./pages/ParentDashboard";
+import MathPractice from "./pages/MathPractice";
+import SpellingPractice from "./pages/SpellingPractice";
 import { LeaderboardsPage } from "./components/gamification/LeaderboardsPage";
 import { AchievementsPage } from "./components/gamification/AchievementsPage";
 import NotFound from "./pages/NotFound";
@@ -40,6 +42,8 @@ const App = () => {
                 <Route path="/" element={<Index />} />
                 <Route path="/select-user" element={<UserSelection />} />
                 <Route path="/parent-dashboard" element={<ParentDashboard />} />
+                <Route path="/math" element={<MathPractice />} />
+                <Route path="/spelling" element={<SpellingPractice />} />
                 <Route path="/leaderboards" element={<LeaderboardsPage />} />
                 <Route path="/achievements" element={<AchievementsPage />} />
                 <Route path="/donation-success" element={<DonationSuccess />} />

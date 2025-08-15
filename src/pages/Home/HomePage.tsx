@@ -20,15 +20,9 @@ const HomePage = () => {
   const { mathStats, spellingStats } = useStatistics(authState.user?.id || null);
   const { mathAnswers, spellingAnswers } = useDetailedAnswers(authState.user?.id || null);
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [practiceDefaultTab, setPracticeDefaultTab] = useState<"spelling" | "math">("spelling");
 
-  const handleNavigateToTab = (tab: "practice" | "statistics") => {
+  const handleNavigateToTab = (tab: "statistics") => {
     setActiveTab(tab);
-  };
-
-  const handleNavigateToPractice = (defaultTab: "spelling" | "math") => {
-    setPracticeDefaultTab(defaultTab);
-    setActiveTab("practice");
   };
 
 
@@ -40,7 +34,7 @@ const HomePage = () => {
       <ModernHeader />
       <div className="container mx-auto p-4 max-w-7xl flex-1">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-6">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
             <TabsTrigger 
               value="dashboard"
               className="data-[state=active]:shadow-sm"
@@ -50,16 +44,6 @@ const HomePage = () => {
               } as React.CSSProperties}
             >
               Dashboard
-            </TabsTrigger>
-            <TabsTrigger 
-              value="practice"
-              className="data-[state=active]:shadow-sm"
-              style={{
-                '--active-bg': `${theme.primaryColor}22`,
-                '--active-color': theme.accentColor
-              } as React.CSSProperties}
-            >
-              Procvičování
             </TabsTrigger>
             <TabsTrigger 
               value="statistics"
@@ -76,14 +60,8 @@ const HomePage = () => {
           <TabsContent value="dashboard">
             <WelcomeDashboard 
               onNavigateToTab={handleNavigateToTab}
-              onNavigateToPractice={handleNavigateToPractice}
             />
           </TabsContent>
-
-          <TabsContent value="practice">
-            <PracticeTabs defaultTab={practiceDefaultTab} />
-          </TabsContent>
-
 
           <TabsContent value="statistics">
             <StatisticsTabs 
