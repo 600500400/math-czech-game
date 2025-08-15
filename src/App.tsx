@@ -20,11 +20,13 @@ import "@/i18n";
 import DonationSuccess from "./pages/DonationSuccess";
 import Dictionary from "./pages/Dictionary";
 
+// Create query client with proper configuration
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
       retry: false,
+      staleTime: 5 * 60 * 1000, // 5 minutes
     },
   },
 });

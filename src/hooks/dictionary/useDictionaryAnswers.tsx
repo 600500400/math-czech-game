@@ -1,25 +1,25 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { DictionaryAnswer } from "@/types/dictionaryTypes";
-import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export const useDictionaryAnswers = (userId: string | null) => {
-  console.log("useDictionaryAnswers - inicializace s userId:", userId);
-  
-  const [localAnswers, setLocalAnswers] = useState<DictionaryAnswer[]>([]);
   const queryClient = useQueryClient();
+  const [localAnswers, setLocalAnswers] = useState<DictionaryAnswer[]>([]);
 
-  // Fetch dictionary answers from database
-  const { data: dictionaryAnswers = [], isLoading } = useQuery({
+  console.log("useDictionaryAnswers - inicializace s userId:", userId);
+
+  // Load answers from database
+  const { data: databaseAnswers = [] } = useQuery({
     queryKey: ["dictionaryAnswers", userId],
     queryFn: async (): Promise<DictionaryAnswer[]> => {
       if (!userId) {
-        console.log("Žádný userId - vracím prázdné dictionary odpovědi");
+        console.log("useDictionaryAnswers - žádný userId, vracím prázdné pole");
         return [];
       }
-      
-      console.log("Načítání dictionary odpovědí z databáze pro uživatele:", userId);
+
+      console.log("useDictionaryAnswers - načítám odpovědi z databáze pro userId:", userId);
       
       const { data, error } = await supabase
         .from('dictionary_answers')
@@ -28,108 +28,154 @@ export const useDictionaryAnswers = (userId: string | null) => {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error("Chyba při načítání dictionary odpovědí:", error);
+        console.error("useDictionaryAnswers - chyba při načítání:", error);
         throw error;
       }
 
-      console.log("Načtené dictionary odpovědi z databáze:", data);
-      return (data || []) as DictionaryAnswer[];
+      console.log("useDictionaryAnswers - načteno z databáze:", data?.length || 0, "odpovědí");
+      return data || [];
     },
     enabled: !!userId,
     staleTime: 30000,
   });
 
-  // Add answer to local state
-  const addDictionaryAnswer = (answer: Omit<DictionaryAnswer, 'id' | 'created_at'>) => {
-    const newAnswer: DictionaryAnswer = {
-      id: crypto.randomUUID(),
-      created_at: new Date().toISOString(),
-      ...answer
-    };
-    
-    console.log("Přidávám dictionary odpověď do lokálního stavu:", newAnswer);
-    setLocalAnswers(prev => [...prev, newAnswer]);
-  };
+  // Combine database and local answers
+  const allAnswers = [...databaseAnswers, ...localAnswers];
 
-  // Save answers to Supabase
-  const saveDictionaryAnswers = useMutation({
-    mutationFn: async () => {
-      if (!userId || localAnswers.length === 0) {
-        throw new Error("Žádné dictionary odpovědi k uložení nebo chybí userId");
+  // Add answer mutation
+  const addAnswerMutation = useMutation({
+    mutationFn: async (answer: Omit<DictionaryAnswer, 'id' | 'created_at'>) => {
+      if (!userId) {
+        throw new Error("Uživatel není nastaven");
       }
 
-      console.log("Ukládání dictionary odpovědí do databáze:", localAnswers);
-      
-      const answersToSave = localAnswers.map(answer => ({
-        user_id: userId,
-        word_id: answer.word_id,
-        english_word: answer.english_word,
-        czech_translation: answer.czech_translation,
-        user_answer: answer.user_answer,
-        is_correct: answer.is_correct,
-        mode: answer.mode,
-        direction: answer.direction
-      }));
+      console.log("useDictionaryAnswers - přidávám odpověď do databáze:", answer);
 
       const { data, error } = await supabase
         .from('dictionary_answers')
-        .insert(answersToSave);
+        .insert({
+          user_id: userId,
+          word_id: answer.word_id,
+          czech_word: answer.czech_word,
+          english_word: answer.english_word,
+          user_answer: answer.user_answer,
+          is_correct: answer.is_correct,
+          answer_time: answer.answer_time
+        })
+        .select()
+        .single();
 
       if (error) {
-        console.error("Chyba při ukládání dictionary odpovědí:", error);
+        console.error("useDictionaryAnswers - chyba při ukládání:", error);
         throw error;
       }
 
-      console.log("Dictionary odpovědi úspěšně uloženy do databáze");
+      console.log("useDictionaryAnswers - odpověď uložena do databáze:", data);
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["dictionaryAnswers"] });
-      setLocalAnswers([]); // Clear local answers after successful save
-      console.log("Dictionary odpovědi uloženy a lokální stav vyčištěn");
-    },
-    onError: (error: any) => {
-      console.error("Chyba při ukládání dictionary odpovědí:", error);
-    },
+      queryClient.invalidateQueries({ queryKey: ["dictionaryAnswers", userId] });
+    }
   });
 
-  // Clear answers from database
-  const clearDictionaryAnswers = async () => {
-    if (!userId) return;
-    
-    console.log("Mažu dictionary odpovědi z databáze pro userId:", userId);
-    
-    const { error } = await supabase
-      .from('dictionary_answers')
-      .delete()
-      .eq('user_id', userId);
+  // Save answers mutation
+  const saveAnswersMutation = useMutation({
+    mutationFn: async (answers: Omit<DictionaryAnswer, 'id' | 'created_at'>[]) => {
+      if (!userId || answers.length === 0) {
+        return;
+      }
 
-    if (error) {
-      console.error("Chyba při mazání dictionary odpovědí:", error);
-      throw error;
+      console.log("useDictionaryAnswers - ukládám", answers.length, "odpovědí do databáze");
+
+      const { data, error } = await supabase
+        .from('dictionary_answers')
+        .insert(
+          answers.map(answer => ({
+            user_id: userId,
+            word_id: answer.word_id,
+            czech_word: answer.czech_word,
+            english_word: answer.english_word,
+            user_answer: answer.user_answer,
+            is_correct: answer.is_correct,
+            answer_time: answer.answer_time
+          }))
+        )
+        .select();
+
+      if (error) {
+        console.error("useDictionaryAnswers - chyba při ukládání odpovědí:", error);
+        throw error;
+      }
+
+      console.log("useDictionaryAnswers - uloženo", data?.length || 0, "odpovědí do databáze");
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["dictionaryAnswers", userId] });
+      setLocalAnswers([]);
     }
+  });
 
-    queryClient.invalidateQueries({ queryKey: ["dictionaryAnswers"] });
-    setLocalAnswers([]);
-    console.log("Dictionary odpovědi vymazány z databáze");
+  // Clear answers mutation
+  const clearAnswersMutation = useMutation({
+    mutationFn: async () => {
+      if (!userId) {
+        return;
+      }
+
+      console.log("useDictionaryAnswers - mažu všechny odpovědi pro userId:", userId);
+
+      const { error } = await supabase
+        .from('dictionary_answers')
+        .delete()
+        .eq('user_id', userId);
+
+      if (error) {
+        console.error("useDictionaryAnswers - chyba při mazání:", error);
+        throw error;
+      }
+
+      console.log("useDictionaryAnswers - odpovědi vymazány z databáze");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["dictionaryAnswers", userId] });
+      setLocalAnswers([]);
+    }
+  });
+
+  const addDictionaryAnswer = (answer: Omit<DictionaryAnswer, 'id' | 'created_at'>) => {
+    console.log("useDictionaryAnswers - přidávám lokální odpověď:", answer);
+    setLocalAnswers(prev => [...prev, {
+      ...answer,
+      id: `temp-${Date.now()}`,
+      created_at: new Date().toISOString()
+    }]);
   };
 
-  const allAnswers = [...dictionaryAnswers, ...localAnswers];
-  
+  const saveDictionaryAnswers = () => {
+    console.log("useDictionaryAnswers - ukládám", localAnswers.length, "lokálních odpovědí");
+    if (localAnswers.length > 0) {
+      saveAnswersMutation.mutate(localAnswers);
+    }
+  };
+
+  const clearDictionaryAnswers = () => {
+    console.log("useDictionaryAnswers - mažu všechny odpovědi");
+    return clearAnswersMutation.mutateAsync();
+  };
+
   console.log("useDictionaryAnswers - aktuální stav:", {
     userId,
-    databaseAnswers: dictionaryAnswers.length,
-    localAnswers: localAnswers.length,
-    totalAnswers: allAnswers.length,
-    wrongAnswers: allAnswers.filter(a => !a.is_correct).length
+    databaseAnswersCount: databaseAnswers.length,
+    localAnswersCount: localAnswers.length,
+    totalAnswersCount: allAnswers.length
   });
 
   return {
     dictionaryAnswers: allAnswers,
     addDictionaryAnswer,
-    saveDictionaryAnswers: saveDictionaryAnswers.mutate,
+    saveDictionaryAnswers,
     clearDictionaryAnswers,
-    isLoading,
-    isSaving: saveDictionaryAnswers.isPending
+    isLoading: saveAnswersMutation.isPending || clearAnswersMutation.isPending
   };
 };

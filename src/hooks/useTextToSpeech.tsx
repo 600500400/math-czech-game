@@ -1,78 +1,70 @@
-import { useState, useCallback, useRef } from 'react';
-import { useAudioSystem } from './useAudioSystem';
 
-interface TextToSpeechOptions {
-  language?: 'en-US' | 'cs-CZ';
-  rate?: number;
-  pitch?: number;
-  volume?: number;
-}
+import { useState, useCallback } from "react";
 
 export const useTextToSpeech = () => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isSupported] = useState(() => 'speechSynthesis' in window);
-  const { settings } = useAudioSystem();
-  const currentUtteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const speak = useCallback((text: string, options: TextToSpeechOptions = {}) => {
-    if (!isSupported || !settings.enabled || !text.trim()) return;
-
-    // Stop any current speech
-    if (currentUtteranceRef.current) {
-      speechSynthesis.cancel();
+  const speak = useCallback((text: string, lang: string = 'en-US') => {
+    console.log("🗣️ TTS: Attempting to speak:", text, "in language:", lang);
+    
+    if (!('speechSynthesis' in window)) {
+      const errorMsg = "Speech synthesis not supported";
+      console.error("🗣️ TTS Error:", errorMsg);
+      setError(errorMsg);
+      return;
     }
 
-    const utterance = new SpeechSynthesisUtterance(text);
-    currentUtteranceRef.current = utterance;
-
-    // Set options
-    utterance.lang = options.language || 'en-US';
-    utterance.rate = options.rate || 0.9;
-    utterance.pitch = options.pitch || 1;
-    utterance.volume = (options.volume || settings.volume) * 0.8; // Slightly lower than sound effects
-
-    // Event handlers
-    utterance.onstart = () => {
-      setIsPlaying(true);
-    };
-
-    utterance.onend = () => {
-      setIsPlaying(false);
-      currentUtteranceRef.current = null;
-    };
-
-    utterance.onerror = (event) => {
-      console.warn('Speech synthesis error:', event.error);
-      setIsPlaying(false);
-      currentUtteranceRef.current = null;
-    };
-
-    // Start speaking
-    speechSynthesis.speak(utterance);
-  }, [isSupported, settings.enabled, settings.volume]);
-
-  const stop = useCallback(() => {
-    if (speechSynthesis.speaking) {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      // Cancel any ongoing speech
       speechSynthesis.cancel();
-      setIsPlaying(false);
-      currentUtteranceRef.current = null;
+      
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = lang;
+      utterance.rate = 0.8;
+      utterance.pitch = 1;
+      utterance.volume = 1;
+      
+      utterance.onstart = () => {
+        console.log("🗣️ TTS: Speech started");
+      };
+      
+      utterance.onend = () => {
+        console.log("🗣️ TTS: Speech ended");
+        setIsLoading(false);
+      };
+      
+      utterance.onerror = (event) => {
+        const errorMsg = `Speech error: ${event.error}`;
+        console.error("🗣️ TTS Error:", errorMsg);
+        setError(errorMsg);
+        setIsLoading(false);
+      };
+      
+      speechSynthesis.speak(utterance);
+      console.log("🗣️ TTS: Speech synthesis started");
+      
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : "Unknown speech error";
+      console.error("🗣️ TTS Error:", errorMsg);
+      setError(errorMsg);
+      setIsLoading(false);
     }
   }, []);
 
-  const speakEnglish = useCallback((text: string) => {
-    speak(text, { language: 'en-US' });
-  }, [speak]);
-
-  const speakCzech = useCallback((text: string) => {
-    speak(text, { language: 'cs-CZ' });
-  }, [speak]);
+  const stop = useCallback(() => {
+    speechSynthesis.cancel();
+    setIsLoading(false);
+  }, []);
 
   return {
     speak,
-    speakEnglish,
-    speakCzech,
     stop,
-    isPlaying,
-    isSupported,
+    isLoading,
+    error,
+    isSupported: 'speechSynthesis' in window
   };
 };

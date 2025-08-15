@@ -1,193 +1,103 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Trash2, Search, Edit2, Download, Check, X } from "lucide-react";
-import { useDictionaryWords } from "@/hooks/dictionary/useDictionaryWords";
-import { useAuth } from "@/hooks/useAuth";
+
 import { DictionaryWord } from "@/types/dictionaryTypes";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Edit, Trash2, Volume2 } from "lucide-react";
+import { useTextToSpeech } from "@/hooks/useTextToSpeech";
+import { toast } from "sonner";
 
-export default function DictionaryList() {
-  const { authState } = useAuth();
-  const userId = authState.user?.id || null;
-  const { 
-    words, 
-    isLoading, 
-    updateWord,
-    deleteWord, 
-    exportToCSV,
-    isDeletingWord,
-    isUpdatingWord
-  } = useDictionaryWords(userId);
+interface DictionaryListProps {
+  words: DictionaryWord[];
+  onEdit: (word: DictionaryWord) => void;
+  onDelete: (id: string) => void;
+}
 
-  const [searchTerm, setSearchTerm] = useState("");
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState<{ english_word: string; czech_translation: string; difficulty_level: 'basic' | 'intermediate' | 'advanced' }>({
-    english_word: "",
-    czech_translation: "",
-    difficulty_level: "basic"
-  });
+export const DictionaryList = ({ words, onEdit, onDelete }: DictionaryListProps) => {
+  const { speak, isLoading, error } = useTextToSpeech();
 
-  const filteredWords = words.filter(word => {
-    const matchesSearch = searchTerm === "" || 
-      word.english_word.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      word.czech_translation.toLowerCase().includes(searchTerm.toLowerCase());
+  const handlePronounce = (text: string, language: 'cs' | 'en') => {
+    const lang = language === 'cs' ? 'cs-CZ' : 'en-US';
+    speak(text, lang);
     
-    return matchesSearch;
-  });
-
-  const handleStartEdit = (word: DictionaryWord) => {
-    setEditingId(word.id);
-    setEditForm({
-      english_word: word.english_word,
-      czech_translation: word.czech_translation,
-      difficulty_level: word.difficulty_level
-    });
-  };
-
-  const handleSaveEdit = () => {
-    if (editingId) {
-      updateWord({ wordId: editingId, updates: editForm });
-      setEditingId(null);
+    if (error) {
+      toast.error(`Chyba při výslovnosti: ${error}`);
     }
   };
 
-  const handleCancelEdit = () => {
-    setEditingId(null);
-  };
-
-  if (isLoading) {
+  if (words.length === 0) {
     return (
-      <Card>
-        <CardContent className="pt-6 text-center">
-          <p>Načítám slovíčka...</p>
-        </CardContent>
-      </Card>
+      <div className="text-center py-8 text-muted-foreground">
+        Zatím nemáte žádná slovíčka. Přidejte první slovíčko pomocí formuláře výše.
+      </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Filters and Export */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex flex-col sm:flex-row gap-4 justify-between">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Hledat slovíčka..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-            <Button
-              onClick={exportToCSV}
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-2"
-            >
-              <Download className="h-4 w-4" />
-              Export CSV
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* All Words */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Slovník ({filteredWords.length} slovíček)</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {filteredWords.length === 0 ? (
-            <p className="text-center text-muted-foreground">
-              {searchTerm ? `Pro hledaný výraz "${searchTerm}" nebyla nalezena žádná slovíčka` : "Zatím nejsou přidána žádná slovíčka."}
-            </p>
-          ) : (
-            <div className="space-y-2">
-              {filteredWords.map((word) => (
-                <div
-                  key={word.id}
-                  className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
-                >
-                  {editingId === word.id ? (
-                    <div className="flex-1 space-y-2">
-                      <div className="flex gap-2">
-                        <Input
-                          placeholder="Anglické slovo"
-                          value={editForm.english_word}
-                          onChange={(e) => setEditForm(prev => ({ ...prev, english_word: e.target.value }))}
-                        />
-                        <Input
-                          placeholder="Český překlad"
-                          value={editForm.czech_translation}
-                          onChange={(e) => setEditForm(prev => ({ ...prev, czech_translation: e.target.value }))}
-                        />
-                        <select
-                          value={editForm.difficulty_level}
-                          onChange={(e) => setEditForm(prev => ({ ...prev, difficulty_level: e.target.value as 'basic' | 'intermediate' | 'advanced' }))}
-                          className="px-3 py-2 border rounded-md bg-background"
-                        >
-                          <option value="basic">Základní</option>
-                          <option value="intermediate">Střední</option>
-                          <option value="advanced">Pokročilá</option>
-                        </select>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          onClick={handleSaveEdit}
-                          disabled={isUpdatingWord}
-                        >
-                          <Check className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={handleCancelEdit}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="flex-1">
-                        <div className="font-medium">{word.english_word}</div>
-                        <div className="text-sm text-muted-foreground">{word.czech_translation}</div>
-                        <div className="text-xs text-muted-foreground">
-                          Obtížnost: {word.difficulty_level}
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleStartEdit(word)}
-                        >
-                          <Edit2 className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => deleteWord(word.id)}
-                          disabled={isDeletingWord}
-                          className="text-destructive hover:text-destructive"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </>
-                  )}
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold">Vaše slovíčka ({words.length})</h3>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {words.map((word) => (
+          <Card key={word.id} className="hover:shadow-md transition-shadow">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span>{word.czech_word}</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 w-6 p-0"
+                    onClick={() => handlePronounce(word.czech_word, 'cs')}
+                    disabled={isLoading}
+                  >
+                    <Volume2 className="h-3 w-3" />
+                  </Button>
                 </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                <div className="flex gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onEdit(word)}
+                    className="h-8 w-8 p-0"
+                  >
+                    <Edit className="h-3 w-3" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onDelete(word.id)}
+                    className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </Button>
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">{word.english_word}</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0"
+                  onClick={() => handlePronounce(word.english_word, 'en')}
+                  disabled={isLoading}
+                >
+                  <Volume2 className="h-3 w-3" />
+                </Button>
+              </div>
+              {word.difficulty && (
+                <div className="mt-2">
+                  <span className="text-xs bg-secondary px-2 py-1 rounded">
+                    {word.difficulty}
+                  </span>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     </div>
   );
-}
+};
+
+export default DictionaryList;
