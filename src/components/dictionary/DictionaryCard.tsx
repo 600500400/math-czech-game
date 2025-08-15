@@ -46,13 +46,13 @@ const generateExampleSentences = (
 };
 
 export default function DictionaryCard({ word, direction, showAnswer, showSentences = true, sentencesKey = 0, children }: DictionaryCardProps) {
-  const { speak, stop, isLoading, error, isSupported } = useTextToSpeech();
+  const { speak, stop, loading, error, supported } = useTextToSpeech();
   const questionWord = direction === 'en_to_cz' ? word.english_word : word.czech_translation;
   const answerWord = direction === 'en_to_cz' ? word.czech_translation : word.english_word;
   const exampleSentences = useMemo(() => generateExampleSentences(word.english_word, word.czech_translation, direction), [word.id, direction, sentencesKey]);
 
   const handlePronunciation = (text: string, language: 'en' | 'cz') => {
-    const lang = language === 'cs' ? 'cs-CZ' : 'en-US';
+    const lang = language === 'cz' ? 'cs-CZ' : 'en-US';
     speak(text, lang);
   };
   
@@ -64,7 +64,7 @@ export default function DictionaryCard({ word, direction, showAnswer, showSenten
             <div className="text-2xl font-bold text-center">
               {questionWord}
             </div>
-            {isSupported && (
+            {supported && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -72,11 +72,11 @@ export default function DictionaryCard({ word, direction, showAnswer, showSenten
                   questionWord,
                   direction === 'en_to_cz' ? 'en' : 'cz'
                 )}
-                disabled={isLoading}
+                disabled={loading}
                 className="h-8 w-8 p-0 hover:bg-primary/10"
                 aria-label="Přehrát výslovnost"
               >
-                {isLoading ? (
+                {loading ? (
                   <VolumeX className="h-4 w-4" />
                 ) : (
                   <Volume2 className="h-4 w-4" />
@@ -91,7 +91,7 @@ export default function DictionaryCard({ word, direction, showAnswer, showSenten
                 <div className="font-medium">Překlad:</div>
                 <div className="flex items-center justify-center gap-2 mt-1">
                   <div className="text-xl text-foreground">{answerWord}</div>
-                  {isSupported && (
+                  {supported && (
                     <Button
                       variant="ghost"
                       size="sm"
@@ -99,11 +99,11 @@ export default function DictionaryCard({ word, direction, showAnswer, showSenten
                         answerWord,
                         direction === 'en_to_cz' ? 'cz' : 'en'
                       )}
-                      disabled={isLoading}
+                      disabled={loading}
                       className="h-6 w-6 p-0 hover:bg-primary/10 ml-1"
                       aria-label="Přehrát výslovnost odpovědi"
                     >
-                      {isLoading ? (
+                      {loading ? (
                         <VolumeX className="h-3 w-3" />
                       ) : (
                         <Volume2 className="h-3 w-3" />
