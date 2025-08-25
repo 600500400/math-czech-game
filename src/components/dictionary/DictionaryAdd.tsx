@@ -31,7 +31,7 @@ export default function DictionaryAdd() {
   const [userEditedTranslation, setUserEditedTranslation] = useState(false);
   
   // Debounce the English word input for auto-translation
-  const debouncedEnglishWord = useDebounce(singleWord.english_word, 500);
+  const debouncedEnglishWord = useDebounce(singleWord.english_word, 300);
 
   // Auto-translate effect
   useEffect(() => {
@@ -39,8 +39,7 @@ export default function DictionaryAdd() {
       if (
         autoTranslateEnabled &&
         debouncedEnglishWord.trim() &&
-        !userEditedTranslation &&
-        !singleWord.czech_translation.trim()
+        !userEditedTranslation
       ) {
         clearError();
         const translation = await translate(debouncedEnglishWord.trim());
@@ -54,7 +53,7 @@ export default function DictionaryAdd() {
     };
 
     performAutoTranslation();
-  }, [debouncedEnglishWord, autoTranslateEnabled, userEditedTranslation, translate, clearError, singleWord.czech_translation]);
+  }, [debouncedEnglishWord, autoTranslateEnabled, userEditedTranslation, translate, clearError]);
 
   const handleManualTranslate = async () => {
     if (!singleWord.english_word.trim()) {
@@ -170,17 +169,19 @@ export default function DictionaryAdd() {
                       Překládám...
                     </div>
                   )}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={handleManualTranslate}
-                    disabled={isTranslating || !singleWord.english_word.trim()}
-                    className="h-6 px-2 text-xs"
-                  >
-                    <Languages className="h-3 w-3 mr-1" />
-                    Přeložit
-                  </Button>
+                  {(translationError || userEditedTranslation) && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleManualTranslate}
+                      disabled={isTranslating || !singleWord.english_word.trim()}
+                      className="h-6 px-2 text-xs"
+                    >
+                      <Languages className="h-3 w-3 mr-1" />
+                      Přeložit
+                    </Button>
+                  )}
                 </div>
               </div>
               <Input
