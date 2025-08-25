@@ -18,12 +18,14 @@ export const UpdateNotification = () => {
     error: null
   });
   const [showNotification, setShowNotification] = useState(false);
+  const [hasShownToast, setHasShownToast] = useState(false);
 
   useEffect(() => {
     const unsubscribe = pwaUpdater.subscribe((state) => {
       setUpdateState(state);
       
-      if (state.hasUpdate && !showNotification) {
+      if (state.hasUpdate && !hasShownToast) {
+        setHasShownToast(true);
         setShowNotification(true);
         toast.info("Nová verze aplikace je k dispozici!", {
           duration: 5000,
@@ -39,11 +41,16 @@ export const UpdateNotification = () => {
       }
     });
 
-    // Check for updates on mount
-    pwaUpdater.checkForUpdates();
+    // Only check for updates once on initial mount
+    const timer = setTimeout(() => {
+      pwaUpdater.checkForUpdates();
+    }, 2000); // Delay to prevent interference with app startup
 
-    return unsubscribe;
-  }, [showNotification]);
+    return () => {
+      unsubscribe();
+      clearTimeout(timer);
+    };
+  }, []); // Remove showNotification dependency to prevent loops
 
   const handleUpdate = async () => {
     try {

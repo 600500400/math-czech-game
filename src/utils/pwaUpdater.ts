@@ -7,6 +7,7 @@ interface UpdateState {
 }
 
 class PWAUpdater {
+  private static instance: PWAUpdater | null = null;
   private registration: ServiceWorkerRegistration | null = null;
   private updateCallbacks: Array<(state: UpdateState) => void> = [];
   private state: UpdateState = {
@@ -14,34 +15,53 @@ class PWAUpdater {
     isUpdating: false,
     error: null
   };
+  private initialized = false;
+  private lastUpdateCheck = 0;
+  private readonly UPDATE_COOLDOWN = 30000; // 30 seconds
+  private sessionNotificationShown = false;
 
   constructor() {
+    if (PWAUpdater.instance) {
+      return PWAUpdater.instance;
+    }
+    PWAUpdater.instance = this;
     this.initializeUpdater();
   }
 
-  private async initializeUpdater() {
-    if ('serviceWorker' in navigator) {
-      try {
-        // Register service worker with version query parameter
-        const swUrl = `/sw.js?v=${APP_VERSION.build}`;
-        this.registration = await navigator.serviceWorker.register(swUrl);
-        
-        // Listen for updates
-        this.registration.addEventListener('updatefound', this.handleUpdateFound);
-        
-        // Check for existing waiting service worker
-        if (this.registration.waiting) {
-          this.setState({ hasUpdate: true, isUpdating: false, error: null });
-        }
+  static getInstance(): PWAUpdater {
+    if (!PWAUpdater.instance) {
+      PWAUpdater.instance = new PWAUpdater();
+    }
+    return PWAUpdater.instance;
+  }
 
-        // Listen for controlling service worker changes
-        navigator.serviceWorker.addEventListener('controllerchange', this.handleControllerChange);
-        
-        console.log('🔄 PWA Updater initialized');
-      } catch (error) {
-        console.error('Failed to register service worker:', error);
-        this.setState({ hasUpdate: false, isUpdating: false, error: 'Failed to initialize updater' });
+  private async initializeUpdater() {
+    if (this.initialized || !('serviceWorker' in navigator)) {
+      return;
+    }
+
+    try {
+      this.initialized = true;
+      
+      // Register service worker with version query parameter
+      const swUrl = `/sw.js?v=${APP_VERSION.build}`;
+      this.registration = await navigator.serviceWorker.register(swUrl);
+      
+      // Listen for updates
+      this.registration.addEventListener('updatefound', this.handleUpdateFound);
+      
+      // Check for existing waiting service worker
+      if (this.registration.waiting) {
+        this.setState({ hasUpdate: true, isUpdating: false, error: null });
       }
+
+      // Listen for controlling service worker changes
+      navigator.serviceWorker.addEventListener('controllerchange', this.handleControllerChange);
+      
+      console.log('🔄 PWA Updater initialized');
+    } catch (error) {
+      console.error('Failed to register service worker:', error);
+      this.setState({ hasUpdate: false, isUpdating: false, error: 'Failed to initialize updater' });
     }
   }
 
@@ -66,8 +86,16 @@ class PWAUpdater {
   };
 
   private setState(newState: Partial<UpdateState>) {
+    const prevState = { ...this.state };
     this.state = { ...this.state, ...newState };
-    this.updateCallbacks.forEach(callback => callback(this.state));
+    
+    // Only notify if there's a meaningful change and we haven't shown notification this session
+    if (newState.hasUpdate && !this.sessionNotificationShown && prevState.hasUpdate !== newState.hasUpdate) {
+      this.sessionNotificationShown = true;
+      this.updateCallbacks.forEach(callback => callback(this.state));
+    } else if (!newState.hasUpdate || newState.error || newState.isUpdating !== prevState.isUpdating) {
+      this.updateCallbacks.forEach(callback => callback(this.state));
+    }
   }
 
   public subscribe(callback: (state: UpdateState) => void) {
@@ -82,7 +110,17 @@ class PWAUpdater {
   public async checkForUpdates(): Promise<boolean> {
     if (!this.registration) return false;
 
+    // Implement cooldown to prevent excessive checks
+    const now = Date.now();
+    if (now - this.lastUpdateCheck < this.UPDATE_COOLDOWN) {
+      console.log('🔄 Update check skipped - cooldown active');
+      return false;
+    }
+
+    this.lastUpdateCheck = now;
+
     try {
+      console.log('🔄 Checking for updates...');
       await this.registration.update();
       return true;
     } catch (error) {
@@ -143,4 +181,4 @@ class PWAUpdater {
   }
 }
 
-export const pwaUpdater = new PWAUpdater();
+export const pwaUpdater = PWAUpdater.getInstance();

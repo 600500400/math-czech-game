@@ -4,7 +4,7 @@ export const APP_VERSION = {
   major: 1,
   minor: 2,
   patch: 4,
-  build: Date.now(),
+  build: 1735120800000, // Fixed build timestamp to prevent constant rebuilds
   getBuildDate: () => new Date().toISOString(),
   getFullVersion: () => `${APP_VERSION.major}.${APP_VERSION.minor}.${APP_VERSION.patch}`,
   getFullVersionWithBuild: () => `${APP_VERSION.getFullVersion()}-${APP_VERSION.build}`,
