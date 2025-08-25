@@ -51,9 +51,8 @@ export default function DictionaryCard({ word, direction, showAnswer, showSenten
   const answerWord = direction === 'en_to_cz' ? word.czech_translation : word.english_word;
   const exampleSentences = useMemo(() => generateExampleSentences(word.english_word, word.czech_translation, direction), [word.id, direction, sentencesKey]);
 
-  const handlePronunciation = (text: string, language: 'en' | 'cs') => {
-    const lang = language === 'cs' ? 'cs-CZ' : 'en-US';
-    speak(text, lang);
+  const handlePronunciation = (text: string) => {
+    speak(text, 'en-US');
   };
   
   return (
@@ -64,14 +63,11 @@ export default function DictionaryCard({ word, direction, showAnswer, showSenten
             <div className="text-2xl font-bold text-center">
               {questionWord}
             </div>
-            {isSupported && (
+            {isSupported && direction === 'en_to_cz' && (
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => handlePronunciation(
-                  questionWord,
-                  direction === 'en_to_cz' ? 'en' : 'cs'
-                )}
+                onClick={() => handlePronunciation(questionWord)}
                 disabled={isLoading}
                 className="h-8 w-8 p-0 hover:bg-primary/10"
                 aria-label="Přehrát výslovnost"
@@ -91,14 +87,11 @@ export default function DictionaryCard({ word, direction, showAnswer, showSenten
                 <div className="font-medium">Překlad:</div>
                 <div className="flex items-center justify-center gap-2 mt-1">
                   <div className="text-xl text-foreground">{answerWord}</div>
-                  {isSupported && (
+                  {isSupported && direction === 'cz_to_en' && (
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handlePronunciation(
-                        answerWord,
-                        direction === 'en_to_cz' ? 'cs' : 'en'
-                      )}
+                      onClick={() => handlePronunciation(answerWord)}
                       disabled={isLoading}
                       className="h-6 w-6 p-0 hover:bg-primary/10 ml-1"
                       aria-label="Přehrát výslovnost odpovědi"

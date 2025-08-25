@@ -13,9 +13,8 @@ export const DictionaryList = () => {
   const { words, deleteWord } = useDictionaryWords(authState.user?.id || null);
   const { speak, isLoading, error, isSupported } = useTextToSpeech();
 
-  const handlePronounce = (text: string, language: 'cs' | 'en') => {
-    const lang = language === 'cs' ? 'cs-CZ' : 'en-US';
-    speak(text, lang);
+  const handlePronounce = (text: string) => {
+    speak(text, 'en-US');
     
     if (error) {
       toast.error(`Chyba při výslovnosti: ${error}`);
@@ -54,17 +53,6 @@ export const DictionaryList = () => {
               <CardTitle className="text-base flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span>{word.czech_translation}</span>
-                  {isSupported && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-6 w-6 p-0"
-                      onClick={() => handlePronounce(word.czech_translation, 'cs')}
-                      disabled={isLoading}
-                    >
-                      <Volume2 className="h-3 w-3" />
-                    </Button>
-                  )}
                 </div>
                 <div className="flex gap-1">
                   <Button
@@ -94,7 +82,7 @@ export const DictionaryList = () => {
                     variant="ghost"
                     size="sm"
                     className="h-6 w-6 p-0"
-                    onClick={() => handlePronounce(word.english_word, 'en')}
+                    onClick={() => handlePronounce(word.english_word)}
                     disabled={isLoading}
                   >
                     <Volume2 className="h-3 w-3" />
