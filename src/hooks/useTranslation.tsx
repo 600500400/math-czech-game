@@ -25,12 +25,9 @@ export const useTranslation = (): UseTranslationReturn => {
 
     try {
       // Use our Supabase Edge Function as proxy to avoid CORS issues
-      const { createClient } = await import('@supabase/supabase-js');
-      const supabase = createClient(
-        import.meta.env.VITE_SUPABASE_URL,
-        import.meta.env.VITE_SUPABASE_ANON_KEY
-      );
+      const { supabase } = await import('@/integrations/supabase/client');
 
+      console.log('Calling translate-text edge function...');
       const { data, error } = await supabase.functions.invoke('translate-text', {
         body: { text, sourceLang: 'en', targetLang: 'cs' }
       });
