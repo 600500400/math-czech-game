@@ -23,57 +23,78 @@ export const useTextToSpeech = () => {
     }
   }, []);
 
-  // Select the best English voice (hardcoded to English only)
-  const selectBestEnglishVoice = useCallback((): SpeechSynthesisVoice | null => {
+  // Select the best voice for English pronunciation (with Czech fallback)
+  const selectBestVoiceForEnglish = useCallback((): SpeechSynthesisVoice | null => {
     if (availableVoices.length === 0) return null;
 
-    // Filter only English voices
+    // First try to find English voices
     const englishVoices = availableVoices.filter(voice => 
       voice.lang.toLowerCase().startsWith('en')
     );
 
     console.log("🗣️ TTS: Available English voices:", englishVoices.map(v => `${v.name} (${v.lang})`));
 
-    if (englishVoices.length === 0) {
-      console.log("🗣️ TTS: No English voices found, using default");
-      return null;
-    }
+    if (englishVoices.length > 0) {
+      // Preferred English voices in order of priority
+      const preferredVoices = [
+        'Microsoft David',
+        'Google US English', 
+        'Alex',
+        'Samantha',
+        'Microsoft Zira',
+        'Karen',
+        'Daniel'
+      ];
 
-    // Preferred English voices in order of priority
-    const preferredVoices = [
-      'Microsoft David',
-      'Google US English', 
-      'Alex',
-      'Samantha',
-      'Microsoft Zira',
-      'Karen',
-      'Daniel'
-    ];
-
-    // Try to find preferred voices first
-    for (const preferredName of preferredVoices) {
-      const preferredVoice = englishVoices.find(voice => 
-        voice.name.toLowerCase().includes(preferredName.toLowerCase())
-      );
-      if (preferredVoice) {
-        console.log(`🗣️ TTS: Selected preferred English voice: ${preferredVoice.name} (${preferredVoice.lang})`);
-        return preferredVoice;
+      // Try to find preferred voices first
+      for (const preferredName of preferredVoices) {
+        const preferredVoice = englishVoices.find(voice => 
+          voice.name.toLowerCase().includes(preferredName.toLowerCase())
+        );
+        if (preferredVoice) {
+          console.log(`🗣️ TTS: Selected preferred English voice: ${preferredVoice.name} (${preferredVoice.lang})`);
+          return preferredVoice;
+        }
       }
+
+      // Prefer US English if available
+      const usEnglish = englishVoices.find(voice => 
+        voice.lang.toLowerCase().includes('en-us')
+      );
+      if (usEnglish) {
+        console.log(`🗣️ TTS: Selected US English voice: ${usEnglish.name} (${usEnglish.lang})`);
+        return usEnglish;
+      }
+
+      // Use first available English voice
+      const selectedVoice = englishVoices[0];
+      console.log(`🗣️ TTS: Selected first available English voice: ${selectedVoice.name} (${selectedVoice.lang})`);
+      return selectedVoice;
     }
 
-    // Prefer US English if available
-    const usEnglish = englishVoices.find(voice => 
-      voice.lang.toLowerCase().includes('en-us')
+    // FALLBACK: No English voices found, try to use Czech voice with English pronunciation
+    console.log("🗣️ TTS: No English voices found, using Czech voice fallback");
+    
+    // Look for Czech voices
+    const czechVoices = availableVoices.filter(voice => 
+      voice.lang.toLowerCase().startsWith('cs') || voice.lang.toLowerCase().includes('czech')
     );
-    if (usEnglish) {
-      console.log(`🗣️ TTS: Selected US English voice: ${usEnglish.name} (${usEnglish.lang})`);
-      return usEnglish;
+
+    if (czechVoices.length > 0) {
+      const czechVoice = czechVoices[0];
+      console.log(`🗣️ TTS: Selected Czech voice for English fallback: ${czechVoice.name} (${czechVoice.lang})`);
+      return czechVoice;
     }
 
-    // Use first available English voice
-    const selectedVoice = englishVoices[0];
-    console.log(`🗣️ TTS: Selected first available English voice: ${selectedVoice.name} (${selectedVoice.lang})`);
-    return selectedVoice;
+    // Ultimate fallback: use any available voice
+    if (availableVoices.length > 0) {
+      const fallbackVoice = availableVoices[0];
+      console.log(`🗣️ TTS: Using ultimate fallback voice: ${fallbackVoice.name} (${fallbackVoice.lang})`);
+      return fallbackVoice;
+    }
+
+    console.log("🗣️ TTS: No voices available at all");
+    return null;
   }, [availableVoices]);
 
   const speak = useCallback((text: string, _lang?: string) => {
@@ -101,11 +122,11 @@ export const useTextToSpeech = () => {
       utterance.pitch = 1;
       utterance.volume = 1;
 
-      // Always select best English voice
-      const selectedVoice = selectBestEnglishVoice();
+      // Select best voice (with Czech fallback for English pronunciation)
+      const selectedVoice = selectBestVoiceForEnglish();
       if (selectedVoice) {
         utterance.voice = selectedVoice;
-        console.log(`🗣️ TTS: Using English voice: ${selectedVoice.name} (${selectedVoice.lang})`);
+        console.log(`🗣️ TTS: Using voice: ${selectedVoice.name} (${selectedVoice.lang}) for English pronunciation`);
       } else {
         console.log(`🗣️ TTS: Using default voice, forced to English`);
       }
@@ -135,7 +156,7 @@ export const useTextToSpeech = () => {
       setError(errorMsg);
       setIsLoading(false);
     }
-  }, [selectBestEnglishVoice]);
+  }, [selectBestVoiceForEnglish]);
 
   const stop = useCallback(() => {
     speechSynthesis.cancel();
