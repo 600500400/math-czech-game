@@ -3,3 +3,6 @@ project_id = "arnowuvckpxpeavrcbri"
 
 [functions.send-feedback]
 verify_jwt = false
+
+[functions.translate-text]
+verify_jwt = false

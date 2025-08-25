@@ -100,9 +100,37 @@ class PWAUpdater {
     try {
       // Tell the waiting service worker to become active
       this.registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+      
+      // Force reload after a short delay to ensure SW activates
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     } catch (error) {
       console.error('Failed to apply update:', error);
       this.setState({ hasUpdate: true, isUpdating: false, error: 'Failed to apply update' });
+    }
+  }
+
+  public async forceUpdate(): Promise<void> {
+    try {
+      // Clear all caches
+      const cacheNames = await caches.keys();
+      await Promise.all(cacheNames.map(cacheName => caches.delete(cacheName)));
+      
+      // Unregister service worker
+      if (this.registration) {
+        await this.registration.unregister();
+      }
+      
+      // Clear localStorage version info
+      localStorage.removeItem('app_version');
+      localStorage.removeItem('app_last_update');
+      
+      console.log('🧹 Cache cleared, reloading...');
+      window.location.reload();
+    } catch (error) {
+      console.error('Failed to force update:', error);
+      this.setState({ hasUpdate: false, isUpdating: false, error: 'Failed to force update' });
     }
   }
 

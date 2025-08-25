@@ -1,5 +1,4 @@
 import { useState, useCallback } from "react";
-import { useDebounce } from "@/hooks/useDebounce";
 
 interface TranslationResult {
   translatedText: string;
@@ -25,25 +24,24 @@ export const useTranslation = (): UseTranslationReturn => {
     setError(null);
 
     try {
-      // MyMemory API - free translation service
-      const response = await fetch(
-        `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|cs`,
-        {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-          },
-        }
+      // Use our Supabase Edge Function as proxy to avoid CORS issues
+      const { createClient } = await import('@supabase/supabase-js');
+      const supabase = createClient(
+        import.meta.env.VITE_SUPABASE_URL,
+        import.meta.env.VITE_SUPABASE_ANON_KEY
       );
 
-      if (!response.ok) {
-        throw new Error(`Translation API error: ${response.status}`);
+      const { data, error } = await supabase.functions.invoke('translate-text', {
+        body: { text, sourceLang: 'en', targetLang: 'cs' }
+      });
+
+      if (error) {
+        throw new Error(`Translation error: ${error.message}`);
       }
 
-      const data = await response.json();
-      
-      if (data.responseStatus === 200 && data.responseData?.translatedText) {
-        return data.responseData.translatedText;
+      if (data?.translatedText) {
+        console.log(`Translation successful via ${data.source}: "${data.translatedText}"`);
+        return data.translatedText;
       } else {
         throw new Error('No translation available');
       }
