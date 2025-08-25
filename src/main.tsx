@@ -2,15 +2,13 @@
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
-import { registerServiceWorker } from './utils/pwaUtils'
 import { APP_VERSION } from './utils/version'
+import { pwaUpdater } from './utils/pwaUpdater'
+
+// Initialize versioning and PWA updater
+APP_VERSION.initializeVersioning();
 
 // Initialize optional PWA features lazily
-
-// Register service worker for PWA functionality
-registerServiceWorker();
-
-// Initialize versioning after DOM is ready
 const requestIdle = (cb: () => void) => {
   if ('requestIdleCallback' in window) {
     (window as any).requestIdleCallback(cb);
@@ -18,10 +16,6 @@ const requestIdle = (cb: () => void) => {
     setTimeout(cb, 0);
   }
 };
-
-requestIdle(() => {
-  APP_VERSION.initializeVersioning();
-});
 
 // Initialize performance optimizations
 requestIdle(() => {

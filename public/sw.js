@@ -1,7 +1,14 @@
-const CACHE_NAME = 'procvicka-v3';
-const STATIC_CACHE = 'procvicka-static-v3';
-const DYNAMIC_CACHE = 'procvicka-dynamic-v3';
-const IMAGE_CACHE = 'procvicka-images-v3';
+// Procvička App Service Worker - Dynamic Version
+// Automatické verzování s build timestampem
+
+// Dynamické cache názvy s build timestampem
+const BUILD_VERSION = self.location.search.includes('v=') 
+  ? new URLSearchParams(self.location.search).get('v') 
+  : Date.now().toString();
+  
+const CACHE_NAME = `procvicka-static-v${BUILD_VERSION}`;
+const DYNAMIC_CACHE = `procvicka-dynamic-v${BUILD_VERSION}`;
+const IMAGE_CACHE = `procvicka-images-v${BUILD_VERSION}`;
 
 // Cache strategies for different types of resources
 const cacheStrategies = {
@@ -16,21 +23,21 @@ const cacheStrategies = {
   ]
 };
 
-// Install event - cache static resources
+// Service Worker události
 self.addEventListener('install', (event) => {
-  console.log('SW: Installing new service worker v3');
+  console.log(`SW: Installing version ${BUILD_VERSION}...`);
   event.waitUntil(
     Promise.all([
-      caches.open(STATIC_CACHE).then(cache => cache.addAll(cacheStrategies.static)),
+      caches.open(CACHE_NAME).then(cache => cache.addAll(cacheStrategies.static)),
       caches.open(IMAGE_CACHE).then(cache => {
         return cache.addAll([
-          '/public/images/happy-kid.png',
-          '/public/images/stars.png',
-          '/public/images/try-again.png'
+          '/images/happy-kid.png',
+          '/images/stars.png',
+          '/images/try-again.png'
         ]);
       })
     ]).then(() => {
-      console.log('SW: Installation complete v3');
+      console.log(`SW: Install complete for version ${BUILD_VERSION}`);
       return self.skipWaiting();
     }).catch(error => {
       console.error('SW: Installation failed:', error);
@@ -38,24 +45,32 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
-  console.log('SW: Activating new service worker v3');
+  console.log(`SW: Activating version ${BUILD_VERSION}...`);
   event.waitUntil(
-    caches.keys().then(cacheNames => {
+    caches.keys().then((cacheNames) => {
       return Promise.all(
-        cacheNames.map(cacheName => {
-          if (!['procvicka-static-v3', 'procvicka-dynamic-v3', 'procvicka-images-v3'].includes(cacheName)) {
+        cacheNames.map((cacheName) => {
+          // Delete all caches that don't match current version
+          if (!cacheName.includes(BUILD_VERSION)) {
             console.log('SW: Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
       );
     }).then(() => {
-      console.log('SW: Activation complete v3');
+      console.log(`SW: Activation complete for version ${BUILD_VERSION}`);
       return self.clients.claim();
     })
   );
+});
+
+// Listen for skip waiting message from client
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    console.log('SW: Received SKIP_WAITING message');
+    self.skipWaiting();
+  }
 });
 
 // Fetch event with advanced caching strategies
@@ -76,9 +91,9 @@ async function handleRequest(request) {
   const url = new URL(request.url);
   
   try {
-    // Strategy 1: Cache First for static assets
+    // Strategy 1: Stale While Revalidate for static assets (rychlejší aktualizace)
     if (isStaticAsset(url)) {
-      return await cacheFirst(request, STATIC_CACHE);
+      return await staleWhileRevalidate(request, CACHE_NAME);
     }
     
     // Strategy 2: Stale While Revalidate for images
@@ -100,7 +115,7 @@ async function handleRequest(request) {
   }
 }
 
-// Cache First strategy
+// Cache strategie implementace - vylepšená pro lepší aktualizace
 async function cacheFirst(request, cacheName) {
   const cache = await caches.open(cacheName);
   const cachedResponse = await cache.match(request);
@@ -109,14 +124,18 @@ async function cacheFirst(request, cacheName) {
     return cachedResponse;
   }
   
-  const networkResponse = await fetch(request);
-  if (networkResponse.ok) {
-    cache.put(request, networkResponse.clone());
+  try {
+    const networkResponse = await fetch(request);
+    if (networkResponse.ok) {
+      cache.put(request, networkResponse.clone());
+    }
+    return networkResponse;
+  } catch (error) {
+    console.log('SW: Network failed, using offline fallback');
+    return getOfflineFallback(request);
   }
-  return networkResponse;
 }
 
-// Network First strategy
 async function networkFirst(request, cacheName) {
   const cache = await caches.open(cacheName);
   
@@ -127,27 +146,30 @@ async function networkFirst(request, cacheName) {
     }
     return networkResponse;
   } catch (error) {
+    console.log('SW: Network failed, trying cache');
     const cachedResponse = await cache.match(request);
-    if (cachedResponse) {
-      return cachedResponse;
-    }
-    throw error;
+    return cachedResponse || getOfflineFallback(request);
   }
 }
 
-// Stale While Revalidate strategy
+// Vylepšená strategie pro rychlejší aktualizace
 async function staleWhileRevalidate(request, cacheName) {
   const cache = await caches.open(cacheName);
   const cachedResponse = await cache.match(request);
   
-  const fetchPromise = fetch(request).then(networkResponse => {
+  // Vždy fetch z network pro aktualizace na pozadí
+  const fetchPromise = fetch(request).then((networkResponse) => {
     if (networkResponse.ok) {
       cache.put(request, networkResponse.clone());
     }
     return networkResponse;
-  }).catch(() => {});
-  
-  return cachedResponse || await fetchPromise;
+  }).catch(() => {
+    console.log('SW: Network failed for background update');
+    return cachedResponse;
+  });
+
+  // Vrať cache okamžitě, ale aktualizuj na pozadí
+  return cachedResponse || fetchPromise;
 }
 
 // Helper functions
@@ -169,7 +191,7 @@ function isApiCall(url) {
 }
 
 async function getOfflineFallback(request) {
-  const cache = await caches.open(STATIC_CACHE);
+  const cache = await caches.open(CACHE_NAME);
   
   if (request.mode === 'navigate') {
     return await cache.match('/') || new Response('Offline', {

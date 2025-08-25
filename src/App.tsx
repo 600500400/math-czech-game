@@ -16,6 +16,7 @@ import { AchievementsPage } from "./components/gamification/AchievementsPage";
 import NotFound from "./pages/NotFound";
 import PWAInstallPrompt from "./components/pwa/PWAInstallPrompt";
 import OfflineIndicator from "./components/pwa/OfflineIndicator";
+import { UpdateNotification } from "./components/pwa/UpdateNotification";
 import "@/i18n";
 import DonationSuccess from "./pages/DonationSuccess";
 import Dictionary from "./pages/Dictionary";
@@ -54,6 +55,7 @@ const App = () => {
               </Routes>
               <PWAInstallPrompt />
               <OfflineIndicator />
+              <UpdateNotification />
             </AuthProvider>
           </BrowserRouter>
         </TooltipProvider>
