@@ -22,10 +22,10 @@ const ModernHeader = () => {
           {/* Logo */}
           <Link to="/" className="group flex items-center space-x-3 sm:space-x-4 hover:scale-105 transition-all duration-300">
             <div className="relative">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-orange-500 via-red-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-xl group-hover:shadow-2xl transition-all duration-300">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 via-green-500 to-purple-500 rounded-2xl flex items-center justify-center shadow-xl group-hover:shadow-2xl transition-all duration-300">
                 <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-white drop-shadow-sm" />
               </div>
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full flex items-center justify-center animate-pulse">
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full flex items-center justify-center animate-pulse">
                 <Sparkles className="w-2.5 h-2.5 text-white" />
               </div>
             </div>
@@ -34,7 +34,7 @@ const ModernHeader = () => {
                 Procvička
               </h1>
               <p className="text-sm font-medium text-muted-foreground -mt-0.5 tracking-wide">
-                Aplikace pro procvičování
+                Matematika • Pravopis • Slovník
               </p>
             </div>
           </Link>

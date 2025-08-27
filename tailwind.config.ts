@@ -92,6 +92,18 @@ const config = {
           500: "#ef4444",
           600: "#dc2626",
         },
+        // Subject-specific colors for consistent theming
+        subject: {
+          math: "hsl(var(--subject-math))",
+          "math-light": "hsl(var(--subject-math-light))",
+          "math-border": "hsl(var(--subject-math-border))",
+          spelling: "hsl(var(--subject-spelling))",
+          "spelling-light": "hsl(var(--subject-spelling-light))",
+          "spelling-border": "hsl(var(--subject-spelling-border))",
+          dictionary: "hsl(var(--subject-dictionary))",
+          "dictionary-light": "hsl(var(--subject-dictionary-light))",
+          "dictionary-border": "hsl(var(--subject-dictionary-border))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

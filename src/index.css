@@ -58,6 +58,19 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+    
+    /* Section-specific colors */
+    --subject-math: 221.2 83.2% 53.3%; /* blue-600 */
+    --subject-math-light: 214.3 31.8% 95%; /* blue-50 */
+    --subject-math-border: 213.3 93.9% 87.8%; /* blue-200 */
+    
+    --subject-spelling: 142.1 76.2% 36.3%; /* green-600 */
+    --subject-spelling-light: 138.5 76.5% 96.7%; /* green-50 */
+    --subject-spelling-border: 141.4 84.2% 85.1%; /* green-200 */
+    
+    --subject-dictionary: 262.1 83.3% 57.8%; /* purple-600 */
+    --subject-dictionary-light: 270 100% 98%; /* purple-50 */
+    --subject-dictionary-border: 264.5 93.5% 87.1%; /* purple-200 */
   }
 }
 
@@ -183,6 +196,35 @@
   .gradient-text {
     @apply bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent;
   }
+  
+  /* Section-specific utility classes */
+  .subject-math {
+    color: hsl(var(--subject-math));
+    background-color: hsl(var(--subject-math-light));
+    border-color: hsl(var(--subject-math-border));
+  }
+  
+  .subject-spelling {
+    color: hsl(var(--subject-spelling));
+    background-color: hsl(var(--subject-spelling-light));
+    border-color: hsl(var(--subject-spelling-border));
+  }
+  
+  .subject-dictionary {
+    color: hsl(var(--subject-dictionary));
+    background-color: hsl(var(--subject-dictionary-light));
+    border-color: hsl(var(--subject-dictionary-border));
+  }
+  
+  /* Subject text colors only */
+  .text-subject-math { color: hsl(var(--subject-math)); }
+  .text-subject-spelling { color: hsl(var(--subject-spelling)); }
+  .text-subject-dictionary { color: hsl(var(--subject-dictionary)); }
+  
+  /* Subject background colors only */
+  .bg-subject-math-light { background-color: hsl(var(--subject-math-light)); }
+  .bg-subject-spelling-light { background-color: hsl(var(--subject-spelling-light)); }
+  .bg-subject-dictionary-light { background-color: hsl(var(--subject-dictionary-light)); }
 }
 
 /* Accessibility improvements */
