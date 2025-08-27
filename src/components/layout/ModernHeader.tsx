@@ -4,10 +4,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { BookOpen, Sparkles, MessageSquare } from "lucide-react";
 import { Link } from "react-router-dom";
 import UserMenu from "@/components/UserMenu";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
 import FeedbackButton from "@/components/FeedbackButton";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { useLanguage } from "@/hooks/useLanguage";
 import { useGamification } from "@/hooks/gamification/useGamification";
 import { LevelDisplay } from "@/components/gamification/LevelDisplay";
 import { StreakDisplay } from "@/components/gamification/StreakDisplay";
@@ -15,7 +13,6 @@ import DonateButton from "@/components/donation/DonateButton";
 
 const ModernHeader = () => {
   const { authState } = useAuth();
-  const { t } = useLanguage();
   const { leveling, streaks } = useGamification();
 
   return (
@@ -35,7 +32,7 @@ const ModernHeader = () => {
                 Procvička
               </h1>
               <p className="text-xs text-muted-foreground -mt-1">
-                {t('auth.title')}
+                Aplikace pro procvičování
               </p>
             </div>
           </Link>
@@ -60,7 +57,6 @@ const ModernHeader = () => {
           <div className="flex items-center gap-1">
             <DonateButton />
             <ThemeToggle />
-            <LanguageSwitcher />
             <FeedbackButton />
             <UserMenu />
           </div>
