@@ -4,6 +4,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } fro
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { formatDate } from "@/utils/dateUtils";
 import { MathStatistics, SpellingStatistics } from "@/types/authTypes";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface CumulativeChartProps {
   data: MathStatistics[] | SpellingStatistics[];
@@ -19,6 +20,7 @@ interface ChartDataPoint {
 }
 
 const CumulativeChart: React.FC<CumulativeChartProps> = ({ data, type }) => {
+  const { t } = useLanguage();
   // Sort data by date and calculate cumulative values
   const sortedData = [...data].sort((a, b) => 
     new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
@@ -45,22 +47,22 @@ const CumulativeChart: React.FC<CumulativeChartProps> = ({ data, type }) => {
   if (chartData.length === 0) {
     return (
       <div className="text-center text-gray-500 py-8">
-        Žádná data pro graf
+        {t('statisticsTabs.noDataForChart')}
       </div>
     );
   }
 
   const chartConfig = {
     cumulativeCorrect: {
-      label: "Celkem správných odpovědí",
+      label: t('statisticsTabs.totalCorrectAnswers'),
       color: "#4ade80"
     },
     cumulativeWrong: {
-      label: "Celkem špatných odpovědí", 
+      label: t('statisticsTabs.totalWrongAnswers'), 
       color: "#f87171"
     },
     cumulativeTotal: {
-      label: "Celkem odpovědí",
+      label: t('statisticsTabs.totalAllAnswers'),
       color: "#3b82f6"
     }
   };
@@ -68,7 +70,7 @@ const CumulativeChart: React.FC<CumulativeChartProps> = ({ data, type }) => {
   return (
     <div className="space-y-6">
       <h3 className="text-lg font-semibold text-gray-700">
-        Kumulovaný progres v čase
+        {t('statisticsTabs.cumulativeProgress')}
       </h3>
       
       <div className="flex flex-col lg:flex-row gap-6">
@@ -95,7 +97,7 @@ const CumulativeChart: React.FC<CumulativeChartProps> = ({ data, type }) => {
                 />
                 <ChartTooltip 
                   content={<ChartTooltipContent />}
-                  labelFormatter={(label) => `Datum: ${label}`}
+                  labelFormatter={(label) => `${t('statisticsTabs.date')}: ${label}`}
                 />
                 <Line 
                   type="monotone" 
@@ -129,18 +131,18 @@ const CumulativeChart: React.FC<CumulativeChartProps> = ({ data, type }) => {
         {/* Legenda vedle grafu */}
         <div className="lg:w-64 flex-shrink-0">
           <div className="space-y-3">
-            <h4 className="text-sm font-medium text-gray-600 mb-4">Legenda</h4>
+            <h4 className="text-sm font-medium text-gray-600 mb-4">{t('statisticsTabs.legend')}</h4>
             <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
               <div className="w-4 h-4 bg-green-400 rounded-full flex-shrink-0"></div>
-              <span className="text-sm font-medium text-green-800">Celkem správných odpovědí</span>
+              <span className="text-sm font-medium text-green-800">{t('statisticsTabs.totalCorrectAnswers')}</span>
             </div>
             <div className="flex items-center gap-3 p-3 bg-red-50 rounded-lg border border-red-200">
               <div className="w-4 h-4 bg-red-400 rounded-full flex-shrink-0"></div>
-              <span className="text-sm font-medium text-red-800">Celkem špatných odpovědí</span>
+              <span className="text-sm font-medium text-red-800">{t('statisticsTabs.totalWrongAnswers')}</span>
             </div>
             <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
               <div className="w-4 h-4 bg-blue-500 rounded-full flex-shrink-0"></div>
-              <span className="text-sm font-medium text-blue-800">Celkem všech odpovědí</span>
+              <span className="text-sm font-medium text-blue-800">{t('statisticsTabs.totalAllAnswers')}</span>
             </div>
           </div>
         </div>

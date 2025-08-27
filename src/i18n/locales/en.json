@@ -185,5 +185,69 @@
   "userMenu": {
     "changeUser": "Change user",
     "selectUser": "Select user"
+  },
+  "homePage": {
+    "dashboard": "Dashboard",
+    "statistics": "Statistics"
+  },
+  "welcomeDashboard": {
+    "welcomeBack": "Welcome back, {firstName}! 👋",
+    "welcomeMessage": "Ready for more learning? Let's see your progress!",
+    "mathSection": "Mathematics",
+    "spellingSection": "Spelling",
+    "dictionarySection": "Dictionary",
+    "practiceButtons": {
+      "math": "Practice math",
+      "spelling": "Practice spelling",
+      "dictionary": "Open dictionary"
+    },
+    "badges": {
+      "expert": "Expert",
+      "advanced": "Advanced",
+      "learning": "Learning",
+      "beginner": "Beginner",
+      "spellingMaster": "Spelling master"
+    },
+    "problemsSolved": "{total} problems solved",
+    "wordsWritten": "{total} words written",
+    "practiceVocabulary": "Practice vocabulary"
+  },
+  "statisticsTabs": {
+    "overview": "Overview",
+    "totalProblems": "Total problems",
+    "correct": "Correct",
+    "wrong": "Wrong",
+    "accuracy": "Accuracy",
+    "recentGames": "Recent games",
+    "cumulativeProgress": "Cumulative progress over time",
+    "legend": "Legend",
+    "noDataForChart": "No data for chart",
+    "date": "Date",
+    "totalCorrectAnswers": "Total correct answers",
+    "totalWrongAnswers": "Total wrong answers",
+    "totalAllAnswers": "Total all answers",
+    "spellingOverview": "Spelling - Overview",
+    "mathOverview": "Math - Overview",
+    "dictionaryOverview": "Dictionary overview",
+    "total": "Total"
+  },
+  "dictionaryPractice": {
+    "practiceTitle": "Vocabulary practice",
+    "startPractice": "Start practice",
+    "noWordsAvailable": "No words to practice",
+    "back": "Back",
+    "wordCounter": "Word {current} of {total}",
+    "shuffle": "Shuffle",
+    "hideSentences": "Hide sentences",
+    "showSentences": "Show sentences",
+    "generateNewSentences": "New sentences",
+    "iKnow": "I know",
+    "iDontKnow": "I don't know",
+    "enterTranslation": "Enter translation...",
+    "check": "Check",
+    "correct": "✓ Correct!",
+    "wrong": "✗ Wrong",
+    "yourAnswer": "Your answer: {answer}",
+    "end": "End"
   }
 }
