@@ -10,6 +10,7 @@ import { useDictionaryWords } from "@/hooks/dictionary/useDictionaryWords";
 import { useAuth } from "@/hooks/useAuth";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useLanguage } from "@/hooks/useLanguage";
 import { NewDictionaryWord } from "@/types/dictionaryTypes";
 import { toast } from "sonner";
 
@@ -19,6 +20,7 @@ export default function DictionaryAdd() {
   const userId = authState.user?.id || null;
   const { addWord, bulkImport, isAddingWord, isBulkImporting } = useDictionaryWords(userId);
   const { translate, isTranslating, error: translationError, clearError } = useTranslation();
+  const { t } = useLanguage();
 
   const [singleWord, setSingleWord] = useState({
     english_word: "",
@@ -57,7 +59,7 @@ export default function DictionaryAdd() {
 
   const handleManualTranslate = async () => {
     if (!singleWord.english_word.trim()) {
-      toast.error("Nejdříve zadej anglické slovo");
+      toast.error(t('dictionary.enterFirstEnglish'));
       return;
     }
 
@@ -70,13 +72,13 @@ export default function DictionaryAdd() {
       }));
       setUserEditedTranslation(false);
     } else if (translationError) {
-      toast.error(`Překlad se nepodařil: ${translationError}`);
+      toast.error(`${t('dictionary.translationFailedError')}: ${translationError}`);
     }
   };
 
   const handleAddSingleWord = () => {
     if (!singleWord.english_word.trim() || !singleWord.czech_translation.trim()) {
-      toast.error("Vyplň anglické slovo i český překlad");
+      toast.error(t('dictionary.fillBothFields'));
       return;
     }
 
@@ -91,7 +93,7 @@ export default function DictionaryAdd() {
 
   const handleBulkImport = () => {
     if (!bulkText.trim()) {
-      toast.error("Zadej slovíčka v požadovaném formátu");
+      toast.error(t('dictionary.enterWordsFormat'));
       return;
     }
 
@@ -112,13 +114,13 @@ export default function DictionaryAdd() {
           });
         }
       } else {
-        toast.error(`Neplatný formát řádku: ${trimmedLine}`);
+        toast.error(`${t('dictionary.invalidLineFormat')}: ${trimmedLine}`);
         return;
       }
     }
 
     if (words.length === 0) {
-      toast.error("Žádná platná slovíčka nebyla nalezena");
+      toast.error(t('dictionary.noValidWordsFound'));
       return;
     }
 
@@ -133,17 +135,17 @@ export default function DictionaryAdd() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Plus className="h-5 w-5" />
-            Přidat jedno slovíčko
+            {t('dictionary.addSingleWord')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium mb-2 block">
-                Anglické slovo
+                {t('dictionary.englishWord')}
               </label>
               <Input
-                placeholder="Například: house"
+                placeholder={t('dictionary.englishPlaceholder')}
                 value={singleWord.english_word}
                 onChange={(e) => {
                   setSingleWord(prev => ({
@@ -160,13 +162,13 @@ export default function DictionaryAdd() {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label className="text-sm font-medium">
-                  Český překlad
+                  {t('dictionary.czechWord')}
                 </label>
                 <div className="flex items-center gap-2">
                   {autoTranslateEnabled && isTranslating && (
                     <div className="flex items-center gap-1 text-xs text-muted-foreground">
                       <Loader2 className="h-3 w-3 animate-spin" />
-                      Překládám...
+                      {t('dictionary.translating')}
                     </div>
                   )}
                   {(translationError || userEditedTranslation) && (
@@ -179,13 +181,13 @@ export default function DictionaryAdd() {
                       className="h-6 px-2 text-xs"
                     >
                       <Languages className="h-3 w-3 mr-1" />
-                      Přeložit
+                      {t('dictionary.translate')}
                     </Button>
                   )}
                 </div>
               </div>
               <Input
-                placeholder="Například: dům"
+                placeholder={t('dictionary.czechPlaceholder')}
                 value={singleWord.czech_translation}
                 onChange={(e) => {
                   setSingleWord(prev => ({
@@ -197,7 +199,7 @@ export default function DictionaryAdd() {
               />
               {translationError && (
                 <p className="text-xs text-destructive mt-1">
-                  Překlad selhal: {translationError}
+                  {t('dictionary.translationFailed')}: {translationError}
                 </p>
               )}
             </div>
@@ -209,7 +211,7 @@ export default function DictionaryAdd() {
             disabled={isAddingWord || !singleWord.english_word.trim() || !singleWord.czech_translation.trim()}
             className="w-full"
           >
-            {isAddingWord ? "Přidávám..." : "Přidat slovíčko"}
+            {isAddingWord ? t('dictionary.adding') : t('dictionary.addWord')}
           </Button>
         </CardContent>
       </Card>
@@ -221,16 +223,16 @@ export default function DictionaryAdd() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Upload className="h-5 w-5" />
-            Hromadný import
+            {t('dictionary.bulkImport')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
             <label className="text-sm font-medium mb-2 block">
-              Slovíčka (jedno na řádek, formát: anglické→české)
+              {t('dictionary.wordsOnePerLine')}
             </label>
             <Textarea
-              placeholder={`Příklad:
+              placeholder={`${t('dictionary.exampleFormat')}
 house→dům
 cat→kočka
 beautiful→krásný`}
@@ -242,10 +244,10 @@ beautiful→krásný`}
           </div>
 
           <div className="text-sm text-muted-foreground">
-            <p className="font-medium mb-1">Formát:</p>
-            <p>• Každé slovíčko na novém řádku</p>
-            <p>• Použij šipku → mezi anglickým slovem a českým překladem</p>
-            <p>• Příklad: "apple→jablko"</p>
+            <p className="font-medium mb-1">{t('dictionary.formatInstructions')}</p>
+            <p>{t('dictionary.eachWordNewLine')}</p>
+            <p>{t('dictionary.useArrow')}</p>
+            <p>{t('dictionary.exampleApple')}</p>
           </div>
 
           <Button
@@ -253,7 +255,7 @@ beautiful→krásný`}
             disabled={isBulkImporting || !bulkText.trim()}
             className="w-full"
           >
-            {isBulkImporting ? "Importuji..." : "Importovat slovíčka"}
+            {isBulkImporting ? t('dictionary.importing') : t('dictionary.importWords')}
           </Button>
         </CardContent>
       </Card>

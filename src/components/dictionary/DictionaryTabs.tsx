@@ -6,19 +6,21 @@ import DictionaryPractice from "./DictionaryPractice";
 import DictionaryAdd from "./DictionaryAdd";
 import DictionaryList from "./DictionaryList";
 import { useAuth } from "@/hooks/useAuth";
+import { useLanguage } from "@/hooks/useLanguage";
 
 export default function DictionaryTabs() {
   const [activeTab, setActiveTab] = useState("practice");
   const { authState } = useAuth();
+  const { t } = useLanguage();
 
   if (!authState.user) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Přihlášení potřebné</CardTitle>
+          <CardTitle>{t('dictionary.loginRequired')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <p>Pro používání slovníčku se musíte přihlásit.</p>
+          <p>{t('dictionary.loginRequiredDescription')}</p>
         </CardContent>
       </Card>
     );
@@ -28,9 +30,9 @@ export default function DictionaryTabs() {
     <div className="w-full">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-3 mb-6">
-          <TabsTrigger value="practice">Procvičování</TabsTrigger>
-          <TabsTrigger value="add">Přidat</TabsTrigger>
-          <TabsTrigger value="list">Seznam</TabsTrigger>
+          <TabsTrigger value="practice">{t('dictionary.practice')}</TabsTrigger>
+          <TabsTrigger value="add">{t('dictionary.add')}</TabsTrigger>
+          <TabsTrigger value="list">{t('dictionary.list')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="practice">

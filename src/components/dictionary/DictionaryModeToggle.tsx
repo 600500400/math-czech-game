@@ -1,5 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface DictionaryModeToggleProps {
   direction: 'en_to_cz' | 'cz_to_en';
@@ -10,12 +11,14 @@ export default function DictionaryModeToggle({
   direction,
   onDirectionChange
 }: DictionaryModeToggleProps) {
+  const { t } = useLanguage();
+  
   return (
     <Card className="mb-4">
       <CardContent className="pt-6">
         <div>
           <div>
-            <h3 className="text-sm font-medium mb-2">Směr překladu:</h3>
+            <h3 className="text-sm font-medium mb-2">{t('dictionary.translationDirection')}:</h3>
             <div className="flex gap-2">
               <Button
                 variant={direction === 'en_to_cz' ? 'default' : 'outline'}

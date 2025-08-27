@@ -133,5 +133,57 @@
     "noAssignedChildren": "Zatím nemáte přiřazené žádné děti",
     "connectAccountsFirst": "Pro zobrazení statistik je potřeba nejprve propojit váš účet s účty vašich dětí",
     "backToHome": "Zpět na hlavní stránku"
+  },
+  "dictionary": {
+    "loginRequired": "Přihlášení potřebné",
+    "loginRequiredDescription": "Pro používání slovníčku se musíte přihlásit.",
+    "practice": "Procvičování",
+    "add": "Přidat",
+    "list": "Seznam",
+    "translationDirection": "Směr překladu",
+    "addSingleWord": "Přidat jedno slovíčko",
+    "bulkImport": "Hromadný import",
+    "englishWord": "Anglické slovo",
+    "czechWord": "Český překlad",
+    "addWord": "Přidat slovíčko",
+    "adding": "Přidávám...",
+    "wordAdded": "Slovo bylo úspěšně přidáno",
+    "errorAdding": "Chyba při přidávání slova",
+    "pasteWords": "Vložte slova ve formátu: anglické slovo - české slovo",
+    "importWords": "Importovat slovíčka",
+    "importing": "Importuji...",
+    "wordsImported": "Slova byla úspěšně importována",
+    "errorImporting": "Chyba při importu slov",
+    "noWords": "Zatím nemáte žádná slova ve slovníčku",
+    "startAdding": "Začněte přidáváním slov pomocí záložky 'Přidat'",
+    "englishPlaceholder": "Například: house",
+    "czechPlaceholder": "Například: dům",
+    "translating": "Překládám...",
+    "translate": "Přeložit",
+    "translationFailed": "Překlad selhal",
+    "fillBothFields": "Vyplň anglické slovo i český překlad",
+    "enterFirstEnglish": "Nejdříve zadej anglické slovo",
+    "translationFailedError": "Překlad se nepodařil",
+    "enterWordsFormat": "Zadej slovíčka v požadovaném formátu",
+    "invalidLineFormat": "Neplatný formát řádku",
+    "noValidWordsFound": "Žádná platná slovíčka nebyla nalezena",
+    "wordsOnePerLine": "Slovíčka (jedno na řádek, formát: anglické→české)",
+    "exampleFormat": "Příklad:",
+    "formatInstructions": "Formát:",
+    "eachWordNewLine": "• Každé slovíčko na novém řádku",
+    "useArrow": "• Použij šipku → mezi anglickým slovem a českým překladem",
+    "exampleApple": "• Příklad: \"apple→jablko\""
+  },
+  "spelling": {
+    "practiceTitle": "Procvičování vyjmenovaných slov",
+    "practiceDescription": "Procvičujte vyjmenovaná slova zábavnou formou"
+  },
+  "math": {
+    "practiceTitle": "Matematické procvičování",
+    "practiceDescription": "Procvičujte matematické operace zábavnou formou"
+  },
+  "userMenu": {
+    "changeUser": "Změnit uživatele",
+    "selectUser": "Vybrat uživatele"
   }
 }

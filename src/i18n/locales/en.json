@@ -133,5 +133,57 @@
     "noAssignedChildren": "You don't have any assigned children yet",
     "connectAccountsFirst": "To view statistics, you need to first connect your account with your children's accounts",
     "backToHome": "Back to home page"
+  },
+  "dictionary": {
+    "loginRequired": "Login required",
+    "loginRequiredDescription": "You need to log in to use the dictionary.",
+    "practice": "Practice",
+    "add": "Add",
+    "list": "List",
+    "translationDirection": "Translation direction",
+    "addSingleWord": "Add single word",
+    "bulkImport": "Bulk import",
+    "englishWord": "English word",
+    "czechWord": "Czech translation",
+    "addWord": "Add word",
+    "adding": "Adding...",
+    "wordAdded": "Word was successfully added",
+    "errorAdding": "Error adding word",
+    "pasteWords": "Paste words in format: english word - czech translation",
+    "importWords": "Import words",
+    "importing": "Importing...",
+    "wordsImported": "Words were successfully imported",
+    "errorImporting": "Error importing words",
+    "noWords": "You don't have any words in the dictionary yet",
+    "startAdding": "Start by adding words using the 'Add' tab",
+    "englishPlaceholder": "Example: house",
+    "czechPlaceholder": "Example: dům",
+    "translating": "Translating...",
+    "translate": "Translate",
+    "translationFailed": "Translation failed",
+    "fillBothFields": "Fill in both English word and Czech translation",
+    "enterFirstEnglish": "Enter English word first",
+    "translationFailedError": "Translation failed",
+    "enterWordsFormat": "Enter words in the required format",
+    "invalidLineFormat": "Invalid line format",
+    "noValidWordsFound": "No valid words found",
+    "wordsOnePerLine": "Words (one per line, format: english→czech)",
+    "exampleFormat": "Example:",
+    "formatInstructions": "Format:",
+    "eachWordNewLine": "• Each word on a new line",
+    "useArrow": "• Use arrow → between English word and Czech translation",
+    "exampleApple": "• Example: \"apple→jablko\""
+  },
+  "spelling": {
+    "practiceTitle": "Spelling Practice",
+    "practiceDescription": "Practice spelling words in a fun way"
+  },
+  "math": {
+    "practiceTitle": "Math Practice",
+    "practiceDescription": "Practice mathematical operations in a fun way"
+  },
+  "userMenu": {
+    "changeUser": "Change user",
+    "selectUser": "Select user"
   }
 }
