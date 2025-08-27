@@ -9,12 +9,10 @@ import DictionaryModeToggle from "./DictionaryModeToggle";
 import { useDictionaryGame } from "@/hooks/dictionary/useDictionaryGame";
 import { useAuth } from "@/hooks/useAuth";
 import { StatisticsDialog } from "../spelling/StatisticsDialog";
-import { useLanguage } from "@/hooks/useLanguage";
 
 export default function DictionaryPractice() {
   const { authState } = useAuth();
   const userId = authState.user?.id || null;
-  const { t } = useLanguage();
   
   const {
     currentWord,
@@ -57,7 +55,7 @@ export default function DictionaryPractice() {
       <div className="space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle className="text-center">{t('dictionaryPractice.practiceTitle')}</CardTitle>
+            <CardTitle className="text-center">Procvičování slovíček</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <DictionaryModeToggle
@@ -68,7 +66,7 @@ export default function DictionaryPractice() {
             <div className="text-center">
               <Button onClick={startGame} size="lg" className="gap-2">
                 <Play className="h-5 w-5" />
-                {t('dictionaryPractice.startPractice')}
+                Začít procvičování
               </Button>
             </div>
           </CardContent>
@@ -81,9 +79,9 @@ export default function DictionaryPractice() {
     return (
       <Card>
         <CardContent className="pt-6 text-center">
-          <p>{t('dictionaryPractice.noWordsAvailable')}</p>
+          <p>Žádná slovíčka k procvičování</p>
           <Button onClick={resetGame} className="mt-4">
-            {t('dictionaryPractice.back')}
+            Zpět
           </Button>
         </CardContent>
       </Card>
@@ -103,18 +101,18 @@ export default function DictionaryPractice() {
 
             <div className="flex flex-col md:flex-row items-center justify-between gap-3">
               <div className="text-sm text-muted-foreground">
-                {t('dictionaryPractice.wordCounter', { current: (currentIndex ?? 0) + 1, total: totalWords ?? 0 })}
+                Slovíčko <span className="font-semibold text-foreground">{(currentIndex ?? 0) + 1}</span> z <span className="font-semibold text-foreground">{totalWords ?? 0}</span>
               </div>
 
               <div className="flex flex-wrap gap-2">
                 <Button variant="outline" size="sm" onClick={shuffleDeck} aria-label="Zamíchat slovíčka" className="gap-2">
-                  <Shuffle className="h-4 w-4" /> {t('dictionaryPractice.shuffle')}
+                  <Shuffle className="h-4 w-4" /> Zamíchat
                 </Button>
                 <Button variant="outline" size="sm" onClick={() => setShowSentences(!showSentences)} aria-label="Skrýt/Zobrazit věty" className="gap-2">
-                  {showSentences ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />} {showSentences ? t('dictionaryPractice.hideSentences') : t('dictionaryPractice.showSentences')}
+                  {showSentences ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />} {showSentences ? 'Skrýt věty' : 'Zobrazit věty'}
                 </Button>
                 <Button variant="outline" size="sm" onClick={() => setSentencesKey((k) => k + 1)} aria-label="Vygenerovat nové věty" className="gap-2">
-                  <RefreshCcw className="h-4 w-4" /> {t('dictionaryPractice.generateNewSentences')}
+                  <RefreshCcw className="h-4 w-4" /> Nové věty
                 </Button>
               </div>
             </div>
@@ -137,7 +135,7 @@ export default function DictionaryPractice() {
               className="gap-2 bg-green-600 hover:bg-green-700"
             >
               <CheckCircle className="h-4 w-4" />
-              {t('dictionaryPractice.iKnow')}
+              Vím
             </Button>
             <Button
               onClick={() => handleSimpleAnswer(false)}
@@ -145,7 +143,7 @@ export default function DictionaryPractice() {
               className="gap-2"
             >
               <XCircle className="h-4 w-4" />
-              {t('dictionaryPractice.iDontKnow')}
+              Nevím
             </Button>
           </div>
         )}
@@ -153,7 +151,7 @@ export default function DictionaryPractice() {
         {mode === 'advanced' && !showAnswer && (
           <div className="space-y-4">
             <Input
-              placeholder={t('dictionaryPractice.enterTranslation')}
+              placeholder="Zadej překlad..."
               value={userAnswer}
               onChange={(e) => setUserAnswer(e.target.value)}
               onKeyPress={handleKeyPress}
@@ -165,7 +163,7 @@ export default function DictionaryPractice() {
               disabled={!userAnswer.trim()}
               className="w-full"
             >
-              {t('dictionaryPractice.check')}
+              Zkontrolovat
             </Button>
           </div>
         )}
@@ -180,13 +178,13 @@ export default function DictionaryPractice() {
             }`}>
               {userAnswer.trim().toLowerCase() === 
                (direction === 'en_to_cz' ? currentWord.czech_translation : currentWord.english_word).toLowerCase()
-                ? t('dictionaryPractice.correct') 
-                : t('dictionaryPractice.wrong')}
+                ? '✓ Správně!' 
+                : '✗ Špatně'}
             </div>
             {userAnswer.trim().toLowerCase() !== 
              (direction === 'en_to_cz' ? currentWord.czech_translation : currentWord.english_word).toLowerCase() && (
               <div className="text-sm text-muted-foreground mt-1">
-                {t('dictionaryPractice.yourAnswer', { answer: userAnswer })}
+                Tvoje odpověď: {userAnswer}
               </div>
             )}
           </div>
@@ -197,7 +195,7 @@ export default function DictionaryPractice() {
       <div className="flex gap-4 justify-center">
         <Button onClick={endGame} variant="outline" className="gap-2">
           <RotateCcw className="h-4 w-4" />
-          {t('dictionaryPractice.end')}
+          Ukončit
         </Button>
       </div>
 

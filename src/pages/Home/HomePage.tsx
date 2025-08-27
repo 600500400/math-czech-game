@@ -8,7 +8,6 @@ import { useDetailedAnswers } from "@/hooks/statistics/useDetailedAnswers";
 import WelcomeDashboard from "@/components/dashboard/WelcomeDashboard";
 import PracticeTabs from "@/components/practice/PracticeTabs";
 import StatisticsTabs from "@/components/statistics/StatisticsTabs";
-import { useLanguage } from "@/hooks/useLanguage";
 
 import ModernHeader from "@/components/layout/ModernHeader";
 import AppFooter from "@/components/layout/AppFooter";
@@ -21,7 +20,6 @@ const HomePage = () => {
   const { mathStats, spellingStats, dictionaryStats } = useStatistics(authState.user?.id || null);
   const { mathAnswers, spellingAnswers, dictionaryAnswers } = useDetailedAnswers(authState.user?.id || null);
   const [activeTab, setActiveTab] = useState("dashboard");
-  const { t } = useLanguage();
 
   const handleNavigateToTab = (tab: "statistics") => {
     setActiveTab(tab);
@@ -45,7 +43,7 @@ const HomePage = () => {
                 '--active-color': theme.accentColor
               } as React.CSSProperties}
             >
-              {t('homePage.dashboard')}
+              Dashboard
             </TabsTrigger>
             <TabsTrigger 
               value="statistics"
@@ -55,7 +53,7 @@ const HomePage = () => {
                 '--active-color': theme.accentColor
               } as React.CSSProperties}
             >
-              {t('homePage.statistics')}
+              Statistiky
             </TabsTrigger>
           </TabsList>
 

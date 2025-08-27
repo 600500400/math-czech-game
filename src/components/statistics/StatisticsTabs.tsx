@@ -58,7 +58,7 @@ const StatisticsTabs: React.FC<StatisticsTabsProps> = ({
         >
           <FileText className="mr-1 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" />
           <span className="text-xs sm:text-sm md:text-base">
-            <span className="hidden sm:inline">{t('practice.spelling')}</span>
+            <span className="hidden sm:inline">Pravopis</span>
             <span className="sm:hidden">{t('practice.spelling')}</span>
           </span>
         </TabsTrigger>
@@ -80,8 +80,8 @@ const StatisticsTabs: React.FC<StatisticsTabsProps> = ({
         >
           <BookOpen className="mr-1 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" />
           <span className="text-xs sm:text-sm md:text-base">
-            <span className="hidden sm:inline">{t('dictionary.practice')}</span>
-            <span className="sm:hidden">{t('dictionary.practice')}</span>
+            <span className="hidden sm:inline">Slovník</span>
+            <span className="sm:hidden">Slovník</span>
           </span>
         </TabsTrigger>
       </TabsList>
@@ -91,10 +91,10 @@ const StatisticsTabs: React.FC<StatisticsTabsProps> = ({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5" />
-              {t('statisticsTabs.spellingOverview')}
+              {t('practice.spelling')} - Přehled
             </CardTitle>
             <CardDescription>
-              {t('statisticsTabs.totalProblems')}: {spellingTotal} | {t('statisticsTabs.correct')}: {spellingCorrect} | {t('statisticsTabs.wrong')}: {spellingWrong} | {t('statisticsTabs.accuracy')}: {spellingAccuracy}%
+              Celkem problémů: {spellingTotal} | Správně: {spellingCorrect} | Špatně: {spellingWrong} | Úspěšnost: {spellingAccuracy}%
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -115,10 +115,10 @@ const StatisticsTabs: React.FC<StatisticsTabsProps> = ({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calculator className="h-5 w-5" />
-              {t('statisticsTabs.mathOverview')}
+              {t('practice.math')} - Přehled
             </CardTitle>
             <CardDescription>
-              {t('statisticsTabs.totalProblems')}: {mathTotal} | {t('statisticsTabs.correct')}: {mathCorrect} | {t('statisticsTabs.wrong')}: {mathWrong} | {t('statisticsTabs.accuracy')}: {mathAccuracy}%
+              Celkem problémů: {mathTotal} | Správně: {mathCorrect} | Špatně: {mathWrong} | Úspěšnost: {mathAccuracy}%
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -139,10 +139,10 @@ const StatisticsTabs: React.FC<StatisticsTabsProps> = ({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BookOpen className="h-5 w-5" />
-              {t('statisticsTabs.dictionaryOverview')}
+              Přehled slovníku
             </CardTitle>
             <CardDescription>
-              {t('statisticsTabs.totalProblems')}: {dictionaryTotal} | {t('statisticsTabs.correct')}: {dictionaryCorrect} | {t('statisticsTabs.wrong')}: {dictionaryWrong} | {t('statisticsTabs.accuracy')}: {dictionaryAccuracy}%
+              Celkem problémů: {dictionaryTotal} | Správně: {dictionaryCorrect} | Špatně: {dictionaryWrong} | Úspěšnost: {dictionaryAccuracy}%
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -150,31 +150,31 @@ const StatisticsTabs: React.FC<StatisticsTabsProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="bg-muted/50 p-4 rounded-lg text-center">
                   <div className="text-2xl font-bold text-primary">{dictionaryTotal}</div>
-                  <div className="text-sm text-muted-foreground">{t('statisticsTabs.total')}</div>
+                  <div className="text-sm text-muted-foreground">Celkem</div>
                 </div>
                 <div className="bg-green-100 dark:bg-green-900/20 p-4 rounded-lg text-center">
                   <div className="text-2xl font-bold text-green-600">{dictionaryCorrect}</div>
-                  <div className="text-sm text-muted-foreground">{t('statisticsTabs.correct')}</div>
+                  <div className="text-sm text-muted-foreground">Správně</div>
                 </div>
                 <div className="bg-red-100 dark:bg-red-900/20 p-4 rounded-lg text-center">
                   <div className="text-2xl font-bold text-red-600">{dictionaryWrong}</div>
-                  <div className="text-sm text-muted-foreground">{t('statisticsTabs.wrong')}</div>
+                  <div className="text-sm text-muted-foreground">Špatně</div>
                 </div>
                 <div className="bg-blue-100 dark:bg-blue-900/20 p-4 rounded-lg text-center">
                   <div className="text-2xl font-bold text-blue-600">{dictionaryAccuracy}%</div>
-                  <div className="text-sm text-muted-foreground">{t('statisticsTabs.accuracy')}</div>
+                  <div className="text-sm text-muted-foreground">Úspěšnost</div>
                 </div>
               </div>
               
               {dictionaryStats.length > 0 && (
                 <div className="mt-6">
-                  <h3 className="text-lg font-semibold mb-4">{t('statisticsTabs.recentGames')}</h3>
+                  <h3 className="text-lg font-semibold mb-4">Nedávné hry</h3>
                   <div className="space-y-2">
                     {dictionaryStats.slice(0, 5).map((stat) => (
                       <div key={stat.id} className="flex justify-between items-center p-3 bg-muted/30 rounded-lg">
                         <div>
                           <span className="font-medium">
-                            {t('dictionary.practice')} ({stat.direction === 'en_to_cz' ? 'EN → CZ' : 'CZ → EN'})
+                            Slovník ({stat.direction === 'en_to_cz' ? 'EN → CZ' : 'CZ → EN'})
                           </span>
                           <div className="text-sm text-muted-foreground">
                             {new Date(stat.created_at).toLocaleDateString('cs-CZ')}

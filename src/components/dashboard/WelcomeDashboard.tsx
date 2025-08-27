@@ -6,7 +6,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { useStatistics } from "@/hooks/useStatistics";
 import { BookOpen, Calculator, BarChart3, Target, Languages } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useLanguage } from "@/hooks/useLanguage";
 
 interface WelcomeDashboardProps {
   onNavigateToTab: (tab: "statistics") => void;
@@ -18,7 +17,6 @@ const WelcomeDashboard: React.FC<WelcomeDashboardProps> = ({
   const { authState } = useAuth();
   const { mathStats, spellingStats } = useStatistics(authState.user?.id || null);
   const navigate = useNavigate();
-  const { t } = useLanguage();
 
   const userName = authState.profile?.full_name || "Studente";
   const firstName = userName.split(" ")[0] || "Studente";
@@ -49,17 +47,17 @@ const WelcomeDashboard: React.FC<WelcomeDashboardProps> = ({
 
   // Get performance badges
   const getMathBadge = () => {
-    if (mathAccuracy >= 90) return { text: t('welcomeDashboard.badges.expert'), color: "bg-yellow-500" };
-    if (mathAccuracy >= 75) return { text: t('welcomeDashboard.badges.advanced'), color: "bg-green-500" };
-    if (mathAccuracy >= 50) return { text: t('welcomeDashboard.badges.learning'), color: "bg-blue-500" };
-    return { text: t('welcomeDashboard.badges.beginner'), color: "bg-gray-500" };
+    if (mathAccuracy >= 90) return { text: "Expert", color: "bg-yellow-500" };
+    if (mathAccuracy >= 75) return { text: "Pokročilý", color: "bg-green-500" };
+    if (mathAccuracy >= 50) return { text: "Učím se", color: "bg-blue-500" };
+    return { text: "Začátečník", color: "bg-gray-500" };
   };
 
   const getSpellingBadge = () => {
-    if (spellingAccuracy >= 90) return { text: t('welcomeDashboard.badges.spellingMaster'), color: "bg-purple-500" };
-    if (spellingAccuracy >= 75) return { text: t('welcomeDashboard.badges.advanced'), color: "bg-green-500" };
-    if (spellingAccuracy >= 50) return { text: t('welcomeDashboard.badges.learning'), color: "bg-blue-500" };
-    return { text: t('welcomeDashboard.badges.beginner'), color: "bg-gray-500" };
+    if (spellingAccuracy >= 90) return { text: "Mistr pravopisu", color: "bg-purple-500" };
+    if (spellingAccuracy >= 75) return { text: "Pokročilý", color: "bg-green-500" };
+    if (spellingAccuracy >= 50) return { text: "Učím se", color: "bg-blue-500" };
+    return { text: "Začátečník", color: "bg-gray-500" };
   };
 
   const mathBadge = getMathBadge();
@@ -70,10 +68,10 @@ const WelcomeDashboard: React.FC<WelcomeDashboardProps> = ({
       {/* Welcome Section */}
       <div className="text-center space-y-2">
         <h1 className="text-3xl font-bold text-foreground">
-          {t('welcomeDashboard.welcomeBack', { firstName })}
+          Vítej zpět, {firstName}! 👋
         </h1>
         <p className="text-muted-foreground">
-          {t('welcomeDashboard.welcomeMessage')}
+          Připraven na další učení? Pojďme se podívat na tvůj pokrok!
         </p>
       </div>
 
@@ -81,7 +79,7 @@ const WelcomeDashboard: React.FC<WelcomeDashboardProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card className="hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('welcomeDashboard.mathSection')}</CardTitle>
+            <CardTitle className="text-sm font-medium">Matematika</CardTitle>
             <Calculator className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
@@ -93,14 +91,14 @@ const WelcomeDashboard: React.FC<WelcomeDashboardProps> = ({
                 </Badge>
               </div>
               <p className="text-xs text-muted-foreground">
-                {t('welcomeDashboard.problemsSolved', { total: mathTotals.total })}
+                {mathTotals.total} vyřešených příkladů
               </p>
               <Button 
                 onClick={() => navigate('/math')}
                 className="w-full mt-2"
                 size="sm"
               >
-                {t('welcomeDashboard.practiceButtons.math')}
+                Procvičovat matematiku
               </Button>
             </div>
           </CardContent>
@@ -108,7 +106,7 @@ const WelcomeDashboard: React.FC<WelcomeDashboardProps> = ({
 
         <Card className="hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('welcomeDashboard.spellingSection')}</CardTitle>
+            <CardTitle className="text-sm font-medium">Pravopis</CardTitle>
             <BookOpen className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
@@ -120,14 +118,14 @@ const WelcomeDashboard: React.FC<WelcomeDashboardProps> = ({
                 </Badge>
               </div>
               <p className="text-xs text-muted-foreground">
-                {t('welcomeDashboard.wordsWritten', { total: spellingTotals.total })}
+                {spellingTotals.total} napsaných slov
               </p>
               <Button 
                 onClick={() => navigate('/spelling')}
                 className="w-full mt-2"
                 size="sm"
               >
-                {t('welcomeDashboard.practiceButtons.spelling')}
+                Procvičovat pravopis
               </Button>
             </div>
           </CardContent>
@@ -141,18 +139,18 @@ const WelcomeDashboard: React.FC<WelcomeDashboardProps> = ({
         <Card className="hover:shadow-md transition-shadow cursor-pointer"
               onClick={() => navigate('/dictionary')}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('welcomeDashboard.dictionarySection')}</CardTitle>
+            <CardTitle className="text-sm font-medium">Slovník</CardTitle>
             <Languages className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              <p className="text-xs text-muted-foreground">{t('welcomeDashboard.practiceVocabulary')}</p>
+              <p className="text-xs text-muted-foreground">Procvičuj si slovíčka</p>
               <Button
                 onClick={(e) => { e.stopPropagation(); navigate('/dictionary'); }}
                 className="w-full mt-2"
                 size="sm"
               >
-                {t('welcomeDashboard.practiceButtons.dictionary')}
+                Otevřít slovník
               </Button>
             </div>
           </CardContent>
