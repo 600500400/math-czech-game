@@ -125,7 +125,7 @@ export const StatisticsDialog = ({
         <DialogFooter className="mt-4">
           <Button 
             onClick={() => onOpenChange(false)}
-            className="bg-orange-500 hover:bg-orange-600 flex-1"
+            className="bg-subject-spelling hover:opacity-90 text-white flex-1"
           >
             Zavřít
           </Button>

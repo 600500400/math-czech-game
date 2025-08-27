@@ -29,7 +29,7 @@ export const StatisticsDialog: React.FC<StatisticsDialogProps> = ({
         </DialogHeader>
         <div className="py-4 space-y-4">
           <div className="text-center space-y-2">
-            <div className="text-3xl font-bold text-green-600">{correctAnswers}</div>
+            <div className="text-3xl font-bold text-success-600">{correctAnswers}</div>
             <div className="text-sm text-gray-600">Správných odpovědí</div>
           </div>
           
@@ -39,7 +39,7 @@ export const StatisticsDialog: React.FC<StatisticsDialogProps> = ({
           </div>
           
           <div className="text-center space-y-2">
-            <div className="text-3xl font-bold text-blue-600">{successRate}%</div>
+            <div className="text-3xl font-bold text-subject-math">{successRate}%</div>
             <div className="text-sm text-gray-600">Úspěšnost</div>
           </div>
         </div>

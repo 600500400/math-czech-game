@@ -58,7 +58,7 @@ const PracticeTabs: React.FC<PracticeTabsProps> = ({ defaultTab = "spelling" }) 
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <BookOpen className="h-5 w-5 text-green-600" />
+                <BookOpen className="h-5 w-5 text-subject-spelling" />
                 Procvičování pravopisu
               </CardTitle>
             </CardHeader>
@@ -72,7 +72,7 @@ const PracticeTabs: React.FC<PracticeTabsProps> = ({ defaultTab = "spelling" }) 
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Calculator className="h-5 w-5 text-blue-600" />
+                <Calculator className="h-5 w-5 text-subject-math" />
                 Procvičování matematiky
               </CardTitle>
             </CardHeader>

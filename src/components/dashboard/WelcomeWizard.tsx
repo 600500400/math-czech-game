@@ -79,7 +79,7 @@ export const WelcomeWizard: React.FC<WelcomeWizardProps> = ({
     {
       title: "Hotovo! 🎉",
       description: "Nyní můžete začít používat rodičovský dashboard.",
-      icon: <BookOpen className="h-8 w-8 text-purple-500" />,
+      icon: <BookOpen className="h-8 w-8 text-subject-dictionary" />,
       content: (
         <div className="space-y-4">
           <div className="text-center">

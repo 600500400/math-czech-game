@@ -28,7 +28,7 @@ export const GameControls = ({
       <Button 
         onClick={onShowGroupDialog} 
         variant="outline"
-        className="w-full py-2 border-blue-300 text-blue-600 hover:bg-blue-50 dark:border-blue-600 dark:text-blue-400 dark:hover:bg-blue-950"
+        className="w-full py-2 border-subject-spelling-border text-subject-spelling hover:bg-subject-spelling-light dark:border-subject-spelling dark:text-subject-spelling dark:hover:bg-subject-spelling-light/10"
       >
         <Settings size={16} className="mr-2" /> Vybrat skupiny slov
       </Button>

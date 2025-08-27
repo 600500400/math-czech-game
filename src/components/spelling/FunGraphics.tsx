@@ -89,7 +89,7 @@ export const FunGraphics = ({
             ) : (
               <Heart size={48} className="text-red-400" />
             )}
-            <p className={`text-2xl font-bold text-center ${isCorrect ? 'text-green-600' : 'text-orange-600'}`}>
+            <p className={`text-2xl font-bold text-center ${isCorrect ? 'text-success-600' : 'text-error-600'}`}>
               {isCorrect ? 'Výborně!' : 'Zkus to znovu!'}
             </p>
           </div>

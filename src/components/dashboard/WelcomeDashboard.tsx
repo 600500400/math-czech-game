@@ -47,17 +47,17 @@ const WelcomeDashboard: React.FC<WelcomeDashboardProps> = ({
 
   // Get performance badges
   const getMathBadge = () => {
-    if (mathAccuracy >= 90) return { text: "Expert", color: "bg-yellow-500" };
-    if (mathAccuracy >= 75) return { text: "Pokročilý", color: "bg-green-500" };
-    if (mathAccuracy >= 50) return { text: "Učím se", color: "bg-blue-500" };
-    return { text: "Začátečník", color: "bg-gray-500" };
+    if (mathAccuracy >= 90) return { text: "Expert", color: "bg-warning-500" };
+    if (mathAccuracy >= 75) return { text: "Pokročilý", color: "bg-success-500" };
+    if (mathAccuracy >= 50) return { text: "Učím se", color: "bg-subject-math" };
+    return { text: "Začátečník", color: "bg-muted" };
   };
 
   const getSpellingBadge = () => {
-    if (spellingAccuracy >= 90) return { text: "Mistr pravopisu", color: "bg-purple-500" };
-    if (spellingAccuracy >= 75) return { text: "Pokročilý", color: "bg-green-500" };
-    if (spellingAccuracy >= 50) return { text: "Učím se", color: "bg-blue-500" };
-    return { text: "Začátečník", color: "bg-gray-500" };
+    if (spellingAccuracy >= 90) return { text: "Mistr pravopisu", color: "bg-warning-500" };
+    if (spellingAccuracy >= 75) return { text: "Pokročilý", color: "bg-success-500" };
+    if (spellingAccuracy >= 50) return { text: "Učím se", color: "bg-subject-spelling" };
+    return { text: "Začátečník", color: "bg-muted" };
   };
 
   const mathBadge = getMathBadge();
@@ -80,7 +80,7 @@ const WelcomeDashboard: React.FC<WelcomeDashboardProps> = ({
         <Card className="hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Matematika</CardTitle>
-            <Calculator className="h-4 w-4 text-blue-600" />
+            <Calculator className="h-4 w-4 text-subject-math" />
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
@@ -107,7 +107,7 @@ const WelcomeDashboard: React.FC<WelcomeDashboardProps> = ({
         <Card className="hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Pravopis</CardTitle>
-            <BookOpen className="h-4 w-4 text-green-600" />
+            <BookOpen className="h-4 w-4 text-subject-spelling" />
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
@@ -140,7 +140,7 @@ const WelcomeDashboard: React.FC<WelcomeDashboardProps> = ({
               onClick={() => navigate('/dictionary')}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Slovník</CardTitle>
-            <Languages className="h-4 w-4 text-primary" />
+            <Languages className="h-4 w-4 text-subject-dictionary" />
           </CardHeader>
           <CardContent>
             <div className="space-y-2">

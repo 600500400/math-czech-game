@@ -55,7 +55,7 @@ export const EmptyDashboard: React.FC<EmptyDashboardProps> = ({ onChildCreated }
             </Card>
             
             <Card className="text-center p-4 bg-white/70">
-              <BookOpen className="h-8 w-8 text-purple-500 mx-auto mb-2" />
+              <BookOpen className="h-8 w-8 text-subject-dictionary mx-auto mb-2" />
               <h4 className="font-semibold mb-2">Analyzujte výsledky</h4>
               <p className="text-sm text-gray-600">
                 Grafy, trendy a porovnání mezi dětmi

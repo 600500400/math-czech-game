@@ -160,8 +160,8 @@ const StatisticsTabs: React.FC<StatisticsTabsProps> = ({
                   <div className="text-2xl font-bold text-red-600">{dictionaryWrong}</div>
                   <div className="text-sm text-muted-foreground">Špatně</div>
                 </div>
-                <div className="bg-blue-100 dark:bg-blue-900/20 p-4 rounded-lg text-center">
-                  <div className="text-2xl font-bold text-blue-600">{dictionaryAccuracy}%</div>
+                <div className="bg-subject-dictionary-light p-4 rounded-lg text-center">
+                  <div className="text-2xl font-bold text-subject-dictionary">{dictionaryAccuracy}%</div>
                   <div className="text-sm text-muted-foreground">Úspěšnost</div>
                 </div>
               </div>

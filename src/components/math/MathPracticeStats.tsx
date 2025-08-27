@@ -21,7 +21,7 @@ export const MathPracticeStats: React.FC<MathPracticeStatsProps> = ({
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-md mx-auto">
       <Card className="p-4 text-center glass-light border-white/30">
-        <div className="text-2xl font-bold text-green-600">{correctAnswers}</div>
+        <div className="text-2xl font-bold text-success-600">{correctAnswers}</div>
         <div className="text-sm text-gray-600">Správně</div>
       </Card>
       
@@ -31,7 +31,7 @@ export const MathPracticeStats: React.FC<MathPracticeStatsProps> = ({
       </Card>
       
       <Card className="p-4 text-center glass-light border-white/30">
-        <div className="text-2xl font-bold text-blue-600">{successRate}%</div>
+        <div className="text-2xl font-bold text-subject-math">{successRate}%</div>
         <div className="text-sm text-gray-600">Úspěšnost</div>
       </Card>
     </div>

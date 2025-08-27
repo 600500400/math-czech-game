@@ -74,7 +74,7 @@ const GameControls: React.FC<GameControlsProps> = ({
         <Button 
           onClick={onSetDifficulty} 
           variant="outline"
-          className="w-full border-blue-300 text-blue-600 hover:bg-blue-50 dark:border-blue-600 dark:text-blue-400 dark:hover:bg-blue-950"
+          className="w-full border-subject-math-border text-subject-math hover:bg-subject-math-light dark:border-subject-math dark:text-subject-math dark:hover:bg-subject-math-light/10"
         >
           <Settings size={16} className="mr-2" /> Nastavit obtížnost
         </Button>
@@ -83,7 +83,7 @@ const GameControls: React.FC<GameControlsProps> = ({
           <div className="grid grid-cols-2 gap-2">
             <Button
               onClick={onShowStats}
-              className="w-full bg-blue-500 hover:bg-blue-600 text-white"
+              className="w-full bg-subject-math hover:opacity-90 text-white"
             >
               Zobrazit statistiku
             </Button>
