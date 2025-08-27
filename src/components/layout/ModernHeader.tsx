@@ -20,18 +20,20 @@ const ModernHeader = () => {
       <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 sm:space-x-3 hover:opacity-80 transition-opacity">
+          <Link to="/" className="group flex items-center space-x-3 sm:space-x-4 hover:scale-105 transition-all duration-300">
             <div className="relative">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-primary rounded-xl flex items-center justify-center shadow-lg">
-                <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-orange-500 via-red-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-xl group-hover:shadow-2xl transition-all duration-300">
+                <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-white drop-shadow-sm" />
               </div>
-              <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-brand-500 absolute -top-1 -right-1 animate-pulse" />
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full flex items-center justify-center animate-pulse">
+                <Sparkles className="w-2.5 h-2.5 text-white" />
+              </div>
             </div>
             <div className="hidden sm:block">
-              <h1 className="text-xl font-heading font-bold text-foreground">
+              <h1 className="text-2xl font-black bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700 dark:from-white dark:via-gray-100 dark:to-gray-300 bg-clip-text text-transparent tracking-tight">
                 Procvička
               </h1>
-              <p className="text-xs text-muted-foreground -mt-1">
+              <p className="text-sm font-medium text-muted-foreground -mt-0.5 tracking-wide">
                 Aplikace pro procvičování
               </p>
             </div>
