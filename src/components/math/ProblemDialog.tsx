@@ -63,6 +63,24 @@ const ProblemDialog: React.FC<ProblemDialogProps> = ({
     checkAnswer();
   };
 
+  // Handle hardware keyboard input
+  const handleNumericKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key >= '0' && e.key <= '9') {
+      e.preventDefault();
+      triggerTapHaptic();
+      setUserAnswer(userAnswer + e.key);
+    } else if (e.key === 'Backspace') {
+      e.preventDefault();
+      triggerTapHaptic();
+      setUserAnswer(userAnswer.slice(0, -1));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (userAnswer.trim()) {
+        handleCheckAnswer();
+      }
+    }
+  };
+
   // Touch gestures for navigation
   const { elementRef } = useTouchGestures({
     onSwipeRight: () => {
@@ -130,7 +148,7 @@ const ProblemDialog: React.FC<ProblemDialogProps> = ({
                 type="text"
                 value={userAnswer}
                 onChange={() => {}} // No-op since we use numeric keyboard
-                onKeyDown={handleKeyPress}
+                onKeyDown={handleNumericKeyDown}
                 placeholder="Zadej odpověď"
                 className={`text-lg touch-manipulation glass-light border-white/30 ${isMobile ? 'h-14 text-lg' : 'h-12'}`}
                 readOnly={isMobile} // Prevent mobile keyboard
