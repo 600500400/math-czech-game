@@ -144,6 +144,7 @@ const ProblemDialog: React.FC<ProblemDialogProps> = ({
                   onKeyPress={handleKeyboardInput}
                   onClear={handleClear}
                   onSubmit={handleCheckAnswer}
+                  disabled={!userAnswer.trim()}
                 />
               </div>
               
