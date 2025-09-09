@@ -107,6 +107,8 @@ const MathPractice = () => {
         onEndGame={handleEndGame}
         lastAnswerCorrect={mathGame.lastAnswerCorrect}
         showAnimation={mathGame.showAnimation}
+        correctAnswers={mathGame.correctAnswers}
+        wrongAnswers={mathGame.wrongAnswers}
       />
 
       {/* Difficulty Settings Dialog */}

@@ -14,14 +14,14 @@ interface MathProblemDialogProps {
   onEndGame: () => void;
   lastAnswerCorrect: boolean | null;
   showAnimation: boolean;
+  correctAnswers: number;
+  wrongAnswers: number;
 }
 
 export const MathProblemDialog: React.FC<MathProblemDialogProps> = (props) => {
   // Calculate totals for ProblemDialog
-  const correctAnswers = 0; // This will be passed from parent if needed
-  const wrongAnswers = 0; // This will be passed from parent if needed
-  const totalAnswers = correctAnswers + wrongAnswers;
-  const correctPercentage = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 0;
+  const totalAnswers = props.correctAnswers + props.wrongAnswers;
+  const correctPercentage = totalAnswers > 0 ? Math.round((props.correctAnswers / totalAnswers) * 100) : 0;
 
   return (
     <ProblemDialog
@@ -33,8 +33,8 @@ export const MathProblemDialog: React.FC<MathProblemDialogProps> = (props) => {
       handleKeyPress={props.handleKeyPress}
       checkAnswer={props.checkAnswer}
       endGame={props.onEndGame}
-      correctAnswers={correctAnswers}
-      wrongAnswers={wrongAnswers}
+      correctAnswers={props.correctAnswers}
+      wrongAnswers={props.wrongAnswers}
       totalAnswers={totalAnswers}
       correctPercentage={correctPercentage}
     />
