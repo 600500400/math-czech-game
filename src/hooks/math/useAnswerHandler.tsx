@@ -80,7 +80,7 @@ export function useAnswerHandler({
         setUserAnswer("");
       }, 100); // Small delay to ensure animation cleanup
       
-    }, 2500); // Extended to 2500ms to show progress bar feedback
+    }, 1500); // Extended to 1500ms to show progress bar feedback
 
   }, [
     currentProblem,
