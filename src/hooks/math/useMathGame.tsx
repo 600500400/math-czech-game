@@ -104,5 +104,8 @@ export const useMathGame = () => {
     endGame,
     toggleOperation,
     setDifficulty,
+    setMaxValue: difficultySettings.setMaxValue,
+    setMaxMultiplyValue: difficultySettings.setMaxMultiplyValue,
+    setMaxDivideValue: difficultySettings.setMaxDivideValue,
   };
 };

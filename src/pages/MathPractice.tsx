@@ -213,6 +213,9 @@ const MathPractice = () => {
         allowedOperations={mathGame.allowedOperations}
         toggleOperation={mathGame.toggleOperation}
         setDifficulty={mathGame.setDifficulty}
+        setMaxValue={mathGame.setMaxValue}
+        setMaxMultiplyValue={mathGame.setMaxMultiplyValue}
+        setMaxDivideValue={mathGame.setMaxDivideValue}
       />
 
       {/* Statistics Dialog */}
