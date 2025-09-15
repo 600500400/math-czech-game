@@ -58,8 +58,8 @@ const DifficultyDialog: React.FC<DifficultyDialogProps> = ({
   const operationInfo = [
     { operation: "+" as Operation, label: "Sčítání", icon: <Plus size={16} /> },
     { operation: "-" as Operation, label: "Odčítání", icon: <Minus size={16} /> },
-    { operation: "*" as Operation, label: "Násobení (1-10)", icon: <Multiply size={16} /> },
-    { operation: "/" as Operation, label: "Dělení (1-10)", icon: <Divide size={16} /> },
+    { operation: "*" as Operation, label: "Násobení", icon: <Multiply size={16} /> },
+    { operation: "/" as Operation, label: "Dělení", icon: <Divide size={16} /> },
   ];
   
   return (
