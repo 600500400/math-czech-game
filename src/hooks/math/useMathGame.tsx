@@ -12,9 +12,10 @@ export const useMathGame = () => {
   const difficultySettings = useDifficultySettings();
   const problemGenerator = useProblemGenerator({
     allowedOperations: difficultySettings.allowedOperations,
+    minValue: difficultySettings.minValue,
     maxValue: difficultySettings.maxValue,
-    maxMultiplyValue: difficultySettings.maxMultiplyValue,
-    maxDivideValue: difficultySettings.maxDivideValue
+    usedProblems: gameState.usedProblems,
+    setUsedProblems: gameState.setUsedProblems
   });
   
   const answerHandler = useAnswerHandler({
@@ -32,9 +33,8 @@ export const useMathGame = () => {
 
   const gameFlow = useGameFlow({
     allowedOperations: difficultySettings.allowedOperations,
+    minValue: difficultySettings.minValue,
     maxValue: difficultySettings.maxValue,
-    maxMultiplyValue: difficultySettings.maxMultiplyValue,
-    maxDivideValue: difficultySettings.maxDivideValue,
     correctAnswers: gameState.correctAnswers,
     wrongAnswers: gameState.wrongAnswers,
     generateProblem: problemGenerator.generateProblem,
@@ -88,9 +88,8 @@ export const useMathGame = () => {
     difficultySet: gameFlow.difficultySet,
     
     // Difficulty settings
+    minValue: difficultySettings.minValue,
     maxValue: difficultySettings.maxValue,
-    maxMultiplyValue: difficultySettings.maxMultiplyValue,
-    maxDivideValue: difficultySettings.maxDivideValue,
     allowedOperations: difficultySettings.allowedOperations,
     
     // Actions
@@ -104,8 +103,7 @@ export const useMathGame = () => {
     endGame,
     toggleOperation,
     setDifficulty,
+    setMinValue: difficultySettings.setMinValue,
     setMaxValue: difficultySettings.setMaxValue,
-    setMaxMultiplyValue: difficultySettings.setMaxMultiplyValue,
-    setMaxDivideValue: difficultySettings.setMaxDivideValue,
   };
 };

@@ -31,6 +31,7 @@ export interface MathGameState {
   showProblem: boolean;
   showDifficultyDialog: boolean;
   showStatsDialog: boolean;
+  minValue: number;
   maxValue: number;
   difficultySet: boolean;
   gameEnded: boolean;
@@ -39,13 +40,13 @@ export interface MathGameState {
   showConfetti: boolean;
   gameStartTime?: Date;
   gameDuration?: number;
-  answers: MathAnswer[]; // New field for detailed answers
+  answers: MathAnswer[];
+  usedProblems: Set<string>; // Track used problems to avoid duplicates
 }
 
 export interface DifficultyLevel {
+  minValue: number;
   maxValue: number;
-  maxMultiplyValue: number;
-  maxDivideValue: number;
 }
 
 export interface DetailedMathStatistics {

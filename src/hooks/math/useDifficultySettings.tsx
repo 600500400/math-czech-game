@@ -5,9 +5,8 @@ import { Operation } from "@/types/mathTypes";
 
 export function useDifficultySettings() {
   const { toast } = useToast();
+  const [minValue, setMinValue] = useState(1);
   const [maxValue, setMaxValue] = useState(10);
-  const [maxMultiplyValue, setMaxMultiplyValue] = useState(10);
-  const [maxDivideValue, setMaxDivideValue] = useState(10);
   const [allowedOperations, setAllowedOperations] = useState<Operation[]>(["+", "-", "*", "/"]);
 
   const toggleOperation = useCallback((operation: Operation) => {
@@ -32,21 +31,18 @@ export function useDifficultySettings() {
   const setDifficulty = useCallback((level: "easy" | "medium" | "hard") => {
     switch (level) {
       case "easy":
+        setMinValue(1);
         setMaxValue(10);
-        setMaxMultiplyValue(5);
-        setMaxDivideValue(5);
         setAllowedOperations(["+", "-"]);
         break;
       case "medium":
-        setMaxValue(20);
-        setMaxMultiplyValue(10);
-        setMaxDivideValue(10);
+        setMinValue(5);
+        setMaxValue(25);
         setAllowedOperations(["+", "-", "*"]);
         break;
       case "hard":
-        setMaxValue(50);
-        setMaxMultiplyValue(15);
-        setMaxDivideValue(15);
+        setMinValue(10);
+        setMaxValue(100);
         setAllowedOperations(["+", "-", "*", "/"]);
         break;
     }
@@ -57,16 +53,19 @@ export function useDifficultySettings() {
     });
   }, [toast]);
 
+  const setPreset = useCallback((preset: "easy" | "medium" | "hard") => {
+    setDifficulty(preset);
+  }, [setDifficulty]);
+
   return {
+    minValue,
+    setMinValue,
     maxValue,
     setMaxValue,
-    maxMultiplyValue,
-    setMaxMultiplyValue,
-    maxDivideValue,
-    setMaxDivideValue,
     allowedOperations,
     setAllowedOperations,
     toggleOperation,
     setDifficulty,
+    setPreset,
   };
 }

@@ -6,9 +6,8 @@ import { useStatistics } from '@/hooks/useStatistics';
 
 interface UseGameFlowProps {
   allowedOperations: Operation[];
+  minValue: number;
   maxValue: number;
-  maxMultiplyValue: number;
-  maxDivideValue: number;
   correctAnswers: number;
   wrongAnswers: number;
   generateProblem: () => any;
@@ -18,9 +17,8 @@ interface UseGameFlowProps {
 
 export function useGameFlow({
   allowedOperations,
+  minValue,
   maxValue,
-  maxMultiplyValue,
-  maxDivideValue,
   correctAnswers,
   wrongAnswers,
   generateProblem,
@@ -83,9 +81,8 @@ export function useGameFlow({
           operation: operationString,
           gameDuration,
           difficultyLevel: {
-            maxValue,
-            maxMultiplyValue,
-            maxDivideValue
+            minValue,
+            maxValue
           }
         });
       } else {
@@ -105,9 +102,8 @@ export function useGameFlow({
     correctAnswers, 
     wrongAnswers, 
     allowedOperations, 
+    minValue, 
     maxValue, 
-    maxMultiplyValue, 
-    maxDivideValue, 
     userId, 
     saveMathStatistics,
     gameStartTime

@@ -13,9 +13,8 @@ export function useGameState() {
   const [showProblem, setShowProblem] = useState(false);
   const [showDifficultyDialog, setShowDifficultyDialog] = useState(false);
   const [showStatsDialog, setShowStatsDialog] = useState(false);
+  const [minValue, setMinValue] = useState(1);
   const [maxValue, setMaxValue] = useState(10);
-  const [maxMultiplyValue, setMaxMultiplyValue] = useState(10);
-  const [maxDivideValue, setMaxDivideValue] = useState(10);
   const [difficultySet, setDifficultySet] = useState(false);
   const [allowedOperations, setAllowedOperations] = useState<Operation[]>(["+", "-", "*", "/"]);
   const [gameEnded, setGameEnded] = useState(false);
@@ -23,6 +22,7 @@ export function useGameState() {
   const [showAnimation, setShowAnimation] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [answers, setAnswers] = useState<MathAnswer[]>([]);
+  const [usedProblems, setUsedProblems] = useState<Set<string>>(new Set());
 
   // Calculated properties
   const totalAnswers = correctAnswers + wrongAnswers;
@@ -33,9 +33,10 @@ export function useGameState() {
     setAnswers(prev => [...prev, answer]);
   }, []);
 
-  // Reset answers
+  // Reset answers and used problems
   const resetAnswers = useCallback(() => {
     setAnswers([]);
+    setUsedProblems(new Set());
   }, []);
 
   // Increment functions for compatibility
@@ -65,12 +66,10 @@ export function useGameState() {
     setShowDifficultyDialog,
     showStatsDialog,
     setShowStatsDialog,
+    minValue,
+    setMinValue,
     maxValue,
     setMaxValue,
-    maxMultiplyValue,
-    setMaxMultiplyValue,
-    maxDivideValue,
-    setMaxDivideValue,
     difficultySet,
     setDifficultySet,
     allowedOperations,
@@ -85,6 +84,8 @@ export function useGameState() {
     setShowConfetti,
     answers,
     setAnswers,
+    usedProblems,
+    setUsedProblems,
     
     // Calculated properties
     totalAnswers,
