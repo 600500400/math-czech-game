@@ -14,6 +14,9 @@ export default defineConfig(({ mode }) => ({
     mode === 'development' &&
     componentTagger(),
   ].filter(Boolean),
+  define: {
+    'import.meta.env.VITE_BUILD_TIME': JSON.stringify(Date.now()),
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

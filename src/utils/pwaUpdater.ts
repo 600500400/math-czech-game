@@ -17,8 +17,10 @@ class PWAUpdater {
   };
   private initialized = false;
   private lastUpdateCheck = 0;
-  private readonly UPDATE_COOLDOWN = 30000; // 30 seconds
+  private readonly UPDATE_COOLDOWN = 10000; // 10 seconds (více agresivní)
   private sessionNotificationShown = false;
+  private updateCheckInterval: number | null = null;
+  private backgroundUpdateEnabled = true;
 
   constructor() {
     if (PWAUpdater.instance) {
@@ -58,7 +60,13 @@ class PWAUpdater {
       // Listen for controlling service worker changes
       navigator.serviceWorker.addEventListener('controllerchange', this.handleControllerChange);
       
-      console.log('🔄 PWA Updater initialized');
+      // Spustit pravidelné kontroly aktualizací
+      this.startBackgroundUpdateChecks();
+      
+      // Přidat listenery pro focus/visibility změny
+      this.setupVisibilityListeners();
+      
+      console.log('🔄 PWA Updater initialized with version:', APP_VERSION.getFullVersionWithBuild());
     } catch (error) {
       console.error('Failed to register service worker:', error);
       this.setState({ hasUpdate: false, isUpdating: false, error: 'Failed to initialize updater' });
@@ -178,6 +186,61 @@ class PWAUpdater {
 
   public getCurrentVersion(): string {
     return APP_VERSION.getFullVersionWithBuild();
+  }
+
+  private startBackgroundUpdateChecks() {
+    if (!this.backgroundUpdateEnabled) return;
+    
+    // Kontrola každých 5 minut
+    this.updateCheckInterval = window.setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        console.log('🔄 Background update check triggered');
+        this.checkForUpdates();
+      }
+    }, 5 * 60 * 1000);
+  }
+
+  private setupVisibilityListeners() {
+    // Kontrola při změně viditelnosti (návrat z jiné záložky)
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        console.log('🔄 Page visible - checking for updates');
+        setTimeout(() => this.checkForUpdates(), 1000);
+      }
+    });
+
+    // Kontrola při focus okna
+    window.addEventListener('focus', () => {
+      console.log('🔄 Window focused - checking for updates');
+      setTimeout(() => this.checkForUpdates(), 1000);
+    });
+  }
+
+  public enableBackgroundUpdates(enabled: boolean) {
+    this.backgroundUpdateEnabled = enabled;
+    if (!enabled && this.updateCheckInterval) {
+      clearInterval(this.updateCheckInterval);
+      this.updateCheckInterval = null;
+    } else if (enabled && !this.updateCheckInterval) {
+      this.startBackgroundUpdateChecks();
+    }
+  }
+
+  public async debugInfo(): Promise<any> {
+    const registration = await navigator.serviceWorker.getRegistration();
+    return {
+      currentVersion: this.getCurrentVersion(),
+      registrationState: registration ? {
+        active: registration.active?.state,
+        waiting: registration.waiting?.state,
+        installing: registration.installing?.state,
+        scope: registration.scope
+      } : null,
+      cacheNames: await caches.keys(),
+      state: this.state,
+      lastUpdateCheck: new Date(this.lastUpdateCheck).toISOString(),
+      backgroundUpdatesEnabled: this.backgroundUpdateEnabled
+    };
   }
 }
 

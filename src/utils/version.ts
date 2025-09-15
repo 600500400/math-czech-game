@@ -1,11 +1,11 @@
 
-// Automatické verzování aplikace
+// Automatické verzování aplikace s dynamickým build timestampem
 export const APP_VERSION = {
   major: 1,
   minor: 2,
   patch: 4,
-  build: 1735120800000, // Fixed build timestamp to prevent constant rebuilds
-  getBuildDate: () => new Date().toISOString(),
+  build: import.meta.env.VITE_BUILD_TIME || Date.now(),
+  getBuildDate: () => new Date(APP_VERSION.build).toISOString(),
   getFullVersion: () => `${APP_VERSION.major}.${APP_VERSION.minor}.${APP_VERSION.patch}`,
   getFullVersionWithBuild: () => `${APP_VERSION.getFullVersion()}-${APP_VERSION.build}`,
   logVersion: () => {

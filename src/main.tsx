@@ -8,6 +8,12 @@ import { pwaUpdater } from './utils/pwaUpdater'
 // Initialize versioning and PWA updater
 APP_VERSION.initializeVersioning();
 
+// Automatická kontrola verzí při načtení
+setTimeout(() => {
+  console.log('🚀 Checking for app updates on startup...');
+  pwaUpdater.checkForUpdates();
+}, 3000); // Delay pro lepší startup performance
+
 // Initialize optional PWA features lazily
 const requestIdle = (cb: () => void) => {
   if ('requestIdleCallback' in window) {
