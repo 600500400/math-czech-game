@@ -60,15 +60,28 @@
   ],
   "shortcuts": [
     {
+      "name": "Slovník",
+      "short_name": "Slovník",
+      "description": "Procvičování anglických slovíček",
+      "url": "/dictionary",
+      "icons": [
+        {
+          "src": "/icon-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
       "name": "Matematika",
       "short_name": "Matika",
       "description": "Rychlé spuštění matematických úloh",
       "url": "/?practice=math",
       "icons": [
         {
-          "src": "/placeholder.svg",
+          "src": "/icon-192x192.png",
           "sizes": "192x192",
-          "type": "image/svg+xml"
+          "type": "image/png"
         }
       ]
     },
@@ -79,22 +92,22 @@
       "url": "/?practice=spelling",
       "icons": [
         {
-          "src": "/placeholder.svg",
+          "src": "/icon-192x192.png",
           "sizes": "192x192",
-          "type": "image/svg+xml"
+          "type": "image/png"
         }
       ]
     },
     {
-      "name": "Statistiky",
-      "short_name": "Stats",
-      "description": "Zobrazit statistiky výkonu",
-      "url": "/?view=statistics",
+      "name": "Žebříček",
+      "short_name": "Žebříček",
+      "description": "Zobrazit žebříček nejlepších",
+      "url": "/leaderboards",
       "icons": [
         {
-          "src": "/placeholder.svg",
+          "src": "/icon-192x192.png",
           "sizes": "192x192",
-          "type": "image/svg+xml"
+          "type": "image/png"
         }
       ]
     },
@@ -102,12 +115,12 @@
       "name": "Úspěchy",
       "short_name": "Úspěchy",
       "description": "Zobrazit dosažené úspěchy",
-      "url": "/?view=achievements",
+      "url": "/achievements",
       "icons": [
         {
-          "src": "/placeholder.svg",
+          "src": "/icon-192x192.png",
           "sizes": "192x192",
-          "type": "image/svg+xml"
+          "type": "image/png"
         }
       ]
     }
