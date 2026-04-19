@@ -158,12 +158,6 @@ const SpellingPractice = () => {
         correctAnswers={correctAnswers}
         wrongAnswers={wrongAnswers}
         lastAnswerCorrect={lastAnswerCorrect}
-        correctLetters={correctLetters}
-        currentPosition={currentPosition}
-        handleAnswerI={handleAnswerI}
-        handleAnswerY={handleAnswerY}
-        correctAnswers={correctAnswers}
-        wrongAnswers={wrongAnswers}
         showStatsDialog={showStatsDialog}
         setShowStatsDialog={setShowStatsDialog}
         totalAnswers={totalAnswers}
