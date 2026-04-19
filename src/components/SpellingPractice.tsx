@@ -27,6 +27,7 @@ const SpellingPractice = () => {
     showStatsDialog,
     selectedGroups,
     wordGroup,
+    wordType,
     isPhrase,
     correctLetters,
     missingPositions,
@@ -148,7 +149,15 @@ const SpellingPractice = () => {
         currentWord={currentWord}
         isPhrase={isPhrase}
         wordGroup={wordGroup}
+        wordType={wordType}
         missingPositions={missingPositions}
+        correctLetters={correctLetters}
+        currentPosition={currentPosition}
+        handleAnswerI={handleAnswerI}
+        handleAnswerY={handleAnswerY}
+        correctAnswers={correctAnswers}
+        wrongAnswers={wrongAnswers}
+        lastAnswerCorrect={lastAnswerCorrect}
         correctLetters={correctLetters}
         currentPosition={currentPosition}
         handleAnswerI={handleAnswerI}
