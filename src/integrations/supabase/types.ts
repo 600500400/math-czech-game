@@ -515,10 +515,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      calculate_xp_for_level: {
-        Args: { level_num: number }
-        Returns: number
-      }
+      calculate_xp_for_level: { Args: { level_num: number }; Returns: number }
       update_user_level: {
         Args: { p_user_id: string; p_xp_gained: number }
         Returns: {
