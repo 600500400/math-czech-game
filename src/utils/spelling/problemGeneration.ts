@@ -40,15 +40,11 @@ export function generateSpellingProblem(
   }
   
   if (usePhrase && randomGroup.phrases) {
-    console.log("⚙️ generateSpellingProblem: Pokus o použití fráze");
-    // Vybereme náhodnou frázi
     const randomPhrase = randomGroup.phrases[Math.floor(Math.random() * randomGroup.phrases.length)];
-    console.log("⚙️ generateSpellingProblem: Vybraná fráze:", randomPhrase);
-    
-    // Najdeme všechny pozice i/y/í/ý v textu
+
     const positions: number[] = [];
     const letters: string[] = [];
-    
+
     for (let i = 0; i < randomPhrase.length; i++) {
       const char = randomPhrase[i].toLowerCase();
       if (char === 'i' || char === 'y' || char === 'í' || char === 'ý') {
@@ -56,53 +52,40 @@ export function generateSpellingProblem(
         letters.push(char);
       }
     }
-    
-    console.log("⚙️ generateSpellingProblem: Pozice i/y ve frázi:", positions, "Písmena:", letters);
-    
-    // Pokud jsou nějaké i/y ve frázi
+
     if (positions.length > 0) {
-      // Vytvoříme text s podtržítky místo i/y
       let displayedPhrase = '';
       for (let i = 0; i < randomPhrase.length; i++) {
-        if (positions.includes(i)) {
-          displayedPhrase += '_';
-        } else {
-          displayedPhrase += randomPhrase[i];
-        }
+        displayedPhrase += positions.includes(i) ? '_' : randomPhrase[i];
       }
-      
-      console.log("⚙️ generateSpellingProblem: Zobrazená fráze:", displayedPhrase);
-      
+
       return {
         word: randomPhrase,
         displayed: displayedPhrase,
         group: randomGroup.name,
         positions,
         letters,
-        isPhrase: true
+        isPhrase: true,
       };
     }
   }
-  
-  // Pokud nepoužijeme frázi nebo žádná není k dispozici, použijeme slovo
+
+  // Fallback: použijeme jednotlivé slovo
   const words = randomGroup.words;
   if (words.length === 0) {
-    console.log("⚙️ generateSpellingProblem: Žádná slova ve skupině");
+    logger.warn("⚙️ generateSpellingProblem: Žádná slova ve skupině");
     return null;
   }
-  
-  // Opakujeme výběr slova, dokud nenajdeme takové, které obsahuje i/y
+
   let attempts = 0;
-  const maxAttempts = 50; // Zabránění nekonečné smyčky
-  
+  const maxAttempts = 50;
+
   while (attempts < maxAttempts) {
     const randomWord = words[Math.floor(Math.random() * words.length)];
-    console.log(`⚙️ generateSpellingProblem: Pokus ${attempts + 1}: zkouším slovo "${randomWord.word}"`);
-    
-    // Najdeme všechny pozice i/y/í/ý ve slově
+
     const positions: number[] = [];
     const letters: string[] = [];
-    
+
     for (let i = 0; i < randomWord.word.length; i++) {
       const char = randomWord.word[i].toLowerCase();
       if (char === 'i' || char === 'y' || char === 'í' || char === 'ý') {
@@ -110,24 +93,13 @@ export function generateSpellingProblem(
         letters.push(char);
       }
     }
-    
-    console.log("⚙️ generateSpellingProblem: Pozice i/y ve slově:", positions, "Písmena:", letters);
-    
-    // Pokud slovo obsahuje i/y, použijeme ho
+
     if (positions.length > 0) {
-      // Vytvoříme slovo s podtržítky místo i/y
       let displayedWord = '';
       for (let i = 0; i < randomWord.word.length; i++) {
-        if (positions.includes(i)) {
-          displayedWord += '_';
-        } else {
-          displayedWord += randomWord.word[i];
-        }
+        displayedWord += positions.includes(i) ? '_' : randomWord.word[i];
       }
-      
-      console.log("⚙️ generateSpellingProblem: Originální slovo:", randomWord.word);
-      console.log("⚙️ generateSpellingProblem: Zobrazené slovo:", displayedWord);
-      
+
       return {
         word: randomWord.word,
         displayed: displayedWord,
@@ -135,14 +107,14 @@ export function generateSpellingProblem(
         type: randomWord.type,
         positions,
         letters,
-        isPhrase: false
+        isPhrase: false,
       };
     }
-    
+
     attempts++;
   }
-  
-  // Pokud nenajdeme žádné vhodné slovo, vrátíme null
-  console.warn(`⚙️ generateSpellingProblem: Nenalezeno žádné slovo s i/y ve skupině ${randomGroup.name} po ${maxAttempts} pokusech`);
+
+  logger.warn(`⚙️ generateSpellingProblem: Žádné vhodné slovo ve skupině ${randomGroup.name}`);
   return null;
 }
+
