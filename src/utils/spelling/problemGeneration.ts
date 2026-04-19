@@ -1,26 +1,43 @@
 
 import { SpellingGroup } from "@/types/spellingTypes";
+import { logger } from "@/utils/logger";
+
+export type PhraseMode = "mixed" | "phrases-only" | "words-only";
+
+// Pravděpodobnost výběru fráze v režimu "mixed" (50%)
+const MIXED_PHRASE_PROBABILITY = 0.5;
 
 // Funkce pro generování problému
-export function generateSpellingProblem(selectedGroups: string[], spellingGroups: SpellingGroup[]) {
-  console.log("⚙️ generateSpellingProblem: Generování problému pro skupiny:", selectedGroups);
-  
+export function generateSpellingProblem(
+  selectedGroups: string[],
+  spellingGroups: SpellingGroup[],
+  phraseMode: PhraseMode = "mixed"
+) {
+  logger.debug("⚙️ generateSpellingProblem: skupiny:", selectedGroups, "režim:", phraseMode);
+
   // Filtrujeme skupiny podle výběru
-  const availableGroups = spellingGroups.filter(group => 
+  const availableGroups = spellingGroups.filter(group =>
     selectedGroups.includes(group.name)
   );
-  
+
   if (availableGroups.length === 0) {
-    console.log("⚙️ generateSpellingProblem: Žádné dostupné skupiny");
+    logger.warn("⚙️ generateSpellingProblem: Žádné dostupné skupiny");
     return null;
   }
-  
+
   // Náhodně vybereme skupinu
   const randomGroup = availableGroups[Math.floor(Math.random() * availableGroups.length)];
-  console.log("⚙️ generateSpellingProblem: Vybraná skupina:", randomGroup.name);
-  
-  // Náhodně rozhodneme, zda použijeme frázi nebo slovo
-  const usePhrase = randomGroup.phrases && randomGroup.phrases.length > 0 && Math.random() > 0.7;
+
+  // Rozhodnutí o použití fráze podle režimu
+  const hasPhrases = !!(randomGroup.phrases && randomGroup.phrases.length > 0);
+  let usePhrase = false;
+  if (phraseMode === "phrases-only") {
+    usePhrase = hasPhrases;
+  } else if (phraseMode === "words-only") {
+    usePhrase = false;
+  } else {
+    usePhrase = hasPhrases && Math.random() < MIXED_PHRASE_PROBABILITY;
+  }
   
   if (usePhrase && randomGroup.phrases) {
     console.log("⚙️ generateSpellingProblem: Pokus o použití fráze");
