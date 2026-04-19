@@ -16,6 +16,7 @@ interface WordProblemDialogProps {
   currentWord: string;
   isPhrase: boolean;
   wordGroup: string;
+  wordType?: string;
   missingPositions: number[];
   correctLetters: string[];
   currentPosition: number;
@@ -23,6 +24,7 @@ interface WordProblemDialogProps {
   handleAnswerY: () => void;
   correctAnswers: number;
   wrongAnswers: number;
+  lastAnswerCorrect?: boolean | null;
 }
 
 const WordProblemDialog: React.FC<WordProblemDialogProps> = ({
@@ -33,13 +35,15 @@ const WordProblemDialog: React.FC<WordProblemDialogProps> = ({
   currentWord,
   isPhrase,
   wordGroup,
+  wordType,
   missingPositions,
   correctLetters,
   currentPosition,
   handleAnswerI,
   handleAnswerY,
   correctAnswers,
-  wrongAnswers
+  wrongAnswers,
+  lastAnswerCorrect,
 }) => {
   const isMobile = useIsMobile();
   const { triggerTapHaptic } = useMobileInteractions({ hapticsEnabled: true, preventZoom: true });
