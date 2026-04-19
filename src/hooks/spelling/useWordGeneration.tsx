@@ -1,6 +1,7 @@
 
 import { useCallback } from "react";
 import { getWordsFromGroups, createDisplayedWord } from "@/utils/spellingUtils";
+import { logger } from "@/utils/logger";
 
 interface UseWordGenerationProps {
   selectedGroups: string[];
@@ -13,6 +14,7 @@ interface UseWordGenerationProps {
     isPhrase: boolean;
     positions: number[];
     letters: string[];
+    type?: string;
   }) => void;
 }
 
@@ -20,85 +22,70 @@ export const useWordGeneration = ({
   selectedGroups,
   setLastAnswerCorrect,
   setShowAnimation,
-  updateWordState
+  updateWordState,
 }: UseWordGenerationProps) => {
-  
+
   const generateNewWord = useCallback(() => {
-    console.log("🎯 generateNewWord: Generuji nové slovo pro skupiny:", selectedGroups);
-    
     if (selectedGroups.length === 0) {
-      console.warn("⚠️ generateNewWord: Žádné skupiny nevybrány");
+      logger.warn("⚠️ generateNewWord: Žádné skupiny nevybrány");
       return;
     }
 
     try {
       const allWords = getWordsFromGroups(selectedGroups);
-      console.log("📚 generateNewWord: Dostupná slova:", allWords.length);
-      
+
       if (allWords.length === 0) {
-        console.error("❌ generateNewWord: Žádná platná slova k dispozici pro vybrané skupiny");
+        logger.error("❌ generateNewWord: Žádná platná slova pro skupiny:", selectedGroups);
         return;
       }
 
-      // Try to find a valid word (with safety limit to prevent infinite loop)
       let attempts = 0;
       const maxAttempts = 50;
-      let validWord = null;
+      let validWord: ReturnType<typeof getWordsFromGroups>[number] & {
+        displayWord: string;
+        positions: number[];
+        letters: string[];
+      } | null = null;
 
       while (attempts < maxAttempts && !validWord) {
         const randomWord = allWords[Math.floor(Math.random() * allWords.length)];
-        console.log(`🎲 generateNewWord: Pokus ${attempts + 1}: testuju slovo "${randomWord.word}"`);
-        
         const { displayWord, positions, letters } = createDisplayedWord(randomWord.word);
-        
-        // Check if word actually has positions to fill
+
         if (positions.length > 0) {
           validWord = {
             ...randomWord,
             displayWord,
             positions,
-            letters
+            letters,
           };
-          console.log("✅ generateNewWord: Nalezeno platné slovo:", validWord);
-        } else {
-          console.log(`⚠️ generateNewWord: Slovo "${randomWord.word}" nemá žádné i/y pozice`);
         }
-        
         attempts++;
       }
 
       if (!validWord) {
-        console.error("❌ generateNewWord: Nepodařilo se najít platné slovo po", maxAttempts, "pokusech");
+        logger.error("❌ generateNewWord: Nepodařilo se najít platné slovo po", maxAttempts, "pokusech");
         return;
       }
 
       // FORCE RESET ANIMATION BEFORE SETTING NEW WORD
-      console.log("🎯 generateNewWord: Force reset animace před nastavením nového slova");
       setShowAnimation(false);
       setLastAnswerCorrect(null);
 
-      // Set the valid word using the callback
       updateWordState({
         word: validWord.word,
         displayWord: validWord.displayWord,
         group: validWord.group,
         isPhrase: validWord.isPhrase || false,
         positions: validWord.positions,
-        letters: validWord.letters
-      });
-      
-      console.log("✅ generateNewWord: Nové slovo úspěšně nastaveno:", {
-        word: validWord.word,
-        displayWord: validWord.displayWord,
-        positions: validWord.positions,
-        letters: validWord.letters
+        letters: validWord.letters,
+        type: validWord.type,
       });
     } catch (error) {
-      console.error("❌ generateNewWord: Chyba při generování nového slova:", error);
+      logger.error("❌ generateNewWord: Chyba při generování slova:", error);
     }
   }, [selectedGroups, setShowAnimation, setLastAnswerCorrect, updateWordState]);
 
   return {
-    generateNewWord
+    generateNewWord,
   };
 };

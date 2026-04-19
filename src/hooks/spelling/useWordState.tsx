@@ -5,6 +5,7 @@ export const useWordState = () => {
   const [currentWord, setCurrentWord] = useState("");
   const [displayedWord, setDisplayedWord] = useState("");
   const [wordGroup, setWordGroup] = useState("");
+  const [wordType, setWordType] = useState<string | undefined>(undefined);
   const [isPhrase, setIsPhrase] = useState(false);
   const [correctLetters, setCorrectLetters] = useState<string[]>([]);
   const [missingPositions, setMissingPositions] = useState<number[]>([]);
@@ -14,6 +15,7 @@ export const useWordState = () => {
     setCurrentWord("");
     setDisplayedWord("");
     setWordGroup("");
+    setWordType(undefined);
     setIsPhrase(false);
     setCorrectLetters([]);
     setMissingPositions([]);
@@ -27,10 +29,12 @@ export const useWordState = () => {
     isPhrase: boolean;
     positions: number[];
     letters: string[];
+    type?: string;
   }) => {
     setCurrentWord(wordData.word);
     setDisplayedWord(wordData.displayWord);
     setWordGroup(wordData.group);
+    setWordType(wordData.type);
     setIsPhrase(wordData.isPhrase);
     setMissingPositions(wordData.positions);
     setCorrectLetters(wordData.letters);
@@ -45,6 +49,7 @@ export const useWordState = () => {
     currentWord,
     displayedWord,
     wordGroup,
+    wordType,
     isPhrase,
     correctLetters,
     missingPositions,
@@ -52,6 +57,6 @@ export const useWordState = () => {
     resetWordState,
     updateWordState,
     moveToNextPosition,
-    setDisplayedWord
+    setDisplayedWord,
   };
 };
