@@ -92,8 +92,10 @@ export const useMathGame = () => {
     // Difficulty settings
     minValue: difficultySettings.minValue,
     maxValue: difficultySettings.maxValue,
+    mulDivMin: difficultySettings.mulDivMin,
+    mulDivMax: difficultySettings.mulDivMax,
     allowedOperations: difficultySettings.allowedOperations,
-    
+
     // Actions
     setUserAnswer: gameState.setUserAnswer,
     setShowProblem: gameFlow.setShowProblem,
@@ -107,5 +109,7 @@ export const useMathGame = () => {
     setDifficulty,
     setMinValue: difficultySettings.setMinValue,
     setMaxValue: difficultySettings.setMaxValue,
+    setMulDivMin: difficultySettings.setMulDivMin,
+    setMulDivMax: difficultySettings.setMulDivMax,
   };
 };
