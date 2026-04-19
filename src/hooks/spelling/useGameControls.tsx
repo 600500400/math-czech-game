@@ -2,6 +2,7 @@
 import { useCallback } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { toast } from "sonner";
+import { logger } from "@/utils/logger";
 
 export interface UseGameControlsProps {
   selectedGroups: string[];
@@ -76,7 +77,7 @@ export const useGameControls = ({
     
     // Save statistics if user is logged in and there are some results
     if (userId && saveSpellingStatistics && (correctAnswers > 0 || wrongAnswers > 0)) {
-      console.log("Ukládám statistiky na konci hry:", {
+      logger.debug("Ukládám statistiky na konci hry:", {
         correctAnswers,
         wrongAnswers,
         wordGroups: selectedGroups,
@@ -96,7 +97,7 @@ export const useGameControls = ({
           }
         }, {
           onSuccess: () => {
-            console.log("Statistiky úspěšně uloženy");
+            logger.debug("Statistiky úspěšně uloženy");
             // Nezobrazeit toast zde - už se zobrazí v useSpellingStatistics
           },
           onError: (error: any) => {

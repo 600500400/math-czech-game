@@ -9,6 +9,7 @@ import { useAuth } from "../useAuth";
 import { useStatistics } from "../useStatistics";
 import { useGameControls } from "./useGameControls";
 import { useDetailedAnswers } from "../statistics/useDetailedAnswers";
+import { logger } from "@/utils/logger";
 
 export const useSpellingGame = () => {
   // Get user authentication state
@@ -29,7 +30,7 @@ export const useSpellingGame = () => {
   
   // Enhanced addAnswer function that saves to both game stats and detailed answers
   const enhancedAddAnswer = useCallback((answer: any) => {
-    console.log("🔍 useSpellingGame: Ukládám detailní odpověď:", answer);
+    logger.debug("🔍 useSpellingGame: Ukládám detailní odpověď:", answer);
     gameStats.addAnswer(answer);
     addSpellingAnswer(answer);
   }, [gameStats.addAnswer, addSpellingAnswer]);
