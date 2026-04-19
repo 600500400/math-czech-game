@@ -14,6 +14,8 @@ export const useMathGame = () => {
     allowedOperations: difficultySettings.allowedOperations,
     minValue: difficultySettings.minValue,
     maxValue: difficultySettings.maxValue,
+    mulDivMin: difficultySettings.mulDivMin,
+    mulDivMax: difficultySettings.mulDivMax,
     usedProblems: gameState.usedProblems,
     setUsedProblems: gameState.setUsedProblems
   });
