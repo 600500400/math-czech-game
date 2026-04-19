@@ -89,7 +89,26 @@ const WordProblemDialog: React.FC<WordProblemDialogProps> = ({
               <DialogDescription className="sr-only">
                 Zde můžete doplňovat správná písmena do slov
               </DialogDescription>
+              {wordGroup && (
+                <p className="text-center text-xs text-muted-foreground mt-1">
+                  Skupina: <span className="font-semibold">{wordGroup}</span>
+                  {isPhrase && <span className="ml-1">· věta</span>}
+                </p>
+              )}
             </DialogHeader>
+
+            {/* Hint po správné odpovědi */}
+            {lastAnswerCorrect === true && wordType && !isPhrase && (
+              <div className="mt-2 p-2 rounded-lg bg-green-50 border border-green-200 text-center">
+                <p className="text-sm text-green-700">
+                  ✓ <span className="font-semibold">{currentWord}</span>
+                  {" — "}
+                  {wordType === "vyjmenované" && `vyjmenované slovo po ${wordGroup}`}
+                  {wordType === "příbuzné" && `příbuzné slovo k vyjmenovaným po ${wordGroup}`}
+                  {wordType === "odvozené" && `slovo s měkkým i (kontrast k vyjmenovaným po ${wordGroup})`}
+                </p>
+              </div>
+            )}
 
             <div className="py-4 space-y-4">
               <HoverScale>
