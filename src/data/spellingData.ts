@@ -27,7 +27,7 @@ export const spellingGroups: SpellingGroup[] = [
       { word: "obydlí", type: "příbuzné" },
       { word: "obyvatelstvo", type: "příbuzné" },
       { word: "obyčejně", type: "příbuzné" },
-      { word: "bystrnost", type: "příbuzné" },
+      { word: "bystrost", type: "příbuzné" },
       { word: "bylinkář", type: "příbuzné" },
       { word: "kobylka", type: "příbuzné" },
       { word: "bidlo", type: "odvozené" },
@@ -69,10 +69,7 @@ export const spellingGroups: SpellingGroup[] = [
       { word: "plýtvání", type: "příbuzné" },
       { word: "vzlykot", type: "příbuzné" },
       { word: "lysina", type: "příbuzné" },
-      { word: "plynárenský", type: "příbuzné" },
-      { word: "linka", type: "odvozené" },
-      { word: "list", type: "odvozené" },
-      { word: "lichý", type: "odvozené" }
+      { word: "plynárenský", type: "příbuzné" }
     ],
     phrases: [
       "Na nebi se blýská",
@@ -168,7 +165,7 @@ export const spellingGroups: SpellingGroup[] = [
       { word: "vysychání", type: "příbuzné" },
       { word: "sýkorka", type: "příbuzné" },
       { word: "syslí", type: "příbuzné" },
-      { word: "sysypání", type: "příbuzné" },
+      { word: "sypání", type: "příbuzné" },
       { word: "posypat", type: "příbuzné" }
     ]
   },
@@ -206,31 +203,25 @@ export const spellingGroups: SpellingGroup[] = [
   {
     name: "Z",
     words: [
+      { word: "brzy", type: "vyjmenované" },
       { word: "jazyk", type: "vyjmenované" },
       { word: "nazývat", type: "vyjmenované" },
-      { word: "ozývat se", type: "vyjmenované" },
-      { word: "vyzývat", type: "vyjmenované" },
-      { word: "zbytek", type: "vyjmenované" },
-      { word: "zvedat", type: "vyjmenované" },
-      { word: "způsob", type: "vyjmenované" },
-      { word: "zykat", type: "vyjmenované" },
-      { word: "zisk", type: "vyjmenované" },
-      { word: "hezký", type: "vyjmenované" },
-      { word: "prazdroj", type: "vyjmenované" },
-      { word: "zkouška", type: "vyjmenované" },
+      { word: "Ruzyně", type: "vyjmenované" },
       // Příbuzná a odvozená slova
       { word: "jazykový", type: "příbuzné" },
-      { word: "pojmenovat", type: "příbuzné" },
-      { word: "ozvěna", type: "příbuzné" },
+      { word: "jazýček", type: "příbuzné" },
+      { word: "nazývaný", type: "příbuzné" },
+      { word: "vyzývat", type: "příbuzné" },
+      { word: "vzývat", type: "příbuzné" },
+      { word: "ozývat se", type: "příbuzné" },
+      { word: "ozývání", type: "příbuzné" },
       { word: "výzva", type: "příbuzné" },
-      { word: "zbývat", type: "příbuzné" },
-      { word: "zvednout", type: "příbuzné" },
-      { word: "způsobný", type: "příbuzné" },
-      { word: "zykavý", type: "příbuzné" },
-      { word: "ziskovost", type: "příbuzné" },
-      { word: "hezkost", type: "příbuzné" },
-      { word: "prazdrojový", type: "příbuzné" },
-      { word: "zkušební", type: "příbuzné" }
+      { word: "vyzývavý", type: "příbuzné" }
+    ],
+    phrases: [
+      "Brzy ráno vstávám do školy",
+      "Jazyk je důležitý pro řeč",
+      "Ozývá se výzva ze záhady"
     ]
   }
 ];
