@@ -30,6 +30,7 @@ export const useWordProblem = ({
     currentWord,
     displayedWord,
     wordGroup,
+    wordType,
     isPhrase,
     correctLetters,
     missingPositions,
@@ -69,7 +70,6 @@ export const useWordProblem = ({
   // Generate initial word when groups are selected
   useEffect(() => {
     if (selectedGroups.length > 0 && !currentWord) {
-      console.log("🚀 useWordProblem: Generuji první slovo pro vybrané skupiny");
       generateNewWord();
     }
   }, [selectedGroups, currentWord, generateNewWord]);
@@ -78,6 +78,7 @@ export const useWordProblem = ({
     currentWord,
     displayedWord,
     wordGroup,
+    wordType,
     isPhrase,
     correctLetters,
     missingPositions,

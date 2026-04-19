@@ -75,6 +75,7 @@ export const useSpellingGame = () => {
     currentWord: wordProblem.currentWord,
     displayedWord: wordProblem.displayedWord,
     wordGroup: wordProblem.wordGroup,
+    wordType: wordProblem.wordType,
     isPhrase: wordProblem.isPhrase,
     correctLetters: wordProblem.correctLetters,
     missingPositions: wordProblem.missingPositions,
