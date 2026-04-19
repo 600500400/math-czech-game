@@ -1,5 +1,6 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
+import { logger } from "@/utils/logger";
 
 export function useAnimationState() {
   const [lastAnswerCorrect, setLastAnswerCorrect] = useState<boolean | null>(null);
@@ -11,7 +12,7 @@ export function useAnimationState() {
   
   // Emergency cleanup function
   const emergencyCleanup = useCallback(() => {
-    console.log("🚨 useAnimationState: EMERGENCY CLEANUP triggered");
+    logger.debug("🚨 useAnimationState: EMERGENCY CLEANUP triggered");
     
     // Clear all timeouts
     if (animationTimeoutRef.current) {
@@ -41,17 +42,17 @@ export function useAnimationState() {
   }, [emergencyCleanup]);
   
   const setLastAnswerCorrectSafe = useCallback((value: boolean | null) => {
-    console.log("🎬 useAnimationState: Setting lastAnswerCorrect to:", value);
+    logger.debug("🎬 useAnimationState: Setting lastAnswerCorrect to:", value);
     setLastAnswerCorrect(value);
   }, []);
   
   const setShowAnimationSafe = useCallback((value: boolean) => {
     const currentAnimationId = animationId;
-    console.log("🎬 useAnimationState: Setting showAnimation to:", value, "ID:", currentAnimationId, "Currently active:", animationActiveRef.current);
+    logger.debug("🎬 useAnimationState: Setting showAnimation to:", value, "ID:", currentAnimationId, "Currently active:", animationActiveRef.current);
     
     // If trying to show new animation, always do emergency cleanup first
     if (value) {
-      console.log("🎬 useAnimationState: Starting new animation - doing emergency cleanup first");
+      logger.debug("🎬 useAnimationState: Starting new animation - doing emergency cleanup first");
       emergencyCleanup();
       
       // Small delay to ensure cleanup is complete
@@ -79,7 +80,7 @@ export function useAnimationState() {
   
   const scheduleAnimationHide = useCallback((delay: number = 1500) => {
     const currentAnimationId = animationId;
-    console.log("🎬 useAnimationState: Scheduling animation hide in", delay, "ms, ID:", currentAnimationId);
+    logger.debug("🎬 useAnimationState: Scheduling animation hide in", delay, "ms, ID:", currentAnimationId);
     
     // Clear any existing timeout
     if (animationTimeoutRef.current) {
@@ -89,7 +90,7 @@ export function useAnimationState() {
     animationTimeoutRef.current = setTimeout(() => {
       // Only hide if this is still the current animation
       if (currentAnimationId === animationId) {
-        console.log("🎬 useAnimationState: Auto-hiding animation after timeout, ID:", currentAnimationId);
+        logger.debug("🎬 useAnimationState: Auto-hiding animation after timeout, ID:", currentAnimationId);
         setShowAnimation(false);
         animationActiveRef.current = false;
         animationTimeoutRef.current = null;
@@ -105,7 +106,7 @@ export function useAnimationState() {
   }, [animationId]);
   
   const resetAnimation = useCallback(() => {
-    console.log("🎬 useAnimationState: Manual reset animation");
+    logger.debug("🎬 useAnimationState: Manual reset animation");
     emergencyCleanup();
   }, [emergencyCleanup]);
   

@@ -2,6 +2,7 @@
 import { useCallback } from "react";
 import { SpellingAnswer } from "@/types/spellingTypes";
 import { checkSpellingAnswer, renderWordWithCurrentGap } from "@/utils/spellingUtils";
+import { logger } from "@/utils/logger";
 
 interface UseAnswerHandlingProps {
   currentWord: string;
@@ -38,7 +39,7 @@ export const useAnswerHandling = ({
 }: UseAnswerHandlingProps) => {
 
   const handleAnswer = useCallback((letter: "i" | "y") => {
-    console.log("🎯 handleAnswer: Zpracovávám odpověď:", letter);
+    logger.debug("🎯 handleAnswer: Zpracovávám odpověď:", letter);
     
     if (currentPosition >= missingPositions.length) {
       console.warn("⚠️ handleAnswer: Všechny pozice již vyplněny");
@@ -51,7 +52,7 @@ export const useAnswerHandling = ({
     // Use the checkSpellingAnswer function for proper comparison
     const isCorrect = checkSpellingAnswer(correctAnswer, letter);
 
-    console.log("🔍 handleAnswer: Kontrola odpovědi:", {
+    logger.debug("🔍 handleAnswer: Kontrola odpovědi:", {
       userAnswer: letter,
       correctAnswer,
       position,
@@ -70,7 +71,7 @@ export const useAnswerHandling = ({
       }
     }
     
-    console.log("🔤 handleAnswer: Zobrazujem vybrané písmeno:", tempDisplayedWord);
+    logger.debug("🔤 handleAnswer: Zobrazujem vybrané písmeno:", tempDisplayedWord);
     setDisplayedWord(tempDisplayedWord);
 
     // Record the answer
@@ -94,13 +95,13 @@ export const useAnswerHandling = ({
     }
 
     // Show animation
-    console.log("🎬 handleAnswer: Starting animation sequence");
+    logger.debug("🎬 handleAnswer: Starting animation sequence");
     setLastAnswerCorrect(isCorrect);
     setShowAnimation(true);
 
     // Wait a bit longer to show the selected letter, then show animation result
     setTimeout(() => {
-      console.log("🎬 handleAnswer: Hiding animation");
+      logger.debug("🎬 handleAnswer: Hiding animation");
       setShowAnimation(false);
       setLastAnswerCorrect(null);
       
@@ -113,17 +114,17 @@ export const useAnswerHandling = ({
         nextPosition
       );
       
-      console.log("🔤 handleAnswer: Updating displayed word:", updatedDisplayedWord);
+      logger.debug("🔤 handleAnswer: Updating displayed word:", updatedDisplayedWord);
       setDisplayedWord(updatedDisplayedWord);
       
       setTimeout(() => {
         if (nextPosition >= missingPositions.length) {
           // Word completed - generate new word
-          console.log("🎯 handleAnswer: Word completed, generating new word");
+          logger.debug("🎯 handleAnswer: Word completed, generating new word");
           generateNewWord();
         } else {
           // Move to next position in same word
-          console.log("➡️ handleAnswer: Moving to next position:", nextPosition);
+          logger.debug("➡️ handleAnswer: Moving to next position:", nextPosition);
           moveToNextPosition();
         }
       }, 100);

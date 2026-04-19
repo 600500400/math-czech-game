@@ -3,6 +3,7 @@ import { useState, useCallback } from 'react';
 import { Operation } from '@/types/mathTypes';
 import { useAuth } from '@/hooks/useAuth';
 import { useStatistics } from '@/hooks/useStatistics';
+import { logger } from "@/utils/logger";
 
 interface UseGameFlowProps {
   allowedOperations: Operation[];
@@ -38,10 +39,10 @@ export function useGameFlow({
 
   // Start new game flow
   const startNewGame = useCallback(() => {
-    console.log("🎮 useGameFlow: Starting new game");
+    logger.debug("🎮 useGameFlow: Starting new game");
     const startTime = Date.now();
     setGameStartTime(startTime);
-    console.log("🎮 useGameFlow: Game start time set to:", new Date(startTime).toLocaleTimeString());
+    logger.debug("🎮 useGameFlow: Game start time set to:", new Date(startTime).toLocaleTimeString());
     
     setCurrentProblem(generateProblem());
     setShowProblem(true);
@@ -51,9 +52,9 @@ export function useGameFlow({
 
   // End game flow
   const endGame = useCallback(() => {
-    console.log("🎮 useGameFlow: Ending game");
-    console.log("🎮 useGameFlow: Game start time was:", gameStartTime ? new Date(gameStartTime).toLocaleTimeString() : 'NULL');
-    console.log("🎮 useGameFlow: Current time:", new Date().toLocaleTimeString());
+    logger.debug("🎮 useGameFlow: Ending game");
+    logger.debug("🎮 useGameFlow: Game start time was:", gameStartTime ? new Date(gameStartTime).toLocaleTimeString() : 'NULL');
+    logger.debug("🎮 useGameFlow: Current time:", new Date().toLocaleTimeString());
     
     setShowProblem(false);
     setGameEnded(true);
@@ -65,15 +66,15 @@ export function useGameFlow({
       const gameDuration = Math.round((endTime - gameStartTime) / 1000);
       const operationString = allowedOperations.join(',');
       
-      console.log("🎮 useGameFlow: Saving game statistics:");
-      console.log("🎮 useGameFlow: - Start time:", new Date(gameStartTime).toLocaleTimeString());
-      console.log("🎮 useGameFlow: - End time:", new Date(endTime).toLocaleTimeString());
-      console.log("🎮 useGameFlow: - Duration in seconds:", gameDuration);
-      console.log("🎮 useGameFlow: - Correct answers:", correctAnswers);
-      console.log("🎮 useGameFlow: - Wrong answers:", wrongAnswers);
+      logger.debug("🎮 useGameFlow: Saving game statistics:");
+      logger.debug("🎮 useGameFlow: - Start time:", new Date(gameStartTime).toLocaleTimeString());
+      logger.debug("🎮 useGameFlow: - End time:", new Date(endTime).toLocaleTimeString());
+      logger.debug("🎮 useGameFlow: - Duration in seconds:", gameDuration);
+      logger.debug("🎮 useGameFlow: - Correct answers:", correctAnswers);
+      logger.debug("🎮 useGameFlow: - Wrong answers:", wrongAnswers);
       
       if (gameDuration > 0) {
-        console.log("🎮 useGameFlow: Calling saveMathStatistics.mutate with duration:", gameDuration);
+        logger.debug("🎮 useGameFlow: Calling saveMathStatistics.mutate with duration:", gameDuration);
         
         saveMathStatistics.mutate({
           correctAnswers,
@@ -89,7 +90,7 @@ export function useGameFlow({
         console.warn("🎮 useGameFlow: Invalid game duration:", gameDuration);
       }
     } else {
-      console.log("🎮 useGameFlow: Not saving statistics - missing requirements:", {
+      logger.debug("🎮 useGameFlow: Not saving statistics - missing requirements:", {
         userId: !!userId,
         gameStartTime: !!gameStartTime,
         hasAnswers: (correctAnswers > 0 || wrongAnswers > 0)

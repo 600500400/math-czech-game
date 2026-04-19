@@ -1,9 +1,10 @@
 
 import { removeDiacritics } from "@/lib/utils";
+import { logger } from "@/utils/logger";
 
 // Helper function to create displayed word with missing letters
 export function createDisplayedWord(word: string) {
-  console.log("🔤 createDisplayedWord: Zpracovávám slovo:", word);
+  logger.debug("🔤 createDisplayedWord: Zpracovávám slovo:", word);
   
   const positions: number[] = [];
   const letters: string[] = [];
@@ -29,9 +30,9 @@ export function createDisplayedWord(word: string) {
     }
   }
   
-  console.log("🔤 createDisplayedWord: Zobrazené slovo:", displayWord);
-  console.log("🔤 createDisplayedWord: Pozice:", positions);
-  console.log("🔤 createDisplayedWord: Písmena (normalizovaná):", letters);
+  logger.debug("🔤 createDisplayedWord: Zobrazené slovo:", displayWord);
+  logger.debug("🔤 createDisplayedWord: Pozice:", positions);
+  logger.debug("🔤 createDisplayedWord: Písmena (normalizovaná):", letters);
   
   return {
     displayWord,

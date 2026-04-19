@@ -209,11 +209,15 @@ const MathPractice = () => {
         onOpenChange={mathGame.setShowDifficultyDialog}
         minValue={mathGame.minValue}
         maxValue={mathGame.maxValue}
+        mulDivMin={mathGame.mulDivMin}
+        mulDivMax={mathGame.mulDivMax}
         allowedOperations={mathGame.allowedOperations}
         toggleOperation={mathGame.toggleOperation}
         setDifficulty={mathGame.setDifficulty}
         setMinValue={mathGame.setMinValue}
         setMaxValue={mathGame.setMaxValue}
+        setMulDivMin={mathGame.setMulDivMin}
+        setMulDivMax={mathGame.setMulDivMax}
       />
 
       {/* Statistics Dialog */}

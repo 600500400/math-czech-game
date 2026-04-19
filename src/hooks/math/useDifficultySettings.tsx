@@ -5,13 +5,16 @@ import { Operation } from "@/types/mathTypes";
 
 export function useDifficultySettings() {
   const { toast } = useToast();
+  // Rozsah pro sčítání / odčítání
   const [minValue, setMinValue] = useState(1);
   const [maxValue, setMaxValue] = useState(10);
+  // Rozsah pro násobení / dělení (samostatný)
+  const [mulDivMin, setMulDivMin] = useState(1);
+  const [mulDivMax, setMulDivMax] = useState(10);
   const [allowedOperations, setAllowedOperations] = useState<Operation[]>(["+", "-", "*", "/"]);
 
   const toggleOperation = useCallback((operation: Operation) => {
     if (allowedOperations.includes(operation)) {
-      // Don't allow removing the last operation
       if (allowedOperations.length === 1) {
         toast({
           title: "Upozornění",
@@ -20,10 +23,8 @@ export function useDifficultySettings() {
         });
         return;
       }
-      // Remove the operation
       setAllowedOperations(allowedOperations.filter(op => op !== operation));
     } else {
-      // Add the operation
       setAllowedOperations([...allowedOperations, operation]);
     }
   }, [allowedOperations, toast]);
@@ -33,16 +34,22 @@ export function useDifficultySettings() {
       case "easy":
         setMinValue(1);
         setMaxValue(10);
+        setMulDivMin(1);
+        setMulDivMax(5);
         setAllowedOperations(["+", "-"]);
         break;
       case "medium":
         setMinValue(5);
         setMaxValue(25);
+        setMulDivMin(1);
+        setMulDivMax(10);
         setAllowedOperations(["+", "-", "*"]);
         break;
       case "hard":
         setMinValue(10);
         setMaxValue(100);
+        setMulDivMin(2);
+        setMulDivMax(12);
         setAllowedOperations(["+", "-", "*", "/"]);
         break;
     }
@@ -62,6 +69,10 @@ export function useDifficultySettings() {
     setMinValue,
     maxValue,
     setMaxValue,
+    mulDivMin,
+    setMulDivMin,
+    mulDivMax,
+    setMulDivMax,
     allowedOperations,
     setAllowedOperations,
     toggleOperation,

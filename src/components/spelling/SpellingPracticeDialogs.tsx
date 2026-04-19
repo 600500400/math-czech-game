@@ -14,7 +14,7 @@ interface SpellingPracticeDialogsProps {
   setGroups: () => void;
   toggleAllGroups: () => void;
   allSelected: boolean;
-  
+
   // Word problem dialog props
   showProblem: boolean;
   onEndGame: () => void;
@@ -22,6 +22,7 @@ interface SpellingPracticeDialogsProps {
   currentWord: string;
   isPhrase: boolean;
   wordGroup: string;
+  wordType?: string;
   missingPositions: number[];
   correctLetters: string[];
   currentPosition: number;
@@ -29,7 +30,8 @@ interface SpellingPracticeDialogsProps {
   handleAnswerY: () => void;
   correctAnswers: number;
   wrongAnswers: number;
-  
+  lastAnswerCorrect?: boolean | null;
+
   // Statistics dialog props
   showStatsDialog: boolean;
   setShowStatsDialog: (show: boolean) => void;
@@ -51,6 +53,7 @@ export const SpellingPracticeDialogs = ({
   currentWord,
   isPhrase,
   wordGroup,
+  wordType,
   missingPositions,
   correctLetters,
   currentPosition,
@@ -58,14 +61,14 @@ export const SpellingPracticeDialogs = ({
   handleAnswerY,
   correctAnswers,
   wrongAnswers,
+  lastAnswerCorrect,
   showStatsDialog,
   setShowStatsDialog,
   totalAnswers,
-  answers
+  answers,
 }: SpellingPracticeDialogsProps) => {
   return (
     <>
-      {/* Group Selection Dialog */}
       <GroupSelectionDialog
         open={showGroupDialog}
         onOpenChange={setShowGroupDialog}
@@ -77,7 +80,6 @@ export const SpellingPracticeDialogs = ({
         allSelected={allSelected}
       />
 
-      {/* Word Problem Dialog with statistics */}
       <WordProblemDialog
         open={showProblem}
         onOpenChange={(open) => {
@@ -87,6 +89,7 @@ export const SpellingPracticeDialogs = ({
         currentWord={currentWord}
         isPhrase={isPhrase}
         wordGroup={wordGroup}
+        wordType={wordType}
         missingPositions={missingPositions}
         correctLetters={correctLetters}
         currentPosition={currentPosition}
@@ -95,10 +98,10 @@ export const SpellingPracticeDialogs = ({
         onEndGame={onEndGame}
         correctAnswers={correctAnswers}
         wrongAnswers={wrongAnswers}
+        lastAnswerCorrect={lastAnswerCorrect}
       />
-      
-      {/* Statistics Dialog with answers - only shown when manually requested */}
-      <StatisticsDialog 
+
+      <StatisticsDialog
         open={showStatsDialog}
         onOpenChange={setShowStatsDialog}
         correctAnswers={correctAnswers}
