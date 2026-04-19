@@ -1,5 +1,6 @@
 
 import { spellingGroups } from "@/data/spellingData";
+import { logger } from "@/utils/logger";
 
 // Helper function to check if a word contains i/y letters
 function containsTargetLetters(word: string): boolean {
@@ -9,47 +10,38 @@ function containsTargetLetters(word: string): boolean {
 
 // Helper function to get words from selected groups
 export function getWordsFromGroups(selectedGroups: string[]) {
-  console.log("📚 getWordsFromGroups: Získávám slova ze skupin:", selectedGroups);
-  
-  const allWords: Array<{word: string, group: string, isPhrase?: boolean}> = [];
-  
+  const allWords: Array<{ word: string; group: string; isPhrase?: boolean; type?: string }> = [];
+
   spellingGroups.forEach(group => {
     if (selectedGroups.includes(group.name)) {
-      // Add regular words - but only those containing i/y
       group.words.forEach(wordObj => {
         if (containsTargetLetters(wordObj.word)) {
           allWords.push({
             word: wordObj.word,
             group: group.name,
-            isPhrase: false
+            isPhrase: false,
+            type: wordObj.type,
           });
-        } else {
-          console.log(`⚠️ Skipping word "${wordObj.word}" - no i/y letters found`);
         }
       });
-      
-      // Add phrases if available - but only those containing i/y
+
       if (group.phrases) {
         group.phrases.forEach(phrase => {
           if (containsTargetLetters(phrase)) {
             allWords.push({
               word: phrase,
               group: group.name,
-              isPhrase: true
+              isPhrase: true,
             });
-          } else {
-            console.log(`⚠️ Skipping phrase "${phrase}" - no i/y letters found`);
           }
         });
       }
     }
   });
-  
-  console.log("📚 getWordsFromGroups: Nalezeno platných slov:", allWords.length);
-  
+
   if (allWords.length === 0) {
-    console.warn("⚠️ getWordsFromGroups: Žádná platná slova nalezena pro vybrané skupiny!");
+    logger.warn("⚠️ getWordsFromGroups: Žádná platná slova nalezena pro vybrané skupiny:", selectedGroups);
   }
-  
+
   return allWords;
 }
