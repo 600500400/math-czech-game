@@ -1,85 +1,60 @@
 
 
-## Analýza aplikace - nalezené chyby a návrhy vylepšení
+## Analýza problému
 
-### 🔴 KRITICKÉ - Pravopisné chyby v datech (`src/data/spellingData.ts`)
+Uživatel má pravdu. V databázi `src/data/spellingData.ts` je masivní nerovnováha:
 
-**Skupina B:**
-- `"bystrnost"` → správně **`"bystrost"`** (překlep, slovo neexistuje)
+| Skupina | Slova s Y/Ý (vyjmenovaná + příbuzná) | Slova s měkkým I/Í (protiklady) |
+|---------|--------------------------------------|---------------------------------|
+| B       | 25                                   | 3 (`bidlo`, `nabídka`, `bit`)   |
+| L       | 25                                   | **0**                           |
+| M       | 23                                   | **0**                           |
+| P       | 25                                   | **0**                           |
+| S       | 25                                   | **0**                           |
+| V       | 25                                   | **0**                           |
+| Z       | 13                                   | **0**                           |
 
-**Skupina S:**
-- `"sysypání"` → správně **`"sypání"`** (zdvojené "sy")
+**Výsledek:** Z ~161 slov v databázi má pouze 3 slova měkké I (1.8 %). Logika výběru v `wordSelection.ts` filtruje všechna slova obsahující i/y/í/ý, ale prakticky všechna obsahují Y. Dítě tak skoro nikdy nemusí volit měkké I → neučí se rozlišovat, jen mechanicky tipuje Y.
 
-**Skupina Z (závažné problémy):**
-- `"zykat"` a `"zykavý"` → **neexistující slova** v češtině (možná zamýšleno "zvykat"/"zvykavý", ale ty patří do skupiny V)
-- `"prazdroj"` → značka piva, **není vyjmenované slovo**
-- `"zkouška"`, `"zkušební"` → **neobsahují y/i pro procvičování** vyjmenovaných po Z (nemají sporné y/i)
+**Pedagogická chyba:** Pravopis vyjmenovaných slov se učí PRÁVĚ porovnáním s protiklady (např. *byl* × *bil*, *mýt* × *mít*, *výt* × *vít*, *slyšet* × *lišit*).
 
-**Skupina L (matoucí klasifikace):**
-- `"linka"`, `"list"`, `"lichý"` jsou označené jako "odvozené" - **nejsou ale příbuzná vyjmenovaným po L**, jen obsahují "i". Pro děti matoucí - mohou si myslet, že "list" souvisí s "lýko".
+## Plán řešení
 
-### 🟠 STŘEDNÍ - Bug v matematice (potvrzeno z předchozí konverzace)
+### 1. Doplnit "kontrastní slova" (s měkkým I) do každé skupiny
 
-**`src/hooks/math/useProblemGenerator.tsx` řádek 37:**
-```typescript
-num2 = Math.floor(Math.random() * (Math.min(num1, maxValue) - minValue + 1)) + minValue;
-```
-`Math.min(num1, maxValue)` je matematicky bezvýznamné (num1 je už ≤ maxValue). Druhé číslo v odčítání bude vždy ≤ num1, takže reálný rozsah je menší než nastavený - **uživatel zmínil že už funguje OK**, ale logika je nečitelná a měla by se zjednodušit pro lepší údržbu.
+Přidat do `spellingTypes.ts` typ slova `"kontrastní"` (= příbuzné jiného kořene s měkkým i).
+Doplnit tato slova ke každé skupině (cca 8-12 slov na skupinu) pro rovnováhu zhruba 60% Y / 40% I:
 
-### 🟡 UX vylepšení - Matematika
+- **B**: `bít` (bít se), `bít se`, `bicí`, `nabít`, `pobít`, `obilí`, `kobliha` (rozlišení od *kobyla*), `bizon`, `biskup`, `obilný`
+- **L**: `lišit`, `liška`, `lichý`, `lipa`, `linka`, `list`, `liják`, `litovat`, `líbit se`, `lichotit`
+- **M**: `mít` (vlastnit), `míč`, `milý`, `miska`, `minulost`, `mince`, `minout`, `milovat`, `mistr`, `místo`
+- **P**: `pít`, `pivo`, `písmeno`, `psí` (pes), `pilný`, `pilíř`, `pisatel`, `pila`, `pilot`, `pichlavý`
+- **S**: `sirka`, `silný`, `síla`, `sídlo`, `sice`, `sirota`, `síto`, `sin`, `silo`, `slibovat`
+- **V**: `vít` (věnec), `víla`, `vidět`, `vinout`, `víno`, `vichr`, `viset`, `vinař`, `vidlička`, `viník`
+- **Z**: `získat`, `zima`, `zimní`, `zívat`, `zítra`, `zinek`, `zip`, `zisk`
 
-1. **Chybí možnost nastavit rozsah násobení/dělení** - je natvrdo 1-10 (řádky 41-49). Pro pokročilejší děti by bylo vhodné mít rozsah až do násobilky 1-100 (např. 12·12).
+### 2. Vyvážit výběr v `wordSelection.ts`
 
-2. **Preset "Lehké" rovná se default** - není jasný rozdíl mezi výchozím nastavením a presetem.
+Přidat (volitelně) logiku, která zaručí, že generovaná slova budou střídat Y-slova a I-slova v poměru zhruba 50/50, bez ohledu na to kolik slov je v databázi (např. nejdřív losování typu Y/I, pak slovo z dané podmnožiny). To zabrání tomu, aby dominovala početnější skupina.
 
-3. **Dělení vždy beze zbytku** - to je správné pro děti, ale chybí informace v UI.
+### 3. Aktualizovat zpětnou vazbu v UI
 
-4. **Žádný timeout na odpověď** - chybí volitelný režim "na čas" pro motivaci.
+V `WordProblemDialog.tsx` po správné odpovědi:
+- pro `vyjmenované` / `příbuzné` → "Toto je vyjmenované slovo (po B) - píše se tvrdé Y"
+- pro `odvozené` / `kontrastní` → "Toto NENÍ vyjmenované slovo - píše se měkké I"
 
-### 🟡 UX vylepšení - Pravopis
+Tím se z aplikace stane skutečný procvičovací nástroj na rozlišování i/y, ne jen mechanické doplňování Y.
 
-1. **Chybí typ slova v nápovědě** - aplikace ví že slovo je "vyjmenované"/"příbuzné"/"odvozené", ale uživatel to nevidí. Pro učení by pomohlo zobrazit:
-   - "Toto je **vyjmenované slovo** po B" (po správné odpovědi)
+### 4. Update memory `mem://features/pravopis-data`
 
-2. **Chybí věta nebo kontext u slov** - např. u "bydlit" by pomohlo "bydlit = mít kde žít".
+Doplnit pravidlo: **Každá skupina musí obsahovat kontrastní slova s měkkým I pro vyvážený výběr ~50/50.**
 
-3. **Frázový režim je vzácný** - jen 30% pravděpodobnost (`Math.random() > 0.7` v `problemGeneration.ts`). Frázové procvičování je důležité pro porozumění kontextu.
+## Soubory k úpravě
 
-4. **Chybí režim "pouze frázové"** - uživatel si nemůže zvolit jen procvičování ve větách.
-
-### 🟢 Drobnosti
-
-- **`useGamification`** se volá v `SpellingPractice` ale processGameCompletion má hardcoded `subject: 'spelling'` - duplicita s podobným kódem v matematice (DRY).
-- **Console.log spamming** v utilech (`spelling/answerValidation.ts`, `problemGeneration.ts`) - v produkci zatěžuje konzoli stovkami logů.
-
----
-
-## Navrhovaný plán oprav (priorita)
-
-### Fáze 1 - Pravopisné chyby v datech (NUTNÉ)
-Opravit/odstranit chybná slova v `src/data/spellingData.ts`:
-- Skupina B: `bystrnost` → `bystrost`
-- Skupina S: `sysypání` → `sypání`
-- Skupina Z: odstranit `zykat`, `zykavý`, `prazdroj`, `zkouška`, `zkušební`, `zykavý`, `prazdrojový`, `ziskovost`, `hezkost`, `zkušební` - **doplnit správná příbuzná**: `nazývatel`, `výzva`, `vzývat` atd.
-- Skupina L: přesunout `linka`, `list`, `lichý` do kategorie "kontrastní" (slova s "i", ne "y") nebo je odstranit
-
-### Fáze 2 - UX zlepšení pravopisu
-1. Po odpovědi zobrazit kategorii slova ("vyjmenované po B")
-2. Zvýšit poměr frází (z 30% na ~40-50%) nebo přidat toggle
-3. Volitelně přidat malou nápovědu/význam
-
-### Fáze 3 - UX zlepšení matematiky
-1. Vyčistit logiku v `useProblemGenerator` (přepsat čitelněji bez `Math.min`)
-2. Přidat samostatné nastavení rozsahu pro násobení/dělení
-3. Přidat info text o dělení beze zbytku
-
-### Fáze 4 - Úklid kódu
-1. Odstranit/podmíněně logovat console.log v produkci
-2. Refaktor duplicitní logiky `processGameCompletion`
-
----
-
-**Doporučení:** Začněme Fází 1 (pravopisné chyby) - jsou to skutečné chyby, které poškozují vzdělávací hodnotu aplikace. Pak postupně Fáze 2-4 podle vašich priorit.
-
-Které fáze chcete implementovat?
+- `src/types/spellingTypes.ts` - přidat typ `"kontrastní"`
+- `src/data/spellingData.ts` - doplnit kontrastní slova do všech 7 skupin
+- `src/utils/spelling/wordSelection.ts` - vyvážený výběr Y vs I (volitelné, ale doporučené)
+- `src/utils/spelling/problemGeneration.ts` - stejná úprava výběru
+- `src/components/spelling/WordProblemDialog.tsx` - upravit zpětnou vazbu pro kontrastní slova
+- `mem://features/pravopis-data` - aktualizace pravidla
 
