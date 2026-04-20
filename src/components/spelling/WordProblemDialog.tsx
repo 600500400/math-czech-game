@@ -99,13 +99,20 @@ const WordProblemDialog: React.FC<WordProblemDialogProps> = ({
 
             {/* Hint po správné odpovědi */}
             {lastAnswerCorrect === true && wordType && !isPhrase && (
-              <div className="mt-2 p-2 rounded-lg bg-green-50 border border-green-200 text-center">
-                <p className="text-sm text-green-700">
+              <div className={`mt-2 p-2 rounded-lg text-center border ${
+                wordType === "kontrastní"
+                  ? "bg-blue-50 border-blue-200"
+                  : "bg-green-50 border-green-200"
+              }`}>
+                <p className={`text-sm ${
+                  wordType === "kontrastní" ? "text-blue-700" : "text-green-700"
+                }`}>
                   ✓ <span className="font-semibold">{currentWord}</span>
                   {" — "}
-                  {wordType === "vyjmenované" && `vyjmenované slovo po ${wordGroup}`}
-                  {wordType === "příbuzné" && `příbuzné slovo k vyjmenovaným po ${wordGroup}`}
-                  {wordType === "odvozené" && `slovo s měkkým i (kontrast k vyjmenovaným po ${wordGroup})`}
+                  {wordType === "vyjmenované" && `vyjmenované slovo po ${wordGroup} → tvrdé Y`}
+                  {wordType === "příbuzné" && `příbuzné slovo k vyjmenovaným po ${wordGroup} → tvrdé Y`}
+                  {wordType === "odvozené" && `slovo s tvrdým Y po ${wordGroup}`}
+                  {wordType === "kontrastní" && `NENÍ vyjmenované slovo → měkké I`}
                 </p>
               </div>
             )}

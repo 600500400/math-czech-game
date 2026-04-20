@@ -1,6 +1,7 @@
 
 import { useCallback } from "react";
-import { getWordsFromGroups, createDisplayedWord } from "@/utils/spellingUtils";
+import { createDisplayedWord } from "@/utils/spellingUtils";
+import { getWordsFromGroups, pickBalancedWord } from "@/utils/spelling/wordSelection";
 import { logger } from "@/utils/logger";
 
 interface UseWordGenerationProps {
@@ -48,7 +49,12 @@ export const useWordGeneration = ({
       } | null = null;
 
       while (attempts < maxAttempts && !validWord) {
-        const randomWord = allWords[Math.floor(Math.random() * allWords.length)];
+        // Použij vyvážený výběr Y vs I (~50/50) místo čistě náhodného losování
+        const randomWord = pickBalancedWord(allWords);
+        if (!randomWord) {
+          attempts++;
+          continue;
+        }
         const { displayWord, positions, letters } = createDisplayedWord(randomWord.word);
 
         if (positions.length > 0) {

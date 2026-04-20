@@ -70,18 +70,28 @@ export function generateSpellingProblem(
     }
   }
 
-  // Fallback: použijeme jednotlivé slovo
+  // Fallback: použijeme jednotlivé slovo s vyváženým výběrem Y vs I (~50/50)
   const words = randomGroup.words;
   if (words.length === 0) {
     logger.warn("⚙️ generateSpellingProblem: Žádná slova ve skupině");
     return null;
   }
 
+  // Rozdělíme slova na Y-slova a I-slova (kontrastní)
+  const yWords = words.filter(w => w.type !== "kontrastní" && /[yý]/i.test(w.word));
+  const iWords = words.filter(w => w.type === "kontrastní" || (!/[yý]/i.test(w.word) && /[ií]/i.test(w.word)));
+
+  const preferY = Math.random() < 0.5;
+  const primaryPool = preferY ? yWords : iWords;
+  const fallbackPool = preferY ? iWords : yWords;
+  const pool = (primaryPool.length > 0 ? primaryPool : fallbackPool);
+  const wordPool = pool.length > 0 ? pool : words;
+
   let attempts = 0;
   const maxAttempts = 50;
 
   while (attempts < maxAttempts) {
-    const randomWord = words[Math.floor(Math.random() * words.length)];
+    const randomWord = wordPool[Math.floor(Math.random() * wordPool.length)];
 
     const positions: number[] = [];
     const letters: string[] = [];
