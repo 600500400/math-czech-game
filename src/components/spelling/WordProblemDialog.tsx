@@ -156,7 +156,8 @@ const WordProblemDialog: React.FC<WordProblemDialogProps> = ({
                 <HoverScale>
                   <Button
                     onClick={handleAnswerIWithHaptic}
-                    className={`font-bold text-xl bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white transform active:scale-95 transition-all duration-150 ${isMobile ? 'h-16 w-20 text-2xl' : 'h-14 w-16'}`}
+                    disabled={lastAnswerCorrect !== null && lastAnswerCorrect !== undefined}
+                    className={`font-bold text-xl bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white transform active:scale-95 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed ${isMobile ? 'h-16 w-20 text-2xl' : 'h-14 w-16'}`}
                   >
                     I
                   </Button>
@@ -164,7 +165,8 @@ const WordProblemDialog: React.FC<WordProblemDialogProps> = ({
                 <HoverScale>
                   <Button
                     onClick={handleAnswerYWithHaptic}
-                    className={`font-bold text-xl bg-green-500 hover:bg-green-600 active:bg-green-700 text-white transform active:scale-95 transition-all duration-150 ${isMobile ? 'h-16 w-20 text-2xl' : 'h-14 w-16'}`}
+                    disabled={lastAnswerCorrect !== null && lastAnswerCorrect !== undefined}
+                    className={`font-bold text-xl bg-green-500 hover:bg-green-600 active:bg-green-700 text-white transform active:scale-95 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed ${isMobile ? 'h-16 w-20 text-2xl' : 'h-14 w-16'}`}
                   >
                     Y
                   </Button>
