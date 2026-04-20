@@ -1,5 +1,5 @@
 
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { SpellingAnswer } from "@/types/spellingTypes";
 import { checkSpellingAnswer, renderWordWithCurrentGap } from "@/utils/spellingUtils";
 import { logger } from "@/utils/logger";
