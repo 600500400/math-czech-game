@@ -29,9 +29,17 @@ export interface SpellingGameState {
   answers: SpellingAnswer[]; // New field for detailed answers
 }
 
+// Typ slova:
+// - "vyjmenované": klasické vyjmenované slovo (tvrdé Y)
+// - "příbuzné": slovo příbuzné vyjmenovanému (tvrdé Y)
+// - "odvozené": slovo odvozené (zpravidla tvrdé Y, méně přímé příbuzenství)
+// - "kontrastní": slovo s MĚKKÝM I, které se podobá vyjmenovanému (např. bít × být),
+//   slouží k procvičení rozlišování i/y
+export type SpellingWordType = "vyjmenované" | "příbuzné" | "odvozené" | "kontrastní";
+
 export interface SpellingWord {
   word: string;
-  type: string;
+  type: SpellingWordType;
   positions?: number[];
 }
 
