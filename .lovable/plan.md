@@ -1,60 +1,47 @@
 
 
-## Analýza problému
+## Bug: Vícepísmenná slova (např. "nasytit") se zaseknou po prvním kliknutí
 
-Uživatel má pravdu. V databázi `src/data/spellingData.ts` je masivní nerovnováha:
+### Diagnóza
 
-| Skupina | Slova s Y/Ý (vyjmenovaná + příbuzná) | Slova s měkkým I/Í (protiklady) |
-|---------|--------------------------------------|---------------------------------|
-| B       | 25                                   | 3 (`bidlo`, `nabídka`, `bit`)   |
-| L       | 25                                   | **0**                           |
-| M       | 23                                   | **0**                           |
-| P       | 25                                   | **0**                           |
-| S       | 25                                   | **0**                           |
-| V       | 25                                   | **0**                           |
-| Z       | 13                                   | **0**                           |
+Z console logu z preview je jasná příčina:
+```
+⚠️ handleAnswer: Všechny pozice již vyplněny
+```
+`currentPosition` skočí na hodnotu vyšší než počet mezer, ačkoli uživatel zatím vyplnil jen jedno písmeno. Tlačítka I/Y pak okamžitě vyskočí z funkce a UI vypadá zaseknuté — uživatel může jen "Ukončit".
 
-**Výsledek:** Z ~161 slov v databázi má pouze 3 slova měkké I (1.8 %). Logika výběru v `wordSelection.ts` filtruje všechna slova obsahující i/y/í/ý, ale prakticky všechna obsahují Y. Dítě tak skoro nikdy nemusí volit měkké I → neučí se rozlišovat, jen mechanicky tipuje Y.
+### Příčina (race condition)
 
-**Pedagogická chyba:** Pravopis vyjmenovaných slov se učí PRÁVĚ porovnáním s protiklady (např. *byl* × *bil*, *mýt* × *mít*, *výt* × *vít*, *slyšet* × *lišit*).
+V `useAnswerHandling.tsx` po kliknutí na I/Y běží sekvence se `setTimeout(800ms)` + vnořeným `setTimeout(100ms)`, která teprve na konci posune `currentPosition` (`moveToNextPosition`). Během těchto ~900 ms **nic neblokuje další kliknutí**:
 
-## Plán řešení
+1. Uživatel klikne 2× rychle za sebou (nebo 1× s "double-tap" na touchpadu/myši).
+2. Spustí se dva paralelní řetězce timeoutů — oba v okamžiku spuštění vidí `currentPosition = 0`.
+3. Oba 900 ms později zavolají `moveToNextPosition` → `currentPosition` skočí z 0 rovnou na 2.
+4. Pro 2-mezerové slovo (`nasytit`) se nikdy nezavolá `generateNewWord`, takže UI dál ukazuje `nasyt_t`, ale interní stav říká, že už jsou všechny pozice vyplněné. Další klik → warning a žádná akce.
 
-### 1. Doplnit "kontrastní slova" (s měkkým I) do každé skupiny
+Druhotný kosmetický problém: ve stejném souboru (řádky 63–72) při tvorbě dočasně zobrazeného slova se **ostatní už vyplněné mezery přepisují zpátky na `_`** (chybný `else if (missingPositions.includes(i) && missingPositions.indexOf(i) !== currentPosition)`), takže během 800 ms u 2-mezerových slov problikává podtržítko v už zodpovězené pozici.
 
-Přidat do `spellingTypes.ts` typ slova `"kontrastní"` (= příbuzné jiného kořene s měkkým i).
-Doplnit tato slova ke každé skupině (cca 8-12 slov na skupinu) pro rovnováhu zhruba 60% Y / 40% I:
+### Oprava
 
-- **B**: `bít` (bít se), `bít se`, `bicí`, `nabít`, `pobít`, `obilí`, `kobliha` (rozlišení od *kobyla*), `bizon`, `biskup`, `obilný`
-- **L**: `lišit`, `liška`, `lichý`, `lipa`, `linka`, `list`, `liják`, `litovat`, `líbit se`, `lichotit`
-- **M**: `mít` (vlastnit), `míč`, `milý`, `miska`, `minulost`, `mince`, `minout`, `milovat`, `mistr`, `místo`
-- **P**: `pít`, `pivo`, `písmeno`, `psí` (pes), `pilný`, `pilíř`, `pisatel`, `pila`, `pilot`, `pichlavý`
-- **S**: `sirka`, `silný`, `síla`, `sídlo`, `sice`, `sirota`, `síto`, `sin`, `silo`, `slibovat`
-- **V**: `vít` (věnec), `víla`, `vidět`, `vinout`, `víno`, `vichr`, `viset`, `vinař`, `vidlička`, `viník`
-- **Z**: `získat`, `zima`, `zimní`, `zívat`, `zítra`, `zinek`, `zip`, `zisk`
+Soubor: `src/hooks/spelling/useAnswerHandling.tsx`
 
-### 2. Vyvážit výběr v `wordSelection.ts`
+1. **Přidat zámek proti dvojklikům** pomocí `useRef<boolean>` (např. `isProcessingRef`):
+   - Na začátku `handleAnswer`: pokud `isProcessingRef.current === true`, ihned `return`.
+   - Nastavit `isProcessingRef.current = true` při začátku a uvolnit ho ve vnitřním 100 ms timeoutu (po `moveToNextPosition` / `generateNewWord`).
+   - Bonus: uvolnit zámek také v `useEffect` při unmountu pro jistotu.
 
-Přidat (volitelně) logiku, která zaručí, že generovaná slova budou střídat Y-slova a I-slova v poměru zhruba 50/50, bez ohledu na to kolik slov je v databázi (např. nejdřív losování typu Y/I, pak slovo z dané podmnožiny). To zabrání tomu, aby dominovala početnější skupina.
+2. **Opravit dočasné zobrazení vybraného písmena** (řádky 63–72) — pro již zodpovězené pozice (`missingPositions.indexOf(i) < currentPosition`) vykreslit původní písmeno z `currentWord[i]`, místo přepsání na `_`. Tím odpadne problikání u vícepísmenných slov.
 
-### 3. Aktualizovat zpětnou vazbu v UI
+3. **Volitelně vizuálně blokovat tlačítka** — přidat `disabled={showAnimation}` na tlačítka I/Y v `WordProblemDialog.tsx`, aby uživatel viděl, že další klik není možný (zámek by ale stejně chránil logiku).
 
-V `WordProblemDialog.tsx` po správné odpovědi:
-- pro `vyjmenované` / `příbuzné` → "Toto je vyjmenované slovo (po B) - píše se tvrdé Y"
-- pro `odvozené` / `kontrastní` → "Toto NENÍ vyjmenované slovo - píše se měkké I"
+### Soubory k úpravě
 
-Tím se z aplikace stane skutečný procvičovací nástroj na rozlišování i/y, ne jen mechanické doplňování Y.
+- `src/hooks/spelling/useAnswerHandling.tsx` — zámek proti dvojklikům + oprava vykreslení.
+- `src/components/spelling/WordProblemDialog.tsx` — `disabled={showAnimation}` na tlačítka I a Y (UX zlepšení).
 
-### 4. Update memory `mem://features/pravopis-data`
+### Test po opravě
 
-Doplnit pravidlo: **Každá skupina musí obsahovat kontrastní slova s měkkým I pro vyvážený výběr ~50/50.**
-
-## Soubory k úpravě
-
-- `src/types/spellingTypes.ts` - přidat typ `"kontrastní"`
-- `src/data/spellingData.ts` - doplnit kontrastní slova do všech 7 skupin
-- `src/utils/spelling/wordSelection.ts` - vyvážený výběr Y vs I (volitelné, ale doporučené)
-- `src/utils/spelling/problemGeneration.ts` - stejná úprava výběru
-- `src/components/spelling/WordProblemDialog.tsx` - upravit zpětnou vazbu pro kontrastní slova
-- `mem://features/pravopis-data` - aktualizace pravidla
+1. Vybrat skupinu se 2-mezerovými slovy (např. "S" → "nasytit", "L" → "lyžovat").
+2. Klikat rychle, pomalu, dvojklikem — vždy musí dialog plynule projít všemi pozicemi a pak generovat nové slovo.
+3. Žádný `Všechny pozice již vyplněny` warning v konzoli.
 
