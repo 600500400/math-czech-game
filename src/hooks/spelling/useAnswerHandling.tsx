@@ -1,5 +1,5 @@
 
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { SpellingAnswer } from "@/types/spellingTypes";
 import { checkSpellingAnswer, renderWordWithCurrentGap } from "@/utils/spellingUtils";
 import { logger } from "@/utils/logger";
@@ -37,14 +37,28 @@ export const useAnswerHandling = ({
   moveToNextPosition,
   generateNewWord
 }: UseAnswerHandlingProps) => {
+  const isProcessingRef = useRef(false);
+
+  useEffect(() => {
+    return () => {
+      isProcessingRef.current = false;
+    };
+  }, []);
 
   const handleAnswer = useCallback((letter: "i" | "y") => {
     logger.debug("🎯 handleAnswer: Zpracovávám odpověď:", letter);
-    
+
+    if (isProcessingRef.current) {
+      logger.debug("🔒 handleAnswer: Ignoruji - probíhá zpracování předchozí odpovědi");
+      return;
+    }
+
     if (currentPosition >= missingPositions.length) {
       console.warn("⚠️ handleAnswer: Všechny pozice již vyplněny");
       return;
     }
+
+    isProcessingRef.current = true;
 
     const position = missingPositions[currentPosition];
     const correctAnswer = correctLetters[currentPosition];
@@ -64,8 +78,15 @@ export const useAnswerHandling = ({
     for (let i = 0; i < currentWord.length; i++) {
       if (i === position) {
         tempDisplayedWord += letter.toUpperCase();
-      } else if (missingPositions.includes(i) && missingPositions.indexOf(i) !== currentPosition) {
-        tempDisplayedWord += '_';
+      } else if (missingPositions.includes(i)) {
+        const idx = missingPositions.indexOf(i);
+        if (idx < currentPosition) {
+          // Already answered position - show the correct letter
+          tempDisplayedWord += correctLetters[idx];
+        } else {
+          // Future position - keep underscore
+          tempDisplayedWord += '_';
+        }
       } else {
         tempDisplayedWord += currentWord[i];
       }
@@ -127,6 +148,7 @@ export const useAnswerHandling = ({
           logger.debug("➡️ handleAnswer: Moving to next position:", nextPosition);
           moveToNextPosition();
         }
+        isProcessingRef.current = false;
       }, 100);
       
     }, 800); // Increased from 600ms to 800ms to show the letter longer
