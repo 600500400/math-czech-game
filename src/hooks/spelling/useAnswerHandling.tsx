@@ -148,6 +148,7 @@ export const useAnswerHandling = ({
           logger.debug("➡️ handleAnswer: Moving to next position:", nextPosition);
           moveToNextPosition();
         }
+        isProcessingRef.current = false;
       }, 100);
       
     }, 800); // Increased from 600ms to 800ms to show the letter longer
