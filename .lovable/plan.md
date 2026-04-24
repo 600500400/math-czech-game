@@ -1,47 +1,73 @@
 
 
-## Bug: Vícepísmenná slova (např. "nasytit") se zaseknou po prvním kliknutí
+# Kompletní implementace všech designových vylepšení
 
-### Diagnóza
+Implementuji všechny 4 fáze z designové analýzy v jednom průběhu.
 
-Z console logu z preview je jasná příčina:
-```
-⚠️ handleAnswer: Všechny pozice již vyplněny
-```
-`currentPosition` skočí na hodnotu vyšší než počet mezer, ačkoli uživatel zatím vyplnil jen jedno písmeno. Tlačítka I/Y pak okamžitě vyskočí z funkce a UI vypadá zaseknuté — uživatel může jen "Ukončit".
+## Fáze A — Kritické opravy
 
-### Příčina (race condition)
+1. **`src/pages/Home/HomePage.tsx`** — nahradit `theme.bgGradient` za `bg-background`, aby v dark mode byl text čitelný.
+2. **Smazat duplicitní soubory**:
+   - `src/components/SpellingPractice.tsx`
+   - `src/components/MathPractice.tsx`
+3. **Hardcoded barvy → theme tokeny**: Projít `WelcomeDashboard.tsx`, `GamificationStats.tsx`, `WordProblemDialog.tsx`, `ProblemDialog.tsx` a nahradit `text-gray-600`, `bg-green-100`, `bg-blue-50` apod. za `text-muted-foreground`, `bg-success/10`, `bg-primary/10`.
+4. **`TabsTrigger` kontrast** v `HomePage.tsx` — odstranit inline `--active-bg` triky, použít shadcn defaults.
 
-V `useAnswerHandling.tsx` po kliknutí na I/Y běží sekvence se `setTimeout(800ms)` + vnořeným `setTimeout(100ms)`, která teprve na konci posune `currentPosition` (`moveToNextPosition`). Během těchto ~900 ms **nic neblokuje další kliknutí**:
+## Fáze B — Sjednocení design systému
 
-1. Uživatel klikne 2× rychle za sebou (nebo 1× s "double-tap" na touchpadu/myši).
-2. Spustí se dva paralelní řetězce timeoutů — oba v okamžiku spuštění vidí `currentPosition = 0`.
-3. Oba 900 ms později zavolají `moveToNextPosition` → `currentPosition` skočí z 0 rovnou na 2.
-4. Pro 2-mezerové slovo (`nasytit`) se nikdy nezavolá `generateNewWord`, takže UI dál ukazuje `nasyt_t`, ale interní stav říká, že už jsou všechny pozice vyplněné. Další klik → warning a žádná akce.
+5. **`tailwind.config.ts`**:
+   - Odstranit `brand` orange tokeny a `gradient-primary` orange.
+   - Sladit `primary` HSL s modro-fialovým logem.
+   - Buď doimportovat Poppins do `index.css`, nebo odstranit z config (zvolím odstranit — Inter stačí).
+6. **Sjednotit barvy dialogů se sekcemi**:
+   - `ProblemDialog.tsx` (math): hlavička modrá (`from-blue-600 to-blue-500`), tlačítko Ukončit neutrální outline (bez orange).
+   - `WordProblemDialog.tsx` (spelling): hlavička zelená (`from-green-600 to-emerald-500`), tlačítka I/Y zachovat funkční rozlišení (modrá I / oranžová Y) — odstraní konflikt s sekční zelenou.
 
-Druhotný kosmetický problém: ve stejném souboru (řádky 63–72) při tvorbě dočasně zobrazeného slova se **ostatní už vyplněné mezery přepisují zpátky na `_`** (chybný `else if (missingPositions.includes(i) && missingPositions.indexOf(i) !== currentPosition)`), takže během 800 ms u 2-mezerových slov problikává podtržítko v už zodpovězené pozici.
+## Fáze C — Snížení vizuálního šumu
 
-### Oprava
+7. **Odstranit nadbytečné efekty z dialogů**:
+   - Žádný `animate-pulse` na písmenech a indikátorech během řešení.
+   - Jeden gradient + případně shadow, ne kombinace gradient+blur+glow+pulse.
+   - Animace pouze při správné odpovědi / milníku.
+8. **`ModernHeader.tsx`**:
+   - Odstranit pulsující sparkle ikonu a růžovou tečku z loga.
+   - Na mobilu zobrazit text "Procvička" vedle ikony.
+   - Level zobrazit od `md:`, Streak od `lg:` (místo dnešního `lg:` only pro oba).
 
-Soubor: `src/hooks/spelling/useAnswerHandling.tsx`
+## Fáze D — UX vylepšení
 
-1. **Přidat zámek proti dvojklikům** pomocí `useRef<boolean>` (např. `isProcessingRef`):
-   - Na začátku `handleAnswer`: pokud `isProcessingRef.current === true`, ihned `return`.
-   - Nastavit `isProcessingRef.current = true` při začátku a uvolnit ho ve vnitřním 100 ms timeoutu (po `moveToNextPosition` / `generateNewWord`).
-   - Bonus: uvolnit zámek také v `useEffect` při unmountu pro jistotu.
+9. **`DifficultyDialog.tsx`**:
+   - Zvýraznit aktivní preset (porovnáním s aktuálními min/max).
+   - Pod tlačítky popisek rozsahu (např. "Lehké: 1-5").
+10. **Breadcrumby**: Změnit "Přehled" na "Domů" v `SpellingPractice.tsx`, `MathPractice.tsx`, `Dictionary.tsx`.
+11. **Dashboard grid se Slovníkem**: Změnit `md:grid-cols-2` na full-width kartu, nebo doplnit druhou kartu (Achievementy). Zvolím **full-width** — jednodušší a funguje napříč breakpointy.
+12. **`ThemeToggle.tsx`**: Zachovat dropdown, ale jako trigger ikona Sun/Moon dle aktuálního efektivního theme (místo Monitor pro 'system').
 
-2. **Opravit dočasné zobrazení vybraného písmena** (řádky 63–72) — pro již zodpovězené pozice (`missingPositions.indexOf(i) < currentPosition`) vykreslit původní písmeno z `currentWord[i]`, místo přepsání na `_`. Tím odpadne problikání u vícepísmenných slov.
+## Bonus — runtime errors
 
-3. **Volitelně vizuálně blokovat tlačítka** — přidat `disabled={showAnimation}` na tlačítka I/Y v `WordProblemDialog.tsx`, aby uživatel viděl, že další klik není možný (zámek by ale stejně chránil logiku).
+Runtime hlásí `Cannot read properties of null (reading 'useState')`. Při procházení souborů zkontroluji, zda nejde o souběžný import React (např. duplicitní React v dependencies). Pokud najdu příčinu, opravím (typicky špatný import v nedávno editovaném souboru).
 
-### Soubory k úpravě
+## Soubory k úpravě (souhrn)
 
-- `src/hooks/spelling/useAnswerHandling.tsx` — zámek proti dvojklikům + oprava vykreslení.
-- `src/components/spelling/WordProblemDialog.tsx` — `disabled={showAnimation}` na tlačítka I a Y (UX zlepšení).
+- `src/pages/Home/HomePage.tsx`
+- `src/components/dashboard/WelcomeDashboard.tsx`
+- `src/components/gamification/GamificationStats.tsx`
+- `src/components/spelling/WordProblemDialog.tsx`
+- `src/components/math/ProblemDialog.tsx`
+- `src/components/math/DifficultyDialog.tsx`
+- `src/components/layout/ModernHeader.tsx`
+- `src/components/ui/theme-toggle.tsx`
+- `src/pages/SpellingPractice.tsx`
+- `src/pages/MathPractice.tsx`
+- `src/pages/Dictionary.tsx`
+- `tailwind.config.ts`
+- `src/index.css` (jen pokud bude třeba pro fonty)
+- **smazat**: `src/components/SpellingPractice.tsx`, `src/components/MathPractice.tsx`
 
-### Test po opravě
+## Test po implementaci
 
-1. Vybrat skupinu se 2-mezerovými slovy (např. "S" → "nasytit", "L" → "lyžovat").
-2. Klikat rychle, pomalu, dvojklikem — vždy musí dialog plynule projít všemi pozicemi a pak generovat nové slovo.
-3. Žádný `Všechny pozice již vyplněny` warning v konzoli.
+1. Light mode + Dark mode na `/`, `/math`, `/spelling`, `/dictionary` — žádný nečitelný text.
+2. Spuštění příkladu math i spelling — dialog má sekční barvu, žádné rušivé pulsy.
+3. Mobil (375 px) — header zobrazuje "Procvička" text, theme toggle ukazuje správnou ikonu.
+4. Difficulty dialog — aktivní preset je zvýrazněný.
 
