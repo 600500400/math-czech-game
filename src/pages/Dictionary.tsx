@@ -25,8 +25,8 @@ const Dictionary = () => {
         <nav aria-label="Breadcrumb" className="mb-6">
           <ol className="flex items-center space-x-2 text-sm text-muted-foreground">
             <li>
-              <Link to="/parent-dashboard" className="hover:text-foreground transition-colors">
-                Přehled
+              <Link to="/" className="hover:text-foreground transition-colors">
+                Domů
               </Link>
             </li>
             <li className="flex items-center">

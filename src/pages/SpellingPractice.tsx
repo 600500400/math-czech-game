@@ -121,11 +121,11 @@ const SpellingPractice = () => {
         <nav aria-label="Breadcrumb" className="mb-6">
           <ol className="flex items-center space-x-2 text-sm text-muted-foreground">
             <li>
-              <button 
-                onClick={() => navigate('/')} 
+              <button
+                onClick={() => navigate('/')}
                 className="hover:text-foreground transition-colors"
               >
-                Přehled
+                Domů
               </button>
             </li>
             <li className="flex items-center">
@@ -196,20 +196,20 @@ const SpellingPractice = () => {
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                 <div>
-                  <div className="text-2xl font-bold text-green-600">{correctAnswers}</div>
+                  <div className="text-2xl font-bold text-success-600">{correctAnswers}</div>
                   <div className="text-sm text-muted-foreground">Správně</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-red-600">{wrongAnswers}</div>
+                  <div className="text-2xl font-bold text-destructive">{wrongAnswers}</div>
                   <div className="text-sm text-muted-foreground">Špatně</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-blue-600">{problemCount}</div>
+                  <div className="text-2xl font-bold text-subject-math">{problemCount}</div>
                   <div className="text-sm text-muted-foreground">Slov</div>
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-primary">
-                    {correctAnswers + wrongAnswers > 0 
+                    {correctAnswers + wrongAnswers > 0
                       ? Math.round((correctAnswers / (correctAnswers + wrongAnswers)) * 100)
                       : 0}%
                   </div>
