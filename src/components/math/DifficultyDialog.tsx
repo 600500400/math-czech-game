@@ -69,6 +69,21 @@ const DifficultyDialog: React.FC<DifficultyDialogProps> = ({
     onOpenChange(false);
   };
 
+  // Detekce aktivního presetu podle aktuálních hodnot
+  const PRESETS: Record<"easy" | "medium" | "hard", { label: string; min: number; max: number; mdMin: number; mdMax: number; range: string }> = {
+    easy: { label: "Lehké", min: 1, max: 5, mdMin: 1, mdMax: 5, range: "1–5" },
+    medium: { label: "Střední", min: 1, max: 20, mdMin: 1, mdMax: 10, range: "1–20 (×: 1–10)" },
+    hard: { label: "Těžké", min: 1, max: 100, mdMin: 1, mdMax: 10, range: "1–100 (×: 1–10)" },
+  };
+
+  const activePreset = (Object.keys(PRESETS) as Array<"easy" | "medium" | "hard">).find(
+    (key) =>
+      PRESETS[key].min === minValue &&
+      PRESETS[key].max === maxValue &&
+      PRESETS[key].mdMin === mulDivMin &&
+      PRESETS[key].mdMax === mulDivMax
+  );
+
   const operationInfo = [
     { operation: "+" as Operation, label: "Sčítání", icon: <Plus size={16} /> },
     { operation: "-" as Operation, label: "Odčítání", icon: <Minus size={16} /> },
@@ -89,15 +104,21 @@ const DifficultyDialog: React.FC<DifficultyDialogProps> = ({
           <div>
             <Label className="mb-3 block font-medium">Rychlé předvolby:</Label>
             <div className="grid grid-cols-3 gap-2">
-              <Button variant="outline" size="sm" onClick={() => handlePreset("easy")} className="text-xs">
-                Lehké
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => handlePreset("medium")} className="text-xs">
-                Střední
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => handlePreset("hard")} className="text-xs">
-                Těžké
-              </Button>
+              {(Object.keys(PRESETS) as Array<"easy" | "medium" | "hard">).map((key) => {
+                const isActive = activePreset === key;
+                return (
+                  <Button
+                    key={key}
+                    variant={isActive ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => handlePreset(key)}
+                    className="flex flex-col h-auto py-2"
+                  >
+                    <span className="text-xs font-medium">{PRESETS[key].label}</span>
+                    <span className="text-[10px] opacity-75 mt-0.5">{PRESETS[key].range}</span>
+                  </Button>
+                );
+              })}
             </div>
           </div>
 
