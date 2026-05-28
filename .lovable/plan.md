@@ -1,73 +1,50 @@
+# Postupná implementace všech vylepšení
 
+Provedu změny v 5 krocích, každý samostatně otestovatelný. Pokud něco rozbije UI, vrátíme jen ten jeden krok.
 
-# Kompletní implementace všech designových vylepšení
+## Krok 1 — Nové logo (custom SVG)
 
-Implementuji všechny 4 fáze z designové analýzy v jednom průběhu.
+- Vytvořit `src/components/layout/Logo.tsx` — stylizovaná otevřená kniha s malou hvězdičkou/jiskrou v rozích, používá modro-zeleno-fialový gradient (`subject-math` → `subject-spelling` → `subject-dictionary`)
+- Nahradit `<BookOpen>` ikonu v `ModernHeader.tsx` novou komponentou
+- Aktualizovat `favicon.ico` (necháme stávající, jen logo v hlavičce změníme)
 
-## Fáze A — Kritické opravy
+## Krok 2 — F1 Bezpečnost
 
-1. **`src/pages/Home/HomePage.tsx`** — nahradit `theme.bgGradient` za `bg-background`, aby v dark mode byl text čitelný.
-2. **Smazat duplicitní soubory**:
-   - `src/components/SpellingPractice.tsx`
-   - `src/components/MathPractice.tsx`
-3. **Hardcoded barvy → theme tokeny**: Projít `WelcomeDashboard.tsx`, `GamificationStats.tsx`, `WordProblemDialog.tsx`, `ProblemDialog.tsx` a nahradit `text-gray-600`, `bg-green-100`, `bg-blue-50` apod. za `text-muted-foreground`, `bg-success/10`, `bg-primary/10`.
-4. **`TabsTrigger` kontrast** v `HomePage.tsx` — odstranit inline `--active-bg` triky, použít shadcn defaults.
+- **RLS pro `dictionary_answers`**: migrace, která omezí čtení/zápis pouze na `auth.uid() = user_id` (dnes je tabulka veřejně čitelná — kritický dluh z memory)
+- **`console.* → logger`**: nahradit 213 výskytů `console.log/debug/info` v `src/` za `logger.debug` (warn/error necháme). Skript-based replace, ne ruční.
 
-## Fáze B — Sjednocení design systému
+## Krok 3 — F2 Bundle čištění
 
-5. **`tailwind.config.ts`**:
-   - Odstranit `brand` orange tokeny a `gradient-primary` orange.
-   - Sladit `primary` HSL s modro-fialovým logem.
-   - Buď doimportovat Poppins do `index.css`, nebo odstranit z config (zvolím odstranit — Inter stačí).
-6. **Sjednotit barvy dialogů se sekcemi**:
-   - `ProblemDialog.tsx` (math): hlavička modrá (`from-blue-600 to-blue-500`), tlačítko Ukončit neutrální outline (bez orange).
-   - `WordProblemDialog.tsx` (spelling): hlavička zelená (`from-green-600 to-emerald-500`), tlačítka I/Y zachovat funkční rozlišení (modrá I / oranžová Y) — odstraní konflikt s sekční zelenou.
+- Smazat nepoužívané auth hooky: `useSecureAuth.tsx`, `useAuthCleaner.tsx`, `useAuthHandlers.tsx` (po ověření přes `rg`)
+- Sloučit 3 haptics hooky (`useAdvancedHaptics`, `useEnhancedHaptics`, `useHapticDebugger`) do jednoho `useHaptics`
+- Odstranit i18n: `src/i18n/`, `useLanguage.tsx`, `useTranslation.tsx`, balíčky `i18next`, `react-i18next`, `i18next-browser-languagedetector` z `package.json`, import z `App.tsx`
+- **Neodstraňovat** shadcn komponenty automaticky (riskantní, necháme na později)
 
-## Fáze C — Snížení vizuálního šumu
+## Krok 4 — F3 Performance
 
-7. **Odstranit nadbytečné efekty z dialogů**:
-   - Žádný `animate-pulse` na písmenech a indikátorech během řešení.
-   - Jeden gradient + případně shadow, ne kombinace gradient+blur+glow+pulse.
-   - Animace pouze při správné odpovědi / milníku.
-8. **`ModernHeader.tsx`**:
-   - Odstranit pulsující sparkle ikonu a růžovou tečku z loga.
-   - Na mobilu zobrazit text "Procvička" vedle ikony.
-   - Level zobrazit od `md:`, Streak od `lg:` (místo dnešního `lg:` only pro oba).
+- `React.lazy()` + `<Suspense>` pro všechny routy v `App.tsx` kromě `Index`
+- Sloučit dvojici `<Toaster />` + `<Sonner />` → jen Sonner (modernější, jednodušší)
+- Preload Inter fontu v `index.html` (`<link rel="preload" as="style">`)
 
-## Fáze D — UX vylepšení
+## Krok 5 — F4 Design polish
 
-9. **`DifficultyDialog.tsx`**:
-   - Zvýraznit aktivní preset (porovnáním s aktuálními min/max).
-   - Pod tlačítky popisek rozsahu (např. "Lehké: 1-5").
-10. **Breadcrumby**: Změnit "Přehled" na "Domů" v `SpellingPractice.tsx`, `MathPractice.tsx`, `Dictionary.tsx`.
-11. **Dashboard grid se Slovníkem**: Změnit `md:grid-cols-2` na full-width kartu, nebo doplnit druhou kartu (Achievementy). Zvolím **full-width** — jednodušší a funguje napříč breakpointy.
-12. **`ThemeToggle.tsx`**: Zachovat dropdown, ale jako trigger ikona Sun/Moon dle aktuálního efektivního theme (místo Monitor pro 'system').
+- `src/index.css`: opravit `.dark` varianty `--subject-*-light` (dnes skoro bílé v dark mode) — ztmavit na ~20% lightness
+- `src/index.css`: snížit opacity dekorativních prvků v dark mode
 
-## Bonus — runtime errors
+## Workflow
 
-Runtime hlásí `Cannot read properties of null (reading 'useState')`. Při procházení souborů zkontroluji, zda nejde o souběžný import React (např. duplicitní React v dependencies). Pokud najdu příčinu, opravím (typicky špatný import v nedávno editovaném souboru).
+Mezi každým krokem se zastavím a počkám, až ověříš v preview, že nic není rozbité. Pak pokračujeme dalším krokem. Pokud něco selže, revertujeme jen ten krok.
 
-## Soubory k úpravě (souhrn)
+## Změněné/smazané soubory (orientačně)
 
-- `src/pages/Home/HomePage.tsx`
-- `src/components/dashboard/WelcomeDashboard.tsx`
-- `src/components/gamification/GamificationStats.tsx`
-- `src/components/spelling/WordProblemDialog.tsx`
-- `src/components/math/ProblemDialog.tsx`
-- `src/components/math/DifficultyDialog.tsx`
-- `src/components/layout/ModernHeader.tsx`
-- `src/components/ui/theme-toggle.tsx`
-- `src/pages/SpellingPractice.tsx`
-- `src/pages/MathPractice.tsx`
-- `src/pages/Dictionary.tsx`
-- `tailwind.config.ts`
-- `src/index.css` (jen pokud bude třeba pro fonty)
-- **smazat**: `src/components/SpellingPractice.tsx`, `src/components/MathPractice.tsx`
+- **nové**: `src/components/layout/Logo.tsx`, `src/hooks/useHaptics.tsx`, migrace pro RLS
+- **edit**: `App.tsx`, `ModernHeader.tsx`, `index.html`, `index.css`, `package.json`, ~30 souborů s `console.*`
+- **smazat**: `src/i18n/`, `useLanguage.tsx`, `useTranslation.tsx`, `useSecureAuth.tsx`, `useAuthCleaner.tsx`, `useAuthHandlers.tsx`, `useAdvancedHaptics.tsx`, `useEnhancedHaptics.tsx`, `useHapticDebugger.tsx`
 
-## Test po implementaci
+## Test po každém kroku
 
-1. Light mode + Dark mode na `/`, `/math`, `/spelling`, `/dictionary` — žádný nečitelný text.
-2. Spuštění příkladu math i spelling — dialog má sekční barvu, žádné rušivé pulsy.
-3. Mobil (375 px) — header zobrazuje "Procvička" text, theme toggle ukazuje správnou ikonu.
-4. Difficulty dialog — aktivní preset je zvýrazněný.
-
+1. Logo se zobrazuje v headeru (light + dark)
+2. Slovník — uložení a načtení odpovědi funguje (po RLS)
+3. Aplikace startuje bez i18n chyb
+4. Routy se načítají, žádný blank screen
+5. Sekční barvy čitelné v dark mode
