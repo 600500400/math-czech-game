@@ -1,3 +1,4 @@
+import { logger } from "@/utils/logger";
 
 // Progressive Enhancement Utilities for Advanced PWA Features
 
@@ -51,7 +52,7 @@ class ProgressiveEnhancementManager {
           }
         });
         
-        console.log('✅ Advanced caching initialized');
+        logger.log('✅ Advanced caching initialized');
       } catch (error) {
         console.warn('⚠️ Advanced caching failed:', error);
       }

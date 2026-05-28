@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
+import { logger } from "@/utils/logger";
 export const useStatisticsCore = (userId: string | null) => {
   const [isLocalMode, setIsLocalMode] = useState<boolean | null>(false); // Všichni používají databázi
   const [dbStatus, setDbStatus] = useState<"checking" | "connected" | "disconnected">("checking");
@@ -10,7 +11,7 @@ export const useStatisticsCore = (userId: string | null) => {
   useEffect(() => {
     // Všichni uživatelé nyní používají databázi
     setIsLocalMode(false);
-    console.log(`useStatisticsCore - Uživatel ${userId} používá databázi`);
+    logger.log(`useStatisticsCore - Uživatel ${userId} používá databázi`);
   }, [userId]);
   
   // Efekt pro kontrolu připojení databáze
@@ -24,7 +25,7 @@ export const useStatisticsCore = (userId: string | null) => {
           console.error("Database check failed:", error);
           setDbStatus("disconnected");
         } else {
-          console.log("Database check succeeded - connection is working");
+          logger.log("Database check succeeded - connection is working");
           setDbStatus("connected");
         }
       } catch (err) {
@@ -44,7 +45,7 @@ export const useStatisticsCore = (userId: string | null) => {
   // Get a unique key for storing statistics for a specific user (pouze pro zálohu)
   const getLocalStorageKey = (baseKey: string) => {
     const storageKey = userId ? `${baseKey}_backup_${userId}` : baseKey;
-    console.log(`Generovaný storage klíč pro zálohu: ${storageKey} pro uživatele ${userId || 'anonym'}`);
+    logger.log(`Generovaný storage klíč pro zálohu: ${storageKey} pro uživatele ${userId || 'anonym'}`);
     return storageKey;
   };
 
@@ -53,7 +54,7 @@ export const useStatisticsCore = (userId: string | null) => {
     if (!childId) return { mathStats: [], spellingStats: [] };
     
     try {
-      console.log("Načítání statistik pro dítě z databáze:", childId);
+      logger.log("Načítání statistik pro dítě z databáze:", childId);
       
       // Fetch math statistics
       const { data: mathData, error: mathError } = await supabase
@@ -77,8 +78,8 @@ export const useStatisticsCore = (userId: string | null) => {
         console.error("Error fetching spelling statistics:", spellingError);
       }
 
-      console.log("Načtená matematická data z databáze:", mathData || []);
-      console.log("Načtená data pravopisu z databáze:", spellingData || []);
+      logger.log("Načtená matematická data z databáze:", mathData || []);
+      logger.log("Načtená data pravopisu z databáze:", spellingData || []);
       
       return {
         mathStats: mathData || [],
@@ -114,7 +115,7 @@ export const useStatisticsCore = (userId: string | null) => {
         .delete()
         .eq('user_id', specificUserId);
 
-      console.log(`Statistiky pro uživatele ${specificUserId} byly resetovány v databázi`);
+      logger.log(`Statistiky pro uživatele ${specificUserId} byly resetovány v databázi`);
       return true;
     } catch (error) {
       console.error(`Chyba při resetování statistik uživatele ${specificUserId}:`, error);
@@ -134,7 +135,7 @@ export const useStatisticsCore = (userId: string | null) => {
         }
       }
     });
-    console.log("Všechny lokální záložní statistiky:", stats);
+    logger.log("Všechny lokální záložní statistiky:", stats);
     return stats;
   };
 

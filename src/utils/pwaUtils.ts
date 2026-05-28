@@ -1,10 +1,11 @@
+import { logger } from "@/utils/logger";
 
 // Register service worker
 export const registerServiceWorker = async (): Promise<void> => {
   if ('serviceWorker' in navigator) {
     try {
       const registration = await navigator.serviceWorker.register('/sw.js');
-      console.log('SW registered: ', registration);
+      logger.log('SW registered: ', registration);
       
       // Update service worker when new version is available
       registration.addEventListener('updatefound', () => {
@@ -21,7 +22,7 @@ export const registerServiceWorker = async (): Promise<void> => {
         }
       });
     } catch (error) {
-      console.log('SW registration failed: ', error);
+      logger.log('SW registration failed: ', error);
     }
   }
 };
@@ -34,9 +35,9 @@ export const unregisterServiceWorker = async (): Promise<void> => {
       for (const registration of registrations) {
         await registration.unregister();
       }
-      console.log('All service workers unregistered');
+      logger.log('All service workers unregistered');
     } catch (error) {
-      console.log('Failed to unregister service workers:', error);
+      logger.log('Failed to unregister service workers:', error);
     }
   }
 };

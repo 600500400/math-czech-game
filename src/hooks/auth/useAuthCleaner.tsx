@@ -2,15 +2,16 @@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+import { logger } from "@/utils/logger";
 export const useAuthCleaner = () => {
   const cleanupAuthState = () => {
-    console.log("Čištění auth stavu...");
+    logger.log("Čištění auth stavu...");
     
     // Vyčistíme localStorage
     Object.keys(localStorage).forEach((key) => {
       if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
         localStorage.removeItem(key);
-        console.log(`Odstraněn klíč: ${key}`);
+        logger.log(`Odstraněn klíč: ${key}`);
       }
     });
     
@@ -19,17 +20,17 @@ export const useAuthCleaner = () => {
       Object.keys(sessionStorage).forEach((key) => {
         if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
           sessionStorage.removeItem(key);
-          console.log(`Odstraněn sessionStorage klíč: ${key}`);
+          logger.log(`Odstraněn sessionStorage klíč: ${key}`);
         }
       });
     }
     
-    console.log("Auth stav vyčištěn");
+    logger.log("Auth stav vyčištěn");
   };
 
   const forceAuthRefresh = async () => {
     try {
-      console.log("Vynucování refresh auth stavu...");
+      logger.log("Vynucování refresh auth stavu...");
       
       // Nejdříve vyčistíme stav
       cleanupAuthState();
@@ -38,7 +39,7 @@ export const useAuthCleaner = () => {
       try {
         await supabase.auth.signOut({ scope: 'global' });
       } catch (err) {
-        console.log("Globální odhlášení selhalo, pokračujeme...", err);
+        logger.log("Globální odhlášení selhalo, pokračujeme...", err);
       }
       
       // Krátká pauza
@@ -52,7 +53,7 @@ export const useAuthCleaner = () => {
         throw error;
       }
       
-      console.log("Auth stav obnoven:", data.session?.user?.id);
+      logger.log("Auth stav obnoven:", data.session?.user?.id);
       
       // Vynucujeme page reload pro úplně čistý stav
       setTimeout(() => {

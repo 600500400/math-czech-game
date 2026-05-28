@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Trophy, Heart } from "lucide-react";
 
+import { logger } from "@/utils/logger";
 interface FunGraphicsProps {
   isCorrect: boolean | null;
   showAnimation: boolean;
@@ -28,7 +29,7 @@ export const FunGraphics = ({
   
   // Force cleanup function
   const forceCleanup = () => {
-    console.log("🎨 FunGraphics: Force cleanup called");
+    logger.log("🎨 FunGraphics: Force cleanup called");
     clearExistingTimeout();
     setIsVisible(false);
   };
@@ -49,25 +50,25 @@ export const FunGraphics = ({
   
   // Main animation effect
   useEffect(() => {
-    console.log("🎨 FunGraphics: Animation effect - showAnimation:", showAnimation, "isCorrect:", isCorrect);
+    logger.log("🎨 FunGraphics: Animation effect - showAnimation:", showAnimation, "isCorrect:", isCorrect);
     
     // Clear any existing timeout first
     clearExistingTimeout();
     
     // Hide immediately if animation should not show
     if (!showAnimation || isCorrect === null) {
-      console.log("🎨 FunGraphics: Hiding animation immediately");
+      logger.log("🎨 FunGraphics: Hiding animation immediately");
       setIsVisible(false);
       return;
     }
     
     // Show animation
-    console.log("🎨 FunGraphics: Showing animation");
+    logger.log("🎨 FunGraphics: Showing animation");
     setIsVisible(true);
     
     // Schedule hide after 600ms
     timeoutRef.current = setTimeout(() => {
-      console.log("🎨 FunGraphics: Auto-hiding animation");
+      logger.log("🎨 FunGraphics: Auto-hiding animation");
       setIsVisible(false);
       timeoutRef.current = null;
     }, 600);

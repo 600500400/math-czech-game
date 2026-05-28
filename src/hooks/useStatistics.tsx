@@ -7,6 +7,7 @@ import { useStatisticsCore } from "./statistics/useStatisticsCore";
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
+import { logger } from "@/utils/logger";
 /**
  * Main hook for statistics functionality that combines both math and spelling statistics
  */
@@ -18,7 +19,7 @@ export const useStatistics = (userId: string | null) => {
   // Použijeme userId z parametru nebo z authState (pojistka)
   const effectiveUserId = userId || authState.user?.id || null;
   
-  console.log("useStatistics - Používám ID:", effectiveUserId, "původní ID:", userId);
+  logger.log("useStatistics - Používám ID:", effectiveUserId, "původní ID:", userId);
   
   // Použití specializovaných hooků s ověřeným userId
   const { 
@@ -46,7 +47,7 @@ export const useStatistics = (userId: string | null) => {
   // Efekt pro invalidaci query cache při změně uživatele
   useEffect(() => {
     if (effectiveUserId && effectiveUserId !== lastRefreshId) {
-      console.log(`Nový uživatel detekován (${effectiveUserId}), přenačítám data z databáze...`);
+      logger.log(`Nový uživatel detekován (${effectiveUserId}), přenačítám data z databáze...`);
       
       // Vynucené přenačtení dat při změně uživatele
       queryClient.invalidateQueries({ queryKey: ["mathStatistics"] });
@@ -57,7 +58,7 @@ export const useStatistics = (userId: string | null) => {
       refetchMathStats();
       refetchSpellingStats();
       
-      console.log(`Statistiky pro uživatele ${effectiveUserId} načítány z databáze`);
+      logger.log(`Statistiky pro uživatele ${effectiveUserId} načítány z databáze`);
       
       // Uložíme ID pro kontrolu další změny
       setLastRefreshId(effectiveUserId);
@@ -67,7 +68,7 @@ export const useStatistics = (userId: string | null) => {
   // Funkce pro manuální přenačtení všech statistik
   const forceRefreshAllStatistics = () => {
     if (effectiveUserId) {
-      console.log(`Manuální přenačtení statistik z databáze pro uživatele ${effectiveUserId}`);
+      logger.log(`Manuální přenačtení statistik z databáze pro uživatele ${effectiveUserId}`);
       refetchMathStats();
       refetchSpellingStats();
       return true;
@@ -77,7 +78,7 @@ export const useStatistics = (userId: string | null) => {
   
   // Kontrola režimu
   checkLocalUserMode().then(isLocalMode => {
-    console.log(`useStatistics - Local mode: ${isLocalMode ? 'ANO' : 'NE'} pro uživatele ${effectiveUserId}`);
+    logger.log(`useStatistics - Local mode: ${isLocalMode ? 'ANO' : 'NE'} pro uživatele ${effectiveUserId}`);
   });
 
   return {

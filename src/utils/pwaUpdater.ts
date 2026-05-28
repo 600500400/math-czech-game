@@ -1,5 +1,6 @@
 import { APP_VERSION } from './version';
 
+import { logger } from "@/utils/logger";
 interface UpdateState {
   hasUpdate: boolean;
   isUpdating: boolean;
@@ -66,7 +67,7 @@ class PWAUpdater {
       // Přidat listenery pro focus/visibility změny
       this.setupVisibilityListeners();
       
-      console.log('🔄 PWA Updater initialized with version:', APP_VERSION.getFullVersionWithBuild());
+      logger.log('🔄 PWA Updater initialized with version:', APP_VERSION.getFullVersionWithBuild());
     } catch (error) {
       console.error('Failed to register service worker:', error);
       this.setState({ hasUpdate: false, isUpdating: false, error: 'Failed to initialize updater' });
@@ -81,14 +82,14 @@ class PWAUpdater {
     newWorker.addEventListener('statechange', () => {
       if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
         // New version is available
-        console.log('🆕 New version available');
+        logger.log('🆕 New version available');
         this.setState({ hasUpdate: true, isUpdating: false, error: null });
       }
     });
   };
 
   private handleControllerChange = () => {
-    console.log('🔄 App updated successfully');
+    logger.log('🔄 App updated successfully');
     this.setState({ hasUpdate: false, isUpdating: false, error: null });
     window.location.reload();
   };
@@ -121,14 +122,14 @@ class PWAUpdater {
     // Implement cooldown to prevent excessive checks
     const now = Date.now();
     if (now - this.lastUpdateCheck < this.UPDATE_COOLDOWN) {
-      console.log('🔄 Update check skipped - cooldown active');
+      logger.log('🔄 Update check skipped - cooldown active');
       return false;
     }
 
     this.lastUpdateCheck = now;
 
     try {
-      console.log('🔄 Checking for updates...');
+      logger.log('🔄 Checking for updates...');
       await this.registration.update();
       return true;
     } catch (error) {
@@ -172,7 +173,7 @@ class PWAUpdater {
       localStorage.removeItem('app_version');
       localStorage.removeItem('app_last_update');
       
-      console.log('🧹 Cache cleared, reloading...');
+      logger.log('🧹 Cache cleared, reloading...');
       window.location.reload();
     } catch (error) {
       console.error('Failed to force update:', error);
@@ -194,7 +195,7 @@ class PWAUpdater {
     // Kontrola každých 5 minut
     this.updateCheckInterval = window.setInterval(() => {
       if (document.visibilityState === 'visible') {
-        console.log('🔄 Background update check triggered');
+        logger.log('🔄 Background update check triggered');
         this.checkForUpdates();
       }
     }, 5 * 60 * 1000);
@@ -204,14 +205,14 @@ class PWAUpdater {
     // Kontrola při změně viditelnosti (návrat z jiné záložky)
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') {
-        console.log('🔄 Page visible - checking for updates');
+        logger.log('🔄 Page visible - checking for updates');
         setTimeout(() => this.checkForUpdates(), 1000);
       }
     });
 
     // Kontrola při focus okna
     window.addEventListener('focus', () => {
-      console.log('🔄 Window focused - checking for updates');
+      logger.log('🔄 Window focused - checking for updates');
       setTimeout(() => this.checkForUpdates(), 1000);
     });
   }

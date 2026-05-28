@@ -3,16 +3,17 @@ import { useState, useEffect } from "react";
 import { MathAnswer } from "@/types/mathTypes";
 import { supabase } from "@/integrations/supabase/client";
 
+import { logger } from "@/utils/logger";
 export const useMathAnswers = (userId: string | null) => {
   const [mathAnswers, setMathAnswers] = useState<MathAnswer[]>([]);
 
   // Load math answers from Supabase when component mounts or userId changes
   useEffect(() => {
-    console.log("useMathAnswers - useEffect triggered with userId:", userId);
+    logger.log("useMathAnswers - useEffect triggered with userId:", userId);
     if (userId) {
       loadMathAnswers();
     } else {
-      console.log("useMathAnswers - žádný userId, mazám data");
+      logger.log("useMathAnswers - žádný userId, mazám data");
       setMathAnswers([]);
     }
   }, [userId]);
@@ -21,11 +22,11 @@ export const useMathAnswers = (userId: string | null) => {
   const loadMathAnswers = async () => {
     try {
       if (!userId) {
-        console.log("useMathAnswers - Žádný userId - nelze načíst matematické odpovědi");
+        logger.log("useMathAnswers - Žádný userId - nelze načíst matematické odpovědi");
         return;
       }
       
-      console.log("useMathAnswers - načítám matematické odpovědi pro userId:", userId);
+      logger.log("useMathAnswers - načítám matematické odpovědi pro userId:", userId);
       
       const { data, error } = await supabase
         .from('math_answers')
@@ -38,7 +39,7 @@ export const useMathAnswers = (userId: string | null) => {
         return;
       }
 
-      console.log("useMathAnswers - načteno z databáze:", data?.length || 0, "záznamů");
+      logger.log("useMathAnswers - načteno z databáze:", data?.length || 0, "záznamů");
 
       // Convert database format to app format
       const convertedAnswers: MathAnswer[] = (data || []).map(item => ({
@@ -49,7 +50,7 @@ export const useMathAnswers = (userId: string | null) => {
         timestamp: item.created_at
       }));
 
-      console.log("useMathAnswers - konvertované odpovědi:", convertedAnswers);
+      logger.log("useMathAnswers - konvertované odpovědi:", convertedAnswers);
       setMathAnswers(convertedAnswers);
     } catch (error) {
       console.error("useMathAnswers - Error loading math answers:", error);
@@ -91,7 +92,7 @@ export const useMathAnswers = (userId: string | null) => {
       }
 
       setMathAnswers(answers);
-      console.log("useMathAnswers - uloženy matematické odpovědi do databáze:", answers);
+      logger.log("useMathAnswers - uloženy matematické odpovědi do databáze:", answers);
     } catch (error) {
       console.error("useMathAnswers - Error saving math answers:", error);
     }
@@ -105,7 +106,7 @@ export const useMathAnswers = (userId: string | null) => {
         return;
       }
       
-      console.log("useMathAnswers - přidávám matematickou odpověď:", answer);
+      logger.log("useMathAnswers - přidávám matematickou odpověď:", answer);
       
       const { error } = await supabase
         .from('math_answers')
@@ -125,7 +126,7 @@ export const useMathAnswers = (userId: string | null) => {
 
       const newAnswers = [...mathAnswers, answer];
       setMathAnswers(newAnswers);
-      console.log("useMathAnswers - přidána matematická odpověď, celkem:", newAnswers.length);
+      logger.log("useMathAnswers - přidána matematická odpověď, celkem:", newAnswers.length);
     } catch (error) {
       console.error("useMathAnswers - Error adding math answer:", error);
     }
@@ -146,13 +147,13 @@ export const useMathAnswers = (userId: string | null) => {
 
       setMathAnswers([]);
       
-      console.log("useMathAnswers - vymazány matematické odpovědi z databáze pro uživatele:", userId);
+      logger.log("useMathAnswers - vymazány matematické odpovědi z databáze pro uživatele:", userId);
     } catch (error) {
       console.error("useMathAnswers - Error clearing math answers:", error);
     }
   };
 
-  console.log("useMathAnswers - aktuální stav:", {
+  logger.log("useMathAnswers - aktuální stav:", {
     userId,
     mathAnswersCount: mathAnswers.length,
     wrongAnswersCount: mathAnswers.filter(a => !a.isCorrect).length

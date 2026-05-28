@@ -13,6 +13,7 @@ import { MathAnswer } from "@/types/mathTypes";
 import { SpellingAnswer } from "@/types/spellingTypes";
 import ErrorsTooltip from "./ErrorsTooltip";
 
+import { logger } from "@/utils/logger";
 interface DetailedStatisticsTableProps {
   type: "math" | "spelling";
   data: MathStatistics[] | SpellingStatistics[];
@@ -26,7 +27,7 @@ export const DetailedStatisticsTable: React.FC<DetailedStatisticsTableProps> = (
   mathAnswers = [], 
   spellingAnswers = [] 
 }) => {
-  console.log("DetailedStatisticsTable - props:", {
+  logger.log("DetailedStatisticsTable - props:", {
     type,
     dataCount: data.length,
     mathAnswersCount: mathAnswers.length,
@@ -74,7 +75,7 @@ export const DetailedStatisticsTable: React.FC<DetailedStatisticsTableProps> = (
       });
     }
     
-    console.log(`getAnswersForSession - ${type}:`, {
+    logger.log(`getAnswersForSession - ${type}:`, {
       sessionTime: new Date(stat.created_at),
       relevantAnswersCount: relevantAnswers.length,
       wrongAnswersCount: relevantAnswers.filter(a => !a.isCorrect).length

@@ -1,3 +1,4 @@
+import { logger } from "@/utils/logger";
 interface OfflineAction {
   id: string;
   type: 'game_result' | 'user_setting' | 'achievement';
@@ -21,13 +22,13 @@ class OfflineManager {
 
   private setupEventListeners() {
     window.addEventListener('online', () => {
-      console.log('🌐 Připojení obnoveno - spouštím synchronizaci');
+      logger.log('🌐 Připojení obnoveno - spouštím synchronizaci');
       this.isOnline = true;
       this.processOfflineQueue();
     });
 
     window.addEventListener('offline', () => {
-      console.log('📴 Připojení ztraceno - přepínám do offline režimu');
+      logger.log('📴 Připojení ztraceno - přepínám do offline režimu');
       this.isOnline = false;
     });
 
@@ -84,7 +85,7 @@ class OfflineManager {
     this.offlineQueue.push(action);
     this.saveQueueToStorage();
 
-    console.log(`📝 Přidána offline akce: ${type}`, data);
+    logger.log(`📝 Přidána offline akce: ${type}`, data);
 
     // Try to sync immediately if online
     if (this.isOnline) {
@@ -100,7 +101,7 @@ class OfflineManager {
     }
 
     this.syncInProgress = true;
-    console.log(`🔄 Synchronizuji ${this.offlineQueue.length} offline akcí...`);
+    logger.log(`🔄 Synchronizuji ${this.offlineQueue.length} offline akcí...`);
 
     const actionsToProcess = [...this.offlineQueue];
     const failedActions: OfflineAction[] = [];
@@ -108,7 +109,7 @@ class OfflineManager {
     for (const action of actionsToProcess) {
       try {
         await this.syncAction(action);
-        console.log(`✅ Synchronizována akce: ${action.type}`);
+        logger.log(`✅ Synchronizována akce: ${action.type}`);
         
         // Remove successful action from queue
         this.offlineQueue = this.offlineQueue.filter(a => a.id !== action.id);
@@ -130,9 +131,9 @@ class OfflineManager {
     this.syncInProgress = false;
 
     if (this.offlineQueue.length === 0) {
-      console.log('✅ Všechny offline akce synchronizovány');
+      logger.log('✅ Všechny offline akce synchronizovány');
     } else {
-      console.log(`⏳ Zbývá synchronizovat ${this.offlineQueue.length} akcí`);
+      logger.log(`⏳ Zbývá synchronizovat ${this.offlineQueue.length} akcí`);
     }
   }
 
@@ -151,18 +152,18 @@ class OfflineManager {
 
   private async syncGameResult(data: any): Promise<void> {
     // This would integrate with your actual API
-    console.log('Syncing game result:', data);
+    logger.log('Syncing game result:', data);
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
   }
 
   private async syncUserSetting(data: any): Promise<void> {
-    console.log('Syncing user setting:', data);
+    logger.log('Syncing user setting:', data);
     await new Promise(resolve => setTimeout(resolve, 500));
   }
 
   private async syncAchievement(data: any): Promise<void> {
-    console.log('Syncing achievement:', data);
+    logger.log('Syncing achievement:', data);
     await new Promise(resolve => setTimeout(resolve, 500));
   }
 
@@ -183,12 +184,12 @@ class OfflineManager {
   public clearQueue() {
     this.offlineQueue = [];
     this.saveQueueToStorage();
-    console.log('🗑️ Offline fronta vyčištěna');
+    logger.log('🗑️ Offline fronta vyčištěna');
   }
 
   public forceSync() {
     if (this.isOnline) {
-      console.log('🔄 Vynucená synchronizace...');
+      logger.log('🔄 Vynucená synchronizace...');
       this.processOfflineQueue();
     } else {
       console.warn('⚠️ Nelze synchronizovat - není připojení');

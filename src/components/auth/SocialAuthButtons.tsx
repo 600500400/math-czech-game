@@ -4,12 +4,13 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+import { logger } from "@/utils/logger";
 const SocialAuthButtons = () => {
   const { t } = useLanguage();
 
   const handleSocialAuth = async (provider: 'google' | 'facebook' | 'apple') => {
     try {
-      console.log(`Attempting ${provider} authentication...`);
+      logger.log(`Attempting ${provider} authentication...`);
       
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
@@ -34,7 +35,7 @@ const SocialAuthButtons = () => {
         return;
       }
 
-      console.log(`${provider} auth successful:`, data);
+      logger.log(`${provider} auth successful:`, data);
       toast.success(`Přihlašování přes ${provider} probíhá...`);
       
     } catch (error: any) {

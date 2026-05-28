@@ -1,6 +1,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
+import { logger } from "@/utils/logger";
 interface HapticDebugInfo {
   isSupported: boolean;
   userAgent: string;
@@ -32,8 +33,8 @@ export const useHapticDebugger = () => {
         userAgent: navigator.userAgent
       }));
       
-      console.log('🔧 Haptic Debug: Support detected:', supported);
-      console.log('🔧 Haptic Debug: User Agent:', navigator.userAgent);
+      logger.log('🔧 Haptic Debug: Support detected:', supported);
+      logger.log('🔧 Haptic Debug: User Agent:', navigator.userAgent);
     };
 
     checkSupport();
@@ -41,7 +42,7 @@ export const useHapticDebugger = () => {
 
   const logTrigger = useCallback((type: string, success: boolean, error?: string) => {
     const timestamp = new Date().toLocaleTimeString();
-    console.log(`🔧 Haptic Debug [${timestamp}]: ${type} - ${success ? 'SUCCESS' : 'FAILED'}`);
+    logger.log(`🔧 Haptic Debug [${timestamp}]: ${type} - ${success ? 'SUCCESS' : 'FAILED'}`);
     
     if (error) {
       console.error('🔧 Haptic Debug Error:', error);
@@ -56,7 +57,7 @@ export const useHapticDebugger = () => {
   }, []);
 
   const testVibration = useCallback(async (pattern: number[] = [200]) => {
-    console.log('🔧 Haptic Debug: Testing vibration with pattern:', pattern);
+    logger.log('🔧 Haptic Debug: Testing vibration with pattern:', pattern);
     
     try {
       if (navigator.vibrate) {

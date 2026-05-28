@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useHapticDebugger } from './useHapticDebugger';
 
+import { logger } from "@/utils/logger";
 interface HapticSettings {
   enabled: boolean;
   intensity: 'light' | 'medium' | 'heavy';
@@ -24,7 +25,7 @@ export const useEnhancedHaptics = (settings: HapticSettings = { enabled: true, i
 
   useEffect(() => {
     const handleFirstInteraction = () => {
-      console.log('🔧 Haptic Debug: First user interaction detected');
+      logger.log('🔧 Haptic Debug: First user interaction detected');
       setUserInteracted(true);
       
       // Test vibration capability on first interaction
@@ -58,7 +59,7 @@ export const useEnhancedHaptics = (settings: HapticSettings = { enabled: true, i
       return false;
     }
 
-    console.log(`🔧 Haptic Debug: Triggering ${patternName} pattern:`, pattern);
+    logger.log(`🔧 Haptic Debug: Triggering ${patternName} pattern:`, pattern);
 
     try {
       // Try modern Vibration API first

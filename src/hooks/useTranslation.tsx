@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 
+import { logger } from "@/utils/logger";
 interface TranslationResult {
   translatedText: string;
   confidence: number;
@@ -27,7 +28,7 @@ export const useTranslation = (): UseTranslationReturn => {
       // Use our Supabase Edge Function as proxy to avoid CORS issues
       const { supabase } = await import('@/integrations/supabase/client');
 
-      console.log('Calling translate-text edge function...');
+      logger.log('Calling translate-text edge function...');
       const { data, error } = await supabase.functions.invoke('translate-text', {
         body: { text, sourceLang: 'en', targetLang: 'cs' }
       });
@@ -37,7 +38,7 @@ export const useTranslation = (): UseTranslationReturn => {
       }
 
       if (data?.translatedText) {
-        console.log(`Translation successful via ${data.source}: "${data.translatedText}"`);
+        logger.log(`Translation successful via ${data.source}: "${data.translatedText}"`);
         return data.translatedText;
       } else {
         throw new Error('No translation available');

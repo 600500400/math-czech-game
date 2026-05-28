@@ -4,6 +4,7 @@ import { SpellingStatistics } from "@/types/authTypes";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
+import { logger } from "@/utils/logger";
 export const useSpellingStatistics = (userId: string | null) => {
   const queryClient = useQueryClient();
 
@@ -26,7 +27,7 @@ export const useSpellingStatistics = (userId: string | null) => {
         throw new Error("Uživatel není nastaven - nelze uložit statistiky");
       }
 
-      console.log("Ukládání statistik pravopisu do databáze pro uživatele:", userId);
+      logger.log("Ukládání statistik pravopisu do databáze pro uživatele:", userId);
       
       const { data, error } = await supabase
         .from('spelling_statistics')
@@ -46,7 +47,7 @@ export const useSpellingStatistics = (userId: string | null) => {
         throw error;
       }
 
-      console.log("Statistiky pravopisu úspěšně uloženy do databáze:", data);
+      logger.log("Statistiky pravopisu úspěšně uloženy do databáze:", data);
       return data;
     },
     onSuccess: () => {
@@ -65,11 +66,11 @@ export const useSpellingStatistics = (userId: string | null) => {
     queryKey: ["spellingStatistics", userId],
     queryFn: async (): Promise<SpellingStatistics[]> => {
       if (!userId) {
-        console.log("Žádný userId - vracím prázdné statistiky");
+        logger.log("Žádný userId - vracím prázdné statistiky");
         return [];
       }
       
-      console.log("Načítání statistik pravopisu z databáze pro uživatele:", userId);
+      logger.log("Načítání statistik pravopisu z databáze pro uživatele:", userId);
       
       const { data, error } = await supabase
         .from('spelling_statistics')
@@ -82,7 +83,7 @@ export const useSpellingStatistics = (userId: string | null) => {
         throw error;
       }
 
-      console.log("Načtené statistiky pravopisu z databáze:", data);
+      logger.log("Načtené statistiky pravopisu z databáze:", data);
       return data || [];
     },
     enabled: !!userId,

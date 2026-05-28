@@ -3,6 +3,7 @@ import { AuthState } from "@/types/authTypes";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
+import { logger } from "@/utils/logger";
 export const useSignOut = (setAuthState: React.Dispatch<React.SetStateAction<AuthState>>) => {
   const navigate = useNavigate();
   
@@ -10,7 +11,7 @@ export const useSignOut = (setAuthState: React.Dispatch<React.SetStateAction<Aut
     try {
       setAuthState((prev) => ({ ...prev, isLoading: true }));
       
-      console.log("Odhlašování uživatele");
+      logger.log("Odhlašování uživatele");
       
       // Odstraníme pouze lokálního uživatele (statistiky zůstávají)
       localStorage.removeItem('localUser');

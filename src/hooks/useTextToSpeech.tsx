@@ -1,6 +1,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 
+import { logger } from "@/utils/logger";
 export const useTextToSpeech = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -11,7 +12,7 @@ export const useTextToSpeech = () => {
     const loadVoices = () => {
       const voices = speechSynthesis.getVoices();
       setAvailableVoices(voices);
-      console.log("🗣️ TTS: Available voices:", voices.map(v => `${v.name} (${v.lang})`));
+      logger.log("🗣️ TTS: Available voices:", voices.map(v => `${v.name} (${v.lang})`));
     };
 
     // Load voices initially
@@ -32,7 +33,7 @@ export const useTextToSpeech = () => {
       voice.lang.toLowerCase().startsWith('en')
     );
 
-    console.log("🗣️ TTS: Available English voices:", englishVoices.map(v => `${v.name} (${v.lang})`));
+    logger.log("🗣️ TTS: Available English voices:", englishVoices.map(v => `${v.name} (${v.lang})`));
 
     if (englishVoices.length > 0) {
       // Preferred English voices in order of priority
@@ -52,7 +53,7 @@ export const useTextToSpeech = () => {
           voice.name.toLowerCase().includes(preferredName.toLowerCase())
         );
         if (preferredVoice) {
-          console.log(`🗣️ TTS: Selected preferred English voice: ${preferredVoice.name} (${preferredVoice.lang})`);
+          logger.log(`🗣️ TTS: Selected preferred English voice: ${preferredVoice.name} (${preferredVoice.lang})`);
           return preferredVoice;
         }
       }
@@ -62,18 +63,18 @@ export const useTextToSpeech = () => {
         voice.lang.toLowerCase().includes('en-us')
       );
       if (usEnglish) {
-        console.log(`🗣️ TTS: Selected US English voice: ${usEnglish.name} (${usEnglish.lang})`);
+        logger.log(`🗣️ TTS: Selected US English voice: ${usEnglish.name} (${usEnglish.lang})`);
         return usEnglish;
       }
 
       // Use first available English voice
       const selectedVoice = englishVoices[0];
-      console.log(`🗣️ TTS: Selected first available English voice: ${selectedVoice.name} (${selectedVoice.lang})`);
+      logger.log(`🗣️ TTS: Selected first available English voice: ${selectedVoice.name} (${selectedVoice.lang})`);
       return selectedVoice;
     }
 
     // FALLBACK: No English voices found, try to use Czech voice with English pronunciation
-    console.log("🗣️ TTS: No English voices found, using Czech voice fallback");
+    logger.log("🗣️ TTS: No English voices found, using Czech voice fallback");
     
     // Look for Czech voices
     const czechVoices = availableVoices.filter(voice => 
@@ -82,25 +83,25 @@ export const useTextToSpeech = () => {
 
     if (czechVoices.length > 0) {
       const czechVoice = czechVoices[0];
-      console.log(`🗣️ TTS: Selected Czech voice for English fallback: ${czechVoice.name} (${czechVoice.lang})`);
+      logger.log(`🗣️ TTS: Selected Czech voice for English fallback: ${czechVoice.name} (${czechVoice.lang})`);
       return czechVoice;
     }
 
     // Ultimate fallback: use any available voice
     if (availableVoices.length > 0) {
       const fallbackVoice = availableVoices[0];
-      console.log(`🗣️ TTS: Using ultimate fallback voice: ${fallbackVoice.name} (${fallbackVoice.lang})`);
+      logger.log(`🗣️ TTS: Using ultimate fallback voice: ${fallbackVoice.name} (${fallbackVoice.lang})`);
       return fallbackVoice;
     }
 
-    console.log("🗣️ TTS: No voices available at all");
+    logger.log("🗣️ TTS: No voices available at all");
     return null;
   }, [availableVoices]);
 
   const speak = useCallback((text: string, _lang?: string) => {
     // Always force English pronunciation (ignore lang parameter)
     const forcedLang = 'en-US';
-    console.log("🗣️ TTS: Attempting to speak:", text, "forced to English");
+    logger.log("🗣️ TTS: Attempting to speak:", text, "forced to English");
     
     if (!('speechSynthesis' in window)) {
       const errorMsg = "Speech synthesis not supported";
@@ -126,17 +127,17 @@ export const useTextToSpeech = () => {
       const selectedVoice = selectBestVoiceForEnglish();
       if (selectedVoice) {
         utterance.voice = selectedVoice;
-        console.log(`🗣️ TTS: Using voice: ${selectedVoice.name} (${selectedVoice.lang}) for English pronunciation`);
+        logger.log(`🗣️ TTS: Using voice: ${selectedVoice.name} (${selectedVoice.lang}) for English pronunciation`);
       } else {
-        console.log(`🗣️ TTS: Using default voice, forced to English`);
+        logger.log(`🗣️ TTS: Using default voice, forced to English`);
       }
       
       utterance.onstart = () => {
-        console.log("🗣️ TTS: Speech started");
+        logger.log("🗣️ TTS: Speech started");
       };
       
       utterance.onend = () => {
-        console.log("🗣️ TTS: Speech ended");
+        logger.log("🗣️ TTS: Speech ended");
         setIsLoading(false);
       };
       
@@ -148,7 +149,7 @@ export const useTextToSpeech = () => {
       };
       
       speechSynthesis.speak(utterance);
-      console.log("🗣️ TTS: Speech synthesis started with forced English");
+      logger.log("🗣️ TTS: Speech synthesis started with forced English");
       
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : "Unknown speech error";

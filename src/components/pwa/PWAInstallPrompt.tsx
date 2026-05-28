@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Download, X } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 
+import { logger } from "@/utils/logger";
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
   readonly userChoice: Promise<{
@@ -44,7 +45,7 @@ const PWAInstallPrompt = () => {
 
     // Listen for app installed event
     const handleAppInstalled = () => {
-      console.log('PWA was installed');
+      logger.log('PWA was installed');
       setIsInstalled(true);
       setShowPrompt(false);
       setDeferredPrompt(null);
@@ -65,7 +66,7 @@ const PWAInstallPrompt = () => {
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
     
-    console.log(`User response to the install prompt: ${outcome}`);
+    logger.log(`User response to the install prompt: ${outcome}`);
     
     localStorage.setItem('pwa-install-prompt-shown', 'true');
     setDeferredPrompt(null);
