@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
-import { BookOpen } from "lucide-react";
+import { Logo } from "@/components/layout/Logo";
 import { Link } from "react-router-dom";
 import UserMenu from "@/components/UserMenu";
 import FeedbackButton from "@/components/FeedbackButton";
@@ -23,9 +23,7 @@ const ModernHeader = () => {
             to="/"
             className="group flex items-center space-x-2 sm:space-x-3 hover:opacity-90 transition-opacity duration-200"
           >
-            <div className="w-10 h-10 sm:w-11 sm:h-11 bg-gradient-to-br from-blue-500 via-green-500 to-purple-500 rounded-xl flex items-center justify-center shadow-md">
-              <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-            </div>
+            <Logo size={44} className="sm:!w-11 sm:!h-11" />
             <div>
               <h1 className="text-lg sm:text-2xl font-bold text-foreground tracking-tight">
                 Procvička
