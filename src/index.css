@@ -72,18 +72,18 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
     
-    /* Section-specific colors */
-    --subject-math: 221.2 83.2% 53.3%; /* blue-600 */
-    --subject-math-light: 214.3 31.8% 95%; /* blue-50 */
-    --subject-math-border: 213.3 93.9% 87.8%; /* blue-200 */
+    /* Section-specific colors — dark mode: tlumené tmavé varianty */
+    --subject-math: 217 91% 65%; /* lighter blue for dark bg readability */
+    --subject-math-light: 222 47% 14%; /* dark blue tinted surface */
+    --subject-math-border: 221 50% 25%;
     
-    --subject-spelling: 142.1 76.2% 36.3%; /* green-600 */
-    --subject-spelling-light: 138.5 76.5% 96.7%; /* green-50 */
-    --subject-spelling-border: 141.4 84.2% 85.1%; /* green-200 */
+    --subject-spelling: 142 70% 50%;
+    --subject-spelling-light: 142 40% 12%;
+    --subject-spelling-border: 142 40% 22%;
     
-    --subject-dictionary: 262.1 83.3% 57.8%; /* purple-600 */
-    --subject-dictionary-light: 270 100% 98%; /* purple-50 */
-    --subject-dictionary-border: 264.5 93.5% 87.1%; /* purple-200 */
+    --subject-dictionary: 262 83% 70%;
+    --subject-dictionary-light: 262 40% 15%;
+    --subject-dictionary-border: 262 40% 26%;
   }
 }
 
