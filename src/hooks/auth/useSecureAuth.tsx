@@ -6,6 +6,7 @@ import { secureStorage } from "@/utils/secureStorage";
 import { validateUserInput } from "@/utils/xssProtection";
 import { toast } from "sonner";
 
+import { logger } from "@/utils/logger";
 export const useSecureAuth = () => {
   const [securityMetrics, setSecurityMetrics] = useState({
     storageIntegrity: true,
@@ -76,7 +77,7 @@ export const useSecureAuth = () => {
       if (error) throw error;
 
       // Log successful authentication
-      console.log('Secure authentication successful');
+      logger.log('Secure authentication successful');
       
       return { data, error: null };
     } catch (error) {
@@ -89,7 +90,7 @@ export const useSecureAuth = () => {
   const monitorSession = () => {
     return supabase.auth.onAuthStateChange((event, session) => {
       // Log auth events for security monitoring
-      console.log('Auth state change:', event, session?.user?.id);
+      logger.log('Auth state change:', event, session?.user?.id);
       
       // Detect potential session hijacking
       if (event === 'SIGNED_IN' && session) {

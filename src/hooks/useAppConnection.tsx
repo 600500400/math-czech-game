@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { checkSupabaseConnection } from "@/integrations/supabase/client";
 
+import { logger } from "@/utils/logger";
 export function useAppConnection() {
   const [databaseStatus, setDatabaseStatus] = useState<"checking" | "connected" | "disconnected" | "error">("checking");
 
@@ -13,14 +14,14 @@ export function useAppConnection() {
         const result = await checkSupabaseConnection();
         if (result.success) {
           setDatabaseStatus("connected");
-          console.log("Databáze je připojena:", result);
+          logger.log("Databáze je připojena:", result);
         } else {
           setDatabaseStatus("disconnected");
-          console.log("Aplikace běží v offline režimu");
+          logger.log("Aplikace běží v offline režimu");
         }
       } catch (error) {
         setDatabaseStatus("error");
-        console.log("Aplikace běží v offline režimu");
+        logger.log("Aplikace běží v offline režimu");
       }
     };
     
@@ -49,14 +50,14 @@ export function useAppConnection() {
       
       if (result.success) {
         setDatabaseStatus("connected");
-        console.log("Připojení k databázi úspěšné");
+        logger.log("Připojení k databázi úspěšné");
       } else {
         setDatabaseStatus("disconnected");
-        console.log("Aplikace běží v offline režimu");
+        logger.log("Aplikace běží v offline režimu");
       }
     } catch (error) {
       setDatabaseStatus("error");
-      console.log("Aplikace běží v offline režimu");
+      logger.log("Aplikace běží v offline režimu");
     }
   };
 

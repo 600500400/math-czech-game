@@ -4,22 +4,23 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { DictionaryAnswer } from "@/types/dictionaryTypes";
 import { supabase } from "@/integrations/supabase/client";
 
+import { logger } from "@/utils/logger";
 export const useDictionaryAnswers = (userId: string | null) => {
   const queryClient = useQueryClient();
   const [localAnswers, setLocalAnswers] = useState<DictionaryAnswer[]>([]);
 
-  console.log("useDictionaryAnswers - inicializace s userId:", userId);
+  logger.log("useDictionaryAnswers - inicializace s userId:", userId);
 
   // Load answers from database
   const { data: databaseAnswers = [] } = useQuery({
     queryKey: ["dictionaryAnswers", userId],
     queryFn: async (): Promise<DictionaryAnswer[]> => {
       if (!userId) {
-        console.log("useDictionaryAnswers - žádný userId, vracím prázdné pole");
+        logger.log("useDictionaryAnswers - žádný userId, vracím prázdné pole");
         return [];
       }
 
-      console.log("useDictionaryAnswers - načítám odpovědi z databáze pro userId:", userId);
+      logger.log("useDictionaryAnswers - načítám odpovědi z databáze pro userId:", userId);
       
       const { data, error } = await supabase
         .from('dictionary_answers')
@@ -32,7 +33,7 @@ export const useDictionaryAnswers = (userId: string | null) => {
         throw error;
       }
 
-      console.log("useDictionaryAnswers - načteno z databáze:", data?.length || 0, "odpovědí");
+      logger.log("useDictionaryAnswers - načteno z databáze:", data?.length || 0, "odpovědí");
       // Transform the data to match our types
       return (data || []).map(item => ({
         ...item,
@@ -54,7 +55,7 @@ export const useDictionaryAnswers = (userId: string | null) => {
         throw new Error("Uživatel není nastaven");
       }
 
-      console.log("useDictionaryAnswers - přidávám odpověď do databáze:", answer);
+      logger.log("useDictionaryAnswers - přidávám odpověď do databáze:", answer);
 
       const { data, error } = await supabase
         .from('dictionary_answers')
@@ -76,7 +77,7 @@ export const useDictionaryAnswers = (userId: string | null) => {
         throw error;
       }
 
-      console.log("useDictionaryAnswers - odpověď uložena do databáze:", data);
+      logger.log("useDictionaryAnswers - odpověď uložena do databáze:", data);
       return data;
     },
     onSuccess: () => {
@@ -91,7 +92,7 @@ export const useDictionaryAnswers = (userId: string | null) => {
         return;
       }
 
-      console.log("useDictionaryAnswers - ukládám", answers.length, "odpovědí do databáze");
+      logger.log("useDictionaryAnswers - ukládám", answers.length, "odpovědí do databáze");
 
       const { data, error } = await supabase
         .from('dictionary_answers')
@@ -114,7 +115,7 @@ export const useDictionaryAnswers = (userId: string | null) => {
         throw error;
       }
 
-      console.log("useDictionaryAnswers - uloženo", data?.length || 0, "odpovědí do databáze");
+      logger.log("useDictionaryAnswers - uloženo", data?.length || 0, "odpovědí do databáze");
       return data;
     },
     onSuccess: () => {
@@ -130,7 +131,7 @@ export const useDictionaryAnswers = (userId: string | null) => {
         return;
       }
 
-      console.log("useDictionaryAnswers - mažu všechny odpovědi pro userId:", userId);
+      logger.log("useDictionaryAnswers - mažu všechny odpovědi pro userId:", userId);
 
       const { error } = await supabase
         .from('dictionary_answers')
@@ -142,7 +143,7 @@ export const useDictionaryAnswers = (userId: string | null) => {
         throw error;
       }
 
-      console.log("useDictionaryAnswers - odpovědi vymazány z databáze");
+      logger.log("useDictionaryAnswers - odpovědi vymazány z databáze");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["dictionaryAnswers", userId] });
@@ -151,7 +152,7 @@ export const useDictionaryAnswers = (userId: string | null) => {
   });
 
   const addDictionaryAnswer = (answer: Omit<DictionaryAnswer, 'id' | 'created_at'>) => {
-    console.log("useDictionaryAnswers - přidávám lokální odpověď:", answer);
+    logger.log("useDictionaryAnswers - přidávám lokální odpověď:", answer);
     setLocalAnswers(prev => [...prev, {
       ...answer,
       id: `temp-${Date.now()}`,
@@ -160,18 +161,18 @@ export const useDictionaryAnswers = (userId: string | null) => {
   };
 
   const saveDictionaryAnswers = () => {
-    console.log("useDictionaryAnswers - ukládám", localAnswers.length, "lokálních odpovědí");
+    logger.log("useDictionaryAnswers - ukládám", localAnswers.length, "lokálních odpovědí");
     if (localAnswers.length > 0) {
       saveAnswersMutation.mutate(localAnswers);
     }
   };
 
   const clearDictionaryAnswers = () => {
-    console.log("useDictionaryAnswers - mažu všechny odpovědi");
+    logger.log("useDictionaryAnswers - mažu všechny odpovědi");
     return clearAnswersMutation.mutateAsync();
   };
 
-  console.log("useDictionaryAnswers - aktuální stav:", {
+  logger.log("useDictionaryAnswers - aktuální stav:", {
     userId,
     databaseAnswersCount: databaseAnswers.length,
     localAnswersCount: localAnswers.length,

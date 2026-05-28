@@ -2,6 +2,7 @@
 import { useEffect } from "react";
 import { toast } from "sonner";
 
+import { logger } from "@/utils/logger";
 export const useNetworkEvents = (
   checkConnection: (forceCheck?: boolean) => Promise<any>
 ) => {
@@ -9,7 +10,7 @@ export const useNetworkEvents = (
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
-        console.log("Uživatel se vrátil do aplikace, kontroluji připojení");
+        logger.log("Uživatel se vrátil do aplikace, kontroluji připojení");
         
         // Při návratu do aplikace, počkáme 2 sekundy na ustálení síťového připojení
         setTimeout(() => {
@@ -25,7 +26,7 @@ export const useNetworkEvents = (
   // Kontrola při online/offline změnách
   useEffect(() => {
     const handleOnline = () => {
-      console.log("🌐 Zařízení přešlo do online režimu, kontroluji připojení...");
+      logger.log("🌐 Zařízení přešlo do online režimu, kontroluji připojení...");
       toast.info("Internetové připojení obnoveno, kontroluji připojení k databázi");
       
       // Počkáme 2 sekundy na ustálení síťového připojení
@@ -35,7 +36,7 @@ export const useNetworkEvents = (
     };
     
     const handleOffline = () => {
-      console.log("⚠️ Zařízení přešlo do offline režimu");
+      logger.log("⚠️ Zařízení přešlo do offline režimu");
       toast.warning("Internetové připojení ztraceno, přepínám do offline režimu");
     };
     

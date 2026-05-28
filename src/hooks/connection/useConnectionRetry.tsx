@@ -4,6 +4,7 @@ import { ConnectionStatus, ConnectionHistoryEntry } from "@/types/connectionType
 import { checkSupabaseConnection } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+import { logger } from "@/utils/logger";
 export const useConnectionRetry = (
   userId: string | null,
   checkLocalUserMode: () => Promise<boolean>
@@ -33,7 +34,7 @@ export const useConnectionRetry = (
     
     // Omezení četnosti kontrol (ne častěji než každé 3 sekundy)
     if (!forceCheck && now - lastCheckTime < 3000) {
-      console.log("Příliš časté kontroly spojení, přeskakuji...");
+      logger.log("Příliš časté kontroly spojení, přeskakuji...");
       return {
         success: false,
         skipped: true
@@ -43,7 +44,7 @@ export const useConnectionRetry = (
     try {
       setLastCheckTime(now);
       setStatus("checking");
-      console.log(`Kontrola připojení k databázi (pokus ${retryCount + 1})...`);
+      logger.log(`Kontrola připojení k databázi (pokus ${retryCount + 1})...`);
       
       // Přidání timeoutu pro případ, že by Supabase nereagoval
       const result = await checkSupabaseConnection();
@@ -51,7 +52,7 @@ export const useConnectionRetry = (
       if (result.success) {
         setStatus("connected");
         setRetryCount(0); // Reset počtu pokusů při úspěchu
-        console.log("Database connection verified:", result);
+        logger.log("Database connection verified:", result);
         addToHistory(true);
         
         // Zjistíme, zda jsme v lokálním režimu
@@ -59,7 +60,7 @@ export const useConnectionRetry = (
         setIsLocalMode(localMode);
         
         if (localMode) {
-          console.log("Aplikace je v lokálním režimu pro fallback");
+          logger.log("Aplikace je v lokálním režimu pro fallback");
         }
         
         return result;
@@ -91,10 +92,10 @@ export const useConnectionRetry = (
     if (status !== "connected" && retryCount > 0) {
       // Exponenciální backoff (max 30 sekund)
       const delay = Math.min(Math.pow(2, retryCount) * 1000, 30000);
-      console.log(`Naplánování automatického pokusu o připojení za ${delay/1000} sekund...`);
+      logger.log(`Naplánování automatického pokusu o připojení za ${delay/1000} sekund...`);
       
       const timer = setTimeout(() => {
-        console.log("Automatický pokus o připojení...");
+        logger.log("Automatický pokus o připojení...");
         checkConnection(true);
       }, delay);
       
@@ -105,7 +106,7 @@ export const useConnectionRetry = (
   // Funkce pro ruční obnovení dat
   const handleRefreshData = async () => {
     if (isRefreshing) {
-      console.log("Obnovení již probíhá, ignoruji požadavek");
+      logger.log("Obnovení již probíhá, ignoruji požadavek");
       return;
     }
     

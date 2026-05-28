@@ -4,6 +4,7 @@ import { MathStatistics } from "@/types/authTypes";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
+import { logger } from "@/utils/logger";
 export const useMathStatistics = (userId: string | null) => {
   const queryClient = useQueryClient();
 
@@ -26,7 +27,7 @@ export const useMathStatistics = (userId: string | null) => {
         throw new Error("Uživatel není nastaven - nelze uložit statistiky");
       }
 
-      console.log("Ukládání statistik matematiky do databáze pro uživatele:", userId);
+      logger.log("Ukládání statistik matematiky do databáze pro uživatele:", userId);
       
       const { data, error } = await supabase
         .from('math_statistics')
@@ -46,7 +47,7 @@ export const useMathStatistics = (userId: string | null) => {
         throw error;
       }
 
-      console.log("Statistiky matematiky úspěšně uloženy do databáze:", data);
+      logger.log("Statistiky matematiky úspěšně uloženy do databáze:", data);
       return data;
     },
     onSuccess: () => {
@@ -64,11 +65,11 @@ export const useMathStatistics = (userId: string | null) => {
     queryKey: ["mathStatistics", userId],
     queryFn: async (): Promise<MathStatistics[]> => {
       if (!userId) {
-        console.log("Žádný userId - vracím prázdné statistiky");
+        logger.log("Žádný userId - vracím prázdné statistiky");
         return [];
       }
       
-      console.log("Načítání statistik matematiky z databáze pro uživatele:", userId);
+      logger.log("Načítání statistik matematiky z databáze pro uživatele:", userId);
       
       const { data, error } = await supabase
         .from('math_statistics')
@@ -81,7 +82,7 @@ export const useMathStatistics = (userId: string | null) => {
         throw error;
       }
 
-      console.log("Načtené statistiky matematiky z databáze:", data);
+      logger.log("Načtené statistiky matematiky z databáze:", data);
       return data || [];
     },
     enabled: !!userId,

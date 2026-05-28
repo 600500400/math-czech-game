@@ -2,10 +2,11 @@
 import { AuthState } from "@/types/authTypes";
 import { toast } from "sonner";
 
+import { logger } from "@/utils/logger";
 export const useLocalUser = (setAuthState: React.Dispatch<React.SetStateAction<AuthState>>) => {
   const setLocalUser = async (user: { id: string, username: string, role: string }) => {
     try {
-      console.log(`Setting local user ${user.username} with ID ${user.id}`);
+      logger.log(`Setting local user ${user.username} with ID ${user.id}`);
       
       // Store user as local guest
       localStorage.setItem('localUser', JSON.stringify(user));
@@ -29,15 +30,15 @@ export const useLocalUser = (setAuthState: React.Dispatch<React.SetStateAction<A
       
       if (!localStorage.getItem(mathStatsKey)) {
         localStorage.setItem(mathStatsKey, JSON.stringify([]));
-        console.log(`Inicializovány prázdné math statistiky pro ${user.id}`);
+        logger.log(`Inicializovány prázdné math statistiky pro ${user.id}`);
       }
       
       if (!localStorage.getItem(spellingStatsKey)) {
         localStorage.setItem(spellingStatsKey, JSON.stringify([]));
-        console.log(`Inicializovány prázdné spelling statistiky pro ${user.id}`);
+        logger.log(`Inicializovány prázdné spelling statistiky pro ${user.id}`);
       }
       
-      console.log(`Local guest user ${user.username} set up successfully`);
+      logger.log(`Local guest user ${user.username} set up successfully`);
       
     } catch (error: any) {
       console.error("Error setting local user:", error);

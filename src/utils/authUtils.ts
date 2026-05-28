@@ -1,6 +1,7 @@
 
 import { secureCleanupAuthState } from './secureStorage';
 
+import { logger } from "@/utils/logger";
 // Enhanced utility function to clean up auth state in localStorage and sessionStorage
 export const cleanupAuthState = () => {
   // Use the secure cleanup implementation
@@ -14,7 +15,7 @@ export const attemptGlobalSignOut = async (supabase: any) => {
     return true;
   } catch (err) {
     // Continue even if this fails
-    console.log("Global sign out attempt failed, continuing", err);
+    logger.log("Global sign out attempt failed, continuing", err);
     return false;
   }
 };

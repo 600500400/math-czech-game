@@ -2,6 +2,7 @@
 import { useEffect, useCallback, useRef } from 'react';
 import { webVitalsMonitor } from '@/utils/webVitals';
 
+import { logger } from "@/utils/logger";
 interface PerformanceOptions {
   enableImageLazyLoading?: boolean;
   enableVirtualScrolling?: boolean;
@@ -127,7 +128,7 @@ export const usePerformanceOptimization = (options: PerformanceOptions = {}) => 
     element.addEventListener('scroll', () => {
       requestIdleCallback(() => {
         // Virtualization logic would go here
-        console.log('Virtual scrolling optimization applied');
+        logger.log('Virtual scrolling optimization applied');
       });
     }, { passive: true });
   }, [enableVirtualScrolling]);
@@ -138,7 +139,7 @@ export const usePerformanceOptimization = (options: PerformanceOptions = {}) => 
     const end = performance.now();
     const duration = end - start;
     
-    console.log(`⏱️ ${name} took ${duration.toFixed(2)}ms`);
+    logger.log(`⏱️ ${name} took ${duration.toFixed(2)}ms`);
     
     if (duration > 16.67) { // More than one frame (60fps)
       console.warn(`🐌 Slow operation detected: ${name}`);

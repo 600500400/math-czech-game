@@ -1,3 +1,4 @@
+import { logger } from "@/utils/logger";
 
 // Automatické verzování aplikace s dynamickým build timestampem
 export const APP_VERSION = {
@@ -9,8 +10,8 @@ export const APP_VERSION = {
   getFullVersion: () => `${APP_VERSION.major}.${APP_VERSION.minor}.${APP_VERSION.patch}`,
   getFullVersionWithBuild: () => `${APP_VERSION.getFullVersion()}-${APP_VERSION.build}`,
   logVersion: () => {
-    console.log(`🚀 Aplikace verze: ${APP_VERSION.getFullVersion()}`);
-    console.log(`📅 Build: ${APP_VERSION.getBuildDate()}`);
+    logger.log(`🚀 Aplikace verze: ${APP_VERSION.getFullVersion()}`);
+    logger.log(`📅 Build: ${APP_VERSION.getBuildDate()}`);
   },
   // Inicializace verzování - zavolá se pouze když je potřeba
   initializeVersioning: () => {
@@ -19,7 +20,7 @@ export const APP_VERSION = {
       const currentVersion = APP_VERSION.getFullVersion();
       
       if (previousVersion !== currentVersion) {
-        console.log(`🔄 Aktualizace z verze ${previousVersion || 'neznámá'} na ${currentVersion}`);
+        logger.log(`🔄 Aktualizace z verze ${previousVersion || 'neznámá'} na ${currentVersion}`);
         localStorage.setItem('app_version', currentVersion);
         localStorage.setItem('app_last_update', new Date().toISOString());
       }

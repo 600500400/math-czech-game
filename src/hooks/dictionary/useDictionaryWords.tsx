@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { DictionaryWord, NewDictionaryWord } from "@/types/dictionaryTypes";
 import { toast } from "sonner";
 
+import { logger } from "@/utils/logger";
 export const useDictionaryWords = (userId: string | null) => {
   const queryClient = useQueryClient();
 
@@ -31,7 +32,7 @@ export const useDictionaryWords = (userId: string | null) => {
       // Allow guest users to add words with a default user_id
       const effectiveUserId = userId || 'guest';
 
-      console.log("Adding word with userId:", effectiveUserId, "word:", newWord);
+      logger.log("Adding word with userId:", effectiveUserId, "word:", newWord);
 
       const { data, error } = await supabase
         .from('dictionary_words')

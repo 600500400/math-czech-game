@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useLanguage } from "@/hooks/useLanguage";
 
+import { logger } from "@/utils/logger";
 const StatisticsViewer = () => {
   const { t } = useLanguage();
   const { authState } = useAuth();
@@ -32,7 +33,7 @@ const StatisticsViewer = () => {
   
   // Debug logging
   useEffect(() => {
-    console.log("📊 StatisticsViewer - render s parametry:", {
+    logger.log("📊 StatisticsViewer - render s parametry:", {
       authUserId: authState.user?.id,
       currentUserId,
       mathStatsCount: mathStats?.length || 0,

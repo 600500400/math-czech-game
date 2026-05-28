@@ -3,16 +3,17 @@ import { useState, useEffect } from "react";
 import { SpellingAnswer } from "@/types/spellingTypes";
 import { supabase } from "@/integrations/supabase/client";
 
+import { logger } from "@/utils/logger";
 export const useSpellingAnswers = (userId: string | null) => {
   const [spellingAnswers, setSpellingAnswers] = useState<SpellingAnswer[]>([]);
 
   // Load spelling answers from Supabase when component mounts or userId changes
   useEffect(() => {
-    console.log("useSpellingAnswers - useEffect triggered with userId:", userId);
+    logger.log("useSpellingAnswers - useEffect triggered with userId:", userId);
     if (userId) {
       loadSpellingAnswers();
     } else {
-      console.log("useSpellingAnswers - žádný userId, mazám data");
+      logger.log("useSpellingAnswers - žádný userId, mazám data");
       setSpellingAnswers([]);
     }
   }, [userId]);
@@ -21,11 +22,11 @@ export const useSpellingAnswers = (userId: string | null) => {
   const loadSpellingAnswers = async () => {
     try {
       if (!userId) {
-        console.log("useSpellingAnswers - Žádný userId - nelze načíst pravopisné odpovědi");
+        logger.log("useSpellingAnswers - Žádný userId - nelze načíst pravopisné odpovědi");
         return;
       }
       
-      console.log("useSpellingAnswers - načítám pravopisné odpovědi pro userId:", userId);
+      logger.log("useSpellingAnswers - načítám pravopisné odpovědi pro userId:", userId);
       
       const { data, error } = await supabase
         .from('spelling_answers')
@@ -38,7 +39,7 @@ export const useSpellingAnswers = (userId: string | null) => {
         return;
       }
 
-      console.log("useSpellingAnswers - načteno z databáze:", data?.length || 0, "záznamů");
+      logger.log("useSpellingAnswers - načteno z databáze:", data?.length || 0, "záznamů");
 
       // Convert database format to app format
       const convertedAnswers: SpellingAnswer[] = (data || []).map(item => ({
@@ -51,7 +52,7 @@ export const useSpellingAnswers = (userId: string | null) => {
         wordGroup: item.word_group
       }));
 
-      console.log("useSpellingAnswers - konvertované odpovědi:", convertedAnswers);
+      logger.log("useSpellingAnswers - konvertované odpovědi:", convertedAnswers);
       setSpellingAnswers(convertedAnswers);
     } catch (error) {
       console.error("useSpellingAnswers - Error loading spelling answers:", error);
@@ -95,7 +96,7 @@ export const useSpellingAnswers = (userId: string | null) => {
       }
 
       setSpellingAnswers(answers);
-      console.log("useSpellingAnswers - uloženy pravopisné odpovědi do databáze:", answers);
+      logger.log("useSpellingAnswers - uloženy pravopisné odpovědi do databáze:", answers);
     } catch (error) {
       console.error("useSpellingAnswers - Error saving spelling answers:", error);
     }
@@ -109,7 +110,7 @@ export const useSpellingAnswers = (userId: string | null) => {
         return;
       }
       
-      console.log("useSpellingAnswers - přidávám pravopisnou odpověď:", answer);
+      logger.log("useSpellingAnswers - přidávám pravopisnou odpověď:", answer);
       
       const { error } = await supabase
         .from('spelling_answers')
@@ -131,7 +132,7 @@ export const useSpellingAnswers = (userId: string | null) => {
 
       const newAnswers = [...spellingAnswers, answer];
       setSpellingAnswers(newAnswers);
-      console.log("useSpellingAnswers - přidána pravopisná odpověď, celkem:", newAnswers.length);
+      logger.log("useSpellingAnswers - přidána pravopisná odpověď, celkem:", newAnswers.length);
     } catch (error) {
       console.error("useSpellingAnswers - Error adding spelling answer:", error);
     }
@@ -152,13 +153,13 @@ export const useSpellingAnswers = (userId: string | null) => {
 
       setSpellingAnswers([]);
       
-      console.log("useSpellingAnswers - vymazány pravopisné odpovědi z databáze pro uživatele:", userId);
+      logger.log("useSpellingAnswers - vymazány pravopisné odpovědi z databáze pro uživatele:", userId);
     } catch (error) {
       console.error("useSpellingAnswers - Error clearing spelling answers:", error);
     }
   };
 
-  console.log("useSpellingAnswers - aktuální stav:", {
+  logger.log("useSpellingAnswers - aktuální stav:", {
     userId,
     spellingAnswersCount: spellingAnswers.length,
     wrongAnswersCount: spellingAnswers.filter(a => !a.isCorrect).length

@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { UserProfile } from "@/types/authTypes";
 
+import { logger } from "@/utils/logger";
 /**
  * Hook for fetching and managing child profiles for parent users
  * @param parentId - The ID of the parent user
@@ -21,7 +22,7 @@ export const useChildProfiles = (parentId: string | null) => {
         setIsLoading(true);
         setError(null);
         
-        console.log("Fetching children for parent:", parentId);
+        logger.log("Fetching children for parent:", parentId);
         
         // Get child IDs from parent_child relationships
         const { data: relationships, error: relError } = await supabase

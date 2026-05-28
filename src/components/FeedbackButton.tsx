@@ -25,6 +25,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
+import { logger } from "@/utils/logger";
 const FeedbackButton = () => {
   const { t } = useLanguage();
   const { authState } = useAuth();
@@ -56,7 +57,7 @@ const FeedbackButton = () => {
         throw error;
       }
 
-      console.log('Feedback submitted successfully:', data);
+      logger.log('Feedback submitted successfully:', data);
       toast.success(t('feedback.thankYou') || 'Thank you for your feedback!');
       
       // Reset form and close dialog

@@ -3,6 +3,7 @@
 
 import { toast } from "sonner";
 
+import { logger } from "@/utils/logger";
 // Simple encryption utilities for localStorage security
 const ENCRYPTION_KEY = 'sec_store_key_v1';
 
@@ -200,6 +201,6 @@ export const secureCleanupAuthState = () => {
     result.errors.push(`Cleanup failed: ${error}`);
   }
   
-  console.log("Secure auth state cleanup result:", result);
+  logger.log("Secure auth state cleanup result:", result);
   return result;
 };

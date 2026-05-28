@@ -5,12 +5,13 @@ import './index.css'
 import { APP_VERSION } from './utils/version'
 import { pwaUpdater } from './utils/pwaUpdater'
 
+import { logger } from "@/utils/logger";
 // Initialize versioning and PWA updater
 APP_VERSION.initializeVersioning();
 
 // Automatická kontrola verzí při načtení
 setTimeout(() => {
-  console.log('🚀 Checking for app updates on startup...');
+  logger.log('🚀 Checking for app updates on startup...');
   pwaUpdater.checkForUpdates();
 }, 3000); // Delay pro lepší startup performance
 

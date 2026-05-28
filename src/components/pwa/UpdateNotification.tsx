@@ -6,6 +6,7 @@ import { pwaUpdater } from "@/utils/pwaUpdater";
 import { APP_VERSION } from "@/utils/version";
 import { toast } from "sonner";
 
+import { logger } from "@/utils/logger";
 interface UpdateState {
   hasUpdate: boolean;
   isUpdating: boolean;
@@ -74,7 +75,7 @@ export const UpdateNotification = () => {
       const info = await pwaUpdater.debugInfo();
       setDebugInfo(info);
       setShowDebugInfo(true);
-      console.log('PWA Debug Info:', info);
+      logger.log('PWA Debug Info:', info);
     } catch (error) {
       toast.error("Nepodařilo se načíst debug informace");
     }

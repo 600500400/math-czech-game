@@ -1,6 +1,7 @@
 
 import { onCLS, onINP, onFCP, onLCP, onTTFB } from 'web-vitals';
 
+import { logger } from "@/utils/logger";
 interface VitalMetric {
   name: string;
   value: number;
@@ -45,7 +46,7 @@ class WebVitalsMonitor {
 
   private logVital(vital: VitalMetric) {
     const color = vital.rating === 'good' ? '🟢' : vital.rating === 'needs-improvement' ? '🟡' : '🔴';
-    console.log(`${color} ${vital.name}: ${vital.value.toFixed(2)}ms (${vital.rating})`);
+    logger.log(`${color} ${vital.name}: ${vital.value.toFixed(2)}ms (${vital.rating})`);
   }
 
   private async sendVitalToAnalytics(vital: VitalMetric) {

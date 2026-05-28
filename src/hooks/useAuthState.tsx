@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { AuthState, UserProfile } from "@/types/authTypes";
 
+import { logger } from "@/utils/logger";
 export const useAuthState = () => {
   const [authState, setAuthState] = useState<AuthState>({
     user: null,
@@ -19,7 +20,7 @@ export const useAuthState = () => {
       if (localUserStr) {
         try {
           const localUser = JSON.parse(localUserStr);
-          console.log("Nalezen lokální uživatel:", localUser.id);
+          logger.log("Nalezen lokální uživatel:", localUser.id);
           
           setAuthState({
             user: { id: localUser.id, username: localUser.username },

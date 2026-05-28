@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from "@/integrations/supabase/client";
 
+import { logger } from "@/utils/logger";
 export const useAuthHandlers = () => {
   const { signIn, signUp, setLocalUser } = useAuth();
   const { t } = useLanguage();
@@ -16,7 +17,7 @@ export const useAuthHandlers = () => {
   const handleSignIn = async (email: string, password: string) => {
     setAuthLoading(true);
     try {
-      console.log("Zahajuji přihlášení pro email:", email);
+      logger.log("Zahajuji přihlášení pro email:", email);
       
       await signIn(email, password);
       toast.success(t('auth.loginSuccess'));
@@ -47,7 +48,7 @@ export const useAuthHandlers = () => {
   const handleSignUp = async (email: string, password: string, username: string, role: string = "child") => {
     setAuthLoading(true);
     try {
-      console.log("Zahajuji registraci pro email:", email, "s rolí:", role);
+      logger.log("Zahajuji registraci pro email:", email, "s rolí:", role);
       
       // Sign up with role in metadata
       const { data, error } = await supabase.auth.signUp({
@@ -68,7 +69,7 @@ export const useAuthHandlers = () => {
       }
       
       if (data.user) {
-        console.log("Registrace úspěšná pro uživatele:", data.user.id);
+        logger.log("Registrace úspěšná pro uživatele:", data.user.id);
         
         if (data.user.email_confirmed_at) {
           toast.success("Registrace úspěšná! Přihlašuji...");
@@ -111,7 +112,7 @@ export const useAuthHandlers = () => {
       role: "child"
     };
     
-    console.log("Vytváření guest uživatele:", guestUser);
+    logger.log("Vytváření guest uživatele:", guestUser);
     
     await setLocalUser(guestUser);
     toast.success(t('auth.guestWelcome'));

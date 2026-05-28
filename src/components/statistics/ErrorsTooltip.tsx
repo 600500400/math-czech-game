@@ -8,6 +8,7 @@ import { MathAnswer } from "@/types/mathTypes";
 import { SpellingAnswer } from "@/types/spellingTypes";
 import { useIsMobile } from "@/hooks/use-mobile";
 
+import { logger } from "@/utils/logger";
 interface ErrorsTooltipProps {
   wrongCount: number;
   answers: MathAnswer[] | SpellingAnswer[];
@@ -18,11 +19,11 @@ const ErrorsTooltip: React.FC<ErrorsTooltipProps> = ({ wrongCount, answers, type
   const isMobile = useIsMobile();
   const [dialogOpen, setDialogOpen] = useState(false);
   
-  console.log("ErrorsTooltip - props:", { wrongCount, answersCount: answers.length, type });
+  logger.log("ErrorsTooltip - props:", { wrongCount, answersCount: answers.length, type });
   
   const wrongAnswers = answers.filter(answer => !answer.isCorrect);
   
-  console.log("ErrorsTooltip - wrongAnswers:", wrongAnswers);
+  logger.log("ErrorsTooltip - wrongAnswers:", wrongAnswers);
   
   if (wrongCount === 0) {
     return <span className="text-red-600 font-medium">{wrongCount}</span>;

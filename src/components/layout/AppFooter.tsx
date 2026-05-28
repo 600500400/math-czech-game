@@ -1,12 +1,13 @@
 
 import { APP_VERSION } from "@/utils/version";
 
+import { logger } from "@/utils/logger";
 const AppFooter = () => {
   const handleVersionClick = () => {
-    console.log('📋 Debug informace:');
-    console.log(`Verze: ${APP_VERSION.getFullVersionWithBuild()}`);
-    console.log(`Build datum: ${APP_VERSION.getBuildDate()}`);
-    console.log(`Poslední aktualizace: ${localStorage.getItem('app_last_update') || 'neznámá'}`);
+    logger.log('📋 Debug informace:');
+    logger.log(`Verze: ${APP_VERSION.getFullVersionWithBuild()}`);
+    logger.log(`Build datum: ${APP_VERSION.getBuildDate()}`);
+    logger.log(`Poslední aktualizace: ${localStorage.getItem('app_last_update') || 'neznámá'}`);
   };
 
   return (
