@@ -10,7 +10,7 @@ import Index from "./pages/Index";
 import PWAInstallPrompt from "./components/pwa/PWAInstallPrompt";
 import OfflineIndicator from "./components/pwa/OfflineIndicator";
 import { UpdateNotification } from "./components/pwa/UpdateNotification";
-import "@/i18n";
+
 
 const UserSelection = lazy(() => import("./pages/UserSelection"));
 const ParentDashboard = lazy(() => import("./pages/ParentDashboard"));

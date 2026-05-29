@@ -76,6 +76,7 @@ const UserMenu = () => {
         <Button 
           variant="outline" 
           size="sm" 
+          aria-label={`Uživatelské menu – ${getDisplayName()}`}
           className="h-9 px-2 sm:px-3 bg-white border-gray-200 hover:bg-gray-50 gap-1 sm:gap-2"
         >
           <Avatar className="h-5 w-5 sm:h-6 sm:w-6">
