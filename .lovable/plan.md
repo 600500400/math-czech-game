@@ -1,50 +1,58 @@
-# Postupná implementace všech vylepšení
+# Návrhy dalších zlepšení
 
-Provedu změny v 5 krocích, každý samostatně otestovatelný. Pokud něco rozbije UI, vrátíme jen ten jeden krok.
+Aplikace už prošla základní optimalizací (logo, logger, lazy routes, dark mode). Tady jsou další oblasti seřazené podle dopadu vs. úsilí.
 
-## Krok 1 — Nové logo (custom SVG)
+## 1. Odstranění i18n (vysoký dopad, střední úsilí)
 
-- Vytvořit `src/components/layout/Logo.tsx` — stylizovaná otevřená kniha s malou hvězdičkou/jiskrou v rozích, používá modro-zeleno-fialový gradient (`subject-math` → `subject-spelling` → `subject-dictionary`)
-- Nahradit `<BookOpen>` ikonu v `ModernHeader.tsx` novou komponentou
-- Aktualizovat `favicon.ico` (necháme stávající, jen logo v hlavičce změníme)
+Aplikace je výhradně v češtině (memory rule), ale balíčky `i18next` + `i18next-browser-languagedetector` + `react-i18next` zůstávají v bundlu (~80 kB) a 20 souborů importuje `useLanguage`/`useTranslation`.
 
-## Krok 2 — F1 Bezpečnost
+- Nahradit `t('key')` přímo českými stringy (případně přes lehký `src/i18n/strings.ts` slovník).
+- Smazat `src/i18n/`, `src/hooks/useLanguage.tsx`, `src/hooks/useTranslation.tsx`, import v `App.tsx`.
+- `bun remove i18next i18next-browser-languagedetector react-i18next`.
+- Smazat `src/i18n/locales/en.json`.
 
-- **RLS pro `dictionary_answers`**: migrace, která omezí čtení/zápis pouze na `auth.uid() = user_id` (dnes je tabulka veřejně čitelná — kritický dluh z memory)
-- **`console.* → logger`**: nahradit 213 výskytů `console.log/debug/info` v `src/` za `logger.debug` (warn/error necháme). Skript-based replace, ne ruční.
+## 2. Konsolidace haptických hooků (střední dopad, nízké úsilí)
 
-## Krok 3 — F2 Bundle čištění
+Tři překrývající se haptické hooky (`useAdvancedHaptics`, `useEnhancedHaptics`, `useHapticDebugger`) + dva mobile interaction hooky (`useMobileInteractions`, `useEnhancedMobileInteractions`).
 
-- Smazat nepoužívané auth hooky: `useSecureAuth.tsx`, `useAuthCleaner.tsx`, `useAuthHandlers.tsx` (po ověření přes `rg`)
-- Sloučit 3 haptics hooky (`useAdvancedHaptics`, `useEnhancedHaptics`, `useHapticDebugger`) do jednoho `useHaptics`
-- Odstranit i18n: `src/i18n/`, `useLanguage.tsx`, `useTranslation.tsx`, balíčky `i18next`, `react-i18next`, `i18next-browser-languagedetector` z `package.json`, import z `App.tsx`
-- **Neodstraňovat** shadcn komponenty automaticky (riskantní, necháme na později)
+- Sjednotit do jednoho `useHaptics` a jednoho `useMobileInteractions`.
+- Smazat duplicity, aktualizovat 5 call-sites.
 
-## Krok 4 — F3 Performance
+## 3. Refaktor velkých komponent (střední dopad, střední úsilí)
 
-- `React.lazy()` + `<Suspense>` pro všechny routy v `App.tsx` kromě `Index`
-- Sloučit dvojici `<Toaster />` + `<Sonner />` → jen Sonner (modernější, jednodušší)
-- Preload Inter fontu v `index.html` (`<link rel="preload" as="style">`)
+`src/components/dashboard/` má 90 kB s několika soubory >150 řádků (TimeFilters 240, WelcomeWizard 177, SummaryStatistics 130). Rozdělit na menší komponenty a vytáhnout business logiku do hooků (`useDashboardFilters`, atd.).
 
-## Krok 5 — F4 Design polish
+Podobně `DictionaryTabs` a `ParentDashboard` page.
 
-- `src/index.css`: opravit `.dark` varianty `--subject-*-light` (dnes skoro bílé v dark mode) — ztmavit na ~20% lightness
-- `src/index.css`: snížit opacity dekorativních prvků v dark mode
+## 4. Přístupnost (a11y) (vysoký dopad pro děti, nízké úsilí)
 
-## Workflow
+- Doplnit `aria-label` na ikonové buttony (UserMenu, ModernHeader, dialogy).
+- Doplnit `role="status"` a `aria-live="polite"` na feedback po odpovědi (správně/špatně).
+- Klávesnice: zajistit, že numerická klávesnice v matematice je ovladatelná i přes fyzickou klávesnici (už možná je — zkontrolovat).
+- Kontrast textu v dark mode na `bg-subject-*-light` plochách.
 
-Mezi každým krokem se zastavím a počkám, až ověříš v preview, že nic není rozbité. Pak pokračujeme dalším krokem. Pokud něco selže, revertujeme jen ten krok.
+## 5. Databáze a edge funkce (nízké úsilí)
 
-## Změněné/smazané soubory (orientačně)
+- Spustit security--run_security_scan a opravit nálezy (search_path u SECURITY DEFINER funkcí, RLS na případných nepokrytých tabulkách).
+- Edge funkce `ai-assistant`, `translate-text`: zkontrolovat rate limiting a CORS.
 
-- **nové**: `src/components/layout/Logo.tsx`, `src/hooks/useHaptics.tsx`, migrace pro RLS
-- **edit**: `App.tsx`, `ModernHeader.tsx`, `index.html`, `index.css`, `package.json`, ~30 souborů s `console.*`
-- **smazat**: `src/i18n/`, `useLanguage.tsx`, `useTranslation.tsx`, `useSecureAuth.tsx`, `useAuthCleaner.tsx`, `useAuthHandlers.tsx`, `useAdvancedHaptics.tsx`, `useEnhancedHaptics.tsx`, `useHapticDebugger.tsx`
+## 6. Performance drobnosti
 
-## Test po každém kroku
+- `queryClient` má `retry: false` — zvážit `retry: 1` pro síťové chyby.
+- Preload kritických obrázků v `main.tsx` — zvážit `<link rel="preload">` v `index.html` místo JS triku.
+- `framer-motion` (~60 kB) — zkontrolovat, jestli se používá; pokud jen na pár míst, nahradit CSS animacemi.
 
-1. Logo se zobrazuje v headeru (light + dark)
-2. Slovník — uložení a načtení odpovědi funguje (po RLS)
-3. Aplikace startuje bez i18n chyb
-4. Routy se načítají, žádný blank screen
-5. Sekční barvy čitelné v dark mode
+## 7. PWA
+
+- `sw.js` zkontrolovat strategii cache pro `/images/` (cache-first) a API (network-first s fallbackem).
+- Manifest: doplnit `screenshots` pro lepší PWA install prompt na Androidu.
+
+## Doporučené pořadí
+
+1. **i18n cleanup** — největší úspora bundlu, jasná shoda s memory rule.
+2. **a11y opravy** — rychlé výhry pro UX dětí.
+3. **Haptika konsolidace** — čistota kódu.
+4. **Security scan** — bezpečnost.
+5. **Refaktor dashboardu** — větší zásah, nechat na konec.
+
+Řekni, které z toho mám zařadit do implementace (klidně víc najednou nebo jen jedno).
