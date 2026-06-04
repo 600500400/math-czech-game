@@ -19,8 +19,8 @@ const config = {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        heading: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['DM Sans', 'Inter', 'system-ui', 'sans-serif'],
+        heading: ['Space Grotesk', 'DM Sans', 'system-ui', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -74,6 +74,13 @@ const config = {
           500: "#ef4444",
           600: "#dc2626",
         },
+        sunset: {
+          orange: "hsl(var(--sunset-orange))",
+          amber: "hsl(var(--sunset-amber))",
+          magenta: "hsl(var(--sunset-magenta))",
+          purple: "hsl(var(--sunset-purple))",
+          bg: "hsl(var(--sunset-bg))",
+        },
         // Subject-specific colors for consistent theming
         subject: {
           math: "hsl(var(--subject-math))",
@@ -87,6 +94,7 @@ const config = {
           "dictionary-border": "hsl(var(--subject-dictionary-border))",
         },
       },
+
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",

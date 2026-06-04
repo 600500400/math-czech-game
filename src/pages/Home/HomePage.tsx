@@ -1,53 +1,70 @@
-import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/useAuth";
 import { useStatistics } from "@/hooks/useStatistics";
-import { useDetailedAnswers } from "@/hooks/statistics/useDetailedAnswers";
-import WelcomeDashboard from "@/components/dashboard/WelcomeDashboard";
-import StatisticsTabs from "@/components/statistics/StatisticsTabs";
-
-import ModernHeader from "@/components/layout/ModernHeader";
-import AppFooter from "@/components/layout/AppFooter";
+import MobileShell from "@/components/layout/MobileShell";
+import MathHeroTile from "@/components/dashboard/MathHeroTile";
+import SpellingWideTile from "@/components/dashboard/SpellingWideTile";
+import DictionaryTile from "@/components/dashboard/DictionaryTile";
+import StatsTile from "@/components/dashboard/StatsTile";
 
 const HomePage = () => {
   const { authState } = useAuth();
-  const { mathStats, spellingStats, dictionaryStats } = useStatistics(authState.user?.id || null);
-  const { mathAnswers, spellingAnswers, dictionaryAnswers } = useDetailedAnswers(authState.user?.id || null);
-  const [activeTab, setActiveTab] = useState("dashboard");
+  const { mathStats, spellingStats } = useStatistics(authState.user?.id || null);
 
-  const handleNavigateToTab = (tab: "statistics") => {
-    setActiveTab(tab);
+  const userName = authState.profile?.full_name || "Studente";
+  const firstName = userName.split(" ")[0] || "Studente";
+
+  const sumTotals = (stats: Array<{ correct_answers: number; wrong_answers: number }> | null) =>
+    (stats || []).reduce(
+      (acc, s) => {
+        acc.correct += s.correct_answers;
+        acc.wrong += s.wrong_answers;
+        acc.total += s.correct_answers + s.wrong_answers;
+        return acc;
+      },
+      { correct: 0, wrong: 0, total: 0 }
+    );
+
+  const math = sumTotals(mathStats);
+  const spelling = sumTotals(spellingStats);
+
+  const mathAccuracy = math.total > 0 ? Math.round((math.correct / math.total) * 100) : 0;
+  const spellingAccuracy =
+    spelling.total > 0 ? Math.round((spelling.correct / spelling.total) * 100) : 0;
+
+  const getBadge = (acc: number) => {
+    if (acc >= 90) return "Expert";
+    if (acc >= 75) return "Pokročilý";
+    if (acc >= 50) return "Učím se";
+    return "Začátečník";
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <ModernHeader />
-      <div className="container mx-auto p-4 max-w-7xl flex-1">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-            <TabsTrigger value="statistics">Statistiky</TabsTrigger>
-          </TabsList>
+    <MobileShell>
+      {/* Greeting */}
+      <section className="pb-6 pt-4">
+        <h1 className="font-heading text-3xl font-bold leading-tight text-white">
+          Vítej zpět,{" "}
+          <span className="bg-gradient-to-r from-sunset-orange to-sunset-amber bg-clip-text text-transparent">
+            {firstName}!
+          </span>
+        </h1>
+        <p className="mt-1 text-sm text-white/50">
+          Dnes máš skvělou šanci překonat svůj rekord.
+        </p>
+      </section>
 
-          <TabsContent value="dashboard">
-            <WelcomeDashboard onNavigateToTab={handleNavigateToTab} />
-          </TabsContent>
-
-          <TabsContent value="statistics">
-            <StatisticsTabs
-              mathStats={mathStats}
-              spellingStats={spellingStats}
-              dictionaryStats={dictionaryStats}
-              mathAnswers={mathAnswers}
-              spellingAnswers={spellingAnswers}
-              dictionaryAnswers={dictionaryAnswers}
-            />
-          </TabsContent>
-        </Tabs>
+      {/* Bento grid */}
+      <div className="grid grid-cols-2 gap-4">
+        <MathHeroTile
+          accuracy={mathAccuracy}
+          total={math.total}
+          badge={getBadge(mathAccuracy)}
+        />
+        <StatsTile total={math.total + spelling.total} />
+        <DictionaryTile />
+        <SpellingWideTile accuracy={spellingAccuracy} total={spelling.total} />
       </div>
-
-      <AppFooter />
-    </div>
+    </MobileShell>
   );
 };
 

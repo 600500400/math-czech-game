@@ -1,58 +1,66 @@
-# Návrhy dalších zlepšení
+# Redesign Procvičky — Bento Sunset
 
-Aplikace už prošla základní optimalizací (logo, logger, lazy routes, dark mode). Tady jsou další oblasti seřazené podle dopadu vs. úsilí.
+## Cíl
+Postavit zvolený direction "Bento + tab bar" — moderní mobile-first dashboard s bento gridem, gradientovými dlaždicemi v paletě Sunset Blaze (oranžová → magenta → fialová), tmavým pozadím a sticky bottom tab barem.
 
-## 1. Odstranění i18n (vysoký dopad, střední úsilí)
+## ⚠️ Upozornění na konflikt s memory
+Memory říká: Matematika=modrá, Pravopis=zelená, Slovník=fialová.
+Tvůj výběr Sunset Blaze: Matematika=oranžová gradient, Pravopis=magenta, Slovník=fialová.
 
-Aplikace je výhradně v češtině (memory rule), ale balíčky `i18next` + `i18next-browser-languagedetector` + `react-i18next` zůstávají v bundlu (~80 kB) a 20 souborů importuje `useLanguage`/`useTranslation`.
+Postupuji podle tvého výběru (uživatel přebíjí memory) a po dokončení aktualizuji memory na nové barevné schéma. Pokud chceš zachovat původní barvy sekcí, řekni a paletu aplikuji jen na chrome/akcenty.
 
-- Nahradit `t('key')` přímo českými stringy (případně přes lehký `src/i18n/strings.ts` slovník).
-- Smazat `src/i18n/`, `src/hooks/useLanguage.tsx`, `src/hooks/useTranslation.tsx`, import v `App.tsx`.
-- `bun remove i18next i18next-browser-languagedetector react-i18next`.
-- Smazat `src/i18n/locales/en.json`.
+## Co se změní
 
-## 2. Konsolidace haptických hooků (střední dopad, nízké úsilí)
+### 1. Design tokens (`src/index.css` + `tailwind.config.ts`)
+- Přidám HSL tokeny pro Sunset paletu: `--sunset-orange` (#ff6b35), `--sunset-amber` (#f7931e), `--sunset-magenta` (#e84393), `--sunset-purple` (#6c5ce7)
+- Přepíšu sekční tokeny `--subject-math/spelling/dictionary` na nové barvy (light + dark mode)
+- Nastavím tmavé pozadí (`--background` ~ #0d0c0b warm-black) jako výchozí pro home screen
+- Přidám gradient utility a glow shadow tokens
+- Načtu Space Grotesk + DM Sans z Google Fonts, nastavím body font na DM Sans, heading na Space Grotesk
 
-Tři překrývající se haptické hooky (`useAdvancedHaptics`, `useEnhancedHaptics`, `useHapticDebugger`) + dva mobile interaction hooky (`useMobileInteractions`, `useEnhancedMobileInteractions`).
+### 2. Nová home obrazovka (`src/pages/Home/HomePage.tsx`)
+Kompletně přepsat layout podle prototypu:
+- Tmavé pozadí, max-width 390px na mobilu, responsivní na desktop
+- Hero bento tile: **Matematika** (gradient orange→amber, velký, CTA "Procvičovat počítání")
+- Square tile: **Statistiky** (sklo, celkový počet vyřešených úloh)
+- Square tile: **Slovník** (gradient purple)
+- Wide tile: **Pravopis** (magenta, progress bar + arrow button)
+- Odstranit současné `<Tabs>` (Dashboard/Statistiky) — Statistiky přesunout na samostatnou route přes tab bar
 
-- Sjednotit do jednoho `useHaptics` a jednoho `useMobileInteractions`.
-- Smazat duplicity, aktualizovat 5 call-sites.
+### 3. Nový header (`src/components/layout/ModernHeader.tsx`)
+- Logo + "Procvička" vlevo
+- Vpravo: donate srdíčko (růžové), dark mode toggle, avatar uživatele
+- Glassmorphism styl, ne sticky bar s borderem
 
-## 3. Refaktor velkých komponent (střední dopad, střední úsilí)
+### 4. Bottom tab bar (`src/components/layout/BottomTabBar.tsx` — nový)
+- Sticky bottom, glass blur pozadí
+- 3 záložky: Domů, Grafy (statistiky), Profil (user menu / volba uživatele)
+- Aktivní záložka v `--sunset-amber`, neaktivní white/30
+- Skryt na desktopu (md+), tam zůstane v headeru
 
-`src/components/dashboard/` má 90 kB s několika soubory >150 řádků (TimeFilters 240, WelcomeWizard 177, SummaryStatistics 130). Rozdělit na menší komponenty a vytáhnout business logiku do hooků (`useDashboardFilters`, atd.).
+### 5. Karty sekcí (nové komponenty v `src/components/dashboard/`)
+- `MathHeroTile.tsx` — velká hero dlaždice
+- `SpellingWideTile.tsx` — široká dlaždice s progress
+- `DictionaryTile.tsx` — square gradient
+- `StatsTile.tsx` — square glass
+- Všechny propojené na existující `useStatistics` hook pro reálná data (procenta, počty)
 
-Podobně `DictionaryTabs` a `ParentDashboard` page.
+### 6. Routing (`src/App.tsx`)
+- Přidat route `/statistiky` pro samostatnou stránku statistik (přesun obsahu z Tabs)
+- Bottom tab bar bude navigovat mezi `/`, `/statistiky`, `/profil`
 
-## 4. Přístupnost (a11y) (vysoký dopad pro děti, nízké úsilí)
+## Co se NEMĚNÍ
+- Logika sekcí (math/spelling/dictionary praktikování) — stejné stránky a hooky
+- Auth flow, user selection, parent dashboard
+- PWA mechanismus
+- Český obsah
 
-- Doplnit `aria-label` na ikonové buttony (UserMenu, ModernHeader, dialogy).
-- Doplnit `role="status"` a `aria-live="polite"` na feedback po odpovědi (správně/špatně).
-- Klávesnice: zajistit, že numerická klávesnice v matematice je ovladatelná i přes fyzickou klávesnici (už možná je — zkontrolovat).
-- Kontrast textu v dark mode na `bg-subject-*-light` plochách.
+## Po dokončení
+- Aktualizuji `mem://style/barevne-schema-sekci` a Core memory na novou paletu
+- Otestuji na 390px viewportu (screenshot QA)
 
-## 5. Databáze a edge funkce (nízké úsilí)
-
-- Spustit security--run_security_scan a opravit nálezy (search_path u SECURITY DEFINER funkcí, RLS na případných nepokrytých tabulkách).
-- Edge funkce `ai-assistant`, `translate-text`: zkontrolovat rate limiting a CORS.
-
-## 6. Performance drobnosti
-
-- `queryClient` má `retry: false` — zvážit `retry: 1` pro síťové chyby.
-- Preload kritických obrázků v `main.tsx` — zvážit `<link rel="preload">` v `index.html` místo JS triku.
-- `framer-motion` (~60 kB) — zkontrolovat, jestli se používá; pokud jen na pár míst, nahradit CSS animacemi.
-
-## 7. PWA
-
-- `sw.js` zkontrolovat strategii cache pro `/images/` (cache-first) a API (network-first s fallbackem).
-- Manifest: doplnit `screenshots` pro lepší PWA install prompt na Androidu.
-
-## Doporučené pořadí
-
-1. **i18n cleanup** — největší úspora bundlu, jasná shoda s memory rule.
-2. **a11y opravy** — rychlé výhry pro UX dětí.
-3. **Haptika konsolidace** — čistota kódu.
-4. **Security scan** — bezpečnost.
-5. **Refaktor dashboardu** — větší zásah, nechat na konec.
-
-Řekni, které z toho mám zařadit do implementace (klidně víc najednou nebo jen jedno).
+## Technické poznámky
+- Všechny barvy přes design tokeny v `index.css`, žádné hardcoded hex v komponentách
+- Použiju `bg-gradient-to-br from-[hsl(var(--sunset-orange))] to-[hsl(var(--sunset-amber))]` pattern
+- Tap feedback: `active:scale-[0.98] transition-transform`
+- Dark mode = výchozí stav nového designu (warm dark), light mode zachovám pro toggle ale s teplejší paletou
