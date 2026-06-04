@@ -91,22 +91,30 @@ async function handleRequest(request) {
   const url = new URL(request.url);
   
   try {
-    // Strategy 1: Stale While Revalidate for static assets (rychlejší aktualizace)
+    // Navigace (HTML dokumenty) — vždy NetworkFirst, jinak hrozí stale index.html
+    // s odkazy na neexistující JS chunky po novém buildu.
+    if (request.mode === 'navigate' || (request.destination === 'document')) {
+      return await networkFirst(request, DYNAMIC_CACHE);
+    }
+
+    // JS/CSS chunky s hashem — NetworkFirst, abychom nikdy nevraceli mrtvý chunk
+    if (url.pathname.endsWith('.js') || url.pathname.endsWith('.css')) {
+      return await networkFirst(request, CACHE_NAME);
+    }
+
+    // Statická aktiva (fonty, manifest)
     if (isStaticAsset(url)) {
       return await staleWhileRevalidate(request, CACHE_NAME);
     }
     
-    // Strategy 2: Stale While Revalidate for images
     if (isImage(url)) {
       return await staleWhileRevalidate(request, IMAGE_CACHE);
     }
     
-    // Strategy 3: Network First for API calls
     if (isApiCall(url)) {
       return await networkFirst(request, DYNAMIC_CACHE);
     }
     
-    // Strategy 4: Stale While Revalidate for everything else
     return await staleWhileRevalidate(request, DYNAMIC_CACHE);
     
   } catch (error) {
