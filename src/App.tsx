@@ -25,6 +25,9 @@ const AchievementsPage = lazy(() =>
 const NotFound = lazy(() => import("./pages/NotFound"));
 const DonationSuccess = lazy(() => import("./pages/DonationSuccess"));
 const Dictionary = lazy(() => import("./pages/Dictionary"));
+const Statistics = lazy(() => import("./pages/Statistics"));
+const Profile = lazy(() => import("./pages/Profile"));
+
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -62,7 +65,10 @@ const App = () => {
                   <Route path="/achievements" element={<AchievementsPage />} />
                   <Route path="/donation-success" element={<DonationSuccess />} />
                   <Route path="/dictionary" element={<Dictionary />} />
+                  <Route path="/statistiky" element={<Statistics />} />
+                  <Route path="/profil" element={<Profile />} />
                   <Route path="*" element={<NotFound />} />
+
                 </Routes>
               </Suspense>
               <PWAInstallPrompt />
