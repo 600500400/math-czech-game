@@ -78,10 +78,10 @@ const FeedbackButton = () => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          variant="outline"
+          variant="ghost"
           size="sm"
           aria-label={t('feedback.title')}
-          className="w-9 p-0 sm:w-auto sm:px-3 bg-white border-gray-200 hover:bg-gray-50"
+          className="h-9 w-9 p-0 rounded-full bg-white/5 border border-white/10 text-white/80 hover:bg-white/10 hover:text-white backdrop-blur-md"
         >
           <MessageSquare className="h-4 w-4" />
         </Button>

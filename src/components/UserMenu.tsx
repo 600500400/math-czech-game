@@ -59,7 +59,7 @@ const UserMenu = () => {
   if (!authState.isAuthenticated) {
     return (
       <Link to="/select-user">
-        <Button variant="outline" size="sm" className="h-9 px-2 sm:px-3 bg-white border-gray-200 hover:bg-gray-50">
+        <Button variant="ghost" size="sm" className="h-9 w-9 sm:w-auto p-0 sm:px-3 rounded-full bg-white/5 border border-white/10 text-white/80 hover:bg-white/10 hover:text-white backdrop-blur-md">
           <UserIcon className="h-4 w-4 sm:mr-2" />
           <span className="hidden sm:inline">Vybrat uživatele</span>
         </Button>
@@ -74,13 +74,13 @@ const UserMenu = () => {
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <Button 
-          variant="outline" 
+          variant="ghost" 
           size="sm" 
           aria-label={`Uživatelské menu – ${getDisplayName()}`}
-          className="h-9 px-2 sm:px-3 bg-white border-gray-200 hover:bg-gray-50 gap-1 sm:gap-2"
+          className="h-9 px-1 sm:px-3 rounded-full bg-white/5 border border-white/10 text-white/80 hover:bg-white/10 hover:text-white backdrop-blur-md gap-1 sm:gap-2"
         >
-          <Avatar className="h-5 w-5 sm:h-6 sm:w-6">
-            <AvatarFallback className="text-xs font-medium bg-blue-100 text-blue-700">
+          <Avatar className="h-6 w-6">
+            <AvatarFallback className="text-[10px] font-bold bg-gradient-to-br from-sunset-orange to-sunset-magenta text-white">
               {getNameInitials()}
             </AvatarFallback>
           </Avatar>
