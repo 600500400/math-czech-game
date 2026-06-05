@@ -99,10 +99,10 @@ const ProblemDialog: React.FC<ProblemDialogProps> = ({
   return (
     <Dialog open={open} onOpenChange={(open) => !open && endGame()}>
       <DialogContent
-        className={`z-[9000] touch-manipulation ${isMobile ? 'max-w-[95vw] max-h-[95vh] overflow-y-auto' : ''}`}
+        className={`z-[9000] touch-manipulation border-white/10 bg-sunset-bg text-white ${isMobile ? 'max-w-[95vw] max-h-[95vh] overflow-y-auto' : ''}`}
       >
         <DialogHeader>
-          <DialogTitle className={`text-center text-subject-math ${isMobile ? 'text-lg' : 'text-xl'}`}>
+          <DialogTitle className={`text-center font-heading uppercase tracking-wide text-sunset-amber ${isMobile ? 'text-base' : 'text-lg'}`}>
             Řeš příklad
           </DialogTitle>
           <DialogDescription className="sr-only">
@@ -112,8 +112,8 @@ const ProblemDialog: React.FC<ProblemDialogProps> = ({
 
         <div className="py-4 space-y-4">
           {currentProblem && (
-            <div className="bg-muted/40 p-6 rounded-xl border border-border">
-              <p className={`font-bold text-center text-foreground ${isMobile ? 'text-xl' : 'text-2xl'}`}>
+            <div className="p-6 rounded-2xl bg-gradient-to-br from-sunset-orange to-sunset-amber shadow-lg shadow-sunset-orange/30">
+              <p className={`font-heading font-bold text-center text-white ${isMobile ? 'text-3xl' : 'text-4xl'}`}>
                 {currentProblem.num1} {formatOperation(currentProblem.operation)} {currentProblem.num2} = ?
               </p>
             </div>
@@ -125,7 +125,7 @@ const ProblemDialog: React.FC<ProblemDialogProps> = ({
             onChange={() => {}}
             onKeyDown={handleNumericKeyDown}
             placeholder="Zadej odpověď"
-            className={`text-lg touch-manipulation ${isMobile ? 'h-14 text-lg' : 'h-12'}`}
+            className={`text-lg touch-manipulation bg-white/5 border-white/10 text-white placeholder:text-white/40 ${isMobile ? 'h-14 text-lg' : 'h-12'}`}
             readOnly={isMobile}
             inputMode={isMobile ? "none" : "numeric"}
             style={{ caretColor: 'transparent' }}
@@ -141,21 +141,21 @@ const ProblemDialog: React.FC<ProblemDialogProps> = ({
           </div>
 
           {getMilestoneMessage() && (
-            <div className="mt-4 p-4 bg-success-50 rounded-lg border border-success-100 text-center animate-scale-in">
-              <p className="text-lg font-semibold text-success-600">
+            <div className="mt-4 p-4 rounded-xl border border-sunset-amber/30 bg-sunset-amber/10 text-center animate-scale-in">
+              <p className="text-base font-semibold text-sunset-amber">
                 {getMilestoneMessage()}
               </p>
             </div>
           )}
 
           {totalAnswers > 0 && (
-            <div className="mt-4 space-y-2 bg-muted/30 p-4 rounded-lg border border-border">
+            <div className="mt-4 space-y-2 rounded-xl border border-white/10 bg-white/5 p-4">
               <div className="flex justify-between text-sm font-medium">
-                <span className="text-success-600">Správně: {correctAnswers}</span>
-                <span className="text-destructive">Špatně: {wrongAnswers}</span>
+                <span className="text-emerald-400">Správně: {correctAnswers}</span>
+                <span className="text-rose-400">Špatně: {wrongAnswers}</span>
               </div>
-              <Progress value={correctPercentage} className="h-3" />
-              <p className="text-xs text-center text-muted-foreground">
+              <Progress value={correctPercentage} className="h-2 bg-white/10" />
+              <p className="text-xs text-center text-white/60">
                 {correctPercentage}% úspěšnost
               </p>
             </div>
@@ -165,8 +165,8 @@ const ProblemDialog: React.FC<ProblemDialogProps> = ({
         <DialogFooter className={`flex gap-3 ${isMobile ? 'flex-col' : 'flex-row'}`}>
           <Button
             onClick={handleEndGame}
-            variant="outline"
-            className={`active:scale-95 touch-manipulation transition-all duration-150 ${isMobile ? 'w-full h-14 text-lg' : 'w-auto h-12'}`}
+            variant="ghost"
+            className={`bg-white/5 border border-white/10 text-white hover:bg-white/10 active:scale-95 touch-manipulation transition-all duration-150 ${isMobile ? 'w-full h-14 text-lg' : 'w-auto h-12'}`}
           >
             Ukončit
           </Button>

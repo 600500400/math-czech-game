@@ -1,66 +1,68 @@
-# Redesign Procvičky — Bento Sunset
+## End-to-end test report
 
-## Cíl
-Postavit zvolený direction "Bento + tab bar" — moderní mobile-first dashboard s bento gridem, gradientovými dlaždicemi v paletě Sunset Blaze (oranžová → magenta → fialová), tmavým pozadím a sticky bottom tab barem.
+Provedl jsem průchod aplikací (Domů → Matematika → spuštění hry → odpověď → Pravopis → Slovník → Statistiky → Profil) ve viewportu 390×800.
 
-## ⚠️ Upozornění na konflikt s memory
-Memory říká: Matematika=modrá, Pravopis=zelená, Slovník=fialová.
-Tvůj výběr Sunset Blaze: Matematika=oranžová gradient, Pravopis=magenta, Slovník=fialová.
+### Co funguje ✅
+- Bento dashboard na `/` se vykresluje korektně.
+- Tlačítka v headeru (po předchozí opravě) — srdce, theme, feedback, avatar — jsou čitelná.
+- Matematika: dialog se otevře, vygeneruje `6 + 8`, vyhodnotí odpověď, posune na další příklad, statistika "Správně: 1, 100%" se aktualizuje.
+- BottomTabBar funguje na `/`, `/statistiky`, `/profil` (Domů, Grafy, Profil jsou propojené).
+- Žádné runtime errors v konzoli (jen preview-only `postMessage` šum a 401 na manifest.json mimo published prostředí).
 
-Postupuji podle tvého výběru (uživatel přebíjí memory) a po dokončení aktualizuji memory na nové barevné schéma. Pokud chceš zachovat původní barvy sekcí, řekni a paletu aplikuji jen na chrome/akcenty.
+### Bugy nalezené 🐞
 
-## Co se změní
+1. **Nekonzistentní layout na podstránkách.** `/math`, `/spelling`, `/dictionary` používají starý šedý `bg-background` + `AppFooter` místo `MobileShell` se sunset paletou. Vypadá to jako úplně jiná aplikace.
+2. **BottomTabBar chybí na podstránkách.** Z hry/pravopisu/slovníku se uživatel nedostane na statistiky/profil jinak než přes breadcrumb a logo.
+3. **NumericKeyboard má bílá/barevně náhodná tlačítka** (`bg-red-50`, `bg-blue-50`, `bg-green-500`, `bg-gray-300`) — silně kontrastuje s warm-dark dialogem a tříští sunset estetiku.
+4. **Duplikované sekční hlavičky.** `MathPractice` i `SpellingPractice` mají velký `<h1>` ikona + nadpis sekce navíc — redundantní vůči breadcrumb a nudné "Card → Ovládání hry → Začít novou hru" UI.
+5. **Slovník popisek meta tagu** říká "anglických slovíček" — porušení paměťového pravidla, slovník je český (vyjmenovaná slova).
+6. **PWA install prompt překrývá** spodní obsah, žádný offset pro `safe-area` / bottom tab bar.
+7. **MathProblemDialog** používá výchozí shadcn dialog (středový bílý/neutral) — neladí s warm-dark warmem ostatních ploch.
 
-### 1. Design tokens (`src/index.css` + `tailwind.config.ts`)
-- Přidám HSL tokeny pro Sunset paletu: `--sunset-orange` (#ff6b35), `--sunset-amber` (#f7931e), `--sunset-magenta` (#e84393), `--sunset-purple` (#6c5ce7)
-- Přepíšu sekční tokeny `--subject-math/spelling/dictionary` na nové barvy (light + dark mode)
-- Nastavím tmavé pozadí (`--background` ~ #0d0c0b warm-black) jako výchozí pro home screen
-- Přidám gradient utility a glow shadow tokens
-- Načtu Space Grotesk + DM Sans z Google Fonts, nastavím body font na DM Sans, heading na Space Grotesk
+## Plánované opravy
 
-### 2. Nová home obrazovka (`src/pages/Home/HomePage.tsx`)
-Kompletně přepsat layout podle prototypu:
-- Tmavé pozadí, max-width 390px na mobilu, responsivní na desktop
-- Hero bento tile: **Matematika** (gradient orange→amber, velký, CTA "Procvičovat počítání")
-- Square tile: **Statistiky** (sklo, celkový počet vyřešených úloh)
-- Square tile: **Slovník** (gradient purple)
-- Wide tile: **Pravopis** (magenta, progress bar + arrow button)
-- Odstranit současné `<Tabs>` (Dashboard/Statistiky) — Statistiky přesunout na samostatnou route přes tab bar
+### 1) Sjednocení shellu pro všechny podstránky (MathPractice, SpellingPractice, Dictionary)
+- Zaobalit do `MobileShell` (stejný warm-dark + decorative blobs jako `/`).
+- Odstranit `bg-background` wrapper a `AppFooter` (footer drží `MobileShell`).
+- Přidat `BottomTabBar` na konec — tab "Domů" zůstane aktivní jen na `/`, takže na `/math` nebude žádná z trojice highlightnutá (OK).
+- `<main>` dostane `pb-28` aby obsah nebyl pod tab barem.
 
-### 3. Nový header (`src/components/layout/ModernHeader.tsx`)
-- Logo + "Procvička" vlevo
-- Vpravo: donate srdíčko (růžové), dark mode toggle, avatar uživatele
-- Glassmorphism styl, ne sticky bar s borderem
+### 2) Redesign hero hlavičky každé sekce
+Místo `Card → Ovládání hry` udělat jednu hero kartu v barvě sekce (gradient z bento dlaždice) s ikonou + jménem + tlačítky pod ní:
+- Matematika: orange→amber gradient, dvě tlačítka glass-style ("Nastavení obtížnosti", "Začít novou hru").
+- Pravopis: magenta hero, ("Vybrat skupiny slov", "Začít novou hru").
+- Slovník: purple hero + záložky pod ní.
 
-### 4. Bottom tab bar (`src/components/layout/BottomTabBar.tsx` — nový)
-- Sticky bottom, glass blur pozadí
-- 3 záložky: Domů, Grafy (statistiky), Profil (user menu / volba uživatele)
-- Aktivní záložka v `--sunset-amber`, neaktivní white/30
-- Skryt na desktopu (md+), tam zůstane v headeru
+Breadcrumb zredukovat na malý `← Domů` link nad hero kartou.
 
-### 5. Karty sekcí (nové komponenty v `src/components/dashboard/`)
-- `MathHeroTile.tsx` — velká hero dlaždice
-- `SpellingWideTile.tsx` — široká dlaždice s progress
-- `DictionaryTile.tsx` — square gradient
-- `StatsTile.tsx` — square glass
-- Všechny propojené na existující `useStatistics` hook pro reálná data (procenta, počty)
+### 3) Sjednocení NumericKeyboard
+Nahradit barevný mix v `NumericKeyboard.tsx` sunset/glass tokeny:
+- Číselné klávesy: `bg-white/5 border-white/10 text-white hover:bg-white/10`.
+- Backspace: jemně červený glass (`bg-destructive/15 text-destructive`).
+- Enter: orange gradient (`bg-gradient-to-r from-sunset-orange to-sunset-amber text-white`).
+Disabled stav: `bg-white/5 opacity-40`.
 
-### 6. Routing (`src/App.tsx`)
-- Přidat route `/statistiky` pro samostatnou stránku statistik (přesun obsahu z Tabs)
-- Bottom tab bar bude navigovat mezi `/`, `/statistiky`, `/profil`
+### 4) MathProblemDialog / SpellingProblemDialog styling
+Přebarvit `DialogContent` na `bg-sunset-card border-white/10 text-white`, příklad zobrazit v gradientové kartě (orange/amber pro matematiku, magenta pro pravopis). Progress bar v dolní části dlaždice ladící se sekcí.
 
-## Co se NEMĚNÍ
-- Logika sekcí (math/spelling/dictionary praktikování) — stejné stránky a hooky
-- Auth flow, user selection, parent dashboard
-- PWA mechanismus
-- Český obsah
+### 5) Drobné opravy
+- `Dictionary.tsx`: meta description přepsat na "Slovník Procvička – procvičování vyjmenovaných slov a české slovní zásoby."
+- `PWAInstallPrompt`: přidat `mb-24 md:mb-4` (nebo respektovat `safe-area-inset-bottom`) aby neoverlapoval BottomTabBar.
+- Breadcrumb link "Domů": `text-white/60 hover:text-white` místo `text-muted-foreground`.
 
-## Po dokončení
-- Aktualizuji `mem://style/barevne-schema-sekci` a Core memory na novou paletu
-- Otestuji na 390px viewportu (screenshot QA)
+### 6) Co zůstane beze změny
+- Herní logika (math/spelling/dictionary hooks).
+- Auth, gamifikace, statistiky data.
+- BottomTabBar struktura — funguje, jen ji rozšířit na další routy.
+- České texty.
 
-## Technické poznámky
-- Všechny barvy přes design tokeny v `index.css`, žádné hardcoded hex v komponentách
-- Použiju `bg-gradient-to-br from-[hsl(var(--sunset-orange))] to-[hsl(var(--sunset-amber))]` pattern
-- Tap feedback: `active:scale-[0.98] transition-transform`
-- Dark mode = výchozí stav nového designu (warm dark), light mode zachovám pro toggle ale s teplejší paletou
+## Co NEbudu řešit (ne-bug šum)
+- 401 na `manifest.json` v preview iframe (Lovable platform, v publish OK).
+- `postMessage` warnings z `cdn.gpteng.co` (preview-only).
+
+## Plán testování po opravách
+1. Procházka `/` → `/math` → spustit hru → 1 správně + 1 špatně → ukončit hru.
+2. `/spelling` → vybrat skupinu → spustit → odpověď.
+3. `/dictionary` (host hláška musí být čitelná v sunset stylu).
+4. `/statistiky`, `/profil` — že tab bar zůstává konzistentní.
+5. Screenshot každé stránky ve 390×800.
