@@ -1,9 +1,7 @@
 import { useEffect } from "react";
-import { Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
-import ModernHeader from "@/components/layout/ModernHeader";
-import AppFooter from "@/components/layout/AppFooter";
-import { Button } from "@/components/ui/button";
+import { Languages } from "lucide-react";
+import MobileShell from "@/components/layout/MobileShell";
+import SectionHero from "@/components/layout/SectionHero";
 import DictionaryTabs from "@/components/dictionary/DictionaryTabs";
 
 const Dictionary = () => {
@@ -13,35 +11,32 @@ const Dictionary = () => {
     if (meta) {
       meta.setAttribute(
         "content",
-        "Slovník Procvička – procvičování anglických slovíček s příklady a testy."
+        "Slovník Procvička – procvičování české slovní zásoby a vyjmenovaných slov.",
       );
     }
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
-      <ModernHeader />
-      <main className="max-w-5xl mx-auto px-4 py-6">
-        <nav aria-label="Breadcrumb" className="mb-6">
-          <ol className="flex items-center space-x-2 text-sm text-muted-foreground">
-            <li>
-              <Link to="/" className="hover:text-foreground transition-colors">
-                Domů
-              </Link>
-            </li>
-            <li className="flex items-center">
-              <ArrowLeft className="h-3 w-3 mx-2 rotate-180" />
-              <span className="text-foreground font-medium">Slovník</span>
-            </li>
-          </ol>
-        </nav>
-        <section aria-labelledby="dictionary-heading">
-          <h1 id="dictionary-heading" className="sr-only">Slovník – procvičování</h1>
+    <MobileShell>
+      <div className="space-y-6">
+        <SectionHero
+          title="Slovník"
+          subtitle="Tvoje slovní zásoba na jednom místě"
+          icon={Languages}
+          gradient="from-sunset-purple to-sunset-magenta"
+        />
+
+        <section
+          aria-labelledby="dictionary-heading"
+          className="rounded-3xl border border-white/10 bg-white/5 p-4"
+        >
+          <h2 id="dictionary-heading" className="sr-only">
+            Slovník – procvičování
+          </h2>
           <DictionaryTabs />
         </section>
-      </main>
-      <AppFooter />
-    </div>
+      </div>
+    </MobileShell>
   );
 };
 
