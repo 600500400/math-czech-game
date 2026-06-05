@@ -23,6 +23,35 @@ class PWAUpdater {
   private updateCheckInterval: number | null = null;
   private backgroundUpdateEnabled = true;
 
+  private isPreviewOrDevContext(): boolean {
+    const { hostname, search } = window.location;
+
+    return (
+      !import.meta.env.PROD ||
+      window.self !== window.top ||
+      search.includes("sw=off") ||
+      hostname.startsWith("id-preview--") ||
+      hostname.startsWith("preview--") ||
+      hostname === "lovableproject.com" ||
+      hostname.endsWith(".lovableproject.com") ||
+      hostname === "lovableproject-dev.com" ||
+      hostname.endsWith(".lovableproject-dev.com") ||
+      hostname === "beta.lovable.dev" ||
+      hostname.endsWith(".beta.lovable.dev")
+    );
+  }
+
+  private async unregisterAppServiceWorkers() {
+    if (!("serviceWorker" in navigator)) return;
+
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    await Promise.allSettled(
+      registrations
+        .filter((registration) => registration.active?.scriptURL.includes("/sw.js"))
+        .map((registration) => registration.unregister())
+    );
+  }
+
   constructor() {
     if (PWAUpdater.instance) {
       return PWAUpdater.instance;
@@ -45,6 +74,11 @@ class PWAUpdater {
 
     try {
       this.initialized = true;
+
+      if (this.isPreviewOrDevContext()) {
+        await this.unregisterAppServiceWorkers();
+        return;
+      }
       
       // Register service worker with version query parameter
       const swUrl = `/sw.js?v=${APP_VERSION.build}`;
