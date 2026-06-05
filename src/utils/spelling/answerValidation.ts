@@ -40,9 +40,12 @@ export function renderWordWithCurrentGap(
       if (positionIndex < currentPosition) {
         // Pro už zodpovězené pozice vložíme původní písmeno (doplněno)
         result += currentWord[i];
-      } else {
-        // Aktuální i budoucí pozice se zobrazí jako mezera
+      } else if (positionIndex === currentPosition) {
+        // Skrýváme pouze aktuálně řešenou pozici
         result += '_';
+      } else {
+        // Budoucí pozice zatím ponecháme jako původní písmena
+        result += currentWord[i];
       }
     } else {
       result += currentWord[i];
