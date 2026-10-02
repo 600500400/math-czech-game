@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Achievement, UserAchievement, GameSession } from "@/types/gamificationTypes";
 import { toast } from "sonner";
 
-export const useAchievements = () => {
+export const useAchievements = (onAwardXP?: (xp: number) => Promise<void> | void) => {
   const { authState } = useAuth();
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [userAchievements, setUserAchievements] = useState<UserAchievement[]>([]);
@@ -91,7 +91,10 @@ export const useAchievements = () => {
     const userAchievement = userAchievements.find(ua => ua.achievement_id === achievement.id);
     if (userAchievement?.completed) return;
 
-    const requiredValue = achievement.condition_data?.required || 1;
+    const requiredValue = achievement.condition_data?.required 
+      || achievement.condition_data?.days 
+      || achievement.condition_data?.questions 
+      || 1;
     
     if (currentValue >= requiredValue) {
       await unlockAchievement(achievement.id);
@@ -169,12 +172,17 @@ export const useAchievements = () => {
     }
   };
 
-  // Show achievement notification
+  // Show achievement notification and award bonus XP
   const showAchievementNotification = (achievement: Achievement) => {
-    toast.success(`🏆 Úspěch odemčen!`, {
-      description: `${achievement.name} - ${achievement.description}`,
+    const xpBonus = achievement.xp_reward || 0;
+    toast.success(`🏆 Úspěch odemčen: ${achievement.name}!`, {
+      description: `${achievement.description}${xpBonus > 0 ? ` (+${xpBonus} XP)` : ''}`,
       duration: 5000,
     });
+
+    if (xpBonus > 0 && onAwardXP) {
+      onAwardXP(xpBonus);
+    }
   };
 
   // Check streak achievements

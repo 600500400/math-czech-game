@@ -271,12 +271,10 @@
   }
 }
 
-/* Focus visible for keyboard users */
-@media (prefers-reduced-motion: no-preference) {
-  :focus-visible {
-    outline: 2px solid hsl(var(--ring));
-    outline-offset: 2px;
-  }
+/* Focus visible for all keyboard users (WCAG AA) */
+:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
 }
 
 /* ... keep existing code (keyframes and other styles) */

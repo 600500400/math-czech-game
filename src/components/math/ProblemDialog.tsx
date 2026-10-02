@@ -21,6 +21,8 @@ interface ProblemDialogProps {
   wrongAnswers: number;
   totalAnswers: number;
   correctPercentage: number;
+  lastAnswerCorrect?: boolean | null;
+  lastProblem?: Problem | null;
 }
 
 const ProblemDialog: React.FC<ProblemDialogProps> = ({
@@ -36,6 +38,8 @@ const ProblemDialog: React.FC<ProblemDialogProps> = ({
   wrongAnswers,
   totalAnswers,
   correctPercentage,
+  lastAnswerCorrect,
+  lastProblem,
 }) => {
   const isMobile = useIsMobile();
   const { triggerTapHaptic } = useMobileInteractions({ hapticsEnabled: true, preventZoom: true });
@@ -116,6 +120,24 @@ const ProblemDialog: React.FC<ProblemDialogProps> = ({
               <p className={`font-heading font-bold text-center text-white ${isMobile ? 'text-3xl' : 'text-4xl'}`}>
                 {currentProblem.num1} {formatOperation(currentProblem.operation)} {currentProblem.num2} = ?
               </p>
+            </div>
+          )}
+
+          {/* Zobrazení správné odpovědi při chybě */}
+          {lastAnswerCorrect === false && lastProblem && (
+            <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-center animate-scale-in">
+              <p className="text-lg font-bold">
+                <span className="text-red-400">✗ Správná odpověď: </span>
+                <span className="text-green-400">
+                  {lastProblem.num1} {formatOperation(lastProblem.operation)} {lastProblem.num2} = {lastProblem.result}
+                </span>
+              </p>
+            </div>
+          )}
+
+          {lastAnswerCorrect === true && (
+            <div className="p-3 rounded-xl bg-green-500/10 border border-green-500/30 text-center animate-scale-in">
+              <p className="text-lg font-bold text-green-400">✓ Správně!</p>
             </div>
           )}
 

@@ -16,6 +16,7 @@ export const useLocalUser = (setAuthState: React.Dispatch<React.SetStateAction<A
         profile: {
           id: user.id,
           username: user.username,
+          full_name: user.username,
           role: user.role as any,
           created_at: new Date().toISOString(),
         },

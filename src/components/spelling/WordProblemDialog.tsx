@@ -92,17 +92,21 @@ const WordProblemDialog: React.FC<WordProblemDialogProps> = ({
           )}
         </DialogHeader>
 
-        {/* Hint po správné odpovědi */}
-        {lastAnswerCorrect === true && wordType && !isPhrase && (
+        {/* Hint po správné i chybné odpovědi */}
+        {lastAnswerCorrect !== null && lastAnswerCorrect !== undefined && wordType && !isPhrase && (
           <div className={`mt-2 p-2 rounded-lg text-center border ${
-            wordType === "kontrastní"
-              ? "bg-subject-math-light border-subject-math-border"
-              : "bg-subject-spelling-light border-subject-spelling-border"
+            lastAnswerCorrect
+              ? (wordType === "kontrastní"
+                ? "bg-subject-math-light border-subject-math-border"
+                : "bg-subject-spelling-light border-subject-spelling-border")
+              : "bg-red-500/10 border-red-500/30"
           }`}>
             <p className={`text-sm ${
-              wordType === "kontrastní" ? "text-subject-math" : "text-subject-spelling"
+              lastAnswerCorrect
+                ? (wordType === "kontrastní" ? "text-subject-math" : "text-subject-spelling")
+                : "text-red-500"
             }`}>
-              ✓ <span className="font-semibold">{currentWord}</span>
+              {lastAnswerCorrect ? "✓" : "✗ Správně je:"} <span className="font-semibold">{currentWord}</span>
               {" — "}
               {wordType === "vyjmenované" && `vyjmenované slovo po ${wordGroup} → tvrdé Y`}
               {wordType === "příbuzné" && `příbuzné slovo k vyjmenovaným po ${wordGroup} → tvrdé Y`}

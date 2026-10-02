@@ -21,15 +21,15 @@ const BottomTabBar = () => {
               to={tab.to}
               end={tab.end}
               className={({ isActive }) =>
-                `flex flex-col items-center gap-1 px-3 py-1 transition-colors ${
+                `flex flex-col items-center justify-center min-h-[44px] min-w-[56px] gap-1 px-3 py-1.5 transition-colors ${
                   isActive
                     ? "text-sunset-amber"
-                    : "text-white/40 hover:text-white/70"
+                    : "text-white/60 hover:text-white/90"
                 }`
               }
             >
-              <tab.icon className="h-6 w-6" strokeWidth={2.2} />
-              <span className="text-[10px] font-bold uppercase tracking-tight">
+              <tab.icon className="h-5 w-5" strokeWidth={2.2} />
+              <span className="text-xs font-medium tracking-tight">
                 {tab.label}
               </span>
             </NavLink>

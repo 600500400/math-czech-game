@@ -13,6 +13,7 @@ interface MathProblemDialogProps {
   checkAnswer: () => void;
   onEndGame: () => void;
   lastAnswerCorrect: boolean | null;
+  lastProblem?: Problem | null;
   showAnimation: boolean;
   correctAnswers: number;
   wrongAnswers: number;
@@ -37,6 +38,8 @@ export const MathProblemDialog: React.FC<MathProblemDialogProps> = (props) => {
       wrongAnswers={props.wrongAnswers}
       totalAnswers={totalAnswers}
       correctPercentage={correctPercentage}
+      lastAnswerCorrect={props.lastAnswerCorrect}
+      lastProblem={props.lastProblem}
     />
   );
 };

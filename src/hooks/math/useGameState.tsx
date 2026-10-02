@@ -20,6 +20,7 @@ export function useGameState() {
   const [gameEnded, setGameEnded] = useState(false);
   const [lastAnswerCorrect, setLastAnswerCorrect] = useState<boolean | null>(null);
   const [showAnimation, setShowAnimation] = useState(false);
+  const [lastProblem, setLastProblem] = useState<Problem | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
   const [answers, setAnswers] = useState<MathAnswer[]>([]);
   const [usedProblems, setUsedProblems] = useState<Set<string>>(new Set());
@@ -80,6 +81,8 @@ export function useGameState() {
     setLastAnswerCorrect,
     showAnimation,
     setShowAnimation,
+    lastProblem,
+    setLastProblem,
     showConfetti,
     setShowConfetti,
     answers,

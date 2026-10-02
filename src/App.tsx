@@ -21,6 +21,8 @@ import PWAInstallPrompt from "./components/pwa/PWAInstallPrompt";
 import OfflineIndicator from "./components/pwa/OfflineIndicator";
 import { UpdateNotification } from "./components/pwa/UpdateNotification";
 
+import Auth from "./pages/Auth";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -44,12 +46,16 @@ const App = () => {
                 <Route path="/" element={<Index />} />
                 <Route path="/select-user" element={<UserSelection />} />
                 <Route path="/parent-dashboard" element={<ParentDashboard />} />
+                <Route path="/auth" element={<Auth />} />
                 <Route path="/math" element={<MathPractice />} />
+                <Route path="/matematika" element={<MathPractice />} />
                 <Route path="/spelling" element={<SpellingPractice />} />
+                <Route path="/pravopis" element={<SpellingPractice />} />
                 <Route path="/leaderboards" element={<LeaderboardsPage />} />
                 <Route path="/achievements" element={<AchievementsPage />} />
                 <Route path="/donation-success" element={<DonationSuccess />} />
                 <Route path="/dictionary" element={<Dictionary />} />
+                <Route path="/slovnik" element={<Dictionary />} />
                 <Route path="/statistiky" element={<Statistics />} />
                 <Route path="/profil" element={<Profile />} />
                 <Route path="*" element={<NotFound />} />

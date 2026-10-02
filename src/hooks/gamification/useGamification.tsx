@@ -6,8 +6,8 @@ import { useLeaderboards } from "./useLeaderboards";
 import { GameSession } from "@/types/gamificationTypes";
 
 export const useGamification = () => {
-  const achievements = useAchievements();
   const leveling = useLeveling();
+  const achievements = useAchievements(leveling.awardXP);
   const streaks = useStreaks();
   const leaderboards = useLeaderboards();
 

@@ -2,11 +2,15 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Trophy, Lock, Star } from "lucide-react";
+import { Trophy, Lock, Star, ArrowLeft } from "lucide-react";
 import { useGamification } from "@/hooks/gamification/useGamification";
 import { Achievement, UserAchievement } from "@/types/gamificationTypes";
+import { useNavigate } from "react-router-dom";
+import MobileShell from "@/components/layout/MobileShell";
+import { Button } from "@/components/ui/button";
 
 export const AchievementsPage = () => {
+  const navigate = useNavigate();
   const { achievements } = useGamification();
 
   const getAchievementProgress = (achievement: Achievement, userAchievement?: UserAchievement) => {
@@ -31,18 +35,31 @@ export const AchievementsPage = () => {
     );
   };
 
-  if (achievements.isLoading) {
-    return <div className="text-center py-8">Načítám úspěchy...</div>;
-  }
-
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold mb-2">🏆 Úspěchy</h1>
-        <p className="text-muted-foreground">
-          Odemčeno {achievements.userAchievements.filter(ua => ua.completed).length} z {achievements.achievements.length} úspěchů
-        </p>
-      </div>
+    <MobileShell>
+      <div className="space-y-6 pt-2">
+        <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate(-1)}
+            className="text-white/70 hover:text-white hover:bg-white/10"
+          >
+            <ArrowLeft className="h-5 w-5 mr-1" />
+            Zpět
+          </Button>
+        </div>
+
+        <div className="text-center">
+          <h1 className="text-3xl font-bold mb-2 text-white">🏆 Úspěchy</h1>
+          <p className="text-white/60">
+            Odemčeno {achievements.userAchievements.filter(ua => ua.completed).length} z {achievements.achievements.length} úspěchů
+          </p>
+        </div>
+
+        {achievements.isLoading ? (
+          <div className="text-center py-8 text-white/70">Načítám úspěchy...</div>
+        ) : (
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {achievements.achievements.map((achievement) => {
@@ -102,6 +119,8 @@ export const AchievementsPage = () => {
           );
         })}
       </div>
-    </div>
+        )}
+      </div>
+    </MobileShell>
   );
 };

@@ -20,7 +20,7 @@ const MobileShell = ({ children }: MobileShellProps) => {
 
       <ModernHeader />
 
-      <main className="mx-auto w-full max-w-[420px] px-5 pb-32 pt-2 md:max-w-3xl">
+      <main className="mx-auto w-full max-w-[420px] px-4 pb-32 pt-2 md:max-w-4xl lg:max-w-5xl">
         {children}
       </main>
 

@@ -81,7 +81,7 @@ export const FunGraphics = ({
   }
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-[8000] flex items-center justify-center">
+    <div className="fixed inset-0 pointer-events-none z-[10000] flex items-center justify-center">
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
         <div className={`bg-white/95 rounded-xl shadow-lg p-6 border-2 ${isCorrect ? 'border-green-300 animate-bounce' : 'border-orange-300 animate-pulse'}`}>
           <div className="flex flex-col items-center gap-3">

@@ -1,14 +1,17 @@
 import { useState, useCallback } from "react";
-import { DictionaryGameState, DictionaryAnswer } from "@/types/dictionaryTypes";
+import { DictionaryGameState, DictionaryAnswer, DictionarySource } from "@/types/dictionaryTypes";
 import { useDictionaryWords } from "./useDictionaryWords";
 import { useDictionaryAnswers } from "./useDictionaryAnswers";
 import { useDictionaryStatistics } from "./useDictionaryStatistics";
+import { useGamification } from "@/hooks/gamification/useGamification";
 import { toast } from "sonner";
 
 export const useDictionaryGame = (userId: string | null) => {
-  const { words } = useDictionaryWords(userId);
-  const { addDictionaryAnswer } = useDictionaryAnswers(userId);
-  const { saveStatistics } = useDictionaryStatistics(userId);
+  const effectiveUserId = userId || 'local_user';
+  const { words, personalWords, schoolWords, getWordsBySource } = useDictionaryWords(effectiveUserId);
+  const { addDictionaryAnswer } = useDictionaryAnswers(effectiveUserId);
+  const { saveStatistics } = useDictionaryStatistics(effectiveUserId);
+  const { processGameCompletion } = useGamification();
 
   const [gameState, setGameState] = useState<DictionaryGameState>({
     currentWord: null,
@@ -17,6 +20,7 @@ export const useDictionaryGame = (userId: string | null) => {
     gameStarted: false,
     mode: 'simple',
     direction: 'en_to_cz',
+    source: 'personal',
     correctAnswers: 0,
     wrongAnswers: 0,
     showStatsDialog: false,
@@ -31,12 +35,13 @@ export const useDictionaryGame = (userId: string | null) => {
   const shuffleArray = (arr: any[]) => [...arr].sort(() => Math.random() - 0.5);
 
   const startGame = useCallback(() => {
-    if (!words || words.length === 0) {
-      toast.error("Žádná slovíčka k procvičování");
+    const activeWords = getWordsBySource(gameState.source);
+    if (!activeWords || activeWords.length === 0) {
+      toast.error("V této kategorii nemáte žádná slovíčka");
       return;
     }
 
-    const deck = shuffleArray(words);
+    const deck = shuffleArray(activeWords);
 
     setGameState(prev => ({
       ...prev,
@@ -52,7 +57,7 @@ export const useDictionaryGame = (userId: string | null) => {
       answers: [],
       gameStartTime: Date.now(),
     }));
-  }, [words]);
+  }, [gameState.source, getWordsBySource]);
 
   const endGame = useCallback(() => {
     if (gameState.correctAnswers + gameState.wrongAnswers > 0) {
@@ -65,6 +70,15 @@ export const useDictionaryGame = (userId: string | null) => {
         wrong_answers: gameState.wrongAnswers,
         mode: gameState.mode,
         direction: gameState.direction,
+        game_duration: gameDuration,
+      });
+
+      // Award XP, streaks, and check achievements for dictionary practice!
+      processGameCompletion({
+        subject: 'spelling',
+        correct_answers: gameState.correctAnswers,
+        wrong_answers: gameState.wrongAnswers,
+        perfect_game: gameState.wrongAnswers === 0 && gameState.correctAnswers >= 5,
         game_duration: gameDuration,
       });
 
@@ -82,7 +96,7 @@ export const useDictionaryGame = (userId: string | null) => {
       currentIndex: 0,
       totalWords: 0,
     }));
-  }, [gameState.correctAnswers, gameState.wrongAnswers, gameState.mode, gameState.direction, gameState.gameStartTime, saveStatistics]);
+  }, [gameState.correctAnswers, gameState.wrongAnswers, gameState.mode, gameState.direction, gameState.gameStartTime, saveStatistics, processGameCompletion]);
 
   const nextWord = useCallback(() => {
     setGameState(prev => {
@@ -103,8 +117,9 @@ export const useDictionaryGame = (userId: string | null) => {
   }, [endGame]);
 
   const shuffleDeck = useCallback(() => {
-    if (!words || words.length === 0) return;
-    const deck = shuffleArray(words);
+    const activeWords = getWordsBySource(gameState.source);
+    if (!activeWords || activeWords.length === 0) return;
+    const deck = shuffleArray(activeWords);
     setGameState(prev => ({
       ...prev,
       shuffledWords: deck,
@@ -118,13 +133,13 @@ export const useDictionaryGame = (userId: string | null) => {
       answers: [],
       gameStartTime: Date.now(),
     }));
-  }, [words]);
+  }, [gameState.source, getWordsBySource]);
 
   const handleSimpleAnswer = useCallback((isCorrect: boolean) => {
-    if (!gameState.currentWord || !userId) return;
+    if (!gameState.currentWord) return;
 
     const answer: Omit<DictionaryAnswer, 'id' | 'created_at'> = {
-      user_id: userId,
+      user_id: effectiveUserId,
       word_id: gameState.currentWord.id,
       english_word: gameState.currentWord.english_word,
       czech_translation: gameState.currentWord.czech_translation,
@@ -148,10 +163,10 @@ export const useDictionaryGame = (userId: string | null) => {
     setTimeout(() => {
       nextWord();
     }, 1500);
-  }, [gameState.currentWord, gameState.mode, gameState.direction, userId, addDictionaryAnswer, nextWord]);
+  }, [gameState.currentWord, gameState.mode, gameState.direction, effectiveUserId, addDictionaryAnswer, nextWord]);
 
   const handleAdvancedAnswer = useCallback(() => {
-    if (!gameState.currentWord || !userId || !gameState.userAnswer.trim()) return;
+    if (!gameState.currentWord || !gameState.userAnswer.trim()) return;
 
     const correctAnswer = gameState.direction === 'en_to_cz' 
       ? gameState.currentWord.czech_translation 
@@ -160,7 +175,7 @@ export const useDictionaryGame = (userId: string | null) => {
     const isCorrect = gameState.userAnswer.trim().toLowerCase() === correctAnswer.toLowerCase();
 
     const answer: Omit<DictionaryAnswer, 'id' | 'created_at'> = {
-      user_id: userId,
+      user_id: effectiveUserId,
       word_id: gameState.currentWord.id,
       english_word: gameState.currentWord.english_word,
       czech_translation: gameState.currentWord.czech_translation,
@@ -184,7 +199,7 @@ export const useDictionaryGame = (userId: string | null) => {
     setTimeout(() => {
       nextWord();
     }, 2000);
-  }, [gameState.currentWord, gameState.userAnswer, gameState.mode, gameState.direction, userId, addDictionaryAnswer, nextWord]);
+  }, [gameState.currentWord, gameState.userAnswer, gameState.mode, gameState.direction, effectiveUserId, addDictionaryAnswer, nextWord]);
 
 
   const resetGame = useCallback(() => {
@@ -205,9 +220,8 @@ export const useDictionaryGame = (userId: string | null) => {
     }));
   }, []);
 
-  // Mode is fixed to 'simple' - no longer changeable
   const setMode = useCallback((mode: 'simple' | 'advanced') => {
-    // Do nothing - mode is always 'simple'
+    setGameState(prev => ({ ...prev, mode }));
   }, []);
 
   const setDirection = useCallback((direction: 'en_to_cz' | 'cz_to_en') => {
@@ -218,12 +232,8 @@ export const useDictionaryGame = (userId: string | null) => {
     setGameState(prev => ({ ...prev, userAnswer: answer }));
   }, []);
 
-  const setShowStatsDialog = useCallback((show: boolean) => {
-    setGameState(prev => ({ ...prev, showStatsDialog: show }));
-  }, []);
-
-  const setShowSentences = useCallback((show: boolean) => {
-    setGameState(prev => ({ ...prev, showSentences: show }));
+  const setSource = useCallback((source: DictionarySource) => {
+    setGameState(prev => ({ ...prev, source }));
   }, []);
 
   return {
@@ -236,6 +246,10 @@ export const useDictionaryGame = (userId: string | null) => {
     handleAdvancedAnswer,
     setMode,
     setDirection,
+    setSource,
+    personalWordsCount: personalWords.length,
+    schoolWordsCount: schoolWords.length,
+    totalWordsCount: words.length,
     setUserAnswer,
     setShowStatsDialog,
     setShowSentences,

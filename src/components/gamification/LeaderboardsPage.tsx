@@ -2,10 +2,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Trophy, Medal, Award, TrendingUp } from "lucide-react";
+import { Trophy, Medal, Award, TrendingUp, ArrowLeft } from "lucide-react";
 import { useLeaderboards } from "@/hooks/gamification/useLeaderboards";
+import { useNavigate } from "react-router-dom";
+import MobileShell from "@/components/layout/MobileShell";
+import { Button } from "@/components/ui/button";
 
 export const LeaderboardsPage = () => {
+  const navigate = useNavigate();
   const { 
     globalLeaderboard, 
     weeklyLeaderboard, 
@@ -39,24 +43,37 @@ export const LeaderboardsPage = () => {
     }
   };
 
-  if (isLoading) {
-    return <div className="text-center py-8">Načítám žebříček...</div>;
-  }
-
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold mb-2">🏆 Žebříček</h1>
-        <p className="text-muted-foreground">
-          Soutěž s ostatními a ukaž své dovednosti!
-        </p>
-        {userRank && (
-          <Badge variant="outline" className="mt-2">
-            <TrendingUp className="w-3 h-3 mr-1" />
-            Tvoje pozice: #{userRank}
-          </Badge>
-        )}
-      </div>
+    <MobileShell>
+      <div className="space-y-6 pt-2">
+        <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate(-1)}
+            className="text-white/70 hover:text-white hover:bg-white/10"
+          >
+            <ArrowLeft className="h-5 w-5 mr-1" />
+            Zpět
+          </Button>
+        </div>
+
+        <div className="text-center">
+          <h1 className="text-3xl font-bold mb-2 text-white">🏆 Žebříček</h1>
+          <p className="text-white/60">
+            Soutěž s ostatními a ukaž své dovednosti!
+          </p>
+          {userRank && (
+            <Badge variant="outline" className="mt-2 text-white border-white/20">
+              <TrendingUp className="w-3 h-3 mr-1" />
+              Tvoje pozice: #{userRank}
+            </Badge>
+          )}
+        </div>
+
+        {isLoading ? (
+          <div className="text-center py-8 text-white/70">Načítám žebříček...</div>
+        ) : (
 
       <Tabs defaultValue="global" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
@@ -152,6 +169,8 @@ export const LeaderboardsPage = () => {
           </Card>
         </TabsContent>
       </Tabs>
-    </div>
+        )}
+      </div>
+    </MobileShell>
   );
 };

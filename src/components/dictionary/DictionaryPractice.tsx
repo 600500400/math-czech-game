@@ -21,6 +21,11 @@ export default function DictionaryPractice() {
     gameStarted,
     mode,
     direction,
+    source,
+    setSource,
+    personalWordsCount,
+    schoolWordsCount,
+    totalWordsCount,
     correctAnswers,
     wrongAnswers,
     showStatsDialog,
@@ -55,16 +60,82 @@ export default function DictionaryPractice() {
       <div className="space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle className="text-center">Procvičování slovíček</CardTitle>
+            <CardTitle className="text-center font-heading text-xl">Procvičování slovíček</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-5">
+            {/* Výběr slovníku */}
+            <div>
+              <h3 className="text-sm font-semibold mb-2.5 text-foreground">Vyber slovník k procvičování:</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                <Button
+                  type="button"
+                  variant={source === 'personal' ? 'default' : 'outline'}
+                  onClick={() => setSource('personal')}
+                  className={`flex flex-col h-auto py-3 px-3 items-center text-center gap-1 transition-all ${
+                    source === 'personal' ? 'ring-2 ring-primary shadow-sm' : ''
+                  }`}
+                >
+                  <span className="font-semibold text-sm">📝 Můj slovník</span>
+                  <span className="text-xs opacity-75">{personalWordsCount} vlastních slov</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant={source === 'school' ? 'default' : 'outline'}
+                  onClick={() => setSource('school')}
+                  className={`flex flex-col h-auto py-3 px-3 items-center text-center gap-1 transition-all ${
+                    source === 'school' ? 'ring-2 ring-primary shadow-sm' : ''
+                  }`}
+                >
+                  <span className="font-semibold text-sm">🎒 Školní (A1–A2)</span>
+                  <span className="text-xs opacity-75">{schoolWordsCount} základních slov</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant={source === 'all' ? 'default' : 'outline'}
+                  onClick={() => setSource('all')}
+                  className={`flex flex-col h-auto py-3 px-3 items-center text-center gap-1 transition-all ${
+                    source === 'all' ? 'ring-2 ring-primary shadow-sm' : ''
+                  }`}
+                >
+                  <span className="font-semibold text-sm">🌐 Všechna slovíčka</span>
+                  <span className="text-xs opacity-75">{totalWordsCount} slov celkem</span>
+                </Button>
+              </div>
+            </div>
+
+            {/* Styl procvičování */}
+            <div>
+              <h3 className="text-sm font-semibold mb-2 text-foreground">Styl procvičování:</h3>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant={mode === 'simple' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setMode('simple')}
+                  className="flex-1"
+                >
+                  🃏 Kartičky (Vím / Nevím)
+                </Button>
+                <Button
+                  type="button"
+                  variant={mode === 'advanced' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setMode('advanced')}
+                  className="flex-1"
+                >
+                  ✍️ Psaní překladu
+                </Button>
+              </div>
+            </div>
+
+            {/* Směr překladu */}
             <DictionaryModeToggle
               direction={direction}
               onDirectionChange={setDirection}
             />
-            
-            <div className="text-center">
-              <Button onClick={startGame} size="lg" className="gap-2">
+
+            <div className="text-center pt-2">
+              <Button onClick={startGame} size="lg" className="w-full sm:w-auto px-8 gap-2 font-semibold shadow-md">
                 <Play className="h-5 w-5" />
                 Začít procvičování
               </Button>
@@ -79,14 +150,26 @@ export default function DictionaryPractice() {
     return (
       <Card>
         <CardContent className="pt-6 text-center">
-          <p>Žádná slovíčka k procvičování</p>
+          <p>Žádná slovíčka k procvičování v tomto slovníku</p>
           <Button onClick={resetGame} className="mt-4">
-            Zpět
+            Zpět na výběr
           </Button>
         </CardContent>
       </Card>
     );
   }
+
+  const getSourceBadgeLabel = () => {
+    switch (source) {
+      case 'personal':
+        return '📝 Můj slovník';
+      case 'school':
+        return '🎒 Školní (A1–A2)';
+      case 'all':
+      default:
+        return '🌐 Všechna slovíčka';
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -94,6 +177,15 @@ export default function DictionaryPractice() {
       <Card>
         <CardContent className="pt-6">
           <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <Badge variant="outline" className="px-3 py-1 font-medium">
+                {getSourceBadgeLabel()}
+              </Badge>
+              <Button variant="ghost" size="sm" onClick={resetGame} className="text-xs">
+                Změnit výběr
+              </Button>
+            </div>
+
             <DictionaryModeToggle
               direction={direction}
               onDirectionChange={setDirection}

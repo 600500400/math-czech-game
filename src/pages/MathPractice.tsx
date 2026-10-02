@@ -7,6 +7,7 @@ import { useMathGame } from "@/hooks/math/useMathGame";
 import { useEnhancedMobileInteractions } from "@/hooks/useEnhancedMobileInteractions";
 import { useAuth } from "@/hooks/useAuth";
 import { useGamification } from "@/hooks/gamification/useGamification";
+import { useMathAnswers } from "@/hooks/statistics/useMathAnswers";
 import { Button } from "@/components/ui/button";
 import { Calculator, Settings, Play } from "lucide-react";
 import MobileShell from "@/components/layout/MobileShell";
@@ -14,7 +15,8 @@ import SectionHero from "@/components/layout/SectionHero";
 
 const MathPractice = () => {
   const { authState } = useAuth();
-  const mathGame = useMathGame();
+  const { addMathAnswer } = useMathAnswers(authState.user?.id ?? null);
+  const mathGame = useMathGame({ addMathAnswer });
   const { leveling, streaks, processGameCompletion } = useGamification();
 
   const {
@@ -144,6 +146,7 @@ const MathPractice = () => {
         handleKeyPress={mathGame.handleKeyPress}
         onEndGame={handleEndGame}
         lastAnswerCorrect={mathGame.lastAnswerCorrect}
+        lastProblem={mathGame.lastProblem}
         showAnimation={mathGame.showAnimation}
         correctAnswers={mathGame.correctAnswers}
         wrongAnswers={mathGame.wrongAnswers}

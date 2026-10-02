@@ -29,56 +29,66 @@ export function useProblemGenerator({
   setUsedProblems,
 }: UseProblemGeneratorProps) {
 
+  // Helper: vygeneruje jeden příklad pro danou operaci (bez kontroly unikátnosti)
+  const generateProblemForOperation = useCallback((operation: Operation): Problem => {
+    let num1: number, num2: number, result: number;
+
+    switch (operation) {
+      case "+": {
+        // Sčítání: výsledek nepřekročí maxValue
+        result = randInt(minValue + 1, maxValue);
+        num1 = randInt(minValue, result - minValue);
+        num2 = result - num1;
+        break;
+      }
+      case "-":
+        // Aby výsledek nebyl záporný: num1 ≥ num2.
+        // Vybereme num1 z plného rozsahu a num2 z [minValue, num1].
+        num1 = randInt(minValue, maxValue);
+        num2 = randInt(minValue, num1);
+        result = num1 - num2;
+        break;
+      case "*":
+        num1 = randInt(mulDivMin, mulDivMax);
+        num2 = randInt(mulDivMin, mulDivMax);
+        result = num1 * num2;
+        break;
+      case "/":
+        // Generujeme dělení beze zbytku: result a num2 z rozsahu, num1 = result * num2.
+        result = randInt(mulDivMin, mulDivMax);
+        num2 = randInt(Math.max(1, mulDivMin), mulDivMax);
+        num1 = result * num2;
+        break;
+      default:
+        throw new Error("Invalid operation");
+    }
+
+    return { num1, num2, operation, result };
+  }, [minValue, maxValue, mulDivMin, mulDivMax]);
+
   const generateUniqueProblem = useCallback((): Problem => {
     const maxAttempts = 100;
     let attempts = 0;
 
     while (attempts < maxAttempts) {
       const operation = allowedOperations[Math.floor(Math.random() * allowedOperations.length)];
-      let num1: number, num2: number, result: number;
-
-      switch (operation) {
-        case "+":
-          num1 = randInt(minValue, maxValue);
-          num2 = randInt(minValue, maxValue);
-          result = num1 + num2;
-          break;
-        case "-":
-          // Aby výsledek nebyl záporný: num1 ≥ num2.
-          // Vybereme num1 z plného rozsahu a num2 z [minValue, num1].
-          num1 = randInt(minValue, maxValue);
-          num2 = randInt(minValue, num1);
-          result = num1 - num2;
-          break;
-        case "*":
-          num1 = randInt(mulDivMin, mulDivMax);
-          num2 = randInt(mulDivMin, mulDivMax);
-          result = num1 * num2;
-          break;
-        case "/":
-          // Generujeme dělení beze zbytku: result a num2 z rozsahu, num1 = result * num2.
-          result = randInt(mulDivMin, mulDivMax);
-          num2 = randInt(Math.max(1, mulDivMin), mulDivMax);
-          num1 = result * num2;
-          break;
-        default:
-          throw new Error("Invalid operation");
-      }
-
-      const problemKey = `${num1}${operation}${num2}`;
+      const problem = generateProblemForOperation(operation);
+      const problemKey = `${problem.num1}${problem.operation}${problem.num2}`;
 
       if (!usedProblems.has(problemKey)) {
         setUsedProblems(prev => new Set([...prev, problemKey]));
-        return { num1, num2, operation, result };
+        return problem;
       }
 
       attempts++;
     }
 
-    // Reset historie a zkusit znovu
+    // Reset pro příští generování – vyčistíme set
     setUsedProblems(new Set());
-    return generateUniqueProblem();
-  }, [allowedOperations, minValue, maxValue, mulDivMin, mulDivMax, usedProblems, setUsedProblems]);
+    // Vygeneruj příklad bez kontroly unikátnosti (povolí opakování)
+    const operation = allowedOperations[Math.floor(Math.random() * allowedOperations.length)];
+    return generateProblemForOperation(operation);
+  }, [allowedOperations, usedProblems, setUsedProblems, generateProblemForOperation]);
 
   const generateProblem = useCallback((): Problem => {
     return generateUniqueProblem();

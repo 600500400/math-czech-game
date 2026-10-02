@@ -1,13 +1,17 @@
 
 import { useCallback } from "react";
-import { Operation } from "@/types/mathTypes";
+import { Operation, MathAnswer } from "@/types/mathTypes";
 import { useGameState } from "./useGameState";
 import { useProblemGenerator } from "./useProblemGenerator";
 import { useAnswerHandler } from "./useAnswerHandler";
 import { useDifficultySettings } from "./useDifficultySettings";
 import { useGameFlow } from "./useGameFlow";
 
-export const useMathGame = () => {
+interface UseMathGameProps {
+  addMathAnswer?: (answer: MathAnswer) => void;
+}
+
+export const useMathGame = (props?: UseMathGameProps) => {
   const gameState = useGameState();
   const difficultySettings = useDifficultySettings();
   const problemGenerator = useProblemGenerator({
@@ -29,8 +33,10 @@ export const useMathGame = () => {
     incrementCorrect: gameState.incrementCorrect,
     incrementWrong: gameState.incrementWrong,
     addAnswer: gameState.addAnswer,
+    addMathAnswer: props?.addMathAnswer,
     generateProblem: problemGenerator.generateProblem,
-    setCurrentProblem: gameState.setCurrentProblem
+    setCurrentProblem: gameState.setCurrentProblem,
+    setLastProblem: gameState.setLastProblem
   });
 
   const gameFlow = useGameFlow({
@@ -86,6 +92,7 @@ export const useMathGame = () => {
     showStatsDialog: gameFlow.showStatsDialog,
     lastAnswerCorrect: gameState.lastAnswerCorrect,
     showAnimation: gameState.showAnimation,
+    lastProblem: gameState.lastProblem,
     answers: gameState.answers,
     difficultySet: gameFlow.difficultySet,
     

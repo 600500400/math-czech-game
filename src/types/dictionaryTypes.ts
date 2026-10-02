@@ -33,6 +33,8 @@ export interface DictionaryStatistics {
   created_at: string;
 }
 
+export type DictionarySource = 'all' | 'personal' | 'school';
+
 export interface DictionaryGameState {
   currentWord: DictionaryWord | null;
   userAnswer: string;
@@ -40,6 +42,7 @@ export interface DictionaryGameState {
   gameStarted: boolean;
   mode: 'simple' | 'advanced';
   direction: 'en_to_cz' | 'cz_to_en';
+  source: DictionarySource;
   correctAnswers: number;
   wrongAnswers: number;
   showStatsDialog: boolean;
@@ -56,6 +59,7 @@ export interface DictionaryGameState {
 export interface DictionaryModeSettings {
   mode: 'simple' | 'advanced';
   direction: 'en_to_cz' | 'cz_to_en';
+  source: DictionarySource;
   difficultyFilter: 'all' | 'basic' | 'intermediate' | 'advanced';
 }
 

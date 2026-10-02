@@ -1,18 +1,21 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import MobileShell from "@/components/layout/MobileShell";
 import { ChevronRight, Users, Trophy, Award, Heart, LogOut } from "lucide-react";
+import { DonateDialog } from "@/components/donation/DonateDialog";
 
 const Profile = () => {
   const navigate = useNavigate();
   const { authState, signOut } = useAuth();
-  const userName = authState.profile?.full_name || "Host";
+  const [showDonate, setShowDonate] = useState(false);
+  const userName = authState.profile?.full_name || authState.profile?.username || authState.user?.username || "Školák";
 
   const items = [
-    { icon: Users, label: "Přepnout uživatele", to: "/select-user", color: "text-sunset-orange" },
-    { icon: Trophy, label: "Žebříčky", to: "/leaderboards", color: "text-sunset-amber" },
-    { icon: Award, label: "Úspěchy", to: "/achievements", color: "text-sunset-magenta" },
-    { icon: Heart, label: "Podpořit projekt", to: "/donation-success", color: "text-sunset-purple" },
+    { icon: Users, label: "Přepnout uživatele", onClick: () => navigate("/select-user"), color: "text-sunset-orange" },
+    { icon: Trophy, label: "Žebříčky", onClick: () => navigate("/leaderboards"), color: "text-sunset-amber" },
+    { icon: Award, label: "Úspěchy", onClick: () => navigate("/achievements"), color: "text-sunset-magenta" },
+    { icon: Heart, label: "Podpořit projekt", onClick: () => setShowDonate(true), color: "text-sunset-purple" },
   ];
 
   return (
@@ -35,8 +38,8 @@ const Profile = () => {
         {items.map((item) => (
           <button
             key={item.label}
-            onClick={() => navigate(item.to)}
-            className="flex w-full items-center justify-between rounded-2xl border border-white/10 bg-white/5 p-4 text-left backdrop-blur-sm transition-colors active:bg-white/10"
+            onClick={item.onClick}
+            className="flex w-full items-center justify-between rounded-2xl border border-white/10 bg-white/5 p-4 text-left backdrop-blur-sm transition-colors active:bg-white/10 hover:bg-white/10"
           >
             <div className="flex items-center gap-3">
               <item.icon className={`h-5 w-5 ${item.color}`} strokeWidth={2.2} />
@@ -49,7 +52,7 @@ const Profile = () => {
         {authState.user && (
           <button
             onClick={() => signOut()}
-            className="flex w-full items-center justify-between rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-left backdrop-blur-sm transition-colors active:bg-red-500/20"
+            className="flex w-full items-center justify-between rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-left backdrop-blur-sm transition-colors active:bg-red-500/20 hover:bg-red-500/15"
           >
             <div className="flex items-center gap-3">
               <LogOut className="h-5 w-5 text-red-400" strokeWidth={2.2} />
@@ -58,6 +61,8 @@ const Profile = () => {
           </button>
         )}
       </div>
+
+      <DonateDialog open={showDonate} onOpenChange={setShowDonate} />
     </MobileShell>
   );
 };

@@ -5,26 +5,67 @@ import { DictionaryWord, NewDictionaryWord } from "@/types/dictionaryTypes";
 import { toast } from "sonner";
 
 import { logger } from "@/utils/logger";
+import { DEFAULT_DICTIONARY_WORDS } from "@/data/dictionaryData";
+
+import { USER_PERSONAL_WORDS } from "@/data/personalDictionaryData";
+
+const SCHOOL_WORDS: DictionaryWord[] = DEFAULT_DICTIONARY_WORDS.map((w) => ({
+  id: w.id,
+  english_word: w.english_word,
+  czech_translation: w.czech_translation,
+  difficulty_level: w.difficulty_level,
+  user_id: 'school',
+  is_user_created: false,
+  created_at: '',
+  updated_at: '',
+}));
+
 export const useDictionaryWords = (userId: string | null) => {
   const queryClient = useQueryClient();
 
-  // Fetch all available words (all words for everyone)
-  const { data: words = [], isLoading, refetch } = useQuery({
+  // Load custom/personal database words
+  const { data: dbWords = USER_PERSONAL_WORDS, isLoading, refetch } = useQuery({
     queryKey: ["dictionaryWords"],
     queryFn: async (): Promise<DictionaryWord[]> => {
-      const { data, error } = await supabase
-        .from('dictionary_words')
-        .select('*')
-        .order('english_word');
+      try {
+        const { data, error } = await supabase
+          .from('dictionary_words')
+          .select('*')
+          .order('english_word');
 
-      if (error) {
-        console.error("Error fetching dictionary words:", error);
-        throw error;
+        if (error) {
+          console.warn("Could not fetch remote dictionary words, using personal dataset:", error.message);
+          return USER_PERSONAL_WORDS;
+        }
+
+        if (!data || data.length === 0) {
+          return USER_PERSONAL_WORDS;
+        }
+
+        return data as DictionaryWord[];
+      } catch (err) {
+        console.warn("Exception fetching dictionary words, using personal defaults:", err);
+        return USER_PERSONAL_WORDS;
       }
-
-      return (data || []) as DictionaryWord[];
     },
+    initialData: USER_PERSONAL_WORDS,
   });
+
+  const personalWords = dbWords;
+  const schoolWords = SCHOOL_WORDS;
+  const allWords = [...personalWords, ...schoolWords];
+
+  const getWordsBySource = (source: 'all' | 'personal' | 'school'): DictionaryWord[] => {
+    switch (source) {
+      case 'personal':
+        return personalWords;
+      case 'school':
+        return schoolWords;
+      case 'all':
+      default:
+        return allWords;
+    }
+  };
 
   // Add new word
   const addWordMutation = useMutation({
@@ -173,7 +214,11 @@ export const useDictionaryWords = (userId: string | null) => {
   };
 
   return {
-    words,
+    words: allWords,
+    personalWords,
+    schoolWords,
+    allWords,
+    getWordsBySource,
     isLoading,
     addWord: addWordMutation.mutate,
     updateWord: updateWordMutation.mutate,

@@ -12,8 +12,10 @@ interface UseAnswerHandlerProps {
   incrementCorrect: () => void;
   incrementWrong: () => void;
   addAnswer: (answer: MathAnswer) => void;
+  addMathAnswer?: (answer: MathAnswer) => void;
   generateProblem: () => Problem;
   setCurrentProblem: (problem: Problem) => void;
+  setLastProblem: (problem: Problem | null) => void;
 }
 
 export function useAnswerHandler({
@@ -25,8 +27,10 @@ export function useAnswerHandler({
   incrementCorrect,
   incrementWrong,
   addAnswer,
+  addMathAnswer,
   generateProblem,
-  setCurrentProblem
+  setCurrentProblem,
+  setLastProblem
 }: UseAnswerHandlerProps) {
   
   const {
@@ -52,6 +56,7 @@ export function useAnswerHandler({
     };
 
     addAnswer(answerRecord);
+    addMathAnswer?.(answerRecord);
 
     // Update statistics and show feedback
     if (isCorrect) {
@@ -64,14 +69,21 @@ export function useAnswerHandler({
       triggerIncorrectFeedback();
     }
 
+    // Save the current problem so ProblemDialog can show correct answer
+    setLastProblem(currentProblem);
+
     // Show animation
     setShowAnimation(true);
     
-    // Hide animation and generate next problem after shorter delay
+    // Longer delay for wrong answers so child can read correct answer
+    const feedbackDelay = isCorrect ? 800 : 1500;
+    
+    // Hide animation and generate next problem after delay
     setTimeout(() => {
       // First hide animation and reset answer state
       setShowAnimation(false);
       setLastAnswerCorrect(null);
+      setLastProblem(null);
       
       // Then generate next problem after animation cleanup
       setTimeout(() => {
@@ -80,7 +92,7 @@ export function useAnswerHandler({
         setUserAnswer("");
       }, 100); // Small delay to ensure animation cleanup
       
-    }, 800); // Extended to 800ms to show progress bar feedback
+    }, feedbackDelay);
 
   }, [
     currentProblem,
@@ -88,11 +100,13 @@ export function useAnswerHandler({
     incrementCorrect,
     incrementWrong,
     addAnswer,
+    addMathAnswer,
     setLastAnswerCorrect,
     setShowAnimation,
     generateProblem,
     setCurrentProblem,
     setUserAnswer,
+    setLastProblem,
     triggerCorrectFeedback,
     triggerIncorrectFeedback
   ]);

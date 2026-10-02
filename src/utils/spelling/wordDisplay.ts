@@ -2,6 +2,9 @@
 import { removeDiacritics } from "@/lib/utils";
 import { logger } from "@/utils/logger";
 
+// Obojetné souhlásky - pouze po nich se skrývá i/y
+const AMBIGUOUS_CONSONANTS = new Set(['b', 'l', 'm', 'p', 's', 'v', 'z']);
+
 // Helper function to create displayed word with missing letters
 export function createDisplayedWord(word: string) {
   logger.debug("🔤 createDisplayedWord: Zpracovávám slovo:", word);
@@ -9,14 +12,20 @@ export function createDisplayedWord(word: string) {
   const positions: number[] = [];
   const letters: string[] = [];
   
-  // Find all i/y positions
+  // Find i/y positions only after ambiguous consonants
   for (let i = 0; i < word.length; i++) {
     const char = word[i].toLowerCase();
     if (char === 'i' || char === 'y' || char === 'í' || char === 'ý') {
-      positions.push(i);
-      // Store normalized letter (without diacritics) for comparison
-      const normalizedChar = removeDiacritics(char);
-      letters.push(normalizedChar);
+      // Check if the preceding character is an ambiguous consonant
+      if (i > 0) {
+        const prevChar = removeDiacritics(word[i - 1].toLowerCase());
+        if (AMBIGUOUS_CONSONANTS.has(prevChar)) {
+          positions.push(i);
+          // Store normalized letter (without diacritics) for comparison
+          const normalizedChar = removeDiacritics(char);
+          letters.push(normalizedChar);
+        }
+      }
     }
   }
   

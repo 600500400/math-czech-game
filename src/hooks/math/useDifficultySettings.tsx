@@ -33,23 +33,23 @@ export function useDifficultySettings() {
     switch (level) {
       case "easy":
         setMinValue(1);
-        setMaxValue(10);
+        setMaxValue(5);
         setMulDivMin(1);
         setMulDivMax(5);
         setAllowedOperations(["+", "-"]);
         break;
       case "medium":
-        setMinValue(5);
-        setMaxValue(25);
+        setMinValue(1);
+        setMaxValue(20);
         setMulDivMin(1);
         setMulDivMax(10);
         setAllowedOperations(["+", "-", "*"]);
         break;
       case "hard":
-        setMinValue(10);
+        setMinValue(1);
         setMaxValue(100);
-        setMulDivMin(2);
-        setMulDivMax(12);
+        setMulDivMin(1);
+        setMulDivMax(10);
         setAllowedOperations(["+", "-", "*", "/"]);
         break;
     }

@@ -44,8 +44,8 @@ export function renderWordWithCurrentGap(
         // Skrýváme pouze aktuálně řešenou pozici
         result += '_';
       } else {
-        // Budoucí pozice zatím ponecháme jako původní písmena
-        result += currentWord[i];
+        // Budoucí pozice - ponechat podtržítko
+        result += '_';
       }
     } else {
       result += currentWord[i];

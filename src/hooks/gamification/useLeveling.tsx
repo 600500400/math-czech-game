@@ -122,12 +122,19 @@ export const useLeveling = () => {
   const getLevelProgress = () => {
     if (!userLevel) return 0;
     
-    const totalXPForCurrentLevel = (userLevel.current_level - 1) * 100 + ((userLevel.current_level - 2) * 50);
-    const totalXPForNextLevel = userLevel.current_level * 100 + ((userLevel.current_level - 1) * 50);
-    const progressXP = userLevel.total_xp - totalXPForCurrentLevel;
-    const neededXP = totalXPForNextLevel - totalXPForCurrentLevel;
+    // Level 1 starts at 0 XP, Level 2 is reached at 100 XP
+    if (userLevel.current_level <= 1) {
+      const nextLevelThreshold = 100;
+      return Math.min(Math.max(0, Math.round((userLevel.total_xp / nextLevelThreshold) * 100)), 100);
+    }
     
-    return Math.min((progressXP / neededXP) * 100, 100);
+    // For Level N > 1
+    const currentLevelBaseXP = (userLevel.current_level - 1) * 100 + Math.max(0, userLevel.current_level - 2) * 50;
+    const nextLevelTargetXP = userLevel.current_level * 100 + (userLevel.current_level - 1) * 50;
+    const progressXP = Math.max(0, userLevel.total_xp - currentLevelBaseXP);
+    const neededXP = Math.max(1, nextLevelTargetXP - currentLevelBaseXP);
+    
+    return Math.min(Math.max(0, Math.round((progressXP / neededXP) * 100)), 100);
   };
 
   useEffect(() => {

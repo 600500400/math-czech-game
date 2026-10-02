@@ -40,7 +40,7 @@ export const spellingGroups: SpellingGroup[] = [
       { word: "pobít", type: "kontrastní" },
       { word: "obilí", type: "kontrastní" },
       { word: "obilný", type: "kontrastní" },
-      { word: "kobliha", type: "kontrastní" },
+
       { word: "bizon", type: "kontrastní" },
       { word: "biskup", type: "kontrastní" },
       { word: "bidlo", type: "kontrastní" },
