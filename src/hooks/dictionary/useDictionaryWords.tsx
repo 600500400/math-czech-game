@@ -179,6 +179,7 @@ export const useDictionaryWords = (userId: string | null) => {
   });
 
   // Get random word for practice
+  const words = allWords;
   const getRandomWord = (): DictionaryWord | null => {
     if (words.length === 0) return null;
     const randomIndex = Math.floor(Math.random() * words.length);

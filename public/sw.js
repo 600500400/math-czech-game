@@ -1,30 +1,35 @@
-// Kill-switch service worker.
-// Replaces the previous Procvička app-shell SW so returning browsers
-// evict the stale registration and stop loading deleted JS chunks.
+/* Versioned app shell. An incomplete install never replaces the working cache.
+   Updates wait for existing tabs to close; an active lesson is never reloaded. */
+importScripts('/learning-precache.js');
+const CACHE='procvicka-learning-'+self.LEARNING_PRECACHE.version;
+self.addEventListener('install',event=>{
+  event.waitUntil((async()=>{
+    const cache=await caches.open(CACHE);
+    try { await cache.addAll(self.LEARNING_PRECACHE.assets.map(url=>new Request(url,{cache:'reload'}))); }
+    catch(error){ await caches.delete(CACHE); throw error; }
+  })());
+});
+self.addEventListener('activate',event=>{
+  event.waitUntil((async()=>{
+    await self.clients.claim();
+    // Activation happens after the previous worker's clients have closed.
+    const names=await caches.keys();
+    await Promise.all(names.filter(name=>name.startsWith('procvicka-learning-')&&name!==CACHE).map(name=>caches.delete(name)));
+  })());
+});
+self.addEventListener('fetch',event=>{
+  const request=event.request, url=new URL(request.url);
+  if(request.method!=='GET'||url.origin!==self.location.origin||url.pathname.startsWith('/api/'))return;
+  if(request.mode==='navigate'){
+    event.respondWith((async()=>{
+      const cache=await caches.open(CACHE);
+      // Serve the shell matching the installed chunk set. Future releases are
+      // downloaded atomically by the next worker, never mixed with this shell.
+      return (await cache.match('/')) || fetch(request);
+    })()); return;
+  }
+  if(self.LEARNING_PRECACHE.assets.includes(url.pathname)){
+    event.respondWith((async()=>{const cache=await caches.open(CACHE);return (await cache.match(url.pathname))||fetch(request);})());
+  }
+});
 
-self.addEventListener("install", () => self.skipWaiting());
-
-self.addEventListener("activate", (event) =>
-  event.waitUntil(
-    (async () => {
-      try {
-        const cacheNames = await caches.keys();
-        const ours = cacheNames.filter((n) =>
-          /^procvicka-(static|dynamic|images)-v/.test(n) ||
-          /^math-czech-practice-v/.test(n)
-        );
-        await Promise.allSettled(ours.map((n) => caches.delete(n)));
-        await self.clients.claim();
-        const windowClients = await self.clients.matchAll({ type: "window" });
-        await Promise.allSettled(
-          windowClients.map((c) => c.navigate(c.url))
-        );
-      } finally {
-        await self.registration.unregister();
-      }
-    })()
-  )
-);
-
-// Pass-through fetch — never serve cached chunks.
-self.addEventListener("fetch", () => {});

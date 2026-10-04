@@ -1,44 +1,14 @@
-
-import { AuthState } from "@/types/authTypes";
-import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
-
-import { logger } from "@/utils/logger";
+import { supabase } from '@/integrations/supabase/client';
+import type { AuthState } from '@/types/authTypes';
+import { useNavigate } from 'react-router-dom';
 export const useSignOut = (setAuthState: React.Dispatch<React.SetStateAction<AuthState>>) => {
   const navigate = useNavigate();
-  
-  const signOut = async () => {
-    try {
-      setAuthState((prev) => ({ ...prev, isLoading: true }));
-      
-      logger.log("Odhlašování uživatele");
-      
-      // Odstraníme pouze lokálního uživatele (statistiky zůstávají)
-      localStorage.removeItem('localUser');
-      
-      // Aktualizujeme stav
-      setAuthState({
-        user: null,
-        profile: null,
-        isLoading: false,
-        isAuthenticated: false,
-        error: null
-      });
-      
-      toast.success("Uživatel byl odhlášen");
-      
-      // Přesměrujeme na výběr uživatele
-      navigate('/select-user');
-    } catch (error: any) {
-      console.error("Chyba při odhlášení:", error);
-      setAuthState((prev) => ({
-        ...prev,
-        isLoading: false,
-        error: error.message || "Chyba při odhlášení",
-      }));
-      toast.error(`Chyba při odhlášení: ${error.message || "Neznámá chyba"}`);
-    }
-  };
-
-  return { signOut };
+  return { signOut: async () => {
+    const { error } = await supabase.auth.signOut({ scope: 'local' });
+    if (error) { setAuthState(prev => ({ ...prev, isLoading: false, error: 'Odhlášení se nezdařilo. Zkus to znovu.' })); return; }
+    localStorage.removeItem('localUser');
+    setAuthState({ mode: 'local', user: null, profile: null, isLoading: false, isAuthenticated: false, error: null });
+    navigate('/select-user');
+  } };
 };
+

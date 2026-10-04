@@ -1,0 +1,18 @@
+name: Learning checks
+on: [push, pull_request]
+jobs:
+  learning:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint:learning
+      - run: npm test
+      - run: npm run test:database
+      - run: npm run content:generate && git diff --exit-code -- supabase/migrations/20261004090100_learning_content.sql
+      - run: npm run build

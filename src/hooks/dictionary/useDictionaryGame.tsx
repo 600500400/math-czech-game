@@ -236,6 +236,9 @@ export const useDictionaryGame = (userId: string | null) => {
     setGameState(prev => ({ ...prev, source }));
   }, []);
 
+  const setShowStatsDialog = (showStatsDialog: boolean) => setGameState(prev => ({ ...prev, showStatsDialog }));
+  const setShowSentences = (showSentences: boolean) => setGameState(prev => ({ ...prev, showSentences }));
+
   return {
     ...gameState,
     startGame,

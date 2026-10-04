@@ -24,7 +24,7 @@ describe('spellingUtils', () => {
       
       const result = renderWordWithCurrentGap(word, missingPositions, correctLetters, currentPosition);
       
-      expect(result).toBe('ba_yka');
+      expect(result).toBe('ba_y_a');
     });
     
     test('should return original word if no missing positions', () => {

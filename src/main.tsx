@@ -1,48 +1,12 @@
-
-import { createRoot } from 'react-dom/client'
-import App from './App.tsx'
-import './index.css'
-import { APP_VERSION } from './utils/version'
-import { pwaUpdater } from './utils/pwaUpdater'
-
-import { logger } from "@/utils/logger";
-// Initialize versioning and PWA updater
-APP_VERSION.initializeVersioning();
-
-// Automatická kontrola verzí při načtení
-setTimeout(() => {
-  logger.log('🚀 Checking for app updates on startup...');
-  pwaUpdater.checkForUpdates();
-}, 3000); // Delay pro lepší startup performance
-
-// Initialize optional PWA features lazily
-const requestIdle = (cb: () => void) => {
-  if ('requestIdleCallback' in window) {
-    (window as any).requestIdleCallback(cb);
-  } else {
-    setTimeout(cb, 0);
-  }
-};
-
-// Initialize performance optimizations
-requestIdle(() => {
-  // Preload critical images
-  const criticalImages = [
-    '/images/happy-kid.png',
-    '/images/stars.png', 
-    '/images/try-again.png'
-  ];
-  
-  criticalImages.forEach(src => {
-    const img = new Image();
-    img.src = src;
+import { createRoot } from 'react-dom/client';
+import App from './App.tsx';
+import './index.css';
+createRoot(document.getElementById('root')!).render(<App/>);
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    void navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' }).catch(() => {
+      // Online lessons still work if the browser does not permit offline caching.
+    });
   });
-});
+}
 
-createRoot(document.getElementById("root")!).render(<App />);
-
-// Lazy-initialize non-critical features after initial render
-requestIdle(() => {
-  import('./utils/webVitals'); // Initialize Web Vitals monitoring
-  import('./utils/offlineManager'); // Initialize offline manager
-});

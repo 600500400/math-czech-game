@@ -9,7 +9,7 @@ describe('useGameUI', () => {
     const { result } = renderHook(() => useGameUI());
     
     expect(result.current.showProblem).toBe(false);
-    expect(result.current.problemCount).toBe(10);
+    expect(result.current.problemCount).toBe(0);
   });
 
   test('should toggle showProblem state', () => {
@@ -32,7 +32,7 @@ describe('useGameUI', () => {
     expect(result.current.problemCount).toBe(5);
   });
 
-  test('resetGame should reset problemCount to 10', () => {
+  test('resetGame should reset the answered problem count to 0', () => {
     const { result } = renderHook(() => useGameUI());
     
     // First set to different value
@@ -45,6 +45,6 @@ describe('useGameUI', () => {
     act(() => {
       result.current.resetGame();
     });
-    expect(result.current.problemCount).toBe(10);
+    expect(result.current.problemCount).toBe(0);
   });
 });

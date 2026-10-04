@@ -33,7 +33,7 @@ describe('WordProblemDialog', () => {
   test('should render phrase indicator when isPhrase is true', () => {
     render(<WordProblemDialog {...defaultProps} isPhrase={true} />);
     
-    expect(screen.getByText('Spojení')).toBeInTheDocument();
+    expect(screen.getByText('· věta')).toBeInTheDocument();
   });
 
   test('should call handleAnswerI when I button is clicked', async () => {
@@ -58,7 +58,7 @@ describe('WordProblemDialog', () => {
     const user = userEvent.setup();
     render(<WordProblemDialog {...defaultProps} />);
     
-    await user.click(screen.getByText('⏸️ Přestávka'));
+    await user.click(screen.getByRole('button', { name: 'Ukončit' }));
     
     expect(defaultProps.onEndGame).toHaveBeenCalledTimes(1);
   });

@@ -8,6 +8,7 @@ export interface User {
 }
 
 export interface AuthState {
+  mode?: 'local' | 'cloud';
   user: User | null;
   profile: UserProfile | null;
   isAuthenticated: boolean;

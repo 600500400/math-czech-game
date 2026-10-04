@@ -11,7 +11,6 @@ export const useSignUp = (setAuthState: React.Dispatch<React.SetStateAction<Auth
       setAuthState((prev) => ({ ...prev, isLoading: true, error: null }));
       
       // Clean up existing state
-      cleanupAuthState();
 
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -19,12 +18,15 @@ export const useSignUp = (setAuthState: React.Dispatch<React.SetStateAction<Auth
         options: {
           data: {
             username,
+            full_name: username,
             role
           },
         },
       });
 
       if (error) throw error;
+
+      setAuthState(prev => ({ ...prev, isLoading: false }));
 
       toast.success("Registrace úspěšná! Můžete se přihlásit.");
       return;

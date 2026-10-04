@@ -1,43 +1,21 @@
-
-import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-import { cleanupAuthState, attemptGlobalSignOut, forcePageReload } from "@/utils/authUtils";
-import { AuthState } from "@/types/authTypes";
-
-export const useSignIn = (setAuthState: React.Dispatch<React.SetStateAction<AuthState>>) => {
-  const signIn = async (email: string, password: string) => {
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import type { AuthState } from '@/types/authTypes';
+import { stateForSession } from '../useAuthState';
+export const useSignIn = (setAuthState: React.Dispatch<React.SetStateAction<AuthState>>) => ({
+  signIn: async (email: string, password: string) => {
+    setAuthState(prev => ({ ...prev, isLoading: true, error: null }));
     try {
-      setAuthState((prev) => ({ ...prev, isLoading: true, error: null }));
-      
-      // Clean up existing state
-      cleanupAuthState();
-      
-      // Attempt global sign out
-      await attemptGlobalSignOut(supabase);
-
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
-
-      if (data.user) {
-        toast.success("Přihlášení úspěšné");
-        // Force reload for clean state
-        forcePageReload('/');
-      }
-    } catch (error: any) {
-      console.error("Sign in error:", error);
-      setAuthState((prev) => ({
-        ...prev,
-        isLoading: false,
-        error: error.message || "Chyba při přihlášení",
-      }));
-      toast.error(error.message || "Chyba při přihlášení");
+      if (!data.session) throw new Error('Přihlášení nebylo potvrzené.');
+      localStorage.removeItem('localUser');
+      setAuthState(stateForSession(data.session));
+      toast.success('Přihlášení úspěšné');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Přihlášení se nezdařilo.';
+      setAuthState(prev => ({ ...prev, isLoading: false, error: message })); toast.error(message);
     }
-  };
+  },
+});
 
-  return { signIn };
-};

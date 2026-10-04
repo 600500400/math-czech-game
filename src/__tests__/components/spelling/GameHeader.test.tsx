@@ -3,16 +3,17 @@ import { render, screen } from '@testing-library/react';
 import { describe, test, expect } from 'vitest';
 import '@testing-library/jest-dom';
 import { GameHeader } from '@/components/spelling/GameHeader';
+import { t } from '@/hooks/useLanguage';
 
 describe('GameHeader', () => {
   test('should render with all information', () => {
     render(<GameHeader problemCount={10} correctAnswers={5} wrongAnswers={2} />);
     
     // Check title
-    expect(screen.getByText('Procvičování vyjmenovaných slov')).toBeInTheDocument();
+    expect(screen.getByText(t('practice.practiceSpelling'))).toBeInTheDocument();
     
     // Check problem count
-    expect(screen.getByText('Počet slov:')).toBeInTheDocument();
+    expect(screen.getByText(`${t('practice.total')}:`)).toBeInTheDocument();
     expect(screen.getByText('10')).toBeInTheDocument();
     
     // Check correct answers

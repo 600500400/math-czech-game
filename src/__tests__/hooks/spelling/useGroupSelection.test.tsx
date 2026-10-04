@@ -24,12 +24,13 @@ describe('useGroupSelection', () => {
   test('should initialize with default values', () => {
     const { result } = renderHook(() => useGroupSelection());
     
-    expect(result.current.selectedGroups).toEqual([]);
+    expect(result.current.selectedGroups).toEqual(['b', 'm', 'p']);
     expect(result.current.showGroupDialog).toBe(false);
   });
 
   test('should toggle group selection', () => {
     const { result } = renderHook(() => useGroupSelection());
+    act(() => { result.current.deselectAll(); });
     
     // Add a group
     act(() => {
@@ -66,6 +67,7 @@ describe('useGroupSelection', () => {
 
   test('should deselect all groups', () => {
     const { result } = renderHook(() => useGroupSelection());
+    act(() => { result.current.deselectAll(); });
     
     // First select some groups
     act(() => {

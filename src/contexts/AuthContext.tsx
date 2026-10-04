@@ -9,7 +9,7 @@ export interface AuthContextType {
   signUp: (email: string, password: string, username: string, role?: 'child' | 'parent' | 'teacher') => Promise<void>;
   signOut: () => Promise<void>;
   cleanupAuthState: () => void;
-  setLocalUser: (user: { id: string, username: string, role: string }) => void;
+  setLocalUser: (user: { id: string, username: string, role: string }) => Promise<void>;
 }
 
 // Default context values
@@ -25,7 +25,7 @@ const defaultContext: AuthContextType = {
   signUp: async () => {},
   signOut: async () => {},
   cleanupAuthState: () => {},
-  setLocalUser: () => {},
+  setLocalUser: async () => {},
 };
 
 // Create the auth context

@@ -1,0 +1,2 @@
+import { SubjectCards } from './Shell';
+export default function PracticeHub() { return <><div className="learn-page-heading"><div><p className="learn-eyebrow">Uč se svým tempem</p><h1>Co si procvičíme?</h1><p>Vyber předmět. Délku a obtížnost nastavíš před začátkem lekce.</p></div></div><SubjectCards/><div className="learn-tip">Všechny lekce můžeš pozastavit a později dokončit. Rozpracovaná lekce zůstane na tomto zařízení.</div></>; }
