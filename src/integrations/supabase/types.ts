@@ -235,6 +235,123 @@ export type Database = {
         }
         Relationships: []
       }
+      learning_badges: {
+        Row: {
+          awarded_at: string
+          badge_id: string
+          learner_id: string
+          owner_id: string
+        }
+        Insert: {
+          awarded_at: string
+          badge_id: string
+          learner_id: string
+          owner_id: string
+        }
+        Update: {
+          awarded_at?: string
+          badge_id?: string
+          learner_id?: string
+          owner_id?: string
+        }
+        Relationships: []
+      }
+      learning_content: {
+        Row: {
+          content_id: string
+          payload: Json
+          subject: string
+        }
+        Insert: {
+          content_id: string
+          payload: Json
+          subject: string
+        }
+        Update: {
+          content_id?: string
+          payload?: Json
+          subject?: string
+        }
+        Relationships: []
+      }
+      learning_daily_rewards: {
+        Row: {
+          activity_date: string
+          learner_id: string
+          owner_id: string
+          task_key: string
+        }
+        Insert: {
+          activity_date: string
+          learner_id: string
+          owner_id: string
+          task_key: string
+        }
+        Update: {
+          activity_date?: string
+          learner_id?: string
+          owner_id?: string
+          task_key?: string
+        }
+        Relationships: []
+      }
+      learning_sessions: {
+        Row: {
+          activity_date: string
+          completed_at: string
+          learner_id: string
+          owner_id: string
+          payload: Json
+          session_id: string
+          subject: string
+          xp: number
+        }
+        Insert: {
+          activity_date: string
+          completed_at: string
+          learner_id: string
+          owner_id: string
+          payload: Json
+          session_id: string
+          subject: string
+          xp: number
+        }
+        Update: {
+          activity_date?: string
+          completed_at?: string
+          learner_id?: string
+          owner_id?: string
+          payload?: Json
+          session_id?: string
+          subject?: string
+          xp?: number
+        }
+        Relationships: []
+      }
+      learning_words: {
+        Row: {
+          content_id: string
+          learner_id: string
+          owner_id: string
+          payload: Json
+          updated_at: string
+        }
+        Insert: {
+          content_id: string
+          learner_id: string
+          owner_id: string
+          payload: Json
+          updated_at?: string
+        }
+        Update: {
+          content_id?: string
+          learner_id?: string
+          owner_id?: string
+          payload?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       math_answers: {
         Row: {
           correct_answer: number
@@ -516,6 +633,10 @@ export type Database = {
     }
     Functions: {
       calculate_xp_for_level: { Args: { level_num: number }; Returns: number }
+      complete_learning_session: { Args: { p_session: Json }; Returns: Json }
+      get_learning_badges: { Args: { p_learner_id: string }; Returns: Json }
+      get_learning_sessions: { Args: { p_learner_id: string }; Returns: Json }
+      learning_normalize: { Args: { value: string }; Returns: string }
       update_user_level: {
         Args: { p_user_id: string; p_xp_gained: number }
         Returns: {
