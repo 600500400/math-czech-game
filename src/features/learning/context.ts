@@ -7,7 +7,11 @@ export interface LearningContextValue {
   cloud: boolean;
   storageError: string | null;
   syncError: string | null;
+  syncNotice?: string|null;
   syncing: boolean;
+  unsaved?: boolean;
+  conflict?: boolean;
+  resolveConflict?: (useRemote:boolean) => void;
   start: (session: LessonSession) => void;
   dispatch: (id: string, action: LessonAction) => void;
   savePreferences: (preferences: Partial<Preferences>) => void;

@@ -1,5 +1,7 @@
 # Procvička: implementace po auditu
 
+Aktualizace 7. 10. 2026: rodinné cloudové profily, rodičovská oprávnění, párování dětských zařízení a synchronizace rozpracovaných lekcí jsou implementované. Aktuální model, skutečné nasazení tří migrací, zachování historie a zbývající nastavení SMTP popisuje [FAMILY-ACCOUNTS.md](FAMILY-ACCOUNTS.md). Nový model nahrazuje níže uvedený původní předpoklad jednoho výukového profilu na přihlášení; odměny stále potvrzuje serverová transakce, nyní se zámkem výukového profilu.
+
 Datum: 4. 10. 2026. Výchozí commit: `fbe6ee2cd7c7b72d795cbe8a569b0696b89046fb`.
 
 ## Co aplikace nyní používá
@@ -66,6 +68,8 @@ V rámci implementace byly migrace provedeny a otestovány v izolovaném Postgre
 Samostatně zbývá ověření skutečného přihlášení v uživatelském rozhraní, cloudové synchronizace ze dvou prohlížečů a obnovení exportu na testovacím účtu. Test rolí v SQL nepředstavuje ověření OAuth nebo celého přihlašovacího průchodu v prohlížeči.
 
 ## Znalostní záznam a navazující práce
+
+Návrh z 6. 10. 2026 na rodinné cloudové profily, Google/e-mail, rodičovský přehled a automatické ukládání je v [FAMILY-ACCOUNTS.md](FAMILY-ACCOUNTS.md). Jde o návrh další etapy, nikoli již nasazenou rodinnou autorizaci. Veřejné nastavení Supabase potvrzuje zapnutý Google a e-mail, vypnutý Facebook a Apple; úspěšný průchod Google zatím nebyl ověřen.
 
 Zachovat celé osobní studijní slovníky, starší výsledky a XP. Místní dětská jména nejsou cloudové účty. Nové herní stránky nemají používat staré hooks `useMathGame`, `useSpellingGame` nebo `useDictionaryGame`; obsah a reducer v této složce jsou nyní společné místo změn. Po změně schváleného obsahu znovu generovat SQL, upravit jeho verzi bezpečně vůči rozpracovaným lekcím a rozšířit regresní testy.
 

@@ -8,6 +8,7 @@ import { dictionaryWords, englishTask, filterWords } from './dictionary';
 import { summarize } from './session';
 import { subjects } from './catalog';
 import { useAuth } from '@/hooks/useAuth';
+import { useFamily } from './family-context';
 import type { LessonSession, Operation, Preferences, Source, Subject, Task } from './types';
 
 const now = () => new Date().toISOString();
@@ -21,13 +22,14 @@ function PauseDialog({ session }: { session: LessonSession }) {
 
 export default function Practice({ subject }: { subject: Subject }) {
   const { authState } = useAuth();
+  const family = useFamily();
   const { data, learnerId, cloud, start, dispatch, savePreferences } = useLearning();
   const meta = subjects.find(s=>s.id===subject)!;
   const [selectedId,setSelectedId] = useState<string | null>(null);
   const session = data.sessions.find(s=>s.id===selectedId) || data.sessions.find(s=>s.subject===subject&&s.status==='active');
   const sessionId=session?.id;
   useEffect(() => { if(sessionId && selectedId!==sessionId) setSelectedId(sessionId); },[sessionId,selectedId]);
-  const [draft,setDraft] = useState<Preferences>(()=>({ ...data.preferences, math: { ...data.preferences.math, operations: [...data.preferences.math.operations] }, groups: [...data.preferences.groups], englishSource: data.preferences.englishSource || (['gabi','misa','ada'].includes(learnerId) || (authState.profile?.role==='child'&&learnerId!=='host')?'school':'personal') }));
+  const [draft,setDraft] = useState<Preferences>(()=>({ ...data.preferences, math: { ...data.preferences.math, operations: [...data.preferences.math.operations] }, groups: [...data.preferences.groups], englishSource: data.preferences.englishSource || (family.active?.kind==='child'||(!family.active&&(['gabi','misa','ada'].includes(learnerId) || (authState.profile?.role==='child'&&learnerId!=='host')))?'school':'personal') }));
   const [error,setError] = useState(''); const [answer,setAnswer] = useState(''); const [speechMessage,setSpeechMessage] = useState('');
   const input = useRef<HTMLInputElement>(null); const nextButton = useRef<HTMLButtonElement>(null); const heading = useRef<HTMLHeadingElement>(null); const firstChoice = useRef<HTMLButtonElement>(null);
   const words = useMemo(()=>dictionaryWords(data.words),[data.words]);

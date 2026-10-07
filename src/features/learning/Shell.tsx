@@ -4,13 +4,16 @@ import { BookOpen, Home, ChartNoAxesCombined, UserRound, Sun, Moon, Cloud, HardD
 import { useAuth } from '@/hooks/useAuth';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useLearning } from './context';
+import { useFamily } from './family-context';
 import { levelProgress, streak } from './rewards';
 
 import { subjects } from './catalog';
 const links = [{ to: '/', label: 'Domů', icon: Home }, { to: '/practice', label: 'Procvičovat', icon: BookOpen }, { to: '/statistiky', label: 'Pokrok', icon: ChartNoAxesCombined }, { to: '/profil', label: 'Profil', icon: UserRound }];
 export default function Shell() {
   const { authState } = useAuth();
-  const { data, cloud, storageError, syncError, retrySync, syncing } = useLearning();
+  const { data, cloud, storageError, syncError, syncNotice, retrySync, syncing, unsaved, conflict, resolveConflict } = useLearning();
+  const family=useFamily();const own=family.profiles.find(p=>p.access==='self');
+  const hasChildren=family.profiles.some(p=>p.access==='guardian');
   const { effectiveTheme, toggleTheme } = useTheme();
   const [online, setOnline] = useState(navigator.onLine);
   useEffect(() => { const change = () => setOnline(navigator.onLine); window.addEventListener('online',change); window.addEventListener('offline',change); return () => { window.removeEventListener('online',change); window.removeEventListener('offline',change); }; },[]);
@@ -25,14 +28,17 @@ export default function Shell() {
     {!focused && <header className="learn-header"><div className="learn-header-inner">
       <Link className="learn-brand" to="/" aria-label="Procvička – domů"><span className="learn-brand-mark">p<span>·</span></span>procvička<span className="brand-caption">Malé kroky, velké objevy.</span></Link>
       <nav className="learn-desktop-nav" aria-label="Hlavní navigace">{links.map(({ to, label, icon: Icon }) => <NavLink end={to === '/'} key={to} to={to}><Icon size={19} aria-hidden="true"/>{label}</NavLink>)}</nav>
-      <div className="learn-header-actions"><button className="learn-icon-button" onClick={toggleTheme} aria-label={effectiveTheme === 'dark' ? 'Zapnout světlý vzhled' : 'Zapnout tmavý vzhled'}>{effectiveTheme === 'dark' ? <Sun size={21}/> : <Moon size={21}/>}</button><Link className="learn-avatar" to="/profil" aria-label="Otevřít svůj profil">{(authState.profile?.full_name || authState.user?.username || 'H').charAt(0)}</Link></div>
+      <div className="learn-header-actions"><button className="learn-icon-button" onClick={toggleTheme} aria-label={effectiveTheme === 'dark' ? 'Zapnout světlý vzhled' : 'Zapnout tmavý vzhled'}>{effectiveTheme === 'dark' ? <Sun size={21}/> : <Moon size={21}/>}</button><Link className="learn-avatar" to="/profil" aria-label="Otevřít svůj profil">{(family.active?.name || authState.profile?.full_name || authState.user?.username || 'H').charAt(0)}</Link></div>
     </div></header>}
     <main id="learning-content" className="learn-main" tabIndex={-1}>
+      {cloud&&family.active&&<div className="learn-notice family-context"><strong>Procvičuje: {family.active.name}</strong>{own&&own.id!==family.active.id&&<Link to="/children" onClick={()=>family.select(own.id)}>Zpět k rodiči</Link>}{own&&own.id===family.active.id&&<Link to="/children">{hasChildren?'Moje děti':'Přidat dítě'}</Link>}</div>}
+      {conflict&&<div className="learn-notice" role="alert"><span>Na jiném zařízení je jiná rozpracovaná lekce. Vyber, ve které pokračovat. Místní kopii zachováme pro obnovu.</span><button onClick={()=>resolveConflict?.(true)}>Použít lekci z cloudu</button><button onClick={()=>resolveConflict?.(false)}>Pokračovat na tomto zařízení</button></div>}
       {!online && <div className="learn-notice" role="status">Jsi offline. V lekci můžeš pokračovat; výsledky zůstávají na tomto zařízení.</div>}
       {(storageError || syncError) && <div className="learn-notice" role="status"><span>{storageError || syncError}</span>{syncError && <button onClick={() => void retrySync()} disabled={syncing}>Zkusit znovu</button>}<Link to="/profil">Záloha</Link></div>}
       <Outlet/>
+      {syncNotice&&<div className="learn-notice" role="status"><span>{syncNotice}</span><Link to="/statistiky">Zobrazit zachované odpovědi</Link></div>}
     </main>
-    {!focused && <><footer className="learn-footer"><span>{cloud ? <Cloud size={16}/> : <HardDrive size={16}/>} {cloud ? syncing ? 'Ukládáme do účtu…' : data.sessions.some(s => s.sync === 'pending') ? 'Čeká na uložení do účtu' : 'Přihlášený účet' : 'Místní profil · výsledky na tomto zařízení'}</span><span>Úroveň {progress.level} · {total} XP · série {streak(data.sessions)} dnů</span></footer><nav className="learn-mobile-nav" aria-label="Hlavní navigace">{links.map(({ to, label, icon: Icon }) => <NavLink end={to === '/'} key={to} to={to}><Icon size={22} aria-hidden="true"/><span>{label}</span></NavLink>)}</nav></>}
+    {!focused && <><footer className="learn-footer"><span>{cloud ? <Cloud size={16}/> : <HardDrive size={16}/>} {cloud ? syncing ? 'Ukládáme do účtu…' : unsaved ? online ? 'Čeká na uložení do účtu' : 'Čeká na připojení' : 'Uloženo v účtu' : authState.mode==='cloud' ? 'Připojujeme zařízení' : 'Vyzkoušení · výsledky na tomto zařízení'}</span><span>Úroveň {progress.level} · {total} XP · série {streak(data.sessions)} dnů</span></footer><nav className="learn-mobile-nav" aria-label="Hlavní navigace">{links.map(({ to, label, icon: Icon }) => <NavLink end={to === '/'} key={to} to={to}><Icon size={22} aria-hidden="true"/><span>{label}</span></NavLink>)}</nav></>}
   </div>;
 }
 export function SubjectCards() {
