@@ -2,6 +2,12 @@
 
 ## Implementováno 7. 10. 2026
 
+### Oprava veřejného Google přihlášení večer 7. 10. 2026
+
+Skutečná publikovaná adresa je `https://math-czech-game.lovable.app`. Supabase měl stále Site URL a jedinou povolenou návratovou adresu na neexistující `preview--math-czech-practice-48.lovable.app`; nepovolený produkční návrat proto skončil na chybě Lovable. Site URL je nyní skutečná adresa aplikace a allowlist obsahuje přesně její `/` a `/auth`. Zastaralá adresa byla odebraná. Google byl následně skutečně dokončen z veřejné aplikace a po návratu se zobrazil přihlášený účet. [Doklad nastavení](evidence/google-redirect-fixed.png).
+
+Veřejná verze v době této kontroly stále zobrazovala původní Account UI (Google/Facebook/Apple), tedy předchozí vydání. Rodinné změny jsou na GitHubu a v Supabase, ale jejich frontend musí uživatel zveřejnit přes Publish v Lovable. Presetové profily na `/select-user` jsou místní režim; nejsou automaticky cloudovými dětmi a jejich pouhá přítomnost neposkytuje cloudová oprávnění. Jejich historii nemažeme.
+
 Tato část popisuje skutečnou implementaci. Níže zachovaný návrh z 6. a 7. října je historický podklad, nikoli aktuální seznam chyb či nasazených funkcí.
 
 - Každý nový uživatel se přihlásí a začíná vlastním procvičováním. Nevybírá věk, roli ani název rodiny. Rodič přidá dítě zadáním jména; v „Moje děti“ může otevřít jeho pokrok nebo procvičovat jako dítě. Vlastní učení rodiče zůstává samostatné.
