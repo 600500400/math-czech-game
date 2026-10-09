@@ -4,13 +4,14 @@ import { learningCloud } from './cloud';
 import { useFamily } from './family-context';
 import type { LessonSession } from './types';
 import { supabase } from '@/integrations/supabase/client';
+import PairingCode from './PairingCode';
 
 export default function Children() {
  const family=useFamily();const navigate=useNavigate();const children=family.profiles.filter(p=>p.access==='guardian');
  const [name,setName]=useState('');const [error,setError]=useState('');const [busy,setBusy]=useState(false);
  const [existingCode,setExistingCode]=useState('');const [waiting,setWaiting]=useState(false);
  const [results,setResults]=useState<Record<string,{sessions:LessonSession[];xp:number}>>({});
- const [code,setCode]=useState<{name:string;value:string;expires:string}|null>(null);
+ const [code,setCode]=useState<{learnerId:string;value:string;expires:string}|null>(null);
  const [requests,setRequests]=useState<{id:string;learner_id:string;requested_by:string|null}[]>([]);
  const [devices,setDevices]=useState<{account_id:string;learner_id:string;role:string}[]>([]);
  const ids=children.map(p=>p.id).join(',');
@@ -45,12 +46,13 @@ export default function Children() {
   const stats=results[child.id];const finished=stats?.sessions.filter(s=>s.status==='completed')||[];
   return <section className="learn-panel" key={child.id}><h2>{child.name}</h2><p>{stats?`${finished.length} dokončených lekcí · ${stats.xp} XP`:'Načítáme výsledky…'}</p>
    <div className="learn-actions"><button className="learn-button primary" onClick={()=>{family.select(child.id);navigate('/');}}>Procvičovat jako {child.name}</button><button className="learn-button secondary" onClick={()=>{family.select(child.id);navigate('/statistiky');}}>Podrobné výsledky</button></div>
-   <button className="learn-text-button" disabled={busy} onClick={()=>void action(async()=>{const {data,error}=await learningCloud.rpc('issue_learner_invite',{p_learner_id:child.id});if(error)throw error;const invite=data as unknown as {code:string;expires_at:string};setCode({name:child.name,value:invite.code,expires:invite.expires_at});})}>Připojit vlastní mobil nebo PC</button>
+   <button className="learn-button secondary" disabled={busy} onClick={()=>void action(async()=>{const {data,error}=await learningCloud.rpc('issue_learner_invite',{p_learner_id:child.id});if(error)throw error;const invite=data as unknown as {code:string;expires_at:string};setCode({learnerId:child.id,value:invite.code,expires:invite.expires_at});})}>Vytvořit kód pro dítě</button>
+   <p className="learn-muted">Kód připojí mobil nebo PC dítěte k tomuto profilu.</p>
+   {code?.learnerId===child.id&&<div className="learn-panel"><h3>Kód pro {child.name}</h3><PairingCode key={code.value} code={code.value} expires={code.expires}/><p>Na zařízení dítěte otevři Přihlásit se → Mám kód od rodiče. Připoj zařízení bez účtu nebo přes Google dítěte a zadej kód. Pak zde potvrď žádost.</p><button className="learn-text-button" onClick={()=>setCode(null)}>Skrýt kód</button></div>}
    {requests.filter(r=>r.learner_id===child.id).map(request=><div className="learn-notice" key={request.id}><span>Nové zařízení žádá přístup k profilu {child.name}. Potvrď pouze zařízení, na kterém jsi právě zadal/a kód.</span>{[true,false].map(approve=><button key={String(approve)} disabled={busy} onClick={()=>void action(async()=>{const {error}=await learningCloud.rpc('approve_learner_access',{p_invite_id:request.id,p_approve:approve});if(error)throw error;})}>{approve?'Povolit':'Odmítnout'}</button>)}</div>)}
    {devices.filter(d=>d.learner_id===child.id).map((device,index)=><div className="learn-history" key={device.account_id}><span>Připojený účet {index+1}</span><button className="learn-text-button" disabled={busy} onClick={()=>void action(async()=>{const {error}=await learningCloud.rpc('revoke_learner_access',{p_learner_id:child.id,p_account_id:device.account_id});if(error)throw error;})}>Odebrat přístup</button></div>)}
   </section>;
  })}</div>
- {code&&<section className="learn-panel" role="status"><h2>Připojit zařízení: {code.name}</h2><p>Na novém zařízení otevři Procvičku, zvol „Mám kód od rodiče“, zvol připojení bez účtu (nebo Google či e-mail dítěte) a zadej:</p><strong className="family-code">{code.value}</strong><p>Platí do {new Date(code.expires).toLocaleTimeString('cs-CZ',{hour:'2-digit',minute:'2-digit'})}. Potom zde potvrď žádost. Rodičovské přihlášení se na dětské zařízení nepřenáší.</p><button className="learn-text-button" onClick={()=>setCode(null)}>Skrýt kód</button></section>}
  <form className="learn-panel" onSubmit={e=>{e.preventDefault();void action(async()=>{const {error}=await learningCloud.rpc('add_child',{p_name:name.trim()});if(error)throw error;setName('');await family.refresh();});}}><h2>Přidat dítě</h2><label>Jméno dítěte<input value={name} onChange={e=>setName(e.target.value)} required maxLength={60} autoComplete="off"/></label><button className="learn-button primary" type="submit" disabled={busy||!name.trim()}>Přidat dítě</button><p className="learn-muted">Dítě nemusí mít vlastní účet. Na tomto zařízení může procvičovat hned.</p></form>
  <details className="learn-panel"><summary>Dítě již má vlastní účet</summary><p>V účtu dítěte otevři Profil → Propojit tento profil s rodičem. Zadej jeho kód. Dítě potom potvrdí přístup. Dosavadní výsledky zůstanou u stejného profilu.</p><form onSubmit={e=>{e.preventDefault();void action(async()=>{const {error}=await learningCloud.rpc('request_learner_access',{p_code:existingCode,p_purpose:'guardian'});if(error)throw error;setWaiting(true);});}}><label>Kód z účtu dítěte<input required maxLength={16} value={existingCode} onChange={e=>setExistingCode(e.target.value)}/></label><button className="learn-button secondary" disabled={busy}>Požádat o propojení</button>{waiting&&<p role="status">Čekáme na potvrzení v účtu dítěte. Přehled se automaticky obnovuje.</p>}</form></details>
  {error&&<p className="learn-error" role="alert">{error}</p>}</>;

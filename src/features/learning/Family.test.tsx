@@ -9,6 +9,7 @@ import { useLearning } from './context';
 import Children from './Children';
 import Practice from './Practice';
 import Account from './Account';
+import ConnectParent from './ConnectParent';
 import { storageKey } from './storage';
 
 const mock=vi.hoisted(()=>({profiles:[] as LearnerProfile[],draft:null as null|{learner_id:string;revision:number;payload:unknown},rpc:vi.fn(),signInWithOtp:vi.fn(),verifyOtp:vi.fn(),signInWithOAuth:vi.fn(),signInAnonymously:vi.fn()}));
@@ -42,4 +43,27 @@ it('offers Google and passwordless email without inactive providers or role sele
 it('allows a child device to request pairing without Google or email',async()=>{
  render(<MemoryRouter><AuthContext.Provider value={{...auth,authState:{...auth.authState,mode:'local',user:null}}}><Account/></AuthContext.Provider></MemoryRouter>);
  fireEvent.click(screen.getByRole('button',{name:'Mám kód od rodiče'}));fireEvent.click(screen.getByRole('button',{name:'Připojit zařízení bez Google a e-mailu'}));await waitFor(()=>expect(mock.signInAnonymously).toHaveBeenCalled());expect(sessionStorage.getItem('procvicka:pair')).toBe('true');
+});
+it('generates a device code next to the selected child and keeps it separate from siblings',async()=>{
+ mock.profiles=[own,child,{...child,id:'sibling',name:'Míša'}];
+ const original=mock.rpc.getMockImplementation()!;
+ mock.rpc.mockImplementation(async(name,args)=>name==='issue_learner_invite'?{error:null,data:{code:'ABCDEF123456',expires_at:'2026-10-09T12:00:00Z'}}:original(name,args));
+ mount(<Children/>);await screen.findByRole('heading',{name:'Gábi'});
+ fireEvent.click(screen.getAllByRole('button',{name:'Vytvořit kód pro dítě'})[0]);
+ await screen.findByText('ABCDEF123456');expect(mock.rpc).toHaveBeenCalledWith('issue_learner_invite',{p_learner_id:'child'});
+ expect(screen.getByRole('heading',{name:'Kód pro Gábi'})).toBeInTheDocument();expect(screen.queryByRole('heading',{name:'Kód pro Míša'})).not.toBeInTheDocument();
+ fireEvent.click(screen.getByRole('button',{name:'Skrýt kód'}));expect(screen.queryByText('ABCDEF123456')).not.toBeInTheDocument();
+});
+it('offers a visible parent-link code and preserves the existing learner identity',async()=>{
+ const original=mock.rpc.getMockImplementation()!;
+ mock.rpc.mockImplementation(async(name,args)=>name==='issue_learner_invite'?{error:null,data:{code:'123456ABCDEF',expires_at:'2026-10-09T12:00:00Z'}}:original(name,args));
+ mount(<ConnectParent/>);fireEvent.click(await screen.findByRole('button',{name:'Vytvořit kód pro rodiče'}));
+ await screen.findByText('123456ABCDEF');expect(mock.rpc).toHaveBeenCalledWith('issue_learner_invite',{p_learner_id:'parent',p_purpose:'guardian'});
+ expect(screen.getByRole('button',{name:'Kopírovat kód'})).toBeInTheDocument();expect(mock.rpc).not.toHaveBeenCalledWith('add_child',expect.anything());
+});
+it('shows a failed code generation and allows retry instead of displaying a fake code',async()=>{
+ const original=mock.rpc.getMockImplementation()!;
+ mock.rpc.mockImplementation(async(name,args)=>name==='issue_learner_invite'?{error:{message:'Připojení se nezdařilo.'},data:null}:original(name,args));
+ mount(<ConnectParent/>);fireEvent.click(await screen.findByRole('button',{name:'Vytvořit kód pro rodiče'}));
+ await screen.findByText('Připojení se nezdařilo.');expect(screen.getByRole('button',{name:'Vytvořit kód pro rodiče'})).toBeEnabled();expect(screen.queryByRole('button',{name:'Kopírovat kód'})).not.toBeInTheDocument();
 });

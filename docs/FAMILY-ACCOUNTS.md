@@ -2,6 +2,14 @@
 
 ## Implementováno 7. 10. 2026
 
+### Revize dostupnosti kódů 9. 10. 2026
+
+Veřejná `/profil` stále zobrazovala původní „Ukládání a záloha“ bez „Moje děti“: frontend rodinného modelu nebyl publikovaný. Nová verze zpřístupňuje „Vytvořit kód pro rodiče“ přímo v profilu, bez rozbalovací nabídky. Rodič má na kartě dítěte tlačítko „Vytvořit kód pro dítě“; výsledek se ukazuje u dané karty, nikoli až pod celým seznamem. Oba kódy mají kopírování a instrukce včetně následného schválení. Stávající účet s historií se propojuje pozvánkou pro rodiče, prázdné zařízení kódem od rodiče. Izolované UI testy ověřují oba účely, správné ID dítěte a chybu při generování. Celkem 72 testů, typecheck, lint:learning, test:database i build prošly. Publikaci v Lovable stále provádí uživatel.
+
+Skutečné vygenerování kódu a jeho kopírování bylo následně ověřeno v prohlížeči na lokálním novém frontendu proti produkčnímu Supabase, bez udělení přístupu dalšímu účtu. Celé párování dvou skutečných zařízení tím není ručně ověřené.
+
+Hlášené mihotající se okno „AI analýza“ se v aktuálním zdrojovém kódu Procvičky nenachází. K cílené reprodukci je nutná adresa aplikace a konkrétní ovládací prvek; neupravujeme naslepo všechny dialogy.
+
 ### Oprava veřejného Google přihlášení večer 7. 10. 2026
 
 Skutečná publikovaná adresa je `https://math-czech-game.lovable.app`. Supabase měl stále Site URL a jedinou povolenou návratovou adresu na neexistující `preview--math-czech-practice-48.lovable.app`; nepovolený produkční návrat proto skončil na chybě Lovable. Site URL je nyní skutečná adresa aplikace a allowlist obsahuje přesně její `/` a `/auth`. Zastaralá adresa byla odebraná. Google byl následně skutečně dokončen z veřejné aplikace a po návratu se zobrazil přihlášený účet. [Doklad nastavení](evidence/google-redirect-fixed.png).
